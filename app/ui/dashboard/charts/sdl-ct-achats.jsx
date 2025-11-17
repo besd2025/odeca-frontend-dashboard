@@ -62,11 +62,11 @@ const charDataByPeriod = {
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    color: "var(--chart-1)",
+    color: "var(--chart-2)",
   },
   mobile: {
     label: "Mobile",
-    color: "var(--chart-2)",
+    color: "var(--chart-5)",
   },
 };
 
@@ -94,56 +94,7 @@ export function ChartLineAchats() {
         </Tabs>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          {/* <LineChart
-            accessibilityLayer
-            data={charDataByPeriod[period]}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey={
-                period === "jour"
-                  ? "time"
-                  : period === "semaine"
-                  ? "day"
-                  : period === "mois"
-                  ? "month"
-                  : "year"
-              }
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => {
-                if (
-                  period === "jour" ||
-                  period === "semaine" ||
-                  period === "annee"
-                ) {
-                  return value;
-                }
-                return value.slice(0, 3);
-              }}
-            />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Line
-              dataKey="desktop"
-              type="monotone"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              dataKey="mobile"
-              type="monotone"
-              stroke="var(--color-mobile)"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart> */}
+        <ChartContainer config={chartConfig}  className="aspect-auto h-[300px] w-full" >
           <AreaChart
             accessibilityLayer
             data={charDataByPeriod[period]}

@@ -107,7 +107,7 @@ export function ChartPieSdlCtActive() {
         <ChartContainer
           id={id}
           config={chartConfig}
-          className="mx-auto aspect-square w-full max-w-[300px]"
+          className="mx-auto aspect-auto w-full aspect-auto h-[300px]  max-w-[300px]"
         >
           <PieChart>
             <ChartTooltip
