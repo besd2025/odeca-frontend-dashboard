@@ -1,4 +1,4 @@
-import DashboardContainer from "@/app/ui/dashboard";
+import DashboardContainer from "@/app/ui/dashboard/home";
 import React from "react";
 
 function page() {

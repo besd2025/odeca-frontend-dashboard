@@ -35,43 +35,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 // This is sample data.
 const menuItems = {
   navMain: [
     {
       title: "Tableau de bord",
-      url: "#",
-      icon: IconDashboard,
-      keyword: "odeca-dashboard",
-    },
-    {
-      title: "Station de lavage",
-      url: "#",
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="icon icon-tabler icons-tabler-outline icon-tabler-building-warehouse size-12"
-        >
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <path d="M3 21v-13l9 -4l9 4v13" />
-          <path d="M13 13h4v8h-10v-6h6" />
-          <path d="M13 21v-9a1 1 0 0 0 -1 -1h-2a1 1 0 0 0 -1 1v3" />
-        </svg>
-      ),
-      keyword: "odeca-washing-station",
-    },
-    {
-      title: "Centre de transit",
-      url: "#",
+      url: "/odeca-dashboard/home",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -79,20 +50,20 @@ const menuItems = {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="size-12"
+          className="size-6"
         >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"
+            d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
           />
         </svg>
       ),
-      keyword: "odeca-transit-center",
+      keyword: "odeca-dashboard/home",
     },
     {
       title: "Cultivateurs",
-      url: "#",
+      url: "/odeca-dashboard/cultivators",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -111,6 +82,49 @@ const menuItems = {
       ),
       keyword: "cultivators",
     },
+    {
+      title: "Station de lavage",
+      url: "#",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="size-6"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"
+          />
+        </svg>
+      ),
+      keyword: "odeca-washing-station",
+    },
+    {
+      title: "Centre de transit",
+      url: "/odeca-dashboard/home",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="size-6"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"
+          />
+        </svg>
+      ),
+      keyword: "odeca-transit-center",
+    },
+
     {
       title: "Stocks",
       url: "#",
@@ -163,15 +177,17 @@ export function AppSidebar({ ...props }) {
                 // component/function, render it normally.
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton tooltip={item.title} isActive={active}>
-                      {item.icon &&
-                        (React.isValidElement(item.icon) ? (
-                          React.cloneElement(item.icon)
-                        ) : (
-                          <item.icon className="size-12" />
-                        ))}
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
+                    <Link href={item.url} className="flex items-center gap-3">
+                      <SidebarMenuButton tooltip={item.title} isActive={active}>
+                        {item.icon &&
+                          (React.isValidElement(item.icon) ? (
+                            React.cloneElement(item.icon)
+                          ) : (
+                            <item.icon className="size-6" />
+                          ))}
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                    </Link>
                   </SidebarMenuItem>
                 );
               })}

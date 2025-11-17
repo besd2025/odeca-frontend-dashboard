@@ -13,7 +13,7 @@ export default function Layout({ children }) {
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        {children}
+        <div className="p-/4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

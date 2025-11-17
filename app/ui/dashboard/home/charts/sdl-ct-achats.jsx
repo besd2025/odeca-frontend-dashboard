@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { TrendingUp } from "lucide-react";
-import { AreaChart, CartesianGrid, Area, LineChart, XAxis } from "recharts";
+import { AreaChart, CartesianGrid, Area, XAxis } from "recharts";
 
 import {
   Card,
@@ -25,48 +24,48 @@ export const description = "A multiple line chart";
 // Données pour différentes périodes
 const charDataByPeriod = {
   jour: [
-    { time: "00:00", desktop: 40, mobile: 24 },
-    { time: "04:00", desktop: 30, mobile: 13 },
-    { time: "08:00", desktop: 20, mobile: 98 },
-    { time: "12:00", desktop: 27, mobile: 39 },
-    { time: "16:00", desktop: 20, mobile: 20 },
-    { time: "20:00", desktop: 30, mobile: 35 },
-    { time: "23:59", desktop: 10, mobile: 26 },
+    { time: "00:00", ceriseA: 40, ceriseB: 24 },
+    { time: "04:00", ceriseA: 30, ceriseB: 13 },
+    { time: "08:00", ceriseA: 20, ceriseB: 98 },
+    { time: "12:00", ceriseA: 27, ceriseB: 39 },
+    { time: "16:00", ceriseA: 20, ceriseB: 20 },
+    { time: "20:00", ceriseA: 30, ceriseB: 35 },
+    { time: "23:59", ceriseA: 10, ceriseB: 26 },
   ],
   semaine: [
-    { day: "Lun", desktop: 186, mobile: 80 },
-    { day: "Mar", desktop: 305, mobile: 200 },
-    { day: "Mer", desktop: 237, mobile: 120 },
-    { day: "Jeu", desktop: 73, mobile: 190 },
-    { day: "Ven", desktop: 209, mobile: 130 },
-    { day: "Sam", desktop: 214, mobile: 140 },
-    { day: "Dim", desktop: 150, mobile: 100 },
+    { day: "Lun", ceriseA: 186, ceriseB: 80 },
+    { day: "Mar", ceriseA: 305, ceriseB: 200 },
+    { day: "Mer", ceriseA: 237, ceriseB: 120 },
+    { day: "Jeu", ceriseA: 73, ceriseB: 190 },
+    { day: "Ven", ceriseA: 209, ceriseB: 130 },
+    { day: "Sam", ceriseA: 214, ceriseB: 140 },
+    { day: "Dim", ceriseA: 150, ceriseB: 100 },
   ],
   mois: [
-    { month: "January", desktop: 186, mobile: 80 },
-    { month: "February", desktop: 305, mobile: 200 },
-    { month: "March", desktop: 237, mobile: 120 },
-    { month: "April", desktop: 73, mobile: 190 },
-    { month: "May", desktop: 209, mobile: 130 },
-    { month: "June", desktop: 214, mobile: 140 },
+    { month: "January", ceriseA: 186, ceriseB: 80 },
+    { month: "February", ceriseA: 305, ceriseB: 200 },
+    { month: "March", ceriseA: 237, ceriseB: 120 },
+    { month: "April", ceriseA: 73, ceriseB: 190 },
+    { month: "May", ceriseA: 209, ceriseB: 130 },
+    { month: "June", ceriseA: 214, ceriseB: 140 },
   ],
   annee: [
-    { year: "2020", desktop: 1000, mobile: 500 },
-    { year: "2021", desktop: 1500, mobile: 800 },
-    { year: "2022", desktop: 1800, mobile: 900 },
-    { year: "2023", desktop: 2100, mobile: 1200 },
-    { year: "2024", desktop: 2500, mobile: 1400 },
+    { year: "2020", ceriseA: 1000, ceriseB: 500 },
+    { year: "2021", ceriseA: 1500, ceriseB: 800 },
+    { year: "2022", ceriseA: 1800, ceriseB: 900 },
+    { year: "2023", ceriseA: 2100, ceriseB: 1200 },
+    { year: "2024", ceriseA: 2500, ceriseB: 1400 },
   ],
 };
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--chart-2)",
-  },
-  mobile: {
-    label: "Mobile",
+  ceriseA: {
+    label: "Cerise A",
     color: "var(--chart-5)",
+  },
+  ceriseB: {
+    label: "Cerise B",
+    color: "var(--secondary)",
   },
 };
 
@@ -94,7 +93,10 @@ export function ChartLineAchats() {
         </Tabs>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}  className="aspect-auto h-[300px] w-full" >
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[300px] w-full"
+        >
           <AreaChart
             accessibilityLayer
             data={charDataByPeriod[period]}
@@ -133,42 +135,42 @@ export function ChartLineAchats() {
               <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="var(--color-ceriseA)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="var(--color-ceriseA)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
               <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--color-ceriseB)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--color-ceriseB)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
             </defs>
             <Area
-              dataKey="mobile"
+              dataKey="ceriseB"
               type="natural"
               fill="url(#fillMobile)"
               fillOpacity={0.4}
-              stroke="var(--color-mobile)"
+              stroke="var(--color-ceriseB)"
               stackId="a"
             />
             <Area
-              dataKey="desktop"
+              dataKey="ceriseA"
               type="natural"
               fill="url(#fillDesktop)"
               fillOpacity={0.4}
-              stroke="var(--color-desktop)"
+              stroke="var(--color-ceriseA)"
               stackId="a"
             />
           </AreaChart>
