@@ -1,8 +1,7 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartColumn, List } from "lucide-react";
-import CultivatorsListTable from "@/app/ui/dashboard/cultivators/list";
-import ProfilePage from "@/app/ui/dashboard/cultivators/profile/ProfilePage";
+import SdlsListTable from "@/app/ui/dashboard/sdl/list";
 
 function page() {
   return (
@@ -19,8 +18,10 @@ function page() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="list">
-          <h1 className="text-2xl font-semibold m-2">Liste des cultivateurs</h1>
-          <CultivatorsListTable />
+          <h1 className="text-2xl font-semibold m-2">
+            Liste des Station de Lavage
+          </h1>
+          <SdlsListTable />
         </TabsContent>
         <TabsContent value="details">En cours...</TabsContent>
       </Tabs>

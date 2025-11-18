@@ -70,7 +70,7 @@ export default function Edit({
     <Dialog open={open} onOpenChange={setOpen}>
       <form onSubmit={handleSubmit}>
         <DialogTrigger asChild>
-          <Button variant="ghost">
+          <Button variant="secondary">
             <SquarePen />
             Modifier
           </Button>

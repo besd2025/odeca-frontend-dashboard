@@ -8,15 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ArrowUpDownIcon,
-  MoreHorizontal,
-  Rows2,
-  Rows3,
-  Rows4,
-  Search,
-} from "lucide-react";
+import { ArrowUpDownIcon, MoreHorizontal, Phone, Search } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -62,59 +54,30 @@ import Filter from "../filter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Edit from "../edit";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 const data = [
   {
-    id: "cultivator_001",
-    cultivator: {
-      cultivator_code: "2530-522-7545",
+    id: "sdl_001",
+    sdl: {
+      sdl_code: "2530-522-7545",
+      sdl_name: "Brave",
+      type: "SDL",
+    },
+    society: "ODECA",
+    responsable: {
       first_name: "Brave",
       last_name: "Eddy",
-      image_url: "/images/logo_1.jpg",
+      telephone: 78451202,
     },
-    sdl_ct: "NGome",
-    society: "ODECA",
     localite: {
       province: "Buja",
       commune: "Ntahangwa",
     },
-    champs: 4,
-  },
-  {
-    id: "cultivator_002",
-    cultivator: {
-      cultivator_code: "2530-522-7545",
-      first_name: "jaa",
-      last_name: "Eddy",
-      image_url: "/images/logo_1.jpg",
-    },
-    sdl_ct: "aa",
-    society: "ODECA",
-    localite: {
-      province: "Buja",
-      commune: "Ntahangwa",
-    },
-    champs: 4,
-  },
-  {
-    id: "cultivator_003",
-    cultivator: {
-      cultivator_code: "2530-56833",
-      first_name: "yoo",
-      last_name: "Eddy",
-      image_url: "/images/logo_1.jpg",
-    },
-    sdl_ct: "NGome",
-    society: "ODECA",
-    localite: {
-      province: "Buja",
-      commune: "Ntahangwa",
-    },
-    champs: 4,
   },
 ];
 
-export default function CultivatorsListTable() {
+export default function SdlsListTable() {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -125,7 +88,7 @@ export default function CultivatorsListTable() {
       enableHiding: false,
       header: "Actions",
       cell: ({ row }) => {
-        const cultivator = row.original;
+        const sdl = row.original;
 
         return (
           <DropdownMenu>
@@ -140,25 +103,20 @@ export default function CultivatorsListTable() {
                 Actions
               </DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    cultivator.cultivator.cultivator_code
-                  )
-                }
+                onClick={() => navigator.clipboard.writeText(sdl.sdl.sdl_code)}
               >
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <Link href="/odeca-dashboard/cultivators/profile">Profile</Link>
+                <Link href="/odeca-dashboard/sdls/profile">Details</Link>
               </DropdownMenuItem>
               <div>
                 <Edit
-                  cultivator={cultivator.cultivator}
-                  sdl_ct={cultivator.sdl_ct}
-                  society={cultivator.society}
-                  localite={cultivator.localite}
-                  champs={cultivator.champs}
+                  sdl={sdl.sdl}
+                  responsable={sdl.responsable}
+                  society={sdl.society}
+                  localite={sdl.localite}
                 />
               </div>
             </DropdownMenuContent>
@@ -167,62 +125,56 @@ export default function CultivatorsListTable() {
       },
     },
     {
-      accessorKey: "cultivator",
+      accessorKey: "sdl",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Cafeiculteur
+            SDL
             <ArrowUpDownIcon />
           </Button>
         );
       },
       filterFn: (row, columnId, filterValue) => {
-        const cultivator = row.original.cultivator;
+        const sdl = row.original.sdl;
         if (!filterValue) return true;
         const search = filterValue.toLowerCase();
         return (
-          cultivator.first_name.toLowerCase().includes(search) ||
-          cultivator.last_name.toLowerCase().includes(search) ||
-          cultivator.cultivator_code.toLowerCase().includes(search)
+          sdl.sdl_name.toLowerCase().includes(search) ||
+          sdl.sdl_code.toLowerCase().includes(search)
         );
       },
       cell: ({ row }) => {
-        const cultivators = row.original.cultivator;
+        const sdls = row.original.sdl;
         return (
           <div className="flex items-center gap-3">
-            <ViewImageDialog
-              imageUrl={cultivators.image_url}
-              alt={`${cultivators.last_name} ${cultivators.first_name}`}
-            />
-            <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="size-6"
+            >
+              <path
+                fillRule="evenodd"
+                d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
+                clipRule="evenodd"
+              />
+            </svg>
+
+            <div className="relative">
               <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                {cultivators.last_name} {cultivators.first_name}
+                {sdls.sdl_name}
               </span>
-              <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                {cultivators.cultivator_code}
+              <span className="block text-gray-500 text-theme-xs dark:text-gray-400 mt-2">
+                {sdls.sdl_code}
               </span>
+              <Badge className="absolute top-0 right-0 text-xs">SDL</Badge>
             </div>
           </div>
         );
       },
-    },
-    {
-      accessorKey: "sdl_ct",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            SDL/CT
-            <ArrowUpDownIcon />
-          </Button>
-        );
-      },
-      cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
     },
     {
       accessorKey: "society",
@@ -254,13 +206,22 @@ export default function CultivatorsListTable() {
       },
     },
     {
-      accessorKey: "champs",
-      header: "Champs",
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">
-          {row.getValue("champs")}
-        </div>
-      ),
+      accessorKey: "responsable",
+      header: "Responsable",
+      cell: ({ row }) => {
+        const responsable = row.original.responsable;
+        return (
+          <div className="text-sm flex flex-col gap-y-1">
+            <span>
+              {responsable?.first_name} {responsable?.last_name}
+            </span>
+            <span className="flex flex-row gap-x-2 text-accent-foreground/70">
+              <Phone size={18} />
+              {responsable?.telephone}
+            </span>
+          </div>
+        );
+      },
     },
   ];
 
@@ -290,9 +251,9 @@ export default function CultivatorsListTable() {
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
           <Input
             placeholder="Rechercher..."
-            value={table.getColumn("cultivator")?.getFilterValue() ?? ""}
+            value={table.getColumn("sdl")?.getFilterValue() ?? ""}
             onChange={(event) =>
-              table.getColumn("cultivator")?.setFilterValue(event.target.value)
+              table.getColumn("sdl")?.setFilterValue(event.target.value)
             }
             className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
           />
@@ -304,8 +265,8 @@ export default function CultivatorsListTable() {
           </div>
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
-            //   onClickExportButton={exportCultivatorsToExcel}
-            //   onClickDownloadButton={DownloadCultivatorsToExcel}
+            //   onClickExportButton={exportSdlsToExcel}
+            //   onClickDownloadButton={DownloadSdlsToExcel}
             //   loading={loadingEportBtn}
             //   activedownloadBtn={activedownloadBtn}
             />

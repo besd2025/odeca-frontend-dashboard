@@ -1,17 +1,24 @@
+"use client";
 import React, { useEffect, useState } from "react";
-// import LoadingDots from "../loading/loading_dots";
+import Image from "next/image";
 
-const ViewImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
+import { cn } from "@/lib/utils";
+
+// Fullscreen dialog that shows the large image.
+// This is kept internal and used by the main exported component below.
+const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
   const [zoom, setZoom] = useState(1);
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [rotation, setRotation] = useState(0);
 
   useEffect(() => {
     if (!isOpen) return;
     setImageError(false);
     setIsLoading(true);
+    setZoom(1);
+    setRotation(0);
   }, [imageUrl, isOpen]);
-  const [rotation, setRotation] = useState(0);
 
   if (!isOpen) return null;
 
@@ -29,24 +36,35 @@ const ViewImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
     setIsLoading(false);
   };
 
+  const handleBackdropClick = () => {
+    onClose();
+    handleReset();
+  };
+
+  const stopPropagation = (event) => {
+    event.stopPropagation();
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-999999">
-      <div className="relat/ive max-w-full max-h-full p-4">
-        {(isLoading || !imageUrl) && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center">
-            {/* <div
-              className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-white"
-              role="status"
-              aria-label="Loading image"
-            /> */}
-            {/* <LoadingDots /> */}
+    <div
+      className="fixed inset-0 z-9999 flex items-center justify-center bg-black/80"
+      onClick={handleBackdropClick}
+    >
+      <div
+        className="rel/ative max-w-full max-h-full p-4"
+        onClick={stopPropagation}
+      >
+        {(isLoading || !imageUrl) && !imageError && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center text-white/70">
+            Chargement de l&apos;image...
           </div>
         )}
-        {/* Zoom controls */}
-        <div className="absolute top-12 left-12 flex gap-2 z-10">
+
+        {/* Zoom & rotate controls */}
+        <div className="absolute top-12 left-12 z-10 flex gap-2">
           <button
             onClick={handleZoomOut}
-            className="bg-white/20 backdrop-blur-sm text-white transition-colors hover:bg-white/30 rounded-full w-8 h-8 flex items-center justify-center focus:outline-none"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
             aria-label="Zoom out"
             type="button"
           >
@@ -54,15 +72,15 @@ const ViewImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
           </button>
           <button
             onClick={handleReset}
-            className="bg-white/20 backdrop-blur-sm text-white transition-colors hover:bg-white/30 rounded-full w-8 h-8 flex items-center justify-center focus:outline-none"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
             aria-label="Reset zoom"
             type="button"
           >
-            {zoom}x
+            {zoom.toFixed(2)}x
           </button>
           <button
             onClick={handleZoomIn}
-            className="bg-white/20 backdrop-blur-sm text-white transition-colors hover:bg-white/30 rounded-full w-8 h-8 flex items-center justify-center focus:outline-none"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
             aria-label="Zoom in"
             type="button"
           >
@@ -70,7 +88,7 @@ const ViewImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
           </button>
           <button
             onClick={handleRotation}
-            className="bg-white/20 backdrop-blur-sm text-white transition-colors hover:bg-white/30 rounded-full w-8 h-8 flex items-center justify-center focus:outline-none"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
             aria-label="Rotate"
             type="button"
           >
@@ -80,7 +98,7 @@ const ViewImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-6"
+              className="size-5"
             >
               <path
                 strokeLinecap="round"
@@ -90,12 +108,14 @@ const ViewImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
             </svg>
           </button>
         </div>
+
+        {/* Close button */}
         <button
           onClick={() => {
             onClose();
             handleReset();
           }}
-          className="absolute right-12 top-12 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white transition-colors hover:bg-white/30 focus:outline-none"
+          className="absolute right-12 top-12 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
           aria-label="Close"
         >
           <svg
@@ -114,21 +134,74 @@ const ViewImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
           </svg>
         </button>
 
-        <img
-          src={imageUrl}
-          alt={alt || "Image"}
-          onLoad={handleImageLoad}
-          onError={handleImageError}
-          style={{
-            transform: `rotate(${rotation}deg) scale(${zoom})`,
-            transition: "transform 0.2s",
-            display: isLoading ? "none" : "block",
-          }}
-          className="max-w-[90vw] max-h-[80vh] w-auto h-auto rounded shadow-lg object-contain mx-auto"
-        />
+        {!imageError && (
+          <img
+            src={imageUrl}
+            alt={alt || "Image"}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            style={{
+              transform: `rotate(${rotation}deg) scale(${zoom})`,
+              transition: "transform 0.2s",
+              display: isLoading ? "none" : "block",
+            }}
+            className="mx-auto h-auto max-h-[80vh] w-auto max-w-[90vw] rounded shadow-lg object-contain"
+          />
+        )}
+
+        {imageError && (
+          <div className="flex min-h-[200px] items-center justify-center text-sm text-red-100">
+            Impossible de charger l&apos;image.
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default ViewImageModal;
+/**
+ * Main reusable component.
+ *
+ * Usage:
+ * <ViewImageDialog imageUrl="/path/to/image.jpg" alt="Avatar" />
+ *
+ * - Renders a small rounded-full image.
+ * - When clicked, opens the fullscreen modal above.
+ */
+const ViewImageDialog = ({
+  imageUrl,
+  alt = "Image",
+  className = "",
+  fallbackUrl = "/img/blank-profile.png",
+  profile = true,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const src = imageUrl || fallbackUrl;
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        className={cn(
+          profile ? "rounded-full" : "rounded",
+          "relative h-10 w-10 overflow-hidden  border border-border bg-muted",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          className
+        )}
+      >
+        <Image src={src} alt={alt} fill sizes="40px" className="object-cover" />
+      </button>
+
+      <FullscreenImageModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        imageUrl={src}
+        alt={alt}
+      />
+    </>
+  );
+};
+
+export default ViewImageDialog;
