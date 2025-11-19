@@ -25,11 +25,11 @@ export function SectionCards() {
             <div className="bg-primary p-2 rounded-md">
               <Archive className="text-white" />
             </div>
-            <CardTitle className="text-3xl @[250px]/card:text-4xl font-semibold tracking-tight tabular-nums">
-              60 194,59 <span className="text-lg">T</span>
+            <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
+              60 194,59 <span className="text-base">T</span>
             </CardTitle>
           </div>
-          <CardTitle className="text-xl font-semibold tabular-nums  ">
+          <CardTitle className="text-lg font-semibold tabular-nums  ">
             Qte collectee
           </CardTitle>
           {/* <CardAction>
@@ -73,11 +73,11 @@ export function SectionCards() {
             <div className="bg-secondary p-2 rounded-md">
               <ShoppingCart className="text-white" />
             </div>
-            <CardTitle className="text-3xl @[250px]/card:text-4xl font-semibold tracking-tight tabular-nums">
-              20 194,59 <span className="text-lg">T</span>
+            <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
+              20 194,59 <span className="text-base">T</span>
             </CardTitle>
           </div>
-          <CardTitle className="text-xl font-semibold tabular-nums  ">
+          <CardTitle className="text-lg font-semibold tabular-nums  ">
             Qte Vendues
           </CardTitle>
           {/* <CardAction>
@@ -126,7 +126,7 @@ export function SectionCards() {
             </CardTitle>
           </div>
           <CardTitle className="text-3xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-            60 194 559 456 <span className="text-lg">FBU</span>
+            60 194 559 456 <span className="text-base">FBU</span>
           </CardTitle>
 
           <div className="flex flex-row gap-x-2 items-center">
@@ -139,7 +139,7 @@ export function SectionCards() {
             </CardTitle>
           </div>
           <CardTitle className="text-3xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-            60 194 559 456 <span className="text-lg">FBU</span>
+            60 194 559 456 <span className="text-base">FBU</span>
           </CardTitle>
           {/* <CardAction>
             <Badge variant="secondary">

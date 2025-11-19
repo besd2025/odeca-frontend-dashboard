@@ -16,19 +16,19 @@ import {
 
 function StatsCard({ icon: Icon, value, label }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <Card className="@container/card">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-primary p-2 rounded-md">
               <Archive className="text-white" />
             </div>
-            <CardTitle className="text-3xl @[250px]/card:text-4xl font-semibold tracking-tight tabular-nums">
-              60 194,59 <span className="text-lg">T</span>
+            <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
+              60 194,59 <span className="text-base">T</span>
             </CardTitle>
           </div>
-          <CardTitle className="text-xl font-semibold tabular-nums  ">
-            Qte Vendue
+          <CardTitle className="text-lg font-semibold tabular-nums  ">
+            Qte Vendue (CA+CB)
           </CardTitle>
           {/* <CardAction>
             <Badge variant="secondary">
@@ -38,7 +38,7 @@ function StatsCard({ icon: Icon, value, label }) {
           </CardAction> */}
         </CardHeader>
         <CardFooter className="flex flex-row items-center justify-between text-sm ">
-          <div className="text-muted-foreground">Qte totale (CA+CB)</div>
+          {/* <div className="text-muted-foreground">Qte totale (CA+CB)</div> */}
           <div className="ml-2 flex flex-col gap-y-1">
             <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
               <div className="flex flex-row gap-x-1 items-center">
@@ -76,7 +76,7 @@ function StatsCard({ icon: Icon, value, label }) {
             </CardTitle>
           </div>
           <CardTitle className="text-3xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-            60 194 559 456 <span className="text-lg">FBU</span>
+            60 194 559 456 <span className="text-base">FBU</span>
           </CardTitle>
           <div className="mt-3">
             <div className="flex flex-row gap-x-2 items-center">
@@ -87,7 +87,7 @@ function StatsCard({ icon: Icon, value, label }) {
               </CardTitle>
             </div>
             <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
-              559 456 <span className="text-lg">FBU</span>
+              559 456 <span className="text-base">FBU</span>
             </CardTitle>
           </div>
         </CardHeader>

@@ -1,12 +1,6 @@
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+"use client";
+
+import * as React from "react";
 import {
   Table,
   TableBody,
@@ -15,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import ViewImageDialog from "@/components/ui/view-image-dialog";
+import PaginationControls from "@/components/ui/pagination-controls";
 
 const products = [
   {
@@ -43,6 +37,23 @@ const products = [
 ];
 
 export default function EditHistory() {
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(10);
+
+  const totalItems = products.length;
+  const totalPages = Math.max(Math.ceil(totalItems / pageSize), 1);
+
+  React.useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  const paginatedProducts = React.useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return products.slice(start, start + pageSize);
+  }, [page, pageSize]);
+
   return (
     <div className="w-full">
       <div className="w-full border rounded-md overflow-hidden">
@@ -59,7 +70,7 @@ export default function EditHistory() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => (
+            {paginatedProducts.map((product) => (
               <TableRow key={product.id} className="odd:bg-muted/50">
                 <TableCell className="pl-4">{product.id}</TableCell>
                 <TableCell className="font-medium">{product.date}</TableCell>
@@ -76,30 +87,20 @@ export default function EditHistory() {
         </Table>
       </div>
 
-      <Pagination className="mt-4">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#" isActive>
-              2
-            </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">3</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <PaginationControls
+        className="mt-4"
+        page={page}
+        pageSize={pageSize}
+        totalItems={totalItems}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPage(1);
+          setPageSize(size);
+        }}
+        hasNextPage={page < totalPages}
+        hasPreviousPage={page > 1}
+      />
     </div>
   );
 }

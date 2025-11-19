@@ -61,7 +61,7 @@ const menuItems = {
       keyword: "odeca-dashboard/home",
     },
     {
-      title: "Cultivateurs",
+      title: "Cafeiculteurs",
       url: "/odeca-dashboard/cultivators",
       icon: (
         <svg

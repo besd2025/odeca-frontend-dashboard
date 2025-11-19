@@ -30,13 +30,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import ExportButton from "@/components/ui/export_button";
-import Filter from "../filter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
-import Edit from "../edit";
 import Link from "next/link";
+import EditAchats from "./edit-achats";
 import PaginationControls from "@/components/ui/pagination-controls";
 
-export default function CultivatorsListTable({ data, isCultivatorsPage }) {
+export default function Achats({ data, isCultivatorsPage }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -79,12 +78,17 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
               <div>
-                <Edit
+                <EditAchats
                   cultivator={cultivator.cultivator}
                   sdl_ct={cultivator.sdl_ct}
                   society={cultivator.society}
                   localite={cultivator.localite}
-                  champs={cultivator.champs}
+                  num_fiche={cultivator.num_fiche}
+                  num_recu={cultivator.num_recu}
+                  ca={cultivator.ca}
+                  cb={cultivator.cb}
+                  date={cultivator.date}
+                  photo_fiche={cultivator.photo_fiche}
                 />
               </div>
             </DropdownMenuContent>
@@ -189,12 +193,75 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
       },
     },
     {
-      accessorKey: "champs",
-      header: "Champs",
+      accessorKey: "num_fiche",
+      header: "No Fiche",
       cell: ({ row }) => (
         <div className="text-center font-semibold">
-          {row.getValue("champs")}
+          {row.getValue("num_fiche")}
         </div>
+      ),
+    },
+    {
+      accessorKey: "num_recu",
+      header: "No Recus",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          {row.getValue("num_recu")}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "ca",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            CA
+            <ArrowUpDownIcon />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">{row.getValue("ca")}</div>
+      ),
+    },
+    {
+      accessorKey: "cb",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            CB
+            <ArrowUpDownIcon />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">{row.getValue("cb")}</div>
+      ),
+    },
+    {
+      accessorKey: "photo_fiche",
+      header: "Fiche",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          <ViewImageDialog
+            imageUrl={row.getValue("photo_fiche")}
+            alt={`photo_fiche`}
+            profile={false}
+          />
+        </div>
+      ),
+    },
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">{row.getValue("date")}</div>
       ),
     },
   ];
@@ -221,7 +288,7 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
   });
 
   return (
-    <div className="w-full bg-sidebar p-2 rounded-lg">
+    <div className="w-full bg-sidebar  rounded-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
         <div className="relative ">
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
@@ -236,9 +303,6 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
         </div>
 
         <div className="flex flex-row justify-between gap-x-3">
-          <div className="flex items-center gap-3">
-            <Filter />
-          </div>
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
             //   onClickExportButton={exportCultivatorsToExcel}

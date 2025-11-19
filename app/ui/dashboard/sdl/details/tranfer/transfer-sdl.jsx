@@ -30,13 +30,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import ExportButton from "@/components/ui/export_button";
-import Filter from "../filter";
-import ViewImageDialog from "@/components/ui/view-image-dialog";
-import Edit from "../edit";
 import Link from "next/link";
+import EditTransfers from "./edit-tranfers";
+import ViewImageDialog from "@/components/ui/view-image-dialog";
 import PaginationControls from "@/components/ui/pagination-controls";
 
-export default function CultivatorsListTable({ data, isCultivatorsPage }) {
+export default function TransferSdlDep({ data }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -51,7 +50,7 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
       enableHiding: false,
       header: "Actions",
       cell: ({ row }) => {
-        const cultivator = row.original;
+        const transfer = row.original;
 
         return (
           <DropdownMenu>
@@ -68,23 +67,24 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
               <DropdownMenuItem
                 onClick={() =>
                   navigator.clipboard.writeText(
-                    cultivator.cultivator.cultivator_code
+                    `${transfer.from_sdl} -> ${transfer.to_depulpeur_name}`
                   )
                 }
               >
-                Copier code
+                Copier trajet
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <Link href="/odeca-dashboard/cultivators/profile">
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
               <div>
-                <Edit
-                  cultivator={cultivator.cultivator}
-                  sdl_ct={cultivator.sdl_ct}
-                  society={cultivator.society}
-                  localite={cultivator.localite}
-                  champs={cultivator.champs}
+                <EditTransfers
+                  from_sdl={transfer.from_sdl}
+                  to_depulpeur_name={transfer.to_depulpeur_name}
+                  society={transfer.society}
+                  localite={transfer.localite}
+                  qte_tranferer={transfer.qte_tranferer}
+                  photo_fiche={transfer.photo_fiche}
                 />
               </div>
             </DropdownMenuContent>
@@ -93,89 +93,58 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
       },
     },
     {
-      accessorKey: "cultivator",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Cafeiculteur
-            <ArrowUpDownIcon />
-          </Button>
-        );
-      },
+      accessorKey: "from_sdl",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          SDL Source
+          <ArrowUpDownIcon />
+        </Button>
+      ),
       filterFn: (row, columnId, filterValue) => {
-        const cultivator = row.original.cultivator;
         if (!filterValue) return true;
+        const source = row.original.from_sdl ?? "";
+        const target = row.original.to_depulpeur_name ?? "";
         const search = filterValue.toLowerCase();
         return (
-          cultivator.first_name.toLowerCase().includes(search) ||
-          cultivator.last_name.toLowerCase().includes(search) ||
-          cultivator.cultivator_code.toLowerCase().includes(search)
+          source.toLowerCase().includes(search) ||
+          target.toLowerCase().includes(search)
         );
       },
-      cell: ({ row }) => {
-        const cultivators = row.original.cultivator;
-        return (
-          <div className="flex items-center gap-3">
-            <ViewImageDialog
-              imageUrl={cultivators.image_url}
-              alt={`${cultivators.last_name} ${cultivators.first_name}`}
-            />
-            <div>
-              <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                {cultivators.last_name} {cultivators.first_name}
-              </span>
-              <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                {cultivators.cultivator_code}
-              </span>
-            </div>
-          </div>
-        );
-      },
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("from_sdl")}</div>
+      ),
     },
-    ...(isCultivatorsPage
-      ? [
-          {
-            accessorKey: "sdl_ct",
-            header: ({ column }) => {
-              return (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  SDL/CT
-                  <ArrowUpDownIcon />
-                </Button>
-              );
-            },
-            cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
-          },
-          {
-            accessorKey: "society",
-            header: ({ column }) => {
-              return (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  Société
-                  <ArrowUpDownIcon />
-                </Button>
-              );
-            },
-            cell: ({ row }) => (
-              <div className="font-medium">{row.getValue("society")}</div>
-            ),
-          },
-        ]
-      : []),
-
+    {
+      accessorKey: "to_depulpeur_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Dépulpeur
+          <ArrowUpDownIcon />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("to_depulpeur_name")}</div>
+      ),
+    },
+    {
+      accessorKey: "society",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Société
+          <ArrowUpDownIcon />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("society")}</div>,
+    },
     {
       id: "localite",
       header: "Localité",
@@ -189,11 +158,37 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
       },
     },
     {
-      accessorKey: "champs",
-      header: "Champs",
+      id: "ca",
+      header: "CA transféré (kg)",
       cell: ({ row }) => (
         <div className="text-center font-semibold">
-          {row.getValue("champs")}
+          {row.original.qte_tranferer?.ca ?? 0}
+        </div>
+      ),
+    },
+    {
+      id: "cb",
+      header: "CB transféré (kg)",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          {row.original.qte_tranferer?.cb ?? 0}
+        </div>
+      ),
+    },
+    {
+      id: "photo_fiche",
+      header: "Fiche",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          {row.original.photo_fiche ? (
+            <ViewImageDialog
+              imageUrl={row.original.photo_fiche}
+              alt="Photo fiche"
+              profile={false}
+            />
+          ) : (
+            "-"
+          )}
         </div>
       ),
     },
@@ -221,24 +216,21 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
   });
 
   return (
-    <div className="w-full bg-sidebar p-2 rounded-lg">
+    <div className="w-full bg-sidebar rounded-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
         <div className="relative ">
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
           <Input
             placeholder="Rechercher..."
-            value={table.getColumn("cultivator")?.getFilterValue() ?? ""}
+            value={table.getColumn("from_sdl")?.getFilterValue() ?? ""}
             onChange={(event) =>
-              table.getColumn("cultivator")?.setFilterValue(event.target.value)
+              table.getColumn("from_sdl")?.setFilterValue(event.target.value)
             }
             className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
           />
         </div>
 
         <div className="flex flex-row justify-between gap-x-3">
-          <div className="flex items-center gap-3">
-            <Filter />
-          </div>
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
             //   onClickExportButton={exportCultivatorsToExcel}

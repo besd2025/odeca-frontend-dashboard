@@ -23,15 +23,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Table,
   TableBody,
   TableCell,
@@ -41,20 +32,12 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import ExportButton from "@/components/ui/export_button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import Filter from "../filter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Edit from "../edit";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import PaginationControls from "@/components/ui/pagination-controls";
 
 const data = [
   {
@@ -82,6 +65,10 @@ export default function SdlsListTable() {
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const columns = [
     {
       id: "actions",
@@ -108,9 +95,9 @@ export default function SdlsListTable() {
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Link href="/odeca-dashboard/sdls/profile">Details</Link>
-              </DropdownMenuItem>
+              <Link href="/odeca-dashboard/sdl/details">
+                <DropdownMenuItem>Details</DropdownMenuItem>
+              </Link>
               <div>
                 <Edit
                   sdl={sdl.sdl}
@@ -236,11 +223,13 @@ export default function SdlsListTable() {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
 
@@ -328,47 +317,16 @@ export default function SdlsListTable() {
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div>
-          <Select>
-            <SelectTrigger className="w-[80px]">
-              <SelectValue placeholder="5" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="5">5</SelectItem>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Pagination className="">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href="#" />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#" isActive>
-                  2
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">3</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+        <PaginationControls
+          page={table.getState().pagination.pageIndex + 1}
+          pageSize={table.getState().pagination.pageSize}
+          totalItems={table.getFilteredRowModel().rows.length}
+          totalPages={table.getPageCount()}
+          onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
+          onPageSizeChange={(size) => table.setPageSize(size)}
+          hasNextPage={table.getCanNextPage()}
+          hasPreviousPage={table.getCanPreviousPage()}
+        />
       </div>
     </div>
   );

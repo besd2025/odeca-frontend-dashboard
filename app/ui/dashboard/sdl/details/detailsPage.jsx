@@ -1,21 +1,18 @@
 import React from "react";
-import ProfileCard from "./ProfileCard";
 import StatsCard from "./StatsCard";
-import ActivityList from "./profile-content";
 import Edit from "../edit";
+import DetailsCard from "./detailsCard";
+import DetailsContent from "./details-content";
 
-function ProfilePage() {
-  const profile = {
-    name: "Brave Gak",
-    title: "Cafeiculteur",
-    avatar: "/images/logo.jpg",
-    cni: "25/4565",
-    birthDate: "12 Jan 1990",
-    gender: "M",
+function DetailsPage() {
+  const sdlDetails = {
+    name: "AKEZA COFFEE",
+    title: "SDL",
+
     location: "Bujumbura / Kamenge / Mirango",
+
+    responsable: "JIMMY GWEGWEMBE",
     phone: "78451232",
-    champs: "4",
-    sdl: "Ngome / Kayanza",
   };
 
   return (
@@ -23,20 +20,19 @@ function ProfilePage() {
       <div className="flex justify-end gap-2">
         <Edit />
       </div>
-
       <div className="flex flex-col lg:flex-row gap-6">
-        <ProfileCard profile={profile} />
+        <DetailsCard sdlDetails={sdlDetails} />
 
         <div className="flex-1 space-y-6">
           <section className="space-y-4">
             <StatsCard />
           </section>
 
-          <ActivityList />
+          <DetailsContent />
         </div>
       </div>
     </div>
   );
 }
 
-export default ProfilePage;
+export default DetailsPage;
