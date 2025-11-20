@@ -34,6 +34,7 @@ import Link from "next/link";
 import EditTransfers from "./edit-tranfers";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import PaginationControls from "@/components/ui/pagination-controls";
+import DetailsTransfer from "./details-transfer";
 
 export default function TransferSdlDep({ data }) {
   const [sorting, setSorting] = React.useState([]);
@@ -74,9 +75,11 @@ export default function TransferSdlDep({ data }) {
                 Copier trajet
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href="/odeca-dashboard/cultivators/profile">
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-              </Link>
+
+              <div>
+                <DetailsTransfer />
+              </div>
+
               <div>
                 <EditTransfers
                   from_sdl={transfer.from_sdl}

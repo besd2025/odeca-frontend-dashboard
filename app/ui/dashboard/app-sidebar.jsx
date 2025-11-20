@@ -99,7 +99,7 @@ const menuItems = {
     },
     {
       title: "Centre de transit",
-      url: "/odeca-dashboard/home",
+      url: "/odeca-dashboard/ct",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -113,7 +113,7 @@ const menuItems = {
           />
         </svg>
       ),
-      keyword: "odeca-transit-center",
+      keyword: "ct",
     },
 
     {

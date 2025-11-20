@@ -35,7 +35,7 @@ import Link from "next/link";
 import EditAchats from "./edit-achats";
 import PaginationControls from "@/components/ui/pagination-controls";
 
-export default function Achats({ data }) {
+export default function Achats({ data, isCultivatorsPage }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -139,6 +139,46 @@ export default function Achats({ data }) {
         );
       },
     },
+    ...(isCultivatorsPage
+      ? [
+          {
+            accessorKey: "sdl_ct",
+            header: ({ column }) => {
+              return (
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                  }
+                >
+                  SDL/CT
+                  <ArrowUpDownIcon />
+                </Button>
+              );
+            },
+            cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
+          },
+          {
+            accessorKey: "society",
+            header: ({ column }) => {
+              return (
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                  }
+                >
+                  Société
+                  <ArrowUpDownIcon />
+                </Button>
+              );
+            },
+            cell: ({ row }) => (
+              <div className="font-medium">{row.getValue("society")}</div>
+            ),
+          },
+        ]
+      : []),
 
     {
       id: "localite",

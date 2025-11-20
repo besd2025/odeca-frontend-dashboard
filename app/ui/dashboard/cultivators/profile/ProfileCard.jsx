@@ -17,7 +17,6 @@ import ViewImageDialog from "@/components/ui/view-image-dialog";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -133,19 +132,19 @@ function ProfileCard({ profile }) {
                         <Layers2 size={20} /> Champ 1
                       </h1>
                       <div className="mt-2 flex flex-col gap-y-2">
-                        <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                        <div className="flex items-center justify-between text-sm ">
                           <span className="text-muted-foreground">
                             Superficie
                           </span>
                           <span className="font-medium">7.5 ha</span>
                         </div>
-                        <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                        <div className="flex items-center justify-between text-sm ">
                           <span className="text-muted-foreground">
                             Nombre de pieds
                           </span>
                           <span className="font-medium">400</span>
                         </div>
-                        <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                        <div className="flex items-center justify-between text-sm ">
                           <span className="text-muted-foreground flex gap-x-1">
                             <MapPinHouse size={20} />
                             Localité
@@ -161,19 +160,19 @@ function ProfileCard({ profile }) {
                         <Layers2 size={20} /> Champ 2
                       </h1>
                       <div className="mt-2 flex flex-col gap-y-2">
-                        <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                        <div className="flex items-center justify-between text-sm ">
                           <span className="text-muted-foreground">
                             Superficie
                           </span>
                           <span className="font-medium">7.5 ha</span>
                         </div>
-                        <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                        <div className="flex items-center justify-between text-sm ">
                           <span className="text-muted-foreground">
                             Nombre de pieds
                           </span>
                           <span className="font-medium">400</span>
                         </div>
-                        <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                        <div className="flex items-center justify-between text-sm ">
                           <span className="text-muted-foreground flex gap-x-1">
                             <MapPinHouse size={20} />
                             Localité

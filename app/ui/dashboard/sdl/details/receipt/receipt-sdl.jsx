@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -31,11 +30,11 @@ import {
 } from "@/components/ui/table";
 import ExportButton from "@/components/ui/export_button";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
-import Link from "next/link";
-import EditAchats from "./edit-achats";
 import PaginationControls from "@/components/ui/pagination-controls";
+import EditReceipts from "./edit-receipt";
+import DetailsReceipt from "./details-receipt";
 
-export default function Achats({ data }) {
+export default function ReceiptSdlCt({ data }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -50,7 +49,7 @@ export default function Achats({ data }) {
       enableHiding: false,
       header: "Actions",
       cell: ({ row }) => {
-        const cultivator = row.original;
+        const transfer = row.original;
 
         return (
           <DropdownMenu>
@@ -64,31 +63,21 @@ export default function Achats({ data }) {
               <DropdownMenuLabel className="text-muted-foreground font-normal">
                 Actions
               </DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    cultivator.cultivator.cultivator_code
-                  )
-                }
-              >
-                Copier code
-              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
-              <Link href="/odeca-dashboard/cultivators/profile">
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-              </Link>
+
               <div>
-                <EditAchats
-                  cultivator={cultivator.cultivator}
-                  sdl_ct={cultivator.sdl_ct}
-                  society={cultivator.society}
-                  localite={cultivator.localite}
-                  num_fiche={cultivator.num_fiche}
-                  num_recu={cultivator.num_recu}
-                  ca={cultivator.ca}
-                  cb={cultivator.cb}
-                  date={cultivator.date}
-                  photo_fiche={cultivator.photo_fiche}
+                <DetailsReceipt />
+              </div>
+
+              <div>
+                <EditReceipts
+                  from_sdl={transfer.from_sdl}
+                  to_sdl_destination_name={transfer.to_sdl_destination_name}
+                  society={transfer.society}
+                  localite={transfer.localite}
+                  qte_tranferer={transfer.qte_tranferer}
+                  photo_fiche={transfer.photo_fiche}
                 />
               </div>
             </DropdownMenuContent>
@@ -97,49 +86,44 @@ export default function Achats({ data }) {
       },
     },
     {
-      accessorKey: "cultivator",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Cafeiculteur
-            <ArrowUpDownIcon />
-          </Button>
-        );
-      },
+      accessorKey: "from_sdl",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          CT Source
+          <ArrowUpDownIcon />
+        </Button>
+      ),
       filterFn: (row, columnId, filterValue) => {
-        const cultivator = row.original.cultivator;
         if (!filterValue) return true;
+        const source = row.original.from_sdl ?? "";
+        const target = row.original.to_sdl_destination_name ?? "";
         const search = filterValue.toLowerCase();
         return (
-          cultivator.first_name.toLowerCase().includes(search) ||
-          cultivator.last_name.toLowerCase().includes(search) ||
-          cultivator.cultivator_code.toLowerCase().includes(search)
+          source.toLowerCase().includes(search) ||
+          target.toLowerCase().includes(search)
         );
       },
-      cell: ({ row }) => {
-        const cultivators = row.original.cultivator;
-        return (
-          <div className="flex items-center gap-3">
-            <ViewImageDialog
-              imageUrl={cultivators.image_url}
-              alt={`${cultivators.last_name} ${cultivators.first_name}`}
-            />
-            <div>
-              <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                {cultivators.last_name} {cultivators.first_name}
-              </span>
-              <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                {cultivators.cultivator_code}
-              </span>
-            </div>
-          </div>
-        );
-      },
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("from_sdl")}</div>
+      ),
     },
 
+    {
+      accessorKey: "society",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Société
+          <ArrowUpDownIcon />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("society")}</div>,
+    },
     {
       id: "localite",
       header: "Localité",
@@ -153,75 +137,38 @@ export default function Achats({ data }) {
       },
     },
     {
-      accessorKey: "num_fiche",
-      header: "No Fiche",
+      id: "ca",
+      header: "CA récus (kg)",
       cell: ({ row }) => (
         <div className="text-center font-semibold">
-          {row.getValue("num_fiche")}
+          {row.original.qte_tranferer?.ca ?? 0}
         </div>
       ),
     },
     {
-      accessorKey: "num_recu",
-      header: "No Recus",
+      id: "cb",
+      header: "CB récus (kg)",
       cell: ({ row }) => (
         <div className="text-center font-semibold">
-          {row.getValue("num_recu")}
+          {row.original.qte_tranferer?.cb ?? 0}
         </div>
       ),
     },
     {
-      accessorKey: "ca",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            CA
-            <ArrowUpDownIcon />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">{row.getValue("ca")}</div>
-      ),
-    },
-    {
-      accessorKey: "cb",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            CB
-            <ArrowUpDownIcon />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">{row.getValue("cb")}</div>
-      ),
-    },
-    {
-      accessorKey: "photo_fiche",
+      id: "photo_fiche",
       header: "Fiche",
       cell: ({ row }) => (
         <div className="text-center font-semibold">
-          <ViewImageDialog
-            imageUrl={row.getValue("photo_fiche")}
-            alt={`photo_fiche`}
-            profile={false}
-          />
+          {row.original.photo_fiche ? (
+            <ViewImageDialog
+              imageUrl={row.original.photo_fiche}
+              alt="Photo fiche"
+              profile={false}
+            />
+          ) : (
+            "-"
+          )}
         </div>
-      ),
-    },
-    {
-      accessorKey: "date",
-      header: "Date",
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">{row.getValue("date")}</div>
       ),
     },
   ];
@@ -248,15 +195,15 @@ export default function Achats({ data }) {
   });
 
   return (
-    <div className="w-full bg-sidebar  rounded-lg">
+    <div className="w-full bg-sidebar rounded-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
         <div className="relative ">
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
           <Input
             placeholder="Rechercher..."
-            value={table.getColumn("cultivator")?.getFilterValue() ?? ""}
+            value={table.getColumn("from_sdl")?.getFilterValue() ?? ""}
             onChange={(event) =>
-              table.getColumn("cultivator")?.setFilterValue(event.target.value)
+              table.getColumn("from_sdl")?.setFilterValue(event.target.value)
             }
             className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
           />

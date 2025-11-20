@@ -11,7 +11,7 @@ import {
   User,
 } from "lucide-react";
 
-function DetailsCard({ sdlDetails }) {
+function DetailsCard({ ctDetails }) {
   return (
     <Card className="w-full lg:w-[300px] lg:max-w-sm p-6 space-y-4 rounded-xl shadow-sm">
       <div className="flex flex-col items-center space-y-3 text-center">
@@ -30,9 +30,9 @@ function DetailsCard({ sdlDetails }) {
           </svg>
         </div>
         <div className="space-y-1">
-          <p className="text-xl font-semibold">{sdlDetails.name}</p>
+          <p className="text-xl font-semibold">{ctDetails.name}</p>
           <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
-            {sdlDetails.title}
+            {ctDetails.title}
           </p>
         </div>
         <Badge
@@ -55,9 +55,7 @@ function DetailsCard({ sdlDetails }) {
               <MapPinHouse size={20} />
               Localité
             </span>
-            <span className="font-medium text-right">
-              {sdlDetails.location}
-            </span>
+            <span className="font-medium text-right">{ctDetails.location}</span>
           </div>
           <Separator className="my-2" />
         </div>
@@ -68,7 +66,7 @@ function DetailsCard({ sdlDetails }) {
               Responsable
             </span>
             <span className="font-medium text-right">
-              {sdlDetails.responsable}
+              {ctDetails.responsable}
             </span>
           </div>
           <Separator className="my-2" />
@@ -79,7 +77,7 @@ function DetailsCard({ sdlDetails }) {
               <Phone size={20} />
               Téléphone
             </span>
-            <span className="font-medium">{sdlDetails.phone}</span>
+            <span className="font-medium">{ctDetails.phone}</span>
           </div>
           <Separator className="my-2" />
         </div>

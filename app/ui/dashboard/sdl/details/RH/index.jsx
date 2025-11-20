@@ -30,12 +30,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import ExportButton from "@/components/ui/export_button";
+import Filter from "./filter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Link from "next/link";
-import EditAchats from "./edit-achats";
 import PaginationControls from "@/components/ui/pagination-controls";
 
-export default function Achats({ data }) {
+export default function RHlist({ data }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -77,20 +77,6 @@ export default function Achats({ data }) {
               <Link href="/odeca-dashboard/cultivators/profile">
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
-              <div>
-                <EditAchats
-                  cultivator={cultivator.cultivator}
-                  sdl_ct={cultivator.sdl_ct}
-                  society={cultivator.society}
-                  localite={cultivator.localite}
-                  num_fiche={cultivator.num_fiche}
-                  num_recu={cultivator.num_recu}
-                  ca={cultivator.ca}
-                  cb={cultivator.cb}
-                  date={cultivator.date}
-                  photo_fiche={cultivator.photo_fiche}
-                />
-              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -139,89 +125,61 @@ export default function Achats({ data }) {
         );
       },
     },
-
     {
-      id: "localite",
-      header: "Localité",
-      cell: ({ row }) => {
-        const localite = row.original.localite;
-        return (
-          <div className="text-sm">
-            {localite?.commune}, {localite?.province}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "num_fiche",
-      header: "No Fiche",
+      accessorKey: "cni",
+      header: "CNI",
       cell: ({ row }) => (
-        <div className="text-center font-semibold">
-          {row.getValue("num_fiche")}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "num_recu",
-      header: "No Recus",
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">
-          {row.getValue("num_recu")}
-        </div>
+        <div className="text-center font-semibold">{row.getValue("cni")}</div>
       ),
     },
     {
       accessorKey: "ca",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            CA
-            <ArrowUpDownIcon />
-          </Button>
-        );
-      },
+      header: "CA",
       cell: ({ row }) => (
-        <div className="text-center font-semibold">{row.getValue("ca")}</div>
+        <div className="text-center font-semibold">{row.getValue("ca")} Kg</div>
       ),
     },
     {
-      accessorKey: "cb",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            CB
-            <ArrowUpDownIcon />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">{row.getValue("cb")}</div>
-      ),
-    },
-    {
-      accessorKey: "photo_fiche",
-      header: "Fiche",
+      accessorKey: "ca_price",
+      header: "Prix CA",
       cell: ({ row }) => (
         <div className="text-center font-semibold">
-          <ViewImageDialog
-            imageUrl={row.getValue("photo_fiche")}
-            alt={`photo_fiche`}
-            profile={false}
-          />
+          {row.getValue("ca_price")} Fbu
         </div>
       ),
     },
     {
-      accessorKey: "date",
-      header: "Date",
+      accessorKey: "cb",
+      header: "CB",
       cell: ({ row }) => (
-        <div className="text-center font-semibold">{row.getValue("date")}</div>
+        <div className="text-center font-semibold">{row.getValue("cb")} Kg</div>
+      ),
+    },
+    {
+      accessorKey: "cb_price",
+      header: "Prix CB",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          {row.getValue("cb_price")} Fbu
+        </div>
+      ),
+    },
+    {
+      accessorKey: "qte_total",
+      header: "Qte TOTAL",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          {row.getValue("qte_total")} Kg
+        </div>
+      ),
+    },
+    {
+      accessorKey: "total_price",
+      header: "Prix TOTAL",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          {row.getValue("total_price")} Fbu
+        </div>
       ),
     },
   ];
@@ -248,7 +206,7 @@ export default function Achats({ data }) {
   });
 
   return (
-    <div className="w-full bg-sidebar  rounded-lg">
+    <div className="w-full bg-sidebar p-2 rounded-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
         <div className="relative ">
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
@@ -263,6 +221,9 @@ export default function Achats({ data }) {
         </div>
 
         <div className="flex flex-row justify-between gap-x-3">
+          <div className="flex items-center gap-3">
+            <Filter />
+          </div>
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
             //   onClickExportButton={exportCultivatorsToExcel}
