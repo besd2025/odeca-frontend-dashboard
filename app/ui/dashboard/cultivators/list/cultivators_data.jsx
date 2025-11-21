@@ -40,56 +40,7 @@ function CultivatorData() {
 
     getCultivators();
   }, []);
-  // const cultivatorsData = [
-  //   {
-  //     id: "cultivator_001",
-  //     cultivator: {
-  //       cultivator_code: "2530-522-7545",
-  //       first_name: "Brave",
-  //       last_name: "Eddy",
-  //       image_url: "/images/logo_1.jpg",
-  //     },
-  //     sdl_ct: "NGome",
-  //     society: "ODECA",
-  //     localite: {
-  //       province: "Buja",
-  //       commune: "Ntahangwa",
-  //     },
-  //     champs: 4,
-  //   },
-  //   {
-  //     id: "cultivator_002",
-  //     cultivator: {
-  //       cultivator_code: "2530-522-7545",
-  //       first_name: "jaa",
-  //       last_name: "Eddy",
-  //       image_url: "/images/logo_1.jpg",
-  //     },
-  //     sdl_ct: "aa",
-  //     society: "ODECA",
-  //     localite: {
-  //       province: "Buja",
-  //       commune: "Ntahangwa",
-  //     },
-  //     champs: 4,
-  //   },
-  //   {
-  //     id: "cultivator_003",
-  //     cultivator: {
-  //       cultivator_code: "2530-56833",
-  //       first_name: "yoo",
-  //       last_name: "Eddy",
-  //       image_url: "/images/logo_1.jpg",
-  //     },
-  //     sdl_ct: "NGome",
-  //     society: "ODECA",
-  //     localite: {
-  //       province: "Buja",
-  //       commune: "Ntahangwa",
-  //     },
-  //     champs: 4,
-  //   },
-  // ];
+
   return (
     <div className="p-4">
       <Tabs defaultValue="list" className="w-full">

@@ -45,15 +45,14 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 10,
   });
-  console.log("Data in CultivatorsListTable:", data);
   const columns = [
     {
       id: "actions",
       enableHiding: false,
       header: "Actions",
       cell: ({ row }) => {
-        const cultivator = row.original;
-
+        const result = row.original;
+        const cultivator = row.original?.cultivator;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -68,24 +67,24 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
               </DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() =>
-                  navigator.clipboard.writeText(
-                    cultivator.cultivator.cultivator_code
-                  )
+                  navigator.clipboard.writeText(cultivator?.cultivator_code)
                 }
               >
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href="/odeca-dashboard/cultivators/profile">
+              <Link
+                href={`/odeca-dashboard/cultivators/profile/?id=${result?.id}`}
+              >
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
               <div>
                 <Edit
-                  cultivator={cultivator.cultivator}
-                  sdl_ct={cultivator.sdl_ct}
-                  society={cultivator.society}
-                  localite={cultivator.localite}
-                  champs={cultivator.champs}
+                  cultivator={result?.id}
+                  sdl_ct={cultivator?.sdl_ct}
+                  society={cultivator?.society}
+                  localite={cultivator?.localite}
+                  champs={cultivator?.champs}
                 />
               </div>
             </DropdownMenuContent>

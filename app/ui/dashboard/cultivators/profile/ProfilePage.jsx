@@ -1,9 +1,10 @@
+"use client";
 import React from "react";
 import ProfileCard from "./ProfileCard";
 import StatsCard from "./StatsCard";
 import ActivityList from "./profile-content";
 import Edit from "../edit";
-
+import { useSearchParams } from "next/navigation";
 function ProfilePage() {
   const profile = {
     name: "Brave Gak",
@@ -17,11 +18,12 @@ function ProfilePage() {
     champs: "4",
     sdl: "Ngome / Kayanza",
   };
-
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   return (
     <div className=" space-y-6">
       <div className="flex justify-end gap-2">
-        <Edit />
+        <Edit cultivator={id} />
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -29,10 +31,10 @@ function ProfilePage() {
 
         <div className="flex-1 space-y-6">
           <section className="space-y-4">
-            <StatsCard />
+            <StatsCard cult_id={id} />
           </section>
 
-          <ActivityList />
+          <ActivityList cult_id={id} />
         </div>
       </div>
     </div>
