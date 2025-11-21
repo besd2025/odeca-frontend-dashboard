@@ -45,6 +45,7 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 10,
   });
+  console.log("Data in CultivatorsListTable:", data);
   const columns = [
     {
       id: "actions",
@@ -120,15 +121,15 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
         return (
           <div className="flex items-center gap-3">
             <ViewImageDialog
-              imageUrl={cultivators.image_url}
-              alt={`${cultivators.last_name} ${cultivators.first_name}`}
+              imageUrl={cultivators?.image_url}
+              alt={`${cultivators?.last_name} ${cultivators?.first_name}`}
             />
             <div>
               <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                {cultivators.last_name} {cultivators.first_name}
+                {cultivators?.last_name} {cultivators?.first_name}
               </span>
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                {cultivators.cultivator_code}
+                {cultivators?.cultivator_code}
               </span>
             </div>
           </div>
