@@ -51,8 +51,8 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
       enableHiding: false,
       header: "Actions",
       cell: ({ row }) => {
-        const cultivator = row.original;
-
+        const result = row.original;
+        const cultivator = row.original?.cultivator;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -67,24 +67,24 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
               </DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() =>
-                  navigator.clipboard.writeText(
-                    cultivator.cultivator.cultivator_code
-                  )
+                  navigator.clipboard.writeText(cultivator?.cultivator_code)
                 }
               >
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href="/odeca-dashboard/cultivators/profile">
+              <Link
+                href={`/odeca-dashboard/cultivators/profile/?id=${result?.id}`}
+              >
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
               <div>
                 <Edit
-                  cultivator={cultivator.cultivator}
-                  sdl_ct={cultivator.sdl_ct}
-                  society={cultivator.society}
-                  localite={cultivator.localite}
-                  champs={cultivator.champs}
+                  cultivator={result?.id}
+                  sdl_ct={cultivator?.sdl_ct}
+                  society={cultivator?.society}
+                  localite={cultivator?.localite}
+                  champs={cultivator?.champs}
                 />
               </div>
             </DropdownMenuContent>
@@ -120,15 +120,15 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
         return (
           <div className="flex items-center gap-3">
             <ViewImageDialog
-              imageUrl={cultivators.image_url}
-              alt={`${cultivators.last_name} ${cultivators.first_name}`}
+              imageUrl={cultivators?.image_url}
+              alt={`${cultivators?.last_name} ${cultivators?.first_name}`}
             />
             <div>
               <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                {cultivators.last_name} {cultivators.first_name}
+                {cultivators?.last_name} {cultivators?.first_name}
               </span>
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                {cultivators.cultivator_code}
+                {cultivators?.cultivator_code}
               </span>
             </div>
           </div>

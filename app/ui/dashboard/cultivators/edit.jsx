@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogClose,
@@ -14,9 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SquarePen } from "lucide-react";
-
+import { fetchData } from "@/app/_utils/api";
 export default function Edit({
-  cultivator = {},
+  cultivator,
   sdl_ct = "",
   society = "",
   localite = {},
@@ -33,18 +33,47 @@ export default function Edit({
   const [province, setProvince] = React.useState(localite?.province || "");
   const [commune, setCommune] = React.useState(localite?.commune || "");
   const [nbChamps, setNbChamps] = React.useState(champs || 0);
-
+  const [date_naissance, setDateNaissance] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [cni, setCni] = React.useState("");
+  const [payment_mode, setPaymentMode] = React.useState("");
+  const [bank_name, setBankName] = React.useState("");
+  const [bank_account, setBankAccount] = React.useState("");
+  const [payment_phone, setPaymentPhone] = React.useState("");
+  const [proprietaire, setProprietaire] = React.useState("");
   React.useEffect(() => {
-    // keep local state in sync if props change
-    setCode(cultivator.cultivator_code || "");
-    setFirstName(cultivator.first_name || "");
-    setLastName(cultivator.last_name || "");
-    setImageUrl(cultivator.image_url || "");
-    setSdl(sdl_ct || "");
-    setSoc(society || "");
-    setProvince(localite?.province || "");
-    setCommune(localite?.commune || "");
-    setNbChamps(champs || 0);
+    async function getData() {
+      // keep local state in sync if props change
+
+      try {
+        const response = await fetchData("get", `/cultivators/${cultivator}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+        console.log("Fetched cultivator data in Edit useEffect:", response);
+        setCode(response.cultivator_code || "");
+        setFirstName(response?.cultivator_first_name || "");
+        setLastName(response?.cultivator_last_name || "");
+        setImageUrl(response?.cultivator_photo || "");
+        setDateNaissance(response?.date_naissance || "");
+        setPhone(response?.cultivator_telephone || "");
+        setCni(response?.cultivator_cni || "");
+        setSdl(sdl_ct || "");
+        setSoc(society || "");
+        setProvince(localite?.province || "");
+        setCommune(localite?.commune || "");
+        setNbChamps(champs || 0);
+        setPaymentMode(response?.cultivator_payment_type || "");
+        setBankName(response?.cultivator_bank_name || "");
+        setBankAccount(response?.cultivator_bank_account || "");
+        setPaymentPhone(response?.cultivator_mobile_payment_account || "");
+        setProprietaire(response?.cultivator_account_owner || "");
+      } catch (error) {
+        console.error("Error in Edit useEffect:", error);
+      }
+    }
+    getData();
   }, [cultivator, sdl_ct, society, localite, champs]);
 
   const handleSubmit = (e) => {
@@ -118,24 +147,24 @@ export default function Edit({
                   <Label>CNI</Label>
                   <Input
                     type="text"
-                    value={7865}
-                    onChange={(e) => setImageUrl(e.target.value)}
+                    value={cni}
+                    onChange={(e) => setCni(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Date de naissance</Label>
                   <Input
                     type="text"
-                    value={4612}
-                    onChange={(e) => setImageUrl(e.target.value)}
+                    value={date_naissance}
+                    onChange={(e) => setDateNaissance(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Telephone</Label>
                   <Input
                     type="text"
-                    value={45123}
-                    onChange={(e) => setImageUrl(e.target.value)}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
@@ -218,41 +247,41 @@ export default function Edit({
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Mode de paiement</Label>
                   <Input
-                    type="number"
-                    value={nbChamps}
-                    onChange={(e) => setNbChamps(Number(e.target.value))}
+                    type="text"
+                    value={payment_mode}
+                    onChange={(e) => setPaymentMode(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Nom de Banque</Label>
                   <Input
-                    type="number"
-                    value={nbChamps}
-                    onChange={(e) => setNbChamps(Number(e.target.value))}
+                    type="text"
+                    value={bank_name}
+                    onChange={(e) => setBankName(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>No compte bancaire</Label>
                   <Input
-                    type="number"
-                    value={nbChamps}
-                    onChange={(e) => setNbChamps(Number(e.target.value))}
+                    type="text"
+                    value={bank_account}
+                    onChange={(e) => setBankAccount(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>No de Tel de paiement</Label>
                   <Input
-                    type="number"
-                    value={nbChamps}
-                    onChange={(e) => setNbChamps(Number(e.target.value))}
+                    type="text"
+                    value={payment_phone}
+                    onChange={(e) => setPaymentPhone(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Proprietaire</Label>
                   <Input
-                    type="number"
-                    value={nbChamps}
-                    onChange={(e) => setNbChamps(Number(e.target.value))}
+                    type="text"
+                    value={proprietaire}
+                    onChange={(e) => setProprietaire(e.target.value)}
                   />
                 </div>
               </div>
