@@ -71,7 +71,7 @@ export function AppHeader() {
             <h1 className="text-base font-bold">XXX</h1>
             {/* <Logo className="shrink-0" /> */}
 
-            <div className="relative hidden md:block">
+            <div className="relative hidden md:blo/ck">
               <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
               <Input
                 className="pl-10 flex-1  border-none shadow-none w-[380px] rounded-lg bg-background"

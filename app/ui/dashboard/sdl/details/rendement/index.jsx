@@ -57,7 +57,8 @@ export default function RedementC() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="pl-4">ID</TableHead>
+              <TableHead className="pl-4">Actions</TableHead>
+              <TableHead>ID</TableHead>
               <TableHead>Date d'achat</TableHead>
               <TableHead>No Lot</TableHead>
               <TableHead>CA</TableHead>
