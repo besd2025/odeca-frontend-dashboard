@@ -14,61 +14,69 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SquarePen } from "lucide-react";
-
-export default function Edit({
-  sdl = {},
-  responsable = {},
-  society = "",
-  localite = {},
-}) {
+import { fetchData } from "@/app/_utils/api";
+export default function Edit({ id }) {
   // local state initialized from props
   const [open, setOpen] = React.useState(false);
-  const [code, setCode] = React.useState(sdl.sdl_code || "");
-  const [sdlName, setSdlName] = React.useState(sdl.sdl_name || "");
-  const [type, setType] = React.useState(sdl.type || "");
-  const [firstName, setFirstName] = React.useState(
-    responsable?.first_name || ""
-  );
-  const [lastName, setLastName] = React.useState(responsable?.last_name || "");
-  const [telephone, setTelephone] = React.useState(
-    responsable?.telephone || ""
-  );
-  const [soc, setSoc] = React.useState(society || "");
-  const [province, setProvince] = React.useState(localite?.province || "");
-  const [commune, setCommune] = React.useState(localite?.commune || "");
-
+  const [code, setCode] = React.useState("");
+  const [sdlName, setSdlName] = React.useState("");
+  const [type, setType] = React.useState();
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [telephone, setTelephone] = React.useState("");
+  const [societtecode, setSocietteCode] = React.useState("");
+  const [soc, setSoc] = React.useState("");
+  const [province, setProvince] = React.useState("");
+  const [commune, setCommune] = React.useState("");
   React.useEffect(() => {
-    // keep local state in sync if props change
-    setCode(sdl.sdl_code || "");
-    setSdlName(sdl.sdl_name || "");
-    setType(sdl.type || "");
-    setFirstName(responsable?.first_name || "");
-    setLastName(responsable?.last_name || "");
-    setTelephone(responsable?.telephone || "");
-    setSoc(society || "");
-    setProvince(localite?.province || "");
-    setCommune(localite?.commune || "");
-  }, [sdl, responsable, society, localite]);
+    const getSdls = async () => {
+      try {
+        const response = await fetchData("get", `cafe/stationslavage/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+        console.log("SDL data fetched:", response);
+        setCode(response?.sdl_code || "");
+        setSdlName(response?.sdl_nom || "");
+        setSoc(response?.societe?.nom_societe || "");
+        // setSocietteCode(response?.societe?.code_societe || "");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: call API / lift state to parent. For now just log values.
-    const payload = {
-      sdl_code: code,
-      sdl_name: sdlName,
-      type: type,
-      responsable: {
-        first_name: firstName,
-        last_name: lastName,
-        telephone: telephone,
-      },
-      society: soc,
-      localite: { province, commune },
+        // setFirstName(responsable?.first_name || "");
+        // setLastName(responsable?.last_name || "");
+        // setTelephone(responsable?.telephone || "");
+        // setProvince(localite?.province || "");
+        // setCommune(localite?.commune || "");
+      } catch (error) {
+        console.error("Error fetching station data:", error);
+      }
     };
-    // For now output to console; caller can replace with API call
-    // eslint-disable-next-line no-console
-    console.log("Submitting SDL update", payload);
-    setOpen(false);
+
+    getSdls();
+  }, [id]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = {
+      sdl_nom: sdlName,
+    };
+
+    try {
+      const results = await fetchData("patch", `/cafe/stationslavage/${id}/`, {
+        params: {},
+        additionalHeaders: {},
+        body: formData,
+      });
+
+      if (results.status == 200) {
+        window.location.reload();
+      } else {
+        console.log("error");
+      }
+    } catch (error) {
+      setError(error);
+      console.error(error);
+    }
   };
 
   return (
@@ -189,7 +197,9 @@ export default function Edit({
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit">Enregistrer</Button>
+            <Button type="submit" onClick={handleSubmit}>
+              Enregistrer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

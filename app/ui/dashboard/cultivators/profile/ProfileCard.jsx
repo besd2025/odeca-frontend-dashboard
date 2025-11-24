@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { fetchData } from "@/app/_utils/api";
 import {
   Grape,
   Layers,
@@ -22,33 +23,71 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-function ProfileCard({ profile }) {
+function ProfileCard({ cult_id }) {
+  const [data, setData] = React.useState({});
+  useEffect(() => {
+    const getCultivators = async () => {
+      try {
+        const response = await fetchData("get", `/cultivators/${cult_id}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+        // const cultivatorsData = results.map((cultivator) => ({
+        //   id: cultivator.id,
+        //   cultivator: {
+        //     cultivator_code: cultivator?.cultivator_code,
+        //     first_name: cultivator?.cultivator_first_name,
+        //     last_name: cultivator?.cultivator_last_name,
+        //     image_url: cultivator?.cultivator_photo,
+        //   },
+        //   sdl_ct: "NGome",
+        //   society: "ODECA",
+        //   localite: {
+        //     province: "Buja",
+        //     commune: "Ntahangwa",
+        //   },
+        //   champs: 4,
+        // }));
+
+        setData(response);
+        console.log("Cultivators data fetched:", response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCultivators();
+  }, [cult_id]);
+
   return (
     <Card className="w-full lg:w-[300px] lg:max-w-sm p-6 space-y-4 rounded-xl shadow-sm">
       <div className="flex flex-col items-center space-y-3 text-center">
         <Avatar className="w-32 h-32 mx-auto">
           <AvatarImage
-            src={profile.avatar}
-            alt={profile.name}
+            src={data?.cultivator_photo}
+            alt={data?.cultivator_first_name}
             className="object-cover hidden"
           />
           <ViewImageDialog
-            imageUrl={profile.avatar}
+            imageUrl={data?.cultivator_photo}
             className="size-full object-cover"
           />
-          <AvatarFallback>
-            {profile.name
+          {/* <AvatarFallback>
+            {data?.cultivator_first_name
               .split(" ")
               .map((part) => part[0])
               .join("")
               .slice(0, 2)}
-          </AvatarFallback>
+          </AvatarFallback> */}
         </Avatar>
         <div className="space-y-1">
-          <p className="text-xl font-semibold">{profile.name}</p>
+          <p className="text-xl font-semibold">
+            {data?.cultivator_first_name} {data?.cultivator_last_name}
+          </p>
           <p className="text-sm text-muted-foreground flex flex-row gap-x-2">
             <Grape className="text-primary size-5" />
-            {profile.title}
+            {data?.cultivator_code}
           </p>
         </div>
         <Badge
@@ -56,7 +95,7 @@ function ProfileCard({ profile }) {
           variant="outline"
         >
           <QrCode size={30} />
-          <span className="">215-525-644</span>
+          <span className="">{data?.cultivator_code}</span>
         </Badge>
       </div>
 
@@ -68,7 +107,7 @@ function ProfileCard({ profile }) {
         <div>
           <div className="flex items-center justify-between text-sm flex-col gap-y-1">
             <span className="text-muted-foreground">CNI</span>
-            <span className="font-medium">{profile.cni}</span>
+            <span className="font-medium">{data?.cultivator_cni}</span>
           </div>
           <Separator className="my-2" />
         </div>
@@ -76,7 +115,7 @@ function ProfileCard({ profile }) {
         <div>
           <div className="flex items-center justify-between text-sm flex-col gap-y-1">
             <span className="text-muted-foreground">Date de Naissance</span>
-            <span className="font-medium">{profile.birthDate}</span>
+            <span className="font-medium">{data?.date_naissance}</span>
           </div>
           <Separator className="my-2" />
         </div>
@@ -84,7 +123,7 @@ function ProfileCard({ profile }) {
         <div>
           <div className="flex items-center justify-between text-sm ">
             <span className="text-muted-foreground">Sexe</span>
-            <span className="font-medium">{profile.gender}</span>
+            <span className="font-medium">{data?.cultivator_gender}</span>
           </div>
           <Separator className="my-2" />
         </div>
@@ -95,7 +134,11 @@ function ProfileCard({ profile }) {
               <MapPinHouse size={20} />
               Localité
             </span>
-            <span className="font-medium text-right">{profile.location}</span>
+            <span className="font-medium text-right">
+              {data?.cultivator_adress?.zone_code?.commune_code?.commune_name}/
+              {data?.cultivator_adress?.zone_code?.zone_name}/
+              {data?.cultivator_adress?.colline_name}
+            </span>
           </div>
           <Separator className="my-2" />
         </div>
@@ -106,7 +149,7 @@ function ProfileCard({ profile }) {
               <Phone size={20} />
               Téléphone
             </span>
-            <span className="font-medium">{profile.phone}</span>
+            <span className="font-medium">{data?.cultivator_telephone}</span>
           </div>
           <Separator className="my-2" />
         </div>
@@ -115,7 +158,7 @@ function ProfileCard({ profile }) {
             <span className="text-muted-foreground flex gap-x-1">
               <Layers size={20} /> Champs
             </span>
-            <span className="font-medium">{profile.champs}</span>
+            <span className="font-medium">2</span>
 
             <Dialog>
               <DialogTrigger asChild>
@@ -150,7 +193,7 @@ function ProfileCard({ profile }) {
                             Localité
                           </span>
                           <span className="font-medium text-right">
-                            {profile.location}
+                            bujumbura
                           </span>
                         </div>
                       </div>
@@ -178,7 +221,7 @@ function ProfileCard({ profile }) {
                             Localité
                           </span>
                           <span className="font-medium text-right">
-                            {profile.location}
+                            BUBANZA
                           </span>
                         </div>
                       </div>
@@ -194,7 +237,7 @@ function ProfileCard({ profile }) {
             <span className="text-muted-foreground">SDL / CT</span>
             <Link href="/odeca-dashboard/sdl/details">
               <Button variant="link" className="p-0">
-                {profile.sdl}
+                BUHANZA
               </Button>
             </Link>
           </div>

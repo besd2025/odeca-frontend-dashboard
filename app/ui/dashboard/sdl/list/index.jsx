@@ -10,9 +10,10 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDownIcon, MoreHorizontal, Phone, Search } from "lucide-react";
 import * as React from "react";
-
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { fetchData } from "@/app/_utils/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,36 +40,48 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 
-const data = [
-  {
-    id: "sdl_001",
-    sdl: {
-      sdl_code: "2530-522-7545",
-      sdl_name: "Brave",
-      type: "SDL",
-    },
-    society: "ODECA",
-    responsable: {
-      first_name: "Brave",
-      last_name: "Eddy",
-      telephone: 78451202,
-    },
-    localite: {
-      province: "Buja",
-      commune: "Ntahangwa",
-    },
-  },
-];
-
 export default function SdlsListTable() {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [data, setData] = React.useState([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
+  useEffect(() => {
+    const getSdls = async () => {
+      try {
+        const response = await fetchData("get", "cafe/stationslavage/", {});
+        const results = response?.results;
+        const sdlData = results.map((sdl) => ({
+          id: sdl?.id,
+          sdl: {
+            sdl_code: sdl?.sdl_code,
+            sdl_name: sdl?.sdl_nom,
+            type: "SDL",
+          },
+          society: "ODECA",
+          responsable: {
+            first_name: "Brave",
+            last_name: "Eddy",
+            telephone: 78451202,
+          },
+          localite: {
+            province: "Buja",
+            commune: "Ntahangwa",
+          },
+        }));
+
+        setData(sdlData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getSdls();
+  }, []);
   const columns = [
     {
       id: "actions",
@@ -95,7 +108,7 @@ export default function SdlsListTable() {
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href="/odeca-dashboard/sdl/details">
+              <Link href={`/odeca-dashboard/sdl/details/?id=${sdl?.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
               <div>

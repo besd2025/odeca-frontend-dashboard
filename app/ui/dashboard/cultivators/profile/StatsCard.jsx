@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardDescription,
@@ -13,8 +13,44 @@ import {
   Grape,
   Landmark,
 } from "lucide-react";
+import { fetchData } from "@/app/_utils/api";
 
-function StatsCard({ icon: Icon, value, label }) {
+function StatsCard({ cult_id }) {
+  const [data, setData] = React.useState({});
+  useEffect(() => {
+    const getCultivators = async () => {
+      try {
+        const response = await fetchData("get", `/cultivators/${cult_id}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+        // const cultivatorsData = results.map((cultivator) => ({
+        //   id: cultivator.id,
+        //   cultivator: {
+        //     cultivator_code: cultivator?.cultivator_code,
+        //     first_name: cultivator?.cultivator_first_name,
+        //     last_name: cultivator?.cultivator_last_name,
+        //     image_url: cultivator?.cultivator_photo,
+        //   },
+        //   sdl_ct: "NGome",
+        //   society: "ODECA",
+        //   localite: {
+        //     province: "Buja",
+        //     commune: "Ntahangwa",
+        //   },
+        //   champs: 4,
+        // }));
+
+        setData(response);
+        console.log("Cultivators data fetched:", response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCultivators();
+  }, [cult_id]);
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <Card className="@container/card">
@@ -99,30 +135,58 @@ function StatsCard({ icon: Icon, value, label }) {
               <Landmark className="text-white" />
             </div>
             <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
-              Bank
+              {data?.cultivator_payment_type}
             </CardTitle>
           </div>
-          <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-            COOPEC / LUMICASH
-          </CardTitle>
-          <div className="flex flex-col gap-y-2">
-            <div className="flex flex-col ">
-              <div className="text-muted-foreground font-medium tabular-nums  ">
-                No compte
+          {data?.cultivator_payment_type === "momo" ? (
+            <>
+              <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+                {data?.cultivator_payment_type}
+              </CardTitle>
+              <div className="flex flex-col gap-y-2">
+                <div className="flex flex-col ">
+                  <div className="text-muted-foreground font-medium tabular-nums  ">
+                    No compte
+                  </div>
+                  <div className="text-lg font-semibold tracking-tight tabular-nums">
+                    {data?.cultivator_mobile_payment_account}
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <div className="text-sm text-muted-foreground font-medium tabular-nums  ">
+                    Proprietaire
+                  </div>
+                  <div className=" font-semibold tracking-tight tabular-nums">
+                    {data?.cultivator_account_owner}
+                  </div>
+                </div>
               </div>
-              <div className="text-lg font-semibold tracking-tight tabular-nums">
-                559 456 / 68745125
+            </>
+          ) : (
+            <>
+              <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+                {data?.cultivator_bank_name}
+              </CardTitle>
+              <div className="flex flex-col gap-y-2">
+                <div className="flex flex-col ">
+                  <div className="text-muted-foreground font-medium tabular-nums  ">
+                    No compte
+                  </div>
+                  <div className="text-lg font-semibold tracking-tight tabular-nums">
+                    {data?.cultivator_bank_account}
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <div className="text-sm text-muted-foreground font-medium tabular-nums  ">
+                    Proprietaire
+                  </div>
+                  <div className=" font-semibold tracking-tight tabular-nums">
+                    {data?.cultivator_account_owner}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col">
-              <div className="text-sm text-muted-foreground font-medium tabular-nums  ">
-                Proprietaire
-              </div>
-              <div className=" font-semibold tracking-tight tabular-nums">
-                Ndayiragije Jean Vianey / Lui meme
-              </div>
-            </div>
-          </div>
+            </>
+          )}
         </CardHeader>
       </Card>
     </div>

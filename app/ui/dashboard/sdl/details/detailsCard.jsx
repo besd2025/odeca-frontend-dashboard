@@ -1,7 +1,9 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { fetchData } from "@/app/_utils/api";
 import {
   Grape,
   MapPinHouse,
@@ -11,7 +13,25 @@ import {
   User,
 } from "lucide-react";
 
-function DetailsCard({ sdlDetails }) {
+function DetailsCard({ sdlDetails, id }) {
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    const getSdls = async () => {
+      try {
+        const response = await fetchData("get", `cafe/stationslavage/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+
+        setData(response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getSdls();
+  }, []);
   return (
     <Card className="w-full lg:w-[300px] lg:max-w-sm p-6 space-y-4 rounded-xl shadow-sm">
       <div className="flex flex-col items-center space-y-3 text-center">
@@ -30,7 +50,7 @@ function DetailsCard({ sdlDetails }) {
           </svg>
         </div>
         <div className="space-y-1">
-          <p className="text-xl font-semibold">{sdlDetails.name}</p>
+          <p className="text-xl font-semibold">{data?.sdl_nom}</p>
           <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
             {sdlDetails.title}
           </p>
@@ -40,7 +60,7 @@ function DetailsCard({ sdlDetails }) {
           variant="outline"
         >
           <QrCode size={30} />
-          <span className="">215-525-644</span>
+          <span className="">{data?.sdl_code}</span>
         </Badge>
       </div>
 
