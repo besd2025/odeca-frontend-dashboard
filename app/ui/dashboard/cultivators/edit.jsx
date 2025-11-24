@@ -24,15 +24,15 @@ export default function Edit({
 }) {
   // local state initialized from props
   const [open, setOpen] = React.useState(false);
-  const [code, setCode] = React.useState(cultivator.cultivator_code || "");
-  const [firstName, setFirstName] = React.useState(cultivator.first_name || "");
-  const [lastName, setLastName] = React.useState(cultivator.last_name || "");
-  const [imageUrl, setImageUrl] = React.useState(cultivator.image_url || "");
-  const [sdl, setSdl] = React.useState(sdl_ct || "");
-  const [soc, setSoc] = React.useState(society || "");
-  const [province, setProvince] = React.useState(localite?.province || "");
-  const [commune, setCommune] = React.useState(localite?.commune || "");
-  const [nbChamps, setNbChamps] = React.useState(champs || 0);
+  const [code, setCode] = React.useState("");
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [imageUrl, setImageUrl] = React.useState("");
+  const [sdl, setSdl] = React.useState("");
+  const [soc, setSoc] = React.useState("");
+  const [province, setProvince] = React.useState("");
+  const [commune, setCommune] = React.useState("");
+  const [nbChamps, setNbChamps] = React.useState(0);
   const [date_naissance, setDateNaissance] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [cni, setCni] = React.useState("");
@@ -41,6 +41,9 @@ export default function Edit({
   const [bank_account, setBankAccount] = React.useState("");
   const [payment_phone, setPaymentPhone] = React.useState("");
   const [proprietaire, setProprietaire] = React.useState("");
+  const [collector_code, setCollectorCode] = React.useState("");
+  const [address_code, setAdressCode] = React.useState("");
+  const [error, setError] = React.useState("");
   React.useEffect(() => {
     async function getData() {
       // keep local state in sync if props change
@@ -51,7 +54,7 @@ export default function Edit({
           additionalHeaders: {},
           body: {},
         });
-        console.log("Fetched cultivator data in Edit useEffect:", response);
+
         setCode(response.cultivator_code || "");
         setFirstName(response?.cultivator_first_name || "");
         setLastName(response?.cultivator_last_name || "");
@@ -69,32 +72,53 @@ export default function Edit({
         setBankAccount(response?.cultivator_bank_account || "");
         setPaymentPhone(response?.cultivator_mobile_payment_account || "");
         setProprietaire(response?.cultivator_account_owner || "");
+        setCollectorCode(response?.collector?.unique_code || "");
+        setAdressCode(response?.cultivator_adress?.colline_code);
       } catch (error) {
         console.error("Error in Edit useEffect:", error);
       }
     }
     getData();
-  }, [cultivator, sdl_ct, society, localite, champs]);
+  }, [cultivator]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    // setLoadingSearch(true);
     e.preventDefault();
-    // TODO: call API / lift state to parent. For now just log values.
-    const payload = {
+    const formData = {
       cultivator_code: code,
-      first_name: firstName,
-      last_name: lastName,
-      image_url: imageUrl,
-      sdl_ct: sdl,
-      society: soc,
-      localite: { province, commune },
-      champs: nbChamps,
+      cultivator_first_name: firstName,
+      cultivator_last_name: lastName,
+      cultivator_cni: cni,
+      date_naissance: date_naissance,
+      cultivator_payment_type: payment_mode,
+      cultivator_bank_name: bank_name,
+      cultivator_bank_account: bank_account,
+      cultivator_mobile_payment_account: payment_phone,
+      cultivator_account_owner: proprietaire,
+      cultivator_bank_name: bank_name,
+      cultivator_mobile_payment: payment_phone,
+      cultivator_mobile_payment_user_name: proprietaire,
+      cultivator_adress_code: address_code,
+      collector_code: collector_code,
     };
-    // For now output to console; caller can replace with API call
-    // eslint-disable-next-line no-console
-    console.log("Submitting cultivator update", payload);
-    setOpen(false);
-  };
 
+    try {
+      const results = await fetchData("patch", `/cultivators/${cultivator}/`, {
+        params: {},
+        additionalHeaders: {},
+        body: formData,
+      });
+      console.log(results);
+      if (results.status == 200) {
+        window.location.reload();
+      } else {
+        console.log("error");
+      }
+    } catch (error) {
+      setError(error);
+      console.error(error);
+    }
+  };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <form onSubmit={handleSubmit}>
@@ -292,7 +316,9 @@ export default function Edit({
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit">Enregistrer</Button>
+            <Button type="submit" onClick={handleSubmit}>
+              Enregistrer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

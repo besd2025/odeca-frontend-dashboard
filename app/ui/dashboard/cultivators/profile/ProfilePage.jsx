@@ -6,18 +6,6 @@ import ActivityList from "./profile-content";
 import Edit from "../edit";
 import { useSearchParams } from "next/navigation";
 function ProfilePage() {
-  const profile = {
-    name: "Brave Gak",
-    title: "Cafeiculteur",
-    avatar: "/images/logo.jpg",
-    cni: "25/4565",
-    birthDate: "12 Jan 1990",
-    gender: "M",
-    location: "Bujumbura / Kamenge / Mirango",
-    phone: "78451232",
-    champs: "4",
-    sdl: "Ngome / Kayanza",
-  };
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   return (
@@ -27,7 +15,7 @@ function ProfilePage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        <ProfileCard profile={profile} />
+        <ProfileCard cult_id={id} />
 
         <div className="flex-1 space-y-6">
           <section className="space-y-4">

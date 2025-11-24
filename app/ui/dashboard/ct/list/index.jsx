@@ -35,37 +35,59 @@ import Edit from "../edit";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
-
-const data = [
-  {
-    id: "ct_001",
-    ct: {
-      ct_code: "2530-522-7545",
-      ct_name: "Brave",
-      type: "CT",
-    },
-    society: "ODECA",
-    responsable: {
-      first_name: "Brave",
-      last_name: "Eddy",
-      telephone: 78451202,
-    },
-    localite: {
-      province: "Buja",
-      commune: "Ntahangwa",
-    },
-  },
-];
+import { fetchData } from "@/app/_utils/api";
 
 export default function CtsListTable() {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [data, setData] = React.useState([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
+
+  React.useEffect(() => {
+    const getSdls = async () => {
+      try {
+        const response = await fetchData("get", "cafe/centres_transite/", {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+        const results = response?.results;
+        console.log("CTs data fetched:", results);
+        const ctData = results.map((ct) => ({
+          id: ct?.id,
+          ct: {
+            ct_code: ct?.sdl?.sdl_code,
+            ct_name: ct?.ct_nom,
+            type: "",
+          },
+          society: ct?.sdl?.societe?.nom_societe,
+          responsable: {
+            first_name: "Brave",
+            last_name: "Eddy",
+            telephone: 78451202,
+          },
+          localite: {
+            province:
+              ct?.ct_adress?.zone_code?.commune_code?.province_code
+                ?.province_name || "",
+            commune: ct?.ct_adress?.zone_code?.commune_code?.commune_name,
+          },
+        }));
+
+        setData(ctData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getSdls();
+  }, []);
+
   const columns = [
     {
       id: "actions",
@@ -73,7 +95,7 @@ export default function CtsListTable() {
       header: "Actions",
       cell: ({ row }) => {
         const ct = row.original;
-
+        console.log("CT Row Data:", ct);
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -92,16 +114,11 @@ export default function CtsListTable() {
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href="/odeca-dashboard/ct/details">
+              <Link href={`/odeca-dashboard/ct/details/?id=${ct.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
               <div>
-                <Edit
-                  ct={ct.ct}
-                  responsable={ct.responsable}
-                  society={ct.society}
-                  localite={ct.localite}
-                />
+                <Edit id={ct.id} />
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
