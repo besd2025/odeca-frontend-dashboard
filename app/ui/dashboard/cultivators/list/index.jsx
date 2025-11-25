@@ -53,6 +53,7 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
       cell: ({ row }) => {
         const result = row.original;
         const cultivator = row.original?.cultivator;
+        console.log("IMAGE url", cultivator?.image_url);
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -120,7 +121,7 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
         return (
           <div className="flex items-center gap-3">
             <ViewImageDialog
-              imageUrl={cultivators?.image_url}
+              imageUrl={cultivators?.image_url || null}
               alt={`${cultivators?.last_name} ${cultivators?.first_name}`}
             />
             <div>

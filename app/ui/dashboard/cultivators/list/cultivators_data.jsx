@@ -25,8 +25,12 @@ function CultivatorData() {
           sdl_ct: "NGome",
           society: "ODECA",
           localite: {
-            province: "Buja",
-            commune: "Ntahangwa",
+            province:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name,
+            commune:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name,
           },
           champs: 4,
         }));

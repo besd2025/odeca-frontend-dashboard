@@ -176,9 +176,7 @@ const ViewImageDialog = ({
   profile = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const src = imageUrl || fallbackUrl;
-
+  let src = imageUrl || fallbackUrl;
   return (
     <>
       <button
@@ -191,7 +189,14 @@ const ViewImageDialog = ({
           className
         )}
       >
-        <Image src={src} alt={alt} fill sizes="40px" className="object-cover" />
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="40px"
+          className="object-cover"
+          unoptimized
+        />
       </button>
 
       <FullscreenImageModal

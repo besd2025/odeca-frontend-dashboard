@@ -13,7 +13,7 @@ import {
   User,
 } from "lucide-react";
 
-function DetailsCard({ sdlDetails, id }) {
+function DetailsCard({ id }) {
   const [data, setData] = useState([]);
   useEffect(() => {
     const getSdls = async () => {
@@ -31,7 +31,7 @@ function DetailsCard({ sdlDetails, id }) {
     };
 
     getSdls();
-  }, []);
+  }, [id]);
   return (
     <Card className="w-full lg:w-[300px] lg:max-w-sm p-6 space-y-4 rounded-xl shadow-sm">
       <div className="flex flex-col items-center space-y-3 text-center">
@@ -52,7 +52,7 @@ function DetailsCard({ sdlDetails, id }) {
         <div className="space-y-1">
           <p className="text-xl font-semibold">{data?.sdl_nom}</p>
           <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
-            {sdlDetails.title}
+            {""}
           </p>
         </div>
         <Badge
@@ -76,7 +76,11 @@ function DetailsCard({ sdlDetails, id }) {
               Localité
             </span>
             <span className="font-medium text-right">
-              {sdlDetails.location}
+              {
+                data?.sdl_adress?.zone_code?.commune_code?.province_code
+                  ?.province_name
+              }{" "}
+              / {data?.sdl_adress?.zone_code?.commune_code?.commune_name}
             </span>
           </div>
           <Separator className="my-2" />
@@ -88,7 +92,8 @@ function DetailsCard({ sdlDetails, id }) {
               Responsable
             </span>
             <span className="font-medium text-right">
-              {sdlDetails.responsable}
+              {data?.sdl_responsable?.user?.first_name}{" "}
+              {data?.sdl_responsable?.user?.last_name}
             </span>
           </div>
           <Separator className="my-2" />
@@ -99,7 +104,9 @@ function DetailsCard({ sdlDetails, id }) {
               <Phone size={20} />
               Téléphone
             </span>
-            <span className="font-medium">{sdlDetails.phone}</span>
+            <span className="font-medium">
+              {data?.sdl_responsable?.user?.phone}
+            </span>
           </div>
           <Separator className="my-2" />
         </div>

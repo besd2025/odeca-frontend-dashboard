@@ -55,22 +55,26 @@ export default function SdlsListTable() {
       try {
         const response = await fetchData("get", "cafe/stationslavage/", {});
         const results = response?.results;
+        console.log("SDLs fetched:", results);
         const sdlData = results.map((sdl) => ({
           id: sdl?.id,
           sdl: {
             sdl_code: sdl?.sdl_code,
             sdl_name: sdl?.sdl_nom,
-            type: "SDL",
+            type: "",
           },
-          society: "ODECA",
+          society: sdl?.societe?.nom_societe || "",
           responsable: {
-            first_name: "Brave",
-            last_name: "Eddy",
-            telephone: 78451202,
+            first_name: sdl?.sdl_responsable?.user?.first_name || "",
+            last_name: sdl?.sdl_responsable?.user?.last_name || "",
+            telephone: sdl?.sdl_responsable?.user?.phone || "",
           },
           localite: {
-            province: "Buja",
-            commune: "Ntahangwa",
+            province:
+              sdl?.sdl_adress?.zone_code?.commune_code?.province_code
+                ?.province_name || "",
+            commune:
+              sdl?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
           },
         }));
 
@@ -112,12 +116,7 @@ export default function SdlsListTable() {
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
               <div>
-                <Edit
-                  sdl={sdl.sdl}
-                  responsable={sdl.responsable}
-                  society={sdl.society}
-                  localite={sdl.localite}
-                />
+                <Edit id={sdl.id} />
               </div>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -1,6 +1,6 @@
 import DetailsPage from "@/app/ui/dashboard/ct/details/detailsPage";
 import React from "react";
-
+export const dynamic = "force-dynamic";
 export default function page() {
   return (
     <div className="p-4">

@@ -25,14 +25,14 @@ export function LoginForm({ className, ...props }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const accessToken = localStorage.getItem("accessToken");
-  //   if (accessToken) {
-  //     router.push("/odeca-dashboard/home");
-  //   } else {
-  //     router.push("/");
-  //   }
-  // }, [router]);
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      router.push("/odeca-dashboard/home");
+    } else {
+      router.push("/");
+    }
+  }, [router]);
 
   function DecodeToJwt(token) {
     try {

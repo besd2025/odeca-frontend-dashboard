@@ -16,8 +16,26 @@ import {
   Users,
   Venus,
 } from "lucide-react";
+import { fetchData } from "@/app/_utils/api";
+function StatsCard({ id }) {
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getSdls = async () => {
+      try {
+        const response = await fetchData("get", `cafe/stationslavage/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
 
-function StatsCard({ icon: Icon, value, label }) {
+        setData(response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getSdls();
+  }, [id]);
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Card className="@container/card">
