@@ -27,6 +27,7 @@ export default function Edit({ id }) {
   const [soc, setSoc] = React.useState("");
   const [province, setProvince] = React.useState("");
   const [commune, setCommune] = React.useState("");
+  const [societtecode, setSocietteCode] = React.useState("");
 
   React.useEffect(() => {
     const getSdls = async () => {
@@ -40,16 +41,22 @@ export default function Edit({ id }) {
             body: {},
           }
         );
+        console.log("CT data fetched:", response);
         setCode(response?.ct_code || "");
         setCtName(response?.ct_nom || "");
         setSoc(response?.sdl?.societe?.nom_societe || "");
-        // setSocietteCode(response?.societe?.code_societe || "");
+        setSocietteCode(response?.societe?.code_societe || "");
 
-        // setFirstName(responsable?.first_name || "");
-        // setLastName(responsable?.last_name || "");
-        // setTelephone(responsable?.telephone || "");
-        // setProvince(localite?.province || "");
-        // setCommune(localite?.commune || "");
+        setFirstName(response?.ct_responsable?.user?.first_name || "");
+        setLastName(response?.ct_responsable?.user?.last_name || "");
+        setTelephone(response?.ct_responsable?.user?.telephone || "");
+        setProvince(
+          response?.ct_adress?.zone_code?.commune_code?.province_code
+            ?.province_name || ""
+        );
+        setCommune(
+          response?.ct_adress?.zone_code?.commune_code?.commune_name || ""
+        );
       } catch (error) {
         console.error("Error fetching station data:", error);
       }
@@ -126,14 +133,7 @@ export default function Edit({ id }) {
                     onChange={(e) => setCtName(e.target.value)}
                   />
                 </div>
-                <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Type</Label>
-                  <Input
-                    type="text"
-                    value={type}
-                    onChange={(e) => setType(e.target.value)}
-                  />
-                </div>
+
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Société</Label>
                   <Input

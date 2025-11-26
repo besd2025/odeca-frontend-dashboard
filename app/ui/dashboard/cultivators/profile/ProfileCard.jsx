@@ -65,9 +65,9 @@ function ProfileCard({ cult_id }) {
       <div className="flex flex-col items-center space-y-3 text-center">
         <Avatar className="w-32 h-32 mx-auto">
           <AvatarImage
-            src={data?.cultivator_photo}
+            src={data?.cultivator_photo || null}
             alt={data?.cultivator_first_name}
-            className="object-cover hidden"
+            className="object-cover "
           />
           <ViewImageDialog
             imageUrl={data?.cultivator_photo}

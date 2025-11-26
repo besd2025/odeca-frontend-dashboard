@@ -31,6 +31,7 @@ export default function Edit({ id }) {
   React.useEffect(() => {
     const getSdls = async () => {
       try {
+        console.log("Fetching SDL data for ID:", id);
         const response = await fetchData("get", `cafe/stationslavage/${id}/`, {
           params: {},
           additionalHeaders: {},
@@ -40,13 +41,17 @@ export default function Edit({ id }) {
         setCode(response?.sdl_code || "");
         setSdlName(response?.sdl_nom || "");
         setSoc(response?.societe?.nom_societe || "");
-        // setSocietteCode(response?.societe?.code_societe || "");
-
-        // setFirstName(responsable?.first_name || "");
-        // setLastName(responsable?.last_name || "");
-        // setTelephone(responsable?.telephone || "");
-        // setProvince(localite?.province || "");
-        // setCommune(localite?.commune || "");
+        setSocietteCode(response?.societe?.code_societe || "");
+        setFirstName(response?.sdl_responsable?.user?.first_name || "");
+        setLastName(response?.sdl_responsable?.user?.last_name || "");
+        setTelephone(response?.sdl_responsable?.user?.phone || "");
+        setProvince(
+          response?.sdl_adress?.zone_code?.commune_code?.province_code
+            ?.province_name || ""
+        );
+        setCommune(
+          response?.sdl_adress?.zone_code?.commune_code?.commune_name || ""
+        );
       } catch (error) {
         console.error("Error fetching station data:", error);
       }
@@ -117,14 +122,6 @@ export default function Edit({ id }) {
                     type="text"
                     value={sdlName}
                     onChange={(e) => setSdlName(e.target.value)}
-                  />
-                </div>
-                <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Type</Label>
-                  <Input
-                    type="text"
-                    value={type}
-                    onChange={(e) => setType(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">

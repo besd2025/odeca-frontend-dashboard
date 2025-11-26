@@ -1,7 +1,9 @@
+"use client";
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { fetchData } from "@/app/_utils/api";
 import {
   Grape,
   MapPinHouse,
@@ -11,7 +13,30 @@ import {
   User,
 } from "lucide-react";
 
-function DetailsCard({ ctDetails }) {
+function DetailsCard({ id }) {
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getSdls = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/centres_transite/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
+        setData(response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getSdls();
+  }, [id]);
+
   return (
     <Card className="w-full lg:w-[300px] lg:max-w-sm p-6 space-y-4 rounded-xl shadow-sm">
       <div className="flex flex-col items-center space-y-3 text-center">
@@ -30,9 +55,9 @@ function DetailsCard({ ctDetails }) {
           </svg>
         </div>
         <div className="space-y-1">
-          <p className="text-xl font-semibold">{ctDetails.name}</p>
+          <p className="text-xl font-semibold">{data?.ct_nom}</p>
           <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
-            {ctDetails.title}
+            {""}
           </p>
         </div>
         <Badge
@@ -40,7 +65,7 @@ function DetailsCard({ ctDetails }) {
           variant="outline"
         >
           <QrCode size={30} />
-          <span className="">215-525-644</span>
+          <span className="">{data?.ct_code}</span>
         </Badge>
       </div>
 
@@ -55,7 +80,13 @@ function DetailsCard({ ctDetails }) {
               <MapPinHouse size={20} />
               Localité
             </span>
-            <span className="font-medium text-right">{ctDetails.location}</span>
+            <span className="font-medium text-right">
+              {
+                data?.ct_adress?.zone_code?.commune_code?.province_code
+                  ?.province_name
+              }
+              / {data?.ct_adress?.zone_code?.commune_code?.commune_name}
+            </span>
           </div>
           <Separator className="my-2" />
         </div>
@@ -66,7 +97,7 @@ function DetailsCard({ ctDetails }) {
               Responsable
             </span>
             <span className="font-medium text-right">
-              {ctDetails.responsable}
+              {data?.responsable?.first_name} {data?.responsable?.last_name}
             </span>
           </div>
           <Separator className="my-2" />
@@ -77,7 +108,7 @@ function DetailsCard({ ctDetails }) {
               <Phone size={20} />
               Téléphone
             </span>
-            <span className="font-medium">{ctDetails.phone}</span>
+            <span className="font-medium">{data?.responsable?.telephone}</span>
           </div>
           <Separator className="my-2" />
         </div>
