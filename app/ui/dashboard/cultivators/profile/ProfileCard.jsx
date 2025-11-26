@@ -81,7 +81,7 @@ function ProfileCard({ cult_id }) {
               .slice(0, 2)}
           </AvatarFallback> */}
         </Avatar>
-        <div className="space-y-1">
+        <div className="space-y-1 flex flex-col items-center gap-y-2">
           <p className="text-xl font-semibold">
             {data?.cultivator_first_name} {data?.cultivator_last_name}
           </p>

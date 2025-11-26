@@ -163,14 +163,17 @@ export default function SdlsListTable() {
               />
             </svg>
 
-            <div className="relative">
-              <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                {sdls.sdl_name}
-              </span>
-              <span className="block text-gray-500 text-theme-xs dark:text-gray-400 mt-2">
-                {sdls.sdl_code}
-              </span>
-              <Badge className="absolute top-0 right-0 text-xs">SDL</Badge>
+            <div className="relative w-max flex ">
+              <div>
+                <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
+                  {sdls.sdl_name}
+                </span>
+                <span className="block text-gray-500 text-theme-xs dark:text-gray-400 mt-2">
+                  {sdls.sdl_code}
+                </span>
+              </div>
+
+              <Badge className="size-max ml-2 text-xs">SDL</Badge>
             </div>
           </div>
         );
