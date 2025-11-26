@@ -5,6 +5,7 @@ import { ChartColumn, List } from "lucide-react";
 import CultivatorsListTable from "@/app/ui/dashboard/cultivators/list";
 import ProfilePage from "@/app/ui/dashboard/cultivators/profile/ProfilePage";
 import { fetchData } from "@/app/_utils/api";
+import CultivatorAnalytics from "../analytics";
 
 function CultivatorData() {
   const [data, setData] = useState([]);
@@ -62,7 +63,9 @@ function CultivatorData() {
           <h1 className="text-2xl font-semibold m-2">Liste des cultivateurs</h1>
           <CultivatorsListTable data={data} isCultivatorsPage={true} />
         </TabsContent>
-        <TabsContent value="details">En cours...</TabsContent>
+        <TabsContent value="details">
+          <CultivatorAnalytics />
+        </TabsContent>
       </Tabs>
     </div>
   );
