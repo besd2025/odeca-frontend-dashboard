@@ -56,7 +56,7 @@ export function PaymentChart() {
             >
               <LabelList
                 dataKey="mode"
-                className="fill-background"
+                className="fill-sidebar-foreground"
                 stroke="none"
                 fontSize={12}
                 formatter={(value) => paymentConfig[value]?.label}

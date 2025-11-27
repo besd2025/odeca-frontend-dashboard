@@ -25,28 +25,28 @@ import {
 
 const locationData = {
   province: [
-    { name: "Province A", count: 850 },
-    { name: "Province B", count: 620 },
-    { name: "Province C", count: 480 },
-    { name: "Province D", count: 280 },
+    { name: "Province A", count: 25 },
+    { name: "Province B", count: 20 },
+    { name: "Province C", count: 18 },
+    { name: "Province D", count: 12 },
   ],
   region: [
-    { name: "Region X", count: 320 },
-    { name: "Region Y", count: 290 },
-    { name: "Region Z", count: 240 },
-    { name: "Region W", count: 210 },
-    { name: "Region V", count: 180 },
+    { name: "Region X", count: 15 },
+    { name: "Region Y", count: 12 },
+    { name: "Region Z", count: 10 },
+    { name: "Region W", count: 8 },
+    { name: "Region V", count: 5 },
   ],
 };
 
 const locationConfig = {
   count: {
-    label: "Caféiculteurs",
-    color: "var(--chart-5)",
+    label: "CTs",
+    color: "var(--chart-4)",
   },
 };
 
-export function LocationChart() {
+export function CtLocationChart() {
   const [locFilter, setLocFilter] = useState("province");
 
   return (
@@ -87,7 +87,7 @@ export function LocationChart() {
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => value.slice(0, 10)}
               hide
             />
             <XAxis dataKey="count" type="number" hide />

@@ -278,11 +278,14 @@ export default function CtsListTable() {
           </div>
         </div>
       </div>
-      <div className="grid w-full [&>div]:max-h-[300px] [&>div]:border [&>div]:rounded-md">
+      <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className=" sticky top-0">
+              <TableRow
+                key={headerGroup.id}
+                className=" sticky top-0 bg-background z-10 hover:bg-background"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>

@@ -2,6 +2,7 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartColumn, List } from "lucide-react";
 import CtsListTable from "@/app/ui/dashboard/ct/list";
+import CtAnalytics from "@/app/ui/dashboard/ct/analytics";
 
 function page() {
   return (
@@ -23,7 +24,9 @@ function page() {
           </h1>
           <CtsListTable />
         </TabsContent>
-        <TabsContent value="details">En cours...</TabsContent>
+        <TabsContent value="details">
+          <CtAnalytics />
+        </TabsContent>
       </Tabs>
     </div>
   );

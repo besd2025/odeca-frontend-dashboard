@@ -13,7 +13,15 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Cell,
+  LabelList,
+} from "recharts";
 
 const ageData = [
   { range: "-18 ans", count: 50, fill: "var(--color-age1)" },
@@ -60,6 +68,13 @@ export function AgeChart() {
               {ageData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
+              <LabelList
+                dataKey="count"
+                position="insideRight"
+                offset={8}
+                className="fill-white"
+                fontSize={12}
+              />
             </Bar>
           </BarChart>
         </ChartContainer>
