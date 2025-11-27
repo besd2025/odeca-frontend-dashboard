@@ -2,6 +2,7 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartColumn, List } from "lucide-react";
 import SdlsListTable from "@/app/ui/dashboard/sdl/list";
+import SdlAnalytics from "@/app/ui/dashboard/sdl/analytics";
 
 function page() {
   return (
@@ -23,7 +24,9 @@ function page() {
           </h1>
           <SdlsListTable />
         </TabsContent>
-        <TabsContent value="details">En cours...</TabsContent>
+        <TabsContent value="details">
+          <SdlAnalytics />
+        </TabsContent>
       </Tabs>
     </div>
   );

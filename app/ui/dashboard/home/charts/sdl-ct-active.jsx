@@ -1,8 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { Label, Pie, PieChart, Sector } from "recharts";
-
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -14,159 +12,60 @@ import {
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
-  ChartStyle,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-export const description = "An interactive pie chart";
-
-const desktopData = [
-  { siteType: "sdl", site: 300, fill: "var(--color-sdl)" },
-  { siteType: "ct", site: 200, fill: "var(--color-ct)" },
+const chartData = [
+  { entity: "Caféiculteurs", active: 1850, inactive: 380 },
+  { entity: "SDLs", active: 1200, inactive: 300 },
+  { entity: "CTs", active: 650, inactive: 200 },
 ];
 
 const chartConfig = {
-  ct: {
-    label: "Centre de transite",
+  active: {
+    label: "Actif",
     color: "var(--chart-1)",
   },
-  sdl: {
-    label: "Station de lavage ",
+  inactive: {
+    label: "Inactif",
     color: "var(--chart-5)",
   },
 };
 
 export function ChartPieSdlCtActive() {
-  const id = "pie-interactive";
-  const [activeSiteType, setActiveSiteType] = React.useState(
-    desktopData[0].siteType
-  );
-
-  const activeIndex = React.useMemo(
-    () => desktopData.findIndex((item) => item.siteType === activeSiteType),
-    [activeSiteType]
-  );
-  const siteTypes = React.useMemo(
-    () => desktopData.map((item) => item.siteType),
-    []
-  );
-
   return (
-    <Card data-chart={id} className="flex flex-col">
-      <ChartStyle id={id} config={chartConfig} />
-      <CardHeader className="flex-row items-start space-y-0 pb-0">
-        <div className="grid gap-1">
-          <CardTitle>SDL et CT - En activite</CardTitle>
-          <CardDescription>Campagne 2024</CardDescription>
-        </div>
-        <Select value={activeSiteType} onValueChange={setActiveSiteType}>
-          <SelectTrigger
-            className="ml-auto h-7 w-[130px] rounded-lg pl-2.5"
-            aria-label="Select a value"
-          >
-            <SelectValue placeholder="Select siteType" />
-          </SelectTrigger>
-          <SelectContent align="end" className="rounded-xl">
-            {siteTypes.map((key) => {
-              const config = chartConfig[key];
-
-              if (!config) {
-                return null;
-              }
-
-              return (
-                <SelectItem
-                  key={key}
-                  value={key}
-                  className="rounded-lg [&_span]:flex"
-                >
-                  <div className="flex items-center gap-2 text-xs">
-                    <span
-                      className="flex h-3 w-3 shrink-0 rounded-xs"
-                      style={{
-                        backgroundColor: `var(--color-${key})`,
-                      }}
-                    />
-                    {config?.label}
-                  </div>
-                </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
+    <Card>
+      <CardHeader>
+        <CardTitle>Comparaison d'Activité</CardTitle>
+        <CardDescription>Actifs vs Inactifs par Entité</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-1 justify-center pb-0">
-        <ChartContainer
-          id={id}
-          config={chartConfig}
-          className="mx-auto aspect-auto w-full aspect-auto h-[300px]  max-w-[300px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+      <CardContent>
+        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+          <BarChart accessibilityLayer data={chartData}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="entity"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => value}
             />
-            <ChartLegend
-              content={<ChartLegendContent nameKey="siteType" />}
-              className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+            <ChartLegend content={<ChartLegendContent />} />
+            <Bar
+              dataKey="active"
+              stackId="a"
+              fill="var(--color-active)"
+              radius={[0, 0, 4, 4]}
             />
-            <Pie
-              data={desktopData}
-              dataKey="site"
-              nameKey="siteType"
-              innerRadius={60}
-              strokeWidth={5}
-              activeIndex={activeIndex}
-              activeShape={({ outerRadius = 0, ...props }) => (
-                <g>
-                  <Sector {...props} outerRadius={outerRadius + 8} />
-                  <Sector
-                    {...props}
-                    outerRadius={outerRadius + 15}
-                    innerRadius={outerRadius + 12}
-                  />
-                </g>
-              )}
-            >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
-                        >
-                          {desktopData[activeIndex].site.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Sites
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
+            <Bar
+              dataKey="inactive"
+              stackId="a"
+              fill="var(--color-inactive)"
+              radius={[4, 4, 0, 0]}
+            />
+          </BarChart>
         </ChartContainer>
       </CardContent>
     </Card>
