@@ -31,13 +31,11 @@ export default function Edit({ id }) {
   React.useEffect(() => {
     const getSdls = async () => {
       try {
-        console.log("Fetching SDL data for ID:", id);
         const response = await fetchData("get", `cafe/stationslavage/${id}/`, {
           params: {},
           additionalHeaders: {},
           body: {},
         });
-        console.log("SDL data fetched:", response);
         setCode(response?.sdl_code || "");
         setSdlName(response?.sdl_nom || "");
         setSoc(response?.societe?.nom_societe || "");

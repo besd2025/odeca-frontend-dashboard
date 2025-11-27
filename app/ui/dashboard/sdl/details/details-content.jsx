@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { fetchData } from "@/app/_utils/api";
 import EditHistory from "./edit-history";
 import {
   DropdownMenu,
@@ -31,7 +31,7 @@ import RedementC from "./rendement";
 import RHlist from "./RH";
 import { Button } from "@/components/ui/button";
 
-function DetailsContent({ items }) {
+function DetailsContent({ id }) {
   const cultivatorsData = [
     {
       id: "cultivator_001",
@@ -177,6 +177,84 @@ function DetailsContent({ items }) {
     },
   ];
   const [tab, setTab] = useState("cultivators");
+
+  const [data, setData] = React.useState([]);
+  const [dataAchat, setAchatDate] = React.useState([]);
+  React.useEffect(() => {
+    const getAchatsHangars = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_achats/`,
+          {}
+        );
+        const results = response?.results;
+        const AchatsCTData = results?.map((achats) => ({
+          id: achats?.id,
+          cultivator: {
+            cultivator_code: achats?.cafeiculteur?.cultivator_code,
+            first_name: achats?.cafeiculteur?.cultivator_first_name,
+            last_name: achats?.cafeiculteur?.cultivator_last_name,
+            image_url: achats?.cafeiculteur?.cultivator_photo,
+          },
+          localite: {
+            province:
+              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name,
+            commune:
+              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name,
+          },
+          num_fiche: 784,
+          num_recu: achats?.numero_recu,
+          photo_fiche: achats?.photo_fiche,
+          ca: achats?.quantite_cerise_a,
+          cb: achats?.quantite_cerise_b,
+          date: achats?.date_achat,
+        }));
+        setAchatDate(AchatsCTData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+    const getCultivators = async () => {
+      // try {
+      //   const response = await fetchData(
+      //     "get",
+      //     `cafe/stationslavage/${id}/get_cultivators/`,
+      //     {}
+      //   );
+      //   const results = response?.results;
+      //   const cultivatorsData = results?.map((cultivator) => ({
+      //     id: cultivator?.id,
+      //     cultivator: {
+      //       cultivator_code: cultivator?.cultivator_code,
+      //       first_name: cultivator?.cultivator_first_name,
+      //       last_name: cultivator?.cultivator_last_name,
+      //       image_url: cultivator?.cultivator_photo,
+      //     },
+      //     sdl_ct: "NGome",
+      //     society: "ODECA",
+      //     localite: {
+      //       province:
+      //         cultivator?.cultivator_adress?.zone_code?.commune_code
+      //           ?.province_code?.province_name,
+      //       commune:
+      //         cultivator?.cultivator_adress?.zone_code?.commune_code
+      //           ?.commune_name,
+      //     },
+      //     champs: 4,
+      //   }));
+      //   setData(cultivatorsData);
+      // } catch (error) {
+      //   console.error("Error fetching cultivators data:", error);
+      // }
+    };
+
+    getAchatsHangars();
+    // getCultivators();
+  }, [id]);
+
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
       <Tabs value={tab} className="space-y-6 w-full" onValueChange={setTab}>
@@ -259,7 +337,7 @@ function DetailsContent({ items }) {
         </TabsContent>
         <TabsContent value="achats">
           <h1 className="text-xl font-semibold m-2">Achats effectues</h1>
-          <Achats data={sdlAchats} />
+          <Achats data={dataAchat} />
         </TabsContent>
 
         <TabsContent value="maps">En cours...</TabsContent>

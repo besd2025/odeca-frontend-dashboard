@@ -19,23 +19,37 @@ import {
 import { fetchData } from "@/app/_utils/api";
 function StatsCard({ id }) {
   const [data, setData] = React.useState([]);
-  React.useEffect(() => {
-    const getSdls = async () => {
-      try {
-        const response = await fetchData("get", `cafe/stationslavage/${id}/`, {
-          params: {},
-          additionalHeaders: {},
-          body: {},
-        });
+  // React.useEffect(() => {
+  //   const getSdls = async () => {
+  //     try {
+  //       const qte_achete = await fetchData(
+  //         "get",
+  //         `cafe/stationslavage/${id}/get_total_achat_par_sdl/`,
+  //         {
+  //           params: {},
+  //           additionalHeaders: {},
+  //           body: {},
+  //         }
+  //       );
+  //       const nombre_cultivateurs = await fetchData(
+  //         "get",
+  //         `cafe/stationslavage/${id}/get_total_cultivators_sdl/`,
+  //         {
+  //           params: {},
+  //           additionalHeaders: {},
+  //           body: {},
+  //         }
+  //       );
+  //       const response = { qte_achete, nombre_cultivateurs };
+  //       console.log("::::", response);
+  //       setData(response);
+  //     } catch (error) {
+  //       console.error("Error fetching cultivators data:", error);
+  //     }
+  //   };
 
-        setData(response);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-
-    getSdls();
-  }, [id]);
+  //   getSdls();
+  // }, [id]);
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Card className="@container/card">

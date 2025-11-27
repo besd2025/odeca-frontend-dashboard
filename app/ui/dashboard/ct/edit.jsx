@@ -41,7 +41,6 @@ export default function Edit({ id }) {
             body: {},
           }
         );
-        console.log("CT data fetched:", response);
         setCode(response?.ct_code || "");
         setCtName(response?.ct_nom || "");
         setSoc(response?.sdl?.societe?.nom_societe || "");

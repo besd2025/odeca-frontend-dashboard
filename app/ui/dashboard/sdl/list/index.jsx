@@ -55,7 +55,6 @@ export default function SdlsListTable() {
       try {
         const response = await fetchData("get", "cafe/stationslavage/", {});
         const results = response?.results;
-        console.log("SDLs fetched:", results);
         const sdlData = results.map((sdl) => ({
           id: sdl?.id,
           sdl: {
