@@ -10,15 +10,6 @@ import { CtTopFiveCards } from "./components/CtTopFiveCards";
 export default function CtAnalytics() {
   return (
     <div className="lg:p-4 space-y-6 bg-muted/10 min-h-screen">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Analytiques des CTs
-        </h1>
-        <p className="text-muted-foreground">
-          Vue d'ensemble des données et performances des CTs.
-        </p>
-      </div>
-
       {/* Top Cards */}
       <CtSummaryCards />
 

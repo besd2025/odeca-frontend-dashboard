@@ -12,15 +12,6 @@ import { PaymentChart } from "./components/PaymentChart";
 export default function CultivatorAnalytics() {
   return (
     <div className="lg:p-4 space-y-6 bg-muted/10 min-h-screen">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Analytiques des Cultivateurs
-        </h1>
-        <p className="text-muted-foreground">
-          Vue d'ensemble des données démographiques et de production.
-        </p>
-      </div>
-
       {/* Top Cards */}
       <SummaryCards />
 
