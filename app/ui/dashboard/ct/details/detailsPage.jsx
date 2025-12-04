@@ -13,7 +13,7 @@ function DetailsPage() {
       <div className="flex justify-end gap-2">
         <Edit id={id} />
       </div>
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-4">
         <DetailsCard id={id} />
 
         <div className="flex-1 space-y-6">
