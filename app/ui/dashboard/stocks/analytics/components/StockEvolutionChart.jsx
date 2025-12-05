@@ -12,6 +12,8 @@ import {
 import {
   ChartConfig,
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -19,26 +21,35 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const stockDataByPeriod = {
   mois: [
-    { date: "Jan", amount: 40 },
-    { date: "Feb", amount: 45 },
-    { date: "Mar", amount: 35 },
-    { date: "Apr", amount: 50 },
-    { date: "May", amount: 55 },
-    { date: "Jun", amount: 58.2 },
+    { date: "Jan", amount: 40, ca: 120, cb: 20 },
+    { date: "Feb", amount: 42, ca: 135, cb: 25 },
+    { date: "Mar", amount: 46, ca: 150, cb: 28 },
+    { date: "Apr", amount: 49, ca: 160, cb: 30 },
+    { date: "May", amount: 53, ca: 175, cb: 32 },
+    { date: "Jun", amount: 58, ca: 190, cb: 35 },
   ],
+
   annee: [
-    { date: "2020", amount: 120 },
-    { date: "2021", amount: 150 },
-    { date: "2022", amount: 180 },
-    { date: "2023", amount: 210 },
-    { date: "2024", amount: 250 },
+    { date: "2020", amount: 120, ca: 450, cb: 80 },
+    { date: "2021", amount: 140, ca: 480, cb: 85 },
+    { date: "2022", amount: 165, ca: 510, cb: 90 },
+    { date: "2023", amount: 190, ca: 540, cb: 95 },
+    { date: "2024", amount: 220, ca: 580, cb: 100 },
   ],
 };
 
 const chartConfig = {
   amount: {
     label: "Stock (T)",
-    color: "hsl(var(--primary))",
+    color: "var(--destructive)",
+  },
+  ca: {
+    label: "Cerise A (T)",
+    color: "var(--primary)",
+  },
+  cb: {
+    label: "Cerise B (T)",
+    color: "var(--secondary)",
   },
 };
 
@@ -98,6 +109,30 @@ export function StockEvolutionChart() {
                   stopOpacity={0.1}
                 />
               </linearGradient>
+              <linearGradient id="fillStockCA" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-ca)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-ca)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillStockCB" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-cb)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-cb)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
             </defs>
             <Area
               dataKey="amount"
@@ -106,6 +141,21 @@ export function StockEvolutionChart() {
               fillOpacity={0.4}
               stroke="var(--color-amount)"
             />
+            <Area
+              dataKey="ca"
+              type="natural"
+              fill="url(#fillStockCA)"
+              fillOpacity={0.4}
+              stroke="var(--color-ca)"
+            />
+            <Area
+              dataKey="cb"
+              type="natural"
+              fill="url(#fillStockCB)"
+              fillOpacity={0.4}
+              stroke="var(--color-cb)"
+            />
+            <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
         </ChartContainer>
       </CardContent>

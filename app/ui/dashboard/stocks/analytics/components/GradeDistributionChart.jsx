@@ -28,19 +28,19 @@ const chartConfig = {
   },
   a1: {
     label: "Grade A1",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-5)",
   },
   a2: {
     label: "Grade A2",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-4)",
   },
   b1: {
     label: "Grade B1",
-    color: "hsl(var(--chart-3))",
+    color: "var(--chart-1)",
   },
   b2: {
     label: "Grade B2",
-    color: "hsl(var(--chart-4))",
+    color: "var(--chart-2)",
   },
 };
 
@@ -67,8 +67,7 @@ export function GradeDistributionChart() {
               nameKey="name"
               innerRadius={60}
               strokeWidth={5}
-            >
-            </Pie>
+            ></Pie>
             <Legend />
           </PieChart>
         </ChartContainer>

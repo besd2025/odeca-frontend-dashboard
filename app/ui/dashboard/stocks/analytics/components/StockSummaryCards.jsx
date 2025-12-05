@@ -4,19 +4,20 @@ import React from "react";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Package, DollarSign, Layers } from "lucide-react";
+import { Package, DollarSign, Layers, Grape } from "lucide-react";
 
 export function StockSummaryCards() {
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-4">
       <Card className="@container/card">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-destructive p-2 rounded-md text-white">
-             <Package className="h-4 w-4" />
+              <Package className="h-4 w-4" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums ml-2">
               58.2 T
@@ -27,6 +28,35 @@ export function StockSummaryCards() {
           </CardTitle>
         </CardHeader>
       </Card>
+      <Card className="@container/card col-span-1">
+        <CardContent className="text-sm h-full">
+          <div className=" flex flex-col justify-between gap-y-2 h-full">
+            <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-full h-1/2">
+              <div className="flex flex-row gap-x-1 items-center">
+                <Grape className="text-primary size-5" />
+                <CardTitle className="text-md font-semibold text-primary">
+                  Cerise A :
+                </CardTitle>
+              </div>
+              <CardDescription className="font-semibold text-accent-foreground text-lg">
+                7845 <span className="text-sm">Kg</span>
+              </CardDescription>
+            </div>
+            <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg w-full h-1/2">
+              <div className="flex flex-row gap-x-1 items-center">
+                <Grape className="text-secondary size-5" />
+                <CardTitle className="text-md font-semibold text-secondary">
+                  Cerise B :
+                </CardTitle>
+              </div>
+              <CardDescription className="font-semibold text-accent-foreground text-lg">
+                7845 <span className="text-sm">Kg</span>
+              </CardDescription>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Valeur Estimée</CardTitle>
