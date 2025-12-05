@@ -14,30 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { fetchData } from "@/app/_utils/api";
 function Filter() {
-  // Example options for the selects
-  // const provinceOptions = [
-  //   { value: "buja", label: "Buja" },
-  //   { value: "kigali", label: "Kigali" },
-  //   { value: "rwanda_north", label: "Rwanda North" },
-  // ];
-
-  // const communeOptions = [
-  //   { value: "ntahangwa", label: "Ntahangwa" },
-  //   { value: "gasabo", label: "Gasabo" },
-  //   { value: "gicumbi", label: "Gicumbi" },
-  // ];
-
-  // const zoneOptions = [
-  //   { value: "zone_a", label: "Zone A" },
-  //   { value: "zone_b", label: "Zone B" },
-  // ];
-
-  // const collineOptions = [
-  //   { value: "colline_1", label: "Colline 1" },
-  //   { value: "colline_2", label: "Colline 2" },
-  // ];
-
-  // Local state and handlers for the example selects/inputs
   const [selectedProvince, setSelectedProvince] = React.useState("");
   const [selectedCommune, setSelectedCommune] = React.useState("");
   const [selectedZone, setSelectedZone] = React.useState("");
@@ -53,13 +29,8 @@ function Filter() {
   const [error, setError] = React.useState(null);
   const [collines, setColline] = React.useState([]);
   const [societes, setSocietes] = React.useState([]);
-  // const handleSelectProvinceChange = (e) => setSelectedProvince(e.target.value);
-  // const handleSelectCommuneChange = (e) => setSelectedCommune(e.target.value);
-  // const handleSelectZoneChange = (e) => setSelectedZone(e.target.value);
-  // const handleSelectCollineChange = (e) => setSelectedColline(e.target.value);
 
   const handleSelectProvinceChange = async (e) => {
-    //console.log("Selected value:", value);
     const value = e.target.value;
     if (!value) {
       setCommune([]);

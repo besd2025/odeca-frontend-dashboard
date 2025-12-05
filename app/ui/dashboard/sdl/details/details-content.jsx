@@ -181,7 +181,7 @@ function DetailsContent({ id }) {
   const [data, setData] = React.useState([]);
   const [dataAchat, setAchatDate] = React.useState([]);
   React.useEffect(() => {
-    const getAchatsHangars = async () => {
+    const getAchatsSDls = async () => {
       try {
         const response = await fetchData(
           "get",
@@ -189,7 +189,7 @@ function DetailsContent({ id }) {
           {}
         );
         const results = response?.results;
-        const AchatsCTData = results?.map((achats) => ({
+        const AchatsSDLData = results?.map((achats) => ({
           id: achats?.id,
           cultivator: {
             cultivator_code: achats?.cafeiculteur?.cultivator_code,
@@ -212,47 +212,77 @@ function DetailsContent({ id }) {
           cb: achats?.quantite_cerise_b,
           date: achats?.date_achat,
         }));
-        setAchatDate(AchatsCTData);
+        setAchatDate(AchatsSDLData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
     };
     const getCultivators = async () => {
-      // try {
-      //   const response = await fetchData(
-      //     "get",
-      //     `cafe/stationslavage/${id}/get_cultivators/`,
-      //     {}
-      //   );
-      //   const results = response?.results;
-      //   const cultivatorsData = results?.map((cultivator) => ({
-      //     id: cultivator?.id,
-      //     cultivator: {
-      //       cultivator_code: cultivator?.cultivator_code,
-      //       first_name: cultivator?.cultivator_first_name,
-      //       last_name: cultivator?.cultivator_last_name,
-      //       image_url: cultivator?.cultivator_photo,
-      //     },
-      //     sdl_ct: "NGome",
-      //     society: "ODECA",
-      //     localite: {
-      //       province:
-      //         cultivator?.cultivator_adress?.zone_code?.commune_code
-      //           ?.province_code?.province_name,
-      //       commune:
-      //         cultivator?.cultivator_adress?.zone_code?.commune_code
-      //           ?.commune_name,
-      //     },
-      //     champs: 4,
-      //   }));
-      //   setData(cultivatorsData);
-      // } catch (error) {
-      //   console.error("Error fetching cultivators data:", error);
-      // }
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_cultivators/`,
+          {}
+        );
+        const results = response?.results;
+        const cultivatorsData = results?.map((cultivator) => ({
+          id: cultivator?.id,
+          cultivator: {
+            cultivator_code: cultivator?.cultivator_code,
+            first_name: cultivator?.cultivator_first_name,
+            last_name: cultivator?.cultivator_last_name,
+            image_url: cultivator?.cultivator_photo,
+          },
+          sdl_ct: "NGome",
+          society: "ODECA",
+          localite: {
+            province:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name,
+            commune:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name,
+          },
+          champs: 4,
+        }));
+        setData(cultivatorsData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+    const getTransfers = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_transferts/`,
+          {}
+        );
+        const results = response?.results;
+        console.log("transfert: ", response);
+        const transfersData = results?.map((transfer) => ({
+          id: transfer?.id,
+
+          from_sdl: "Ngome",
+          to_depulpeur_name: "NGANE",
+          society: "ODECA",
+          qte_tranferer: {
+            ca: 78452,
+            cb: 741,
+          },
+          photo_fiche: "/images/logo_1.jpg",
+          localite: {
+            province: "Buja",
+            commune: "Ntahangwa",
+          },
+        }));
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
     };
 
-    getAchatsHangars();
-    // getCultivators();
+    getAchatsSDls();
+    getCultivators();
+    getTransfers();
   }, [id]);
 
   return (
@@ -330,10 +360,7 @@ function DetailsContent({ id }) {
         </TabsList>
         <TabsContent value="cultivators">
           <h1 className="text-xl font-semibold m-2">Liste des Cafeiculteurs</h1>
-          <CultivatorsListTable
-            data={cultivatorsData}
-            isCultivatorsPage={false}
-          />
+          <CultivatorsListTable data={data} isCultivatorsPage={false} />
         </TabsContent>
         <TabsContent value="achats">
           <h1 className="text-xl font-semibold m-2">Achats effectues</h1>

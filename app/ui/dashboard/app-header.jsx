@@ -57,6 +57,11 @@ const menuItems = {
     avatar: "/avatars/shadcn.jpg",
   },
 };
+const deconnecter = () => {
+  localStorage.removeItem("accessToken");
+  window.location.href = "/";
+};
+
 export function AppHeader() {
   return (
     <div className="">
@@ -139,7 +144,7 @@ export function AppHeader() {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={deconnecter}>
                   <IconLogout />
                   Log out
                 </DropdownMenuItem>

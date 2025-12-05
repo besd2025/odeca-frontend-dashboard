@@ -19,37 +19,39 @@ import {
 import { fetchData } from "@/app/_utils/api";
 function StatsCard({ id }) {
   const [data, setData] = React.useState([]);
-  // React.useEffect(() => {
-  //   const getSdls = async () => {
-  //     try {
-  //       const qte_achete = await fetchData(
-  //         "get",
-  //         `cafe/stationslavage/${id}/get_total_achat_par_sdl/`,
-  //         {
-  //           params: {},
-  //           additionalHeaders: {},
-  //           body: {},
-  //         }
-  //       );
-  //       const nombre_cultivateurs = await fetchData(
-  //         "get",
-  //         `cafe/stationslavage/${id}/get_total_cultivators_sdl/`,
-  //         {
-  //           params: {},
-  //           additionalHeaders: {},
-  //           body: {},
-  //         }
-  //       );
-  //       const response = { qte_achete, nombre_cultivateurs };
-  //       console.log("::::", response);
-  //       setData(response);
-  //     } catch (error) {
-  //       console.error("Error fetching cultivators data:", error);
-  //     }
-  //   };
+  React.useEffect(() => {
+    const getSdls = async () => {
+      try {
+        const qte_achete = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_total_achat_par_sdl/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
 
-  //   getSdls();
-  // }, [id]);
+        const nombre_cultivateurs = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_total_cultivators_sdl/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
+        const response = { qte_achete, nombre_cultivateurs };
+        console.log("::::", response);
+        setData(response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getSdls();
+  }, [id]);
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Card className="@container/card">
@@ -59,7 +61,9 @@ function StatsCard({ id }) {
               <Archive className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              60 194,59 <span className="text-base">T</span>
+              {data?.qte_achete?.montant_cerise_a +
+                data?.qte_achete?.montant_cerise_b}{" "}
+              <span className="text-base">Kg</span>
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
@@ -77,7 +81,8 @@ function StatsCard({ id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                60 194,59 <span className="text-sm">T</span>
+                {data?.qte_achete?.montant_cerise_a}
+                <span className="text-sm">T</span>
               </CardDescription>
             </div>
             <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
@@ -88,7 +93,8 @@ function StatsCard({ id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                20 194,59 <span className="text-sm">T</span>
+                {data?.qte_achete?.montant_cerise_b}
+                <span className="text-sm">T</span>
               </CardDescription>
             </div>
           </div>
@@ -105,7 +111,9 @@ function StatsCard({ id }) {
             </CardTitle>
           </div>
           <CardTitle className="text-3xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-            60 194 559 456 <span className="text-base">FBU</span>
+            {data?.qte_achete?.montant_cerise_a +
+              data?.qte_achete?.montant_cerise_b}{" "}
+            <span className="text-base">FBU</span>
           </CardTitle>
           <div className="mt-3">
             <div className="flex flex-row gap-x-2 items-center">
@@ -116,7 +124,7 @@ function StatsCard({ id }) {
               </CardTitle>
             </div>
             <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
-              559 456 <span className="text-base">FBU</span>
+              0 <span className="text-base">FBU</span>
             </CardTitle>
           </div>
         </CardHeader>
@@ -132,7 +140,8 @@ function StatsCard({ id }) {
             </CardTitle>
           </div>
           <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-            540
+            {(data?.nombre_cultivateurs?.hommes ?? 0) +
+              (data?.nombre_cultivateurs?.femmes ?? 0)}
           </CardTitle>
           <div className="flex flex-row gap-x-4 mt-4">
             <div className="flex flex-col ">
@@ -143,7 +152,7 @@ function StatsCard({ id }) {
                 Homme
               </div>
               <div className="text-lg font-semibold tracking-tight tabular-nums ml-4">
-                500
+                {data?.nombre_cultivateurs?.hommes}
               </div>
             </div>
             <div className="flex flex-col ">
@@ -154,7 +163,7 @@ function StatsCard({ id }) {
                 Femme
               </div>
               <div className="text-lg font-semibold tracking-tight tabular-nums ml-4">
-                40
+                {data?.nombre_cultivateurs?.femmes}
               </div>
             </div>
           </div>
