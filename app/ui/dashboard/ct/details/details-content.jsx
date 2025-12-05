@@ -27,115 +27,6 @@ import TransferCtDep from "./tranfer/transfer-ct";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
 function DetailsContent({ id }) {
-  const cultivatorsData = [
-    {
-      id: "cultivator_001",
-      cultivator: {
-        cultivator_code: "2530-522-7545",
-        first_name: "Brave",
-        last_name: "Eddy",
-        image_url: "/images/logo_1.jpg",
-      },
-      ct_ct: "NGome",
-      society: "ODECA",
-      localite: {
-        province: "Buja",
-        commune: "Ntahangwa",
-      },
-      champs: 4,
-    },
-    {
-      id: "cultivator_002",
-      cultivator: {
-        cultivator_code: "2530-522-7545",
-        first_name: "jaa",
-        last_name: "Eddy",
-        image_url: "/images/logo_1.jpg",
-      },
-      ct_ct: "aa",
-      society: "ODECA",
-      localite: {
-        province: "Buja",
-        commune: "Ntahangwa",
-      },
-      champs: 4,
-    },
-    {
-      id: "cultivator_003",
-      cultivator: {
-        cultivator_code: "2530-56833",
-        first_name: "yoo",
-        last_name: "Eddy",
-        image_url: "/images/logo_1.jpg",
-      },
-      ct_ct: "NGome",
-      society: "ODECA",
-      localite: {
-        province: "Buja",
-        commune: "Ntahangwa",
-      },
-      champs: 4,
-    },
-  ];
-  const ctAchats = [
-    {
-      id: "cultivator_001",
-      cultivator: {
-        cultivator_code: "2530-522-7545",
-        first_name: "Brave",
-        last_name: "Eddy",
-        image_url: "/images/logo_1.jpg",
-      },
-      localite: {
-        province: "Buja",
-        commune: "Ntahangwa",
-      },
-      num_fiche: 784,
-      num_recu: 7894,
-      photo_fiche: "/images/logo_1.jpg",
-      ca: 78,
-      cb: 456,
-      date: "12/7/2025",
-    },
-    {
-      id: "cultivator_001",
-      cultivator: {
-        cultivator_code: "2530-522-7545",
-        first_name: "Brave",
-        last_name: "Eddy",
-        image_url: "/images/logo_1.jpg",
-      },
-      localite: {
-        province: "Buja",
-        commune: "Ntahangwa",
-      },
-      num_fiche: 784,
-      num_recu: 7894,
-      photo_fiche: "/images/logo_1.jpg",
-      ca: 33,
-      cb: 4,
-      date: "12/7/2025",
-    },
-    {
-      id: "cultivator_001",
-      cultivator: {
-        cultivator_code: "2530-522-7545",
-        first_name: "Brave",
-        last_name: "Eddy",
-        image_url: "/images/logo_1.jpg",
-      },
-      localite: {
-        province: "Buja",
-        commune: "Ntahangwa",
-      },
-      num_fiche: 784,
-      num_recu: 7894,
-      photo_fiche: "/images/logo_1.jpg",
-      ca: 10,
-      cb: 0,
-      date: "12/7/2025",
-    },
-  ];
   const transferData = [
     {
       id: "cultivator_001",
@@ -156,6 +47,7 @@ function DetailsContent({ id }) {
   const [tab, setTab] = useState("cultivators");
   const [data, setData] = React.useState([]);
   const [dataAchat, setAchatDate] = React.useState([]);
+  const [dataTransfert, setDataTransfert] = React.useState([]);
   React.useEffect(() => {
     const getAchatsHangars = async () => {
       try {
@@ -226,7 +118,38 @@ function DetailsContent({ id }) {
         console.error("Error fetching cultivators data:", error);
       }
     };
-
+    const getTransfers = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/centres_transite/${id}/get_transferts/`,
+          {}
+        );
+        const results = response?.results;
+        const transfersData = results?.map((transfer) => ({
+          id: transfer?.id,
+          from_ct: transfer?.ct?.ct_nom,
+          to_depulpeur_name: transfer?.sdl?.sdl_nom,
+          society: transfer?.sdl?.societe?.nom_societe,
+          qte_tranferer: {
+            ca: transfer?.quantite_cerise_a,
+            cb: transfer?.quantite_cerise_b,
+          },
+          photo_fiche: "/images/logo_1.jpg",
+          localite: {
+            province:
+              transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
+                ?.province_name,
+            commune:
+              transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
+          },
+        }));
+        setDataTransfert(transfersData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+    getTransfers();
     getAchatsHangars();
     getCultivators();
   }, [id]);
@@ -287,7 +210,7 @@ function DetailsContent({ id }) {
         <TabsContent value="maps">En cours...</TabsContent>
         <TabsContent value="transferCt">
           <h1 className="text-xl font-semibold m-2">Transfers effectues</h1>
-          <TransferCtDep data={transferData} />
+          <TransferCtDep data={dataTransfert} />
         </TabsContent>
       </Tabs>
     </Card>

@@ -57,7 +57,6 @@ export default function CtsListTable() {
           body: {},
         });
         const results = response?.results;
-        console.log("CTs data fetched:", results);
         const ctData = results.map((ct) => ({
           id: ct?.id,
           ct: {
@@ -95,7 +94,6 @@ export default function CtsListTable() {
       header: "Actions",
       cell: ({ row }) => {
         const ct = row.original;
-        console.log("CT Row Data:", ct);
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

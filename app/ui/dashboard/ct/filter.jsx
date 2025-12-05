@@ -12,32 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-
+import { fetchData } from "@/app/_utils/api";
 function Filter() {
-  // Example options for the selects
-  const provinceOptions = [
-    { value: "buja", label: "Buja" },
-    { value: "kigali", label: "Kigali" },
-    { value: "rwanda_north", label: "Rwanda North" },
-  ];
-
-  const communeOptions = [
-    { value: "ntahangwa", label: "Ntahangwa" },
-    { value: "gasabo", label: "Gasabo" },
-    { value: "gicumbi", label: "Gicumbi" },
-  ];
-
-  const zoneOptions = [
-    { value: "zone_a", label: "Zone A" },
-    { value: "zone_b", label: "Zone B" },
-  ];
-
-  const collineOptions = [
-    { value: "colline_1", label: "Colline 1" },
-    { value: "colline_2", label: "Colline 2" },
-  ];
-
-  // Local state and handlers for the example selects/inputs
   const [selectedProvince, setSelectedProvince] = React.useState("");
   const [selectedCommune, setSelectedCommune] = React.useState("");
   const [selectedZone, setSelectedZone] = React.useState("");
@@ -47,10 +23,113 @@ function Filter() {
   const [dateFrom, setDateFrom] = React.useState("");
   const [dateTo, setDateTo] = React.useState("");
 
-  const handleSelectProvinceChange = (e) => setSelectedProvince(e.target.value);
-  const handleSelectCommuneChange = (e) => setSelectedCommune(e.target.value);
-  const handleSelectZoneChange = (e) => setSelectedZone(e.target.value);
-  const handleSelectCollineChange = (e) => setSelectedColline(e.target.value);
+  const [province, setProvince] = React.useState([]);
+  const [commune, setCommune] = React.useState([]);
+  const [zones, setZones] = React.useState([]);
+  const [error, setError] = React.useState(null);
+  const [collines, setColline] = React.useState([]);
+  const [societes, setSocietes] = React.useState([]);
+
+  const handleSelectProvinceChange = async (e) => {
+    const value = e.target.value;
+    if (!value) {
+      setCommune([]);
+      return;
+    }
+    const communes = await fetchData(
+      "get",
+      `adress/commune/get_communes_by_province`,
+      {
+        params: { province: value },
+        additionalHeaders: {},
+        body: {},
+      }
+    );
+    const options = communes?.map((item) => ({
+      value: item.commune_name,
+      label: item.commune_name,
+    }));
+    setCommune(options);
+    setSelectedProvince(value);
+  };
+  const handleSelectCommuneChange = async (e) => {
+    const value = e.target.value;
+    if (!value) {
+      setCommune([]);
+      return;
+    }
+    const zones = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
+      params: { commune: value },
+      additionalHeaders: {},
+      body: {},
+    });
+    const options = zones?.map((item) => ({
+      value: item.zone_name,
+      label: item.zone_name,
+    }));
+    setZones(options);
+    setSelectedCommune(value);
+  };
+  const handleSelectZoneChange = async (e) => {
+    const value = e.target.value;
+    if (!value) {
+      setCommune([]);
+      return;
+    }
+    const collines = await fetchData("get", `adress/colline/`, {
+      params: {},
+      additionalHeaders: {},
+      body: {},
+    });
+    const options = collines?.results?.map((item) => ({
+      value: item.colline_name,
+      label: item.colline_name,
+    }));
+    setColline(options);
+    setSelectedZone(value);
+  };
+  const handleSelectCollineChange = (e) => {
+    const value = e.target.value;
+    setSelectedColline(value);
+  };
+  React.useEffect(() => {
+    async function getData() {
+      try {
+        const provinces = await fetchData("get", `adress/province/`, {
+          params: {
+            offset: 0,
+            limit: 18,
+          },
+          additionalHeaders: {},
+          body: {},
+        });
+        const societes = await fetchData("get", `cafe/societes/`, {
+          params: {
+            offset: 0,
+            limit: 18,
+          },
+          additionalHeaders: {},
+          body: {},
+        });
+
+        const options = provinces?.results?.map((item) => ({
+          value: item.province_name,
+          label: item.province_name,
+        }));
+        const societesOptions = societes?.results?.map((item) => ({
+          value: item.id,
+          label: item.nom_societe,
+        }));
+        setSocietes(societesOptions);
+        setProvince(options);
+        //setZones(zones);
+      } catch (error) {
+        setError(error);
+        console.error(error);
+      }
+    }
+    getData();
+  }, []);
 
   return (
     <Dialog>
@@ -116,7 +195,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner province</option>
-                        {provinceOptions.map((p) => (
+                        {province.map((p) => (
                           <option key={p.value} value={p.value}>
                             {p.label}
                           </option>
@@ -136,7 +215,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Commune</option>
-                        {communeOptions.map((c) => (
+                        {commune.map((c) => (
                           <option key={c.value} value={c.value}>
                             {c.label}
                           </option>
@@ -155,7 +234,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner zone</option>
-                        {zoneOptions.map((z) => (
+                        {zones.map((z) => (
                           <option key={z.value} value={z.value}>
                             {z.label}
                           </option>
@@ -174,7 +253,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Colline</option>
-                        {collineOptions.map((c) => (
+                        {collines.map((c) => (
                           <option key={c.value} value={c.value}>
                             {c.label}
                           </option>
@@ -193,7 +272,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner societe</option>
-                        {collineOptions.map((c) => (
+                        {societes.map((c) => (
                           <option key={c.value} value={c.value}>
                             {c.label}
                           </option>
@@ -212,7 +291,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Colline</option>
-                        {collineOptions.map((c) => (
+                        {collines.map((c) => (
                           <option key={c.value} value={c.value}>
                             {c.label}
                           </option>

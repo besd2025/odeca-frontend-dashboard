@@ -15,6 +15,7 @@ function CultivatorData() {
       try {
         const response = await fetchData("get", "cultivators/", {});
         const results = response?.results;
+        console.log(results);
         const cultivatorsData = results.map((cultivator) => ({
           id: cultivator.id,
           cultivator: {
