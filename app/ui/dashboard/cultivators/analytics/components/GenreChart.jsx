@@ -22,7 +22,7 @@ const chartData = [
 ];
 const chartConfig = {
   visitors: {
-    label: "Cafeiculteurs",
+    label: "Cafeiculteurs :",
   },
   hommes: {
     label: "Hommes",
