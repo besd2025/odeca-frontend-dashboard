@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/chart";
 
 const chartData = [
-  { entity: "Caféiculteurs", active: 1850, inactive: 380 },
+  { entity: "UDPs", active: 1850, inactive: 380 },
   { entity: "SDLs", active: 1200, inactive: 300 },
   { entity: "CTs", active: 650, inactive: 200 },
 ];
