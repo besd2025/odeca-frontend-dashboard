@@ -12,6 +12,12 @@ import { fetchData } from "@/app/_utils/api";
 
 export function StockSummaryCard() {
   const [data, setData] = React.useState({});
+  const [rendements, setRendements] = React.useState({});
+  const [grade_a1, setGradeA1] = React.useState(0);
+  const [grade_a2, setGradeA2] = React.useState(0);
+  const [grade_a3, setGradeA3] = React.useState(0);
+  const [grade_b1, setGradeB1] = React.useState(0);
+  const [grade_b2, setGradeB2] = React.useState(0);
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -24,9 +30,32 @@ export function StockSummaryCard() {
             body: {},
           }
         );
-
+        const rendement = await fetchData(
+          "get",
+          `/cafe/detail_rendements/get_rendement_cerise_total_group_by_grade/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
         setData(response);
-        console.log("Cultivators data fetched:", response);
+        rendement.forEach((item) => {
+          console.log(item);
+          if (item.grade__grade_name === "A1") {
+            setGradeA1(item.total_cerise);
+          } else if (item.grade__grade_name === "A2") {
+            setGradeA2(item.total_cerise);
+          } else if (item.grade__grade_name === "A3") {
+            setGradeA3(item.total_cerise);
+          } else if (item.grade__grade_name === "B1") {
+            setGradeB1(item.total_cerise);
+          } else if (item.grade__grade_name === "B2") {
+            setGradeB2(item.total_cerise);
+          }
+        });
+
+        setRendements(rendement);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
@@ -78,7 +107,6 @@ export function StockSummaryCard() {
             <span className="font-medium text-muted-foreground">Cerise B</span>
 
             <span className="text-2xl font-bold text-secondary">
-              {" "}
               {data?.total_cerise_b_achat >= 1000 ? (
                 <>
                   {(data?.total_cerise_b_achat / 1000).toLocaleString("fr-FR", {
@@ -107,18 +135,57 @@ export function StockSummaryCard() {
             <div className="flex flex-wrap gap-4 text-sm  text-muted-foreground">
               <div className="flex flex-col">
                 <span>
-                  A1 : 30 <span className="text-xs">T</span>
+                  A1 :
+                  {grade_a1 >= 1000 ? (
+                    <>
+                      {(grade_a1 / 1000).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      <span className="text-base"> T</span>
+                    </>
+                  ) : (
+                    <>
+                      {grade_a1?.toLocaleString("fr-FR") || 0}
+                      <span className="text-base"> Kg</span>
+                    </>
+                  )}
                 </span>
                 <span>
-                  A2 : 15.2 <span className="text-xs">T</span>
+                  A2 :{" "}
+                  {grade_a2 >= 1000 ? (
+                    <>
+                      {(grade_a2 / 1000).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      <span className="text-base"> T</span>
+                    </>
+                  ) : (
+                    <>
+                      {grade_a2?.toLocaleString("fr-FR") || 0}
+                      <span className="text-base"> Kg</span>
+                    </>
+                  )}
                 </span>
               </div>
               <div className="flex flex-col">
                 <span>
-                  A1 : 30 <span className="text-xs">T</span>
-                </span>
-                <span>
-                  A2 : 15.2 <span className="text-xs">T</span>
+                  A3 :{" "}
+                  {grade_a3 >= 1000 ? (
+                    <>
+                      {(grade_a3 / 1000).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      <span className="text-base"> T</span>
+                    </>
+                  ) : (
+                    <>
+                      {grade_a3?.toLocaleString("fr-FR") || 0}
+                      <span className="text-base"> Kg</span>
+                    </>
+                  )}
                 </span>
               </div>
             </div>
@@ -128,18 +195,38 @@ export function StockSummaryCard() {
             <div className="flex flex-wrap gap-4 text-sm  text-muted-foreground">
               <div className="flex flex-col">
                 <span>
-                  B1 : 8 <span className="text-xs">T</span>
+                  B1 :
+                  {grade_b1 >= 1000 ? (
+                    <>
+                      {(grade_b1 / 1000).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      <span className="text-base"> T</span>
+                    </>
+                  ) : (
+                    <>
+                      {grade_b1?.toLocaleString("fr-FR") || 0}
+                      <span className="text-base"> Kg</span>
+                    </>
+                  )}
                 </span>
                 <span>
-                  B2 : 4.8 <span className="text-xs">T</span>
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span>
-                  B1 : 8 <span className="text-xs">T</span>
-                </span>
-                <span>
-                  B2 : 4.8 <span className="text-xs">T</span>
+                  B2 :
+                  {grade_b2 >= 1000 ? (
+                    <>
+                      {(grade_b2 / 1000).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      <span className="text-base"> T</span>
+                    </>
+                  ) : (
+                    <>
+                      {grade_b2?.toLocaleString("fr-FR") || 0}
+                      <span className="text-base"> Kg</span>
+                    </>
+                  )}
                 </span>
               </div>
             </div>
