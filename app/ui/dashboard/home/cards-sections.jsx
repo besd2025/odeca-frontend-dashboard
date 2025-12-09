@@ -56,13 +56,13 @@ export function SectionCards() {
                   {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  })}
+                  })}{" "}
                   <span className="text-base">T</span>
                 </>
               ) : (
                 <>
-                  {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}
-                  <span className="text-base">Kg</span>
+                  {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}{" "}
+                  <span className="text-sm">Kg</span>
                 </>
               )}
             </CardTitle>
@@ -77,7 +77,7 @@ export function SectionCards() {
                 <div className="flex flex-row gap-x-1 items-center">
                   <Grape className="text-primary size-5" />
                   <CardTitle className="text-md font-semibold text-primary">
-                    Cerise A :
+                    CA :
                   </CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">
@@ -89,13 +89,13 @@ export function SectionCards() {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         }
-                      )}
-                      <span className="text-base">T</span>
+                      )}{" "}
+                      <span className="text-sm">T</span>
                     </>
                   ) : (
                     <>
-                      {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}
-                      <span className="text-base">Kg</span>
+                      {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
                     </>
                   )}
                 </CardDescription>
@@ -105,7 +105,7 @@ export function SectionCards() {
                 <div className="flex flex-row gap-x-1 items-center">
                   <Grape className="text-secondary size-5" />
                   <CardTitle className="text-md font-semibold text-secondary">
-                    Cerise B :
+                    CB :
                   </CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">
@@ -118,12 +118,12 @@ export function SectionCards() {
                           maximumFractionDigits: 2,
                         }
                       )}
-                      <span className="text-base">T</span>
+                      <span className="text-sm">T</span>
                     </>
                   ) : (
                     <>
-                      {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}
-                      <span className="text-base">Kg</span>
+                      {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
                     </>
                   )}
                 </CardDescription>
@@ -142,8 +142,8 @@ export function SectionCards() {
             <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
               {(data?.total_montant_achat ?? 0)
                 .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
-              <span className="text-sm font-normal text-muted-foreground">
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+              <span className="text-xs font-normal text-muted-foreground">
                 FBU
               </span>
             </CardTitle>
