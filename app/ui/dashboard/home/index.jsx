@@ -14,22 +14,23 @@ function DashboardContainer() {
         <div className="flex flex-col gap-4 py-4 md:gap-6 ">
           <SectionCards />
 
-          {/* New KPI Grid Section */}
-          <div className="px-4 lg:px-6">
-            <KPIGrid />
-          </div>
-
           <div className="px-4 lg:px-6 grid grid-cols-5 gap-4">
             {/* Existing Charts + Stock Card */}
-            <div className="col-span-5 md:col-span-3 flex flex-col gap-4">
+            <div className="col-span-5 lg:col-span-3 flex flex-col gap-4">
               <StockSummaryCard />
             </div>
-            <div className="col-span-5 md:col-span-2 flex flex-col gap-4">
+            <div className="col-span-5 lg:col-span-2 flex flex-col gap-4">
               <ChartPieSdlCtActive />
             </div>
           </div>
-          <div className="px-4 lg:px-6">
-            <ChartLineAchats />
+          <div className="px-4 lg:px-6 grid grid-cols-5 gap-4">
+            {/* New KPI Grid Section */}
+            <div className="col-span-5 lg:col-span-1">
+              <KPIGrid />
+            </div>
+            <div className="col-span-5 lg:col-span-4">
+              <ChartLineAchats />
+            </div>
           </div>
 
           {/* New Bottom Section: Transactions & Top Performers */}

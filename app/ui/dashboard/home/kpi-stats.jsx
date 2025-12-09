@@ -3,18 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Scale, Tag, Wallet } from "lucide-react";
 
 const kpiData = [
+  // {
+  //   title: "Qualité (Cerise A)",
+  //   value: "78%",
+  //   trend: "+2.4%",
+  //   trendUp: true,
+  //   icon: Scale,
+  //   color: "text-blue-500",
+  //   bgColor: "bg-blue-500/10",
+  // },
   {
-    title: "Qualité (Cerise A)",
-    value: "78%",
-    trend: "+2.4%",
-    trendUp: true,
-    icon: Scale,
-    color: "text-blue-500",
-    bgColor: "bg-blue-500/10",
-  },
-  {
-    title: "Prix Achat",
-    value: "850 FBU",
+    title: "Prix Achat CA",
+    value: "2800",
     trend: "+50 FBU",
     trendUp: true,
     icon: Tag,
@@ -22,28 +22,37 @@ const kpiData = [
     bgColor: "bg-orange-500/10",
   },
   {
-    title: "Prix Vente",
-    value: "1,250 FBU",
-    trend: "-10 FBU",
-    trendUp: false,
-    icon: Wallet,
-    color: "text-green-500",
-    bgColor: "bg-green-500/10",
-  },
-  {
-    title: "Marge Brute",
-    value: "32%",
-    trend: "+1.2%",
+    title: "Prix Achat CB",
+    value: "1850",
+    trend: "+50 FBU",
     trendUp: true,
-    icon: TrendingUp,
-    color: "text-purple-500",
-    bgColor: "bg-purple-500/10",
+    icon: Tag,
+    color: "text-secondary",
+    bgColor: "bg-secondary/10",
   },
+  // {
+  //   title: "Prix Vente",
+  //   value: "1,250 FBU",
+  //   trend: "-10 FBU",
+  //   trendUp: false,
+  //   icon: Wallet,
+  //   color: "text-green-500",
+  //   bgColor: "bg-green-500/10",
+  // },
+  // {
+  //   title: "Marge Brute",
+  //   value: "32%",
+  //   trend: "+1.2%",
+  //   trendUp: true,
+  //   icon: TrendingUp,
+  //   color: "text-purple-500",
+  //   bgColor: "bg-purple-500/10",
+  // },
 ];
 
 export function KPIGrid() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-rows-2 gap-4">
       {kpiData.map((kpi, index) => (
         <Card key={index} className="shadow-sm">
           <CardContent className=" flex flex-col justify-between h-full gap-2">
@@ -67,8 +76,10 @@ export function KPIGrid() {
               )}
             </div>
             <div>
-              <div className="text-2xl font-bold tabular-nums">{kpi.value}</div>
-              <div className="text-xs text-muted-foreground font-medium mt-1">
+              <div className="text-2xl font-bold tabular-nums">
+                {kpi.value} <span className="text-lg">FBU/Kg</span>{" "}
+              </div>
+              <div className="text-muted-foreground font-medium mt-1">
                 {kpi.title}
               </div>
             </div>

@@ -34,6 +34,7 @@ export function StockSummaryCard() {
 
     getDatas();
   }, []);
+
   return (
     <Card className="@container/stock h-full">
       <CardHeader>
@@ -45,22 +46,24 @@ export function StockSummaryCard() {
         </div>
         <CardDescription>État des stocks en temps réel</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4">
+
+      <CardContent className="grid">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1 p-3 bg-primary/10 rounded-lg">
             <span className="font-medium text-muted-foreground">Cerise A</span>
             <span className="text-2xl font-bold text-primary">
+              {" "}
               {data?.total_cerise_a_achat >= 1000 ? (
                 <>
                   {(data?.total_cerise_a_achat / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  })}{" "}
+                  })}
                   <span className="text-base">T</span>
                 </>
               ) : (
                 <>
-                  {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                  {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}
                   <span className="text-base">Kg</span>
                 </>
               )}
@@ -69,11 +72,11 @@ export function StockSummaryCard() {
               {(data?.total_montant_cerise_a_achat ?? 0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
-              FBU
             </span>
           </div>
           <div className="flex flex-col gap-1 p-3 bg-secondary/10 rounded-lg">
             <span className="font-medium text-muted-foreground">Cerise B</span>
+
             <span className="text-2xl font-bold text-secondary">
               {" "}
               {data?.total_cerise_b_achat >= 1000 ? (
@@ -81,12 +84,12 @@ export function StockSummaryCard() {
                   {(data?.total_cerise_b_achat / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  })}{" "}
+                  })}
                   <span className="text-base">T</span>
                 </>
               ) : (
                 <>
-                  {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                  {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}
                   <span className="text-base">Kg</span>
                 </>
               )}
@@ -95,27 +98,38 @@ export function StockSummaryCard() {
               {(data?.total_montant_cerise_b_achat ?? 0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
-              FBU
             </span>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1 p-3 border rounded">
-            <span className="font-medium text-muted-foreground">Grades A</span>
-            <div className="flex flex-col gap-1 text-sm font-medium text-muted-foreground">
-              <span>A1 : 30T</span>
-              <span>A2 : 15.2T</span>
+        <div className="grid grid-cols-2 gap-4 ml-6">
+          <div className="flex flex-col gap-1 p-3 border-l-2 border-l-primary">
+            <span className="font-medium">Grades A</span>
+            <div className="flex flex-wrap gap-4 text-sm  text-muted-foreground">
+              <div className="flex flex-col">
+                <span>A1 : 30T</span>
+                <span>A2 : 15.2T</span>
+              </div>
+              <div className="flex flex-col">
+                <span>A1 : 30T</span>
+                <span>A2 : 15.2T</span>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col gap-1 p-3 border rounded">
-            <span className="font-medium text-muted-foreground">Grades B</span>
-            <div className="flex flex-col gap-1 text-sm font-medium text-muted-foreground">
-              <span>B1 : 8T</span>
-              <span>B2 : 4.8T</span>
+          <div className="flex flex-col gap-1 p-3 border-l-2 border-l-secondary">
+            <span className="font-medium">Grades B</span>
+            <div className="flex flex-wrap gap-4 text-sm  text-muted-foreground">
+              <div className="flex flex-col">
+                <span>B1 : 8T</span>
+                <span>B2 : 4.8T</span>
+              </div>
+              <div className="flex flex-col">
+                <span>B1 : 8T</span>
+                <span>B2 : 4.8T</span>
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 justify-between p-3 border/5 rounded-lg">
+        <div className="flex items-center gap-2 justify-between p-3 border/5 rounded-lg mt-2">
           <div className="flex items-center gap-2">
             <div className="bg-green-100 p-1.5 rounded-full dark:bg-green-900">
               <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />

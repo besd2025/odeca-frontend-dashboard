@@ -82,7 +82,7 @@ export function ChartLineAchats() {
           defaultValue="mois"
           value={period}
           onValueChange={setPeriod}
-          className="w-sm mt-4"
+          className="w-full max-w-sm mt-4"
         >
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="jour">Jour</TabsTrigger>
