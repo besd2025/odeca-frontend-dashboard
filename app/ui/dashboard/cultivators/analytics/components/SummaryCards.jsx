@@ -10,11 +10,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Users, User, Grape } from "lucide-react";
-
+import { fetchData } from "@/app/_utils/api";
 export function SummaryCards() {
-  const totalCultivators = 2230;
-  const menCount = 1250;
-  const womenCount = 980;
+  const [data, setData] = React.useState({});
+  React.useEffect(() => {
+    const getCultivators = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `/cafe/stationslavage/get_total_cultivators/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        setData(response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCultivators();
+  }, []);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -25,7 +43,7 @@ export function SummaryCards() {
               <Users className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums ml-2">
-              60 194,59
+              {data.total_cultivators}
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums ml-2">
@@ -45,9 +63,10 @@ export function SummaryCards() {
           <User className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{menCount.toLocaleString()}</div>
+          <div className="text-2xl font-bold">{data?.hommes}</div>
           <p className="text-xs text-muted-foreground">
-            {((menCount / totalCultivators) * 100).toFixed(1)}% du total
+            {((data?.hommes / data?.total_cultivators) * 100).toFixed(1)}% du
+            total
           </p>
         </CardContent>
       </Card>
@@ -57,11 +76,10 @@ export function SummaryCards() {
           <User className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            {womenCount.toLocaleString()}
-          </div>
+          <div className="text-2xl font-bold">{data?.femmes}</div>
           <p className="text-xs text-muted-foreground">
-            {((womenCount / totalCultivators) * 100).toFixed(1)}% du total
+            {((data?.femmes / data?.total_cultivators) * 100).toFixed(1)}% du
+            total
           </p>
         </CardContent>
       </Card>

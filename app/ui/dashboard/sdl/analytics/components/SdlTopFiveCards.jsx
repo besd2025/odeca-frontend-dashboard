@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-
+import { fetchData } from "@/app/_utils/api";
 const topQuantity = [
   { image: "/images/logo_1.jpg", name: "SDL Alpha", value: 50000, sub: "Kg" },
   { image: "/images/logo_2.jpg", name: "SDL Beta", value: 42000, sub: "Kg" },
@@ -63,6 +63,28 @@ const topCapacity = [
 ];
 
 function TopListCard({ title, icon, data }) {
+  // const [data, setData] = React.useState([]);
+  // React.useEffect(() => {
+  //   const getSdls = async () => {
+  //     try {
+  //       const response = await fetchData(
+  //         "get",
+  //         `cafe/stationslavage/get_active_and_non_active_sdl/`,
+  //         {
+  //           params: {},
+  //           additionalHeaders: {},
+  //           body: {},
+  //         }
+  //       );
+
+  //       setData(response);
+  //     } catch (error) {
+  //       console.error("Error fetching cultivators data:", error);
+  //     }
+  //   };
+
+  //   getSdls();
+  // }, []);
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -74,7 +96,7 @@ function TopListCard({ title, icon, data }) {
           {data.map((item, i) => (
             <div key={i} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ViewImageDialog imageUrl={item.image} />
+                {/* <ViewImageDialog imageUrl={item.image} /> */}
                 <span className="text-sm font-medium leading-none">
                   {item.name}
                 </span>
@@ -105,17 +127,67 @@ function TopListCard({ title, icon, data }) {
 }
 
 export function SdlTopFiveCards() {
+  const [datatopMembers, setDataTopMembers] = React.useState([]);
+  const [datatopAchats, setDataTopAchats] = React.useState([]);
+  React.useEffect(() => {
+    const getSdls = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/get_top_5_sdl_with_more_cultivators_ordered_by_count/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const topMembers = response.map((item) => ({
+          image: "/images/logo_1.jpg",
+          name: item?.collector__responsable_sdl__sdl__sdl_nom,
+          value: item?.count,
+          sub: "Membres",
+        }));
+        setDataTopMembers(topMembers);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+    const getTopAchats = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/get_top_5_sdl_with_more_quantity_cerise_ordered_by_count/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const topAchats = response.map((item) => ({
+          name: item?.responsable__responsable_ct__ct__ct_nom,
+          value: item?.total_cerise,
+          sub: "Kg",
+        }));
+        setDataTopAchats(topAchats);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getTopAchats();
+    getSdls();
+  }, []);
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <TopListCard
         title="Top 5 - Quantité Collectée"
         icon={<Scale className="h-4 w-4" />}
-        data={topQuantity}
+        data={datatopAchats}
       />
       <TopListCard
         title="Top 5 - Nombre de Membres"
         icon={<Users className="h-4 w-4" />}
-        data={topMembers}
+        data={datatopMembers}
       />
       <TopListCard
         title="Top 5 - Capacité Stockage"

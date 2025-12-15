@@ -22,22 +22,7 @@ import {
   CartesianGrid,
   LabelList,
 } from "recharts";
-
-const locationData = {
-  province: [
-    { name: "Province A", count: 850 },
-    { name: "Province B", count: 620 },
-    { name: "Province C", count: 480 },
-    { name: "Province D", count: 280 },
-  ],
-  region: [
-    { name: "Region X", count: 320 },
-    { name: "Region Y", count: 290 },
-    { name: "Region Z", count: 240 },
-    { name: "Region W", count: 210 },
-    { name: "Region V", count: 180 },
-  ],
-};
+import { fetchData } from "@/app/_utils/api";
 
 const locationConfig = {
   count: {
@@ -48,7 +33,48 @@ const locationConfig = {
 
 export function LocationChart() {
   const [locFilter, setLocFilter] = useState("province");
+  const [data, setData] = useState({
+    province: [],
+    region: [],
+  });
 
+  React.useEffect(() => {
+    const getCtsProvince = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/get_count_cultivators_par_provinces/`,
+
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
+        const provinceData = response.map((item) => ({
+          name: item?.cultivator_adress__zone_code__commune_code__province_code__province_name,
+          count: item?.count,
+        }));
+
+        const regionData = [
+          { name: "Region X", count: 15 },
+          { name: "Region Y", count: 12 },
+          { name: "Region Z", count: 10 },
+          { name: "Region W", count: 8 },
+          { name: "Region V", count: 5 },
+        ];
+        setData({
+          province: provinceData,
+          region: regionData,
+        });
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCtsProvince();
+  }, []);
   return (
     <Card className="lg:col-span-1">
       <CardHeader className="flex flex-col gap-y-3 lg:flex-row lg:items-center lg:justify-between">
@@ -74,7 +100,7 @@ export function LocationChart() {
         >
           <BarChart
             accessibilityLayer
-            data={locationData[locFilter]}
+            data={data[locFilter]}
             layout="vertical"
             margin={{
               right: 16,

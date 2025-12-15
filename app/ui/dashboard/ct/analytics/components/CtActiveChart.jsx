@@ -12,11 +12,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-const chartData = [
-  { status: "Actif", count: 65, fill: "var(--color-actif)" },
-  { status: "Non Actif", count: 20, fill: "var(--color-inactif)" },
-];
+import React from "react";
+import { fetchData } from "@/app/_utils/api";
 
 const chartConfig = {
   count: {
@@ -33,6 +30,39 @@ const chartConfig = {
 };
 
 export function CtActiveChart() {
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getCts = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/centres_transite/get_active_and_non_active_ct/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const chartData = [
+          {
+            status: "Actif",
+            count: response?.achat_cafes_ct,
+            fill: "var(--color-actif)",
+          },
+          {
+            status: "Non Actif",
+            count: response?.inactive_ct,
+            fill: "var(--color-inactif)",
+          },
+        ];
+        setData(chartData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCts();
+  }, []);
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader>
@@ -48,7 +78,7 @@ export function CtActiveChart() {
             <ChartTooltip
               content={<ChartTooltipContent nameKey="count" hideLabel />}
             />
-            <Pie data={chartData} dataKey="count">
+            <Pie data={data} dataKey="count">
               <LabelList
                 dataKey="status"
                 className="fill-background"

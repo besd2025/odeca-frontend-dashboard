@@ -3,11 +3,30 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Factory, CheckCircle2, XCircle } from "lucide-react";
-
+import { fetchData } from "@/app/_utils/api";
 export function CtSummaryCards() {
-  const totalCt = 85;
-  const activeCt = 65;
-  const inactiveCt = 20;
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getCts = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/centres_transite/get_active_and_non_active_ct/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
+        setData(response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCts();
+  }, []);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -18,7 +37,7 @@ export function CtSummaryCards() {
               <Factory className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums ml-2">
-              {totalCt}
+              {data?.total_ct}
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums ml-2">
@@ -32,9 +51,12 @@ export function CtSummaryCards() {
           <CheckCircle2 className="h-4 w-4 text-secondary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{activeCt.toLocaleString()}</div>
+          <div className="text-2xl font-bold">
+            {data?.achat_cafes_ct?.toLocaleString()}
+          </div>
           <p className="text-xs text-muted-foreground">
-            {((activeCt / totalCt) * 100).toFixed(1)}% du total
+            {((data?.achat_cafes_ct / data?.total_ct) * 100)?.toFixed(1)}% du
+            total
           </p>
         </CardContent>
       </Card>
@@ -45,10 +67,10 @@ export function CtSummaryCards() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {inactiveCt.toLocaleString()}
+            {data?.inactive_ct?.toLocaleString()}
           </div>
           <p className="text-xs text-muted-foreground">
-            {((inactiveCt / totalCt) * 100).toFixed(1)}% du total
+            {((data?.inactive_ct / data?.total_ct) * 100)?.toFixed(1)}% du total
           </p>
         </CardContent>
       </Card>

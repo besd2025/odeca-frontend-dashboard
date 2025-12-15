@@ -23,7 +23,7 @@ const kpiData = [
   },
   {
     title: "Prix Achat CB",
-    value: "1850",
+    value: "1400",
     trend: "+50 FBU",
     trendUp: true,
     icon: Tag,

@@ -1,5 +1,5 @@
 "use client";
-
+import React from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
@@ -15,12 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-const chartData = [
-  { entity: "UDPs", active: 1850, inactive: 380 },
-  { entity: "SDLs", active: 1200, inactive: 300 },
-  { entity: "CTs", active: 650, inactive: 200 },
-];
+import { fetchData } from "@/app/_utils/api";
 
 const chartConfig = {
   active: {
@@ -34,6 +29,46 @@ const chartConfig = {
 };
 
 export function ChartPieSdlCtActive() {
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getDatas = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `/cafe/stationslavage/get_sdl_ct_usine_avec_achat_ou_enregistrement_cultivateurs/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const chartData = [
+          {
+            entity: "Usines",
+            active: response?.usine_active,
+            inactive: response?.total_usine - response?.usine_active,
+          },
+          {
+            entity: "SDLs",
+            active: response?.achat_cafes_sdl,
+            inactive: response?.total_sdl - response?.achat_cafes_sdl,
+          },
+          {
+            entity: "CTs",
+            active: response?.achat_cafes_ct,
+            inactive: response?.total_ct - response?.achat_cafes_ct,
+          },
+        ];
+
+        setData(chartData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getDatas();
+  }, []);
+
   return (
     <Card>
       <CardHeader>
@@ -42,7 +77,7 @@ export function ChartPieSdlCtActive() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="entity"

@@ -1,4 +1,6 @@
 "use client";
+import React from "react";
+import { fetchData } from "@/app/_utils/api";
 import { TrendingUp } from "lucide-react";
 import { LabelList, Pie, PieChart } from "recharts";
 import {
@@ -16,10 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 export const description = "A pie chart with a label list";
-const chartData = [
-  { browser: "Homme", visitors: 275, fill: "var(--color-hommes)" },
-  { browser: "Femme", visitors: 200, fill: "var(--color-femmes)" },
-];
 const chartConfig = {
   visitors: {
     label: "Cafeiculteurs :",
@@ -35,6 +33,39 @@ const chartConfig = {
 };
 
 export function GenreChart() {
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getCultivators = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `/cafe/stationslavage/get_total_cultivators/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const chartData = [
+          {
+            browser: "Homme",
+            visitors: response?.hommes,
+            fill: "var(--color-hommes)",
+          },
+          {
+            browser: "Femme",
+            visitors: response?.femmes,
+            fill: "var(--color-femmes)",
+          },
+        ];
+        setData(chartData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCultivators();
+  }, []);
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader>
@@ -50,7 +81,7 @@ export function GenreChart() {
             <ChartTooltip
               content={<ChartTooltipContent nameKey="visitors" hideLabel />}
             />
-            <Pie data={chartData} dataKey="visitors">
+            <Pie data={data} dataKey="visitors">
               <LabelList
                 dataKey="browser"
                 className="fill-background"

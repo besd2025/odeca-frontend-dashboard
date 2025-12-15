@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { AreaChart, CartesianGrid, Area, XAxis } from "recharts";
 
 import {
@@ -21,53 +21,60 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const description = "A multiple line chart";
 
-// Données pour différentes périodes
-const charDataByPeriod = {
-  jour: [
-    { time: "00:00", count: 40 },
-    { time: "04:00", count: 30 },
-    { time: "08:00", count: 20 },
-    { time: "12:00", count: 27 },
-    { time: "16:00", count: 20 },
-    { time: "20:00", count: 30 },
-    { time: "23:59", count: 10 },
-  ],
-  semaine: [
-    { day: "Lun", count: 186 },
-    { day: "Mar", count: 305 },
-    { day: "Mer", count: 237 },
-    { day: "Jeu", count: 73 },
-    { day: "Ven", count: 209 },
-    { day: "Sam", count: 214 },
-    { day: "Dim", count: 150 },
-  ],
-  mois: [
-    { month: "January", count: 186 },
-    { month: "February", count: 305 },
-    { month: "March", count: 237 },
-    { month: "April", count: 73 },
-    { month: "May", count: 209 },
-    { month: "June", count: 214 },
-  ],
-  annee: [
-    { year: "2020", count: 1000 },
-    { year: "2021", count: 1500 },
-    { year: "2022", count: 1800 },
-    { year: "2023", count: 2100 },
-    { year: "2024", count: 2500 },
-  ],
-};
-
 const chartConfig = {
   count: {
     label: "Enregistrements:",
     color: "var(--secondary)",
   },
 };
-
+import { fetchData } from "@/app/_utils/api";
 export function RegistrationChart() {
   const [period, setPeriod] = useState("mois");
+  const [dataByPeriod, setDataByPeriod] = useState({}); // ← nouveau nom
 
+  const handleTimePeriodChange = (value) => {
+    setPeriod(value);
+  };
+
+  React.useEffect(() => {
+    async function getData() {
+      try {
+        const periodParam =
+          period === "jour"
+            ? "day"
+            : period === "semaine"
+            ? "week"
+            : period === "annee"
+            ? "year"
+            : "month";
+        console.log("Fetching data for period:", periodParam);
+        const results = await fetchData(
+          "get",
+          `/cafe/stationslavage/cultivateurs_statistiques_par_temps?period=${periodParam}`,
+          { params: {}, additionalHeaders: {}, body: {} }
+        );
+
+        if (!Array.isArray(results)) return;
+
+        const chartData = results.map((item) => ({
+          time: item.period,
+          day: item.period,
+          month: item.period,
+          year: item.period,
+          count: item.nombre || 0,
+        }));
+
+        setDataByPeriod((prev) => ({
+          ...prev,
+          [period]: chartData,
+        }));
+      } catch (error) {
+        console.error("Erreur API :", error);
+      }
+    }
+
+    getData();
+  }, [period]);
   return (
     <Card className="lg:col-span-5">
       <CardHeader className="flex flex-col gap-y-3 lg:flex-row lg:items-center lg:justify-between">
@@ -79,7 +86,7 @@ export function RegistrationChart() {
         <Tabs
           defaultValue="mois"
           value={period}
-          onValueChange={setPeriod}
+          onValueChange={handleTimePeriodChange}
           className="w-full lg:w-[250px]"
         >
           <TabsList className="grid w-full grid-cols-3">
@@ -96,7 +103,7 @@ export function RegistrationChart() {
         >
           <AreaChart
             accessibilityLayer
-            data={charDataByPeriod[period]}
+            data={dataByPeriod[period] || []}
             margin={{
               left: 12,
               right: 12,

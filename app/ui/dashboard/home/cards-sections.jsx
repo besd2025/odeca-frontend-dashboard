@@ -20,6 +20,7 @@ import {
 import { fetchData } from "@/app/_utils/api";
 export function SectionCards() {
   const [data, setData] = React.useState({});
+  const [rendement, setRendement] = React.useState({});
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -33,8 +34,17 @@ export function SectionCards() {
           }
         );
 
+        const rendement = await fetchData(
+          "get",
+          `/cafe/detail_rendements/get_rendement_cerise_total/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
         setData(response);
-        console.log("Cultivators data fetched:", response);
+        setRendement(rendement);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
@@ -157,7 +167,20 @@ export function SectionCards() {
               <ChartColumnBig className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              0 <span className="text-base">Kg</span>
+              {rendement?.total_cerise >= 1000 ? (
+                <>
+                  {(rendement?.total_cerise / 1000).toLocaleString("fr-FR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  <span className="text-sm"> T</span>
+                </>
+              ) : (
+                <>
+                  {rendement?.total_cerise?.toLocaleString("fr-FR") || 0}
+                  <span className="text-sm"> Kg</span>
+                </>
+              )}
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
@@ -180,7 +203,25 @@ export function SectionCards() {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                0 <span className="text-sm">Kg</span>
+                {rendement?.quantite_cerise_a_grade >= 1000 ? (
+                  <>
+                    {(rendement?.quantite_cerise_a_grade / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
+                    <span className="text-sm"> T</span>
+                  </>
+                ) : (
+                  <>
+                    {rendement?.quantite_cerise_a_grade?.toLocaleString(
+                      "fr-FR"
+                    ) || 0}
+                    <span className="text-sm"> Kg</span>
+                  </>
+                )}
               </CardDescription>
             </div>
             <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
@@ -191,7 +232,25 @@ export function SectionCards() {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                0 <span className="text-sm">Kg</span>
+                {rendement?.quantite_cerise_b_grade >= 1000 ? (
+                  <>
+                    {(rendement?.quantite_cerise_b_grade / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
+                    <span className="text-sm"> T</span>
+                  </>
+                ) : (
+                  <>
+                    {rendement?.quantite_cerise_b_grade?.toLocaleString(
+                      "fr-FR"
+                    ) || 0}
+                    <span className="text-sm"> Kg</span>
+                  </>
+                )}
               </CardDescription>
             </div>
           </div>
