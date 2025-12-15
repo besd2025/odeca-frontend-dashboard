@@ -77,7 +77,7 @@ export function KPIGrid() {
             </div>
             <div>
               <div className="text-2xl font-bold tabular-nums">
-                {kpi.value} <span className="text-lg">FBU/Kg</span>{" "}
+                {kpi.value} <span className="text-base">FBU/Kg</span>{" "}
               </div>
               <div className="text-muted-foreground font-medium mt-1">
                 {kpi.title}

@@ -108,12 +108,12 @@ export function StockSummaryCard() {
                   {(data?.total_cerise_b_achat / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  })}
+                  })}{" "}
                   <span className="text-base">T</span>
                 </>
               ) : (
                 <>
-                  {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}
+                  {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
                   <span className="text-base">Kg</span>
                 </>
               )}
@@ -225,10 +225,6 @@ export function StockSummaryCard() {
                   )}
                 </span>
               </div>
-              {/* <div className="flex flex-col">
-                <span>B1 : 8T</span>
-                <span>B2 : 4.8T</span>
-              </div> */}
             </div>
           </div>
         </div>
