@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { AreaChart, CartesianGrid, Area, XAxis } from "recharts";
 
 import {
@@ -12,76 +11,76 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-export const description = "A multiple line chart";
-
-// Données pour différentes périodes
-const charDataByPeriod = {
-  jour: [
-    { time: "00:00", ceriseA: 40, ceriseB: 24 },
-    { time: "04:00", ceriseA: 30, ceriseB: 13 },
-    { time: "08:00", ceriseA: 20, ceriseB: 98 },
-    { time: "12:00", ceriseA: 27, ceriseB: 39 },
-    { time: "16:00", ceriseA: 20, ceriseB: 20 },
-    { time: "20:00", ceriseA: 30, ceriseB: 35 },
-    { time: "23:59", ceriseA: 10, ceriseB: 26 },
-  ],
-  semaine: [
-    { day: "Lun", ceriseA: 186, ceriseB: 80 },
-    { day: "Mar", ceriseA: 305, ceriseB: 200 },
-    { day: "Mer", ceriseA: 237, ceriseB: 120 },
-    { day: "Jeu", ceriseA: 73, ceriseB: 190 },
-    { day: "Ven", ceriseA: 209, ceriseB: 130 },
-    { day: "Sam", ceriseA: 214, ceriseB: 140 },
-    { day: "Dim", ceriseA: 150, ceriseB: 100 },
-  ],
-  mois: [
-    { month: "January", ceriseA: 186, ceriseB: 80 },
-    { month: "February", ceriseA: 305, ceriseB: 200 },
-    { month: "March", ceriseA: 237, ceriseB: 120 },
-    { month: "April", ceriseA: 73, ceriseB: 190 },
-    { month: "May", ceriseA: 209, ceriseB: 130 },
-    { month: "June", ceriseA: 214, ceriseB: 140 },
-  ],
-  annee: [
-    { year: "2020", ceriseA: 1000, ceriseB: 500 },
-    { year: "2021", ceriseA: 1500, ceriseB: 800 },
-    { year: "2022", ceriseA: 1800, ceriseB: 900 },
-    { year: "2023", ceriseA: 2100, ceriseB: 1200 },
-    { year: "2024", ceriseA: 2500, ceriseB: 1400 },
-  ],
-};
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetchData } from "@/app/_utils/api";
 
 const chartConfig = {
-  ceriseA: {
-    label: "Cerise A",
-    color: "var(--chart-5)",
-  },
-  ceriseB: {
-    label: "Cerise B",
-    color: "var(--secondary)",
-  },
+  ceriseA: { label: "Cerise A", color: "var(--chart-5)" },
+  ceriseB: { label: "Cerise B", color: "var(--secondary)" },
 };
 
 export function ChartLineAchats() {
-  const [period, setPeriod] = useState("mois");
+  const [period, setPeriod] = useState("jour");
+  const [dataByPeriod, setDataByPeriod] = useState({}); // ← nouveau nom
+
+  const handleTimePeriodChange = (value) => {
+    setPeriod(value);
+  };
+
+  React.useEffect(() => {
+    async function getData() {
+      try {
+        const periodParam =
+          period === "jour"
+            ? "day"
+            : period === "semaine"
+            ? "week"
+            : period === "annee"
+            ? "year"
+            : "month";
+        console.log("Fetching data for period:", periodParam);
+        const results = await fetchData(
+          "get",
+          `/cafe/stationslavage/get_recent_total_7_cultivators_per_days_or_weeks_or_months_for_line_chart?period=${periodParam}`,
+          { params: {}, additionalHeaders: {}, body: {} }
+        );
+
+        if (!Array.isArray(results)) return;
+
+        const chartData = results.map((item) => ({
+          time: item.period,
+          day: item.period,
+          month: item.period,
+          year: item.period,
+          ceriseA: item.quantite_cerise_a || 0,
+          ceriseB: item.quantite_cerise_b || 0,
+        }));
+
+        setDataByPeriod((prev) => ({
+          ...prev,
+          [period]: chartData,
+        }));
+      } catch (error) {
+        console.error("Erreur API :", error);
+      }
+    }
+
+    getData();
+  }, [period]);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Achats du cafe</CardTitle>
+        <CardTitle>Achats du café</CardTitle>
         <CardDescription>Filtrer par période</CardDescription>
 
         <Tabs
-          defaultValue="mois"
           value={period}
-          onValueChange={setPeriod}
+          onValueChange={handleTimePeriodChange}
           className="w-full max-w-sm mt-4"
         >
           <TabsList className="grid w-full grid-cols-4">
@@ -92,6 +91,7 @@ export function ChartLineAchats() {
           </TabsList>
         </Tabs>
       </CardHeader>
+
       <CardContent>
         <ChartContainer
           config={chartConfig}
@@ -99,13 +99,11 @@ export function ChartLineAchats() {
         >
           <AreaChart
             accessibilityLayer
-            data={charDataByPeriod[period]}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
+            data={dataByPeriod[period] || []} // ← corrected
+            margin={{ left: 12, right: 12 }}
           >
             <CartesianGrid vertical={false} />
+
             <XAxis
               dataKey={
                 period === "jour"
@@ -119,20 +117,12 @@ export function ChartLineAchats() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => {
-                if (
-                  period === "jour" ||
-                  period === "semaine" ||
-                  period === "annee"
-                ) {
-                  return value;
-                }
-                return value.slice(0, 3);
-              }}
             />
+
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+
             <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillCeriseA" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
                   stopColor="var(--color-ceriseA)"
@@ -144,7 +134,8 @@ export function ChartLineAchats() {
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+
+              <linearGradient id="fillCeriseB" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
                   stopColor="var(--color-ceriseB)"
@@ -157,19 +148,18 @@ export function ChartLineAchats() {
                 />
               </linearGradient>
             </defs>
+
             <Area
               dataKey="ceriseB"
               type="natural"
-              fill="url(#fillMobile)"
-              fillOpacity={0.4}
+              fill="url(#fillCeriseB)"
               stroke="var(--color-ceriseB)"
-              stackId="a"
+              stackId="b"
             />
             <Area
               dataKey="ceriseA"
               type="natural"
-              fill="url(#fillDesktop)"
-              fillOpacity={0.4}
+              fill="url(#fillCeriseA)"
               stroke="var(--color-ceriseA)"
               stackId="a"
             />

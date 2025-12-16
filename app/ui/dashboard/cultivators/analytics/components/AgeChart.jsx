@@ -22,7 +22,7 @@ import {
   Cell,
   LabelList,
 } from "recharts";
-
+import { fetchData } from "@/app/_utils/api";
 const ageData = [
   { range: "-18 ans", count: 50, fill: "var(--color-age1)" },
   { range: "18-25 ans", count: 320, fill: "var(--color-age2)" },
@@ -45,6 +45,46 @@ const ageConfig = {
 };
 
 export function AgeChart() {
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getCultivators = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `/cafe/stationslavage/repartition_par_age/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
+        const chartData = response?.map((item) => ({
+          range: item?.tranche_age,
+          count: item?.nombre,
+          fill:
+            item?.tranche_age === "18-25 ans"
+              ? "var(--color-age2)"
+              : item?.tranche_age === "26-35 ans"
+              ? "var(--color-age3)"
+              : item?.tranche_age === "36-45 ans"
+              ? "var(--color-age4)"
+              : item?.tranche_age === "46-60 ans"
+              ? "var(--color-age5)"
+              : item?.tranche_age === "60+ ans"
+              ? "var(--color-age6)"
+              : item?.tranche_age === "Moins de 18 ans"
+              ? "var(--color-age1)"
+              : "var(--color-age1)",
+        }));
+        setData(chartData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCultivators();
+  }, []);
   return (
     <Card>
       <CardHeader>
@@ -53,7 +93,7 @@ export function AgeChart() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={ageConfig} className="h-[300px] w-full">
-          <BarChart data={ageData} layout="vertical" margin={{ left: 0 }}>
+          <BarChart data={data} layout="vertical" margin={{ left: 0 }}>
             <CartesianGrid horizontal={false} />
             <YAxis
               dataKey="range"

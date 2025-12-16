@@ -22,22 +22,7 @@ import {
   CartesianGrid,
   LabelList,
 } from "recharts";
-
-const locationData = {
-  province: [
-    { name: "Province A", count: 25 },
-    { name: "Province B", count: 20 },
-    { name: "Province C", count: 18 },
-    { name: "Province D", count: 12 },
-  ],
-  region: [
-    { name: "Region X", count: 15 },
-    { name: "Region Y", count: 12 },
-    { name: "Region Z", count: 10 },
-    { name: "Region W", count: 8 },
-    { name: "Region V", count: 5 },
-  ],
-};
+import { fetchData } from "@/app/_utils/api";
 
 const locationConfig = {
   count: {
@@ -48,6 +33,51 @@ const locationConfig = {
 
 export function CtLocationChart() {
   const [locFilter, setLocFilter] = useState("province");
+  const [data, setData] = useState({
+    province: [],
+    region: [],
+  });
+
+  React.useEffect(() => {
+    const getCtsProvince = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/centres_transite/get_count_ct_par_provinces/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
+        // Construire la liste des provinces
+        const provinceData = response.map((item) => ({
+          name: item?.ct_adress__zone_code__commune_code__province_code__province_name,
+          count: item?.count,
+        }));
+
+        // Région : si aucune API réelle, on met les valeurs statiques
+        const regionData = [
+          { name: "Region X", count: 15 },
+          { name: "Region Y", count: 12 },
+          { name: "Region Z", count: 10 },
+          { name: "Region W", count: 8 },
+          { name: "Region V", count: 5 },
+        ];
+
+        // Mise à jour des données FORMAT NORMALISÉ
+        setData({
+          province: provinceData,
+          region: regionData,
+        });
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCtsProvince();
+  }, []);
 
   return (
     <Card className="lg:col-span-1">
@@ -56,8 +86,10 @@ export function CtLocationChart() {
           <CardTitle>Répartition Géographique</CardTitle>
           <CardDescription>Par Province ou Région</CardDescription>
         </div>
+
         <Tabs
           defaultValue="province"
+          value={locFilter}
           onValueChange={setLocFilter}
           className="w-full lg:w-[250px]"
         >
@@ -67,6 +99,7 @@ export function CtLocationChart() {
           </TabsList>
         </Tabs>
       </CardHeader>
+
       <CardContent>
         <ChartContainer
           config={locationConfig}
@@ -74,27 +107,27 @@ export function CtLocationChart() {
         >
           <BarChart
             accessibilityLayer
-            data={locationData[locFilter]}
+            data={data[locFilter]}   // ✔ fonctionne maintenant !
             layout="vertical"
-            margin={{
-              right: 16,
-            }}
+            margin={{ right: 16 }}
           >
             <CartesianGrid horizontal={false} />
+
             <YAxis
               dataKey="name"
               type="category"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 10)}
-              hide
             />
-            <XAxis dataKey="count" type="number" hide />
+
+            <XAxis dataKey="count" type="number" />
+
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
             />
+
             <Bar
               dataKey="count"
               layout="vertical"
@@ -103,7 +136,7 @@ export function CtLocationChart() {
               radius={4}
             >
               <LabelList
-                dataKey={"name"}
+                dataKey="name"
                 position="insideLeft"
                 offset={8}
                 className="fill-white"

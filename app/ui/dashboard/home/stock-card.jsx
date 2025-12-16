@@ -12,7 +12,6 @@ import { fetchData } from "@/app/_utils/api";
 
 export function StockSummaryCard() {
   const [data, setData] = React.useState({});
-  const [rendements, setRendements] = React.useState({});
   const [grade_a1, setGradeA1] = React.useState(0);
   const [grade_a2, setGradeA2] = React.useState(0);
   const [grade_a3, setGradeA3] = React.useState(0);
@@ -41,7 +40,6 @@ export function StockSummaryCard() {
         );
         setData(response);
         rendement.forEach((item) => {
-          console.log(item);
           if (item.grade__grade_name === "A1") {
             setGradeA1(item.total_cerise);
           } else if (item.grade__grade_name === "A2") {
@@ -54,8 +52,6 @@ export function StockSummaryCard() {
             setGradeB2(item.total_cerise);
           }
         });
-
-        setRendements(rendement);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
@@ -242,7 +238,13 @@ export function StockSummaryCard() {
               <span className="text-xs text-muted-foreground">Estimée</span>
             </div>
           </div>
-          <span className="text-xl font-bold tabular-nums">53M FBU</span>
+          <span className="text-xl font-bold tabular-nums">
+            {" "}
+            {(data?.total_montant_achat ?? 0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+            FBU
+          </span>
         </div>
       </CardContent>
     </Card>

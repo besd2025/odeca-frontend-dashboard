@@ -16,13 +16,7 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { PieChart, Pie, LabelList } from "recharts";
-
-const paymentData = [
-  { mode: "mobile", visitors: 1200, fill: "var(--color-mobile)" },
-  { mode: "bancaire", visitors: 800, fill: "var(--color-bancaire)" },
-  { mode: "sans_compte", visitors: 230, fill: "var(--color-sans_compte)" },
-];
-
+import { fetchData } from "@/app/_utils/api";
 const paymentConfig = {
   visitors: { label: "Paiements" },
   mobile: { label: "Mobile Money", color: "var(--chart-2)" },
@@ -31,6 +25,37 @@ const paymentConfig = {
 };
 
 export function PaymentChart() {
+  const [data, setData] = React.useState({});
+  React.useEffect(() => {
+    const getCultivators = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `/cafe/stationslavage/cultivateurs_par_moyen_paiement/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const chartData = response.map((item) => ({
+          mode: item?.cultivator_payment_type,
+          visitors: item?.count,
+          fill:
+            item?.cultivator_payment_type === "mobile_money"
+              ? "var(--color-mobile)"
+              : item?.cultivator_payment_type === "bank_transfer"
+              ? "var(--color-bancaire)"
+              : "var(--color-sans_compte)",
+        }));
+        setData(chartData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCultivators();
+  }, []);
   return (
     <Card className="col-span-1">
       <CardHeader>
@@ -48,7 +73,7 @@ export function PaymentChart() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={paymentData}
+              data={data}
               dataKey="visitors"
               nameKey="mode"
               innerRadius={40}

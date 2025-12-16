@@ -3,12 +3,30 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, CheckCircle2, XCircle } from "lucide-react";
-
+import { fetchData } from "@/app/_utils/api";
 export function SdlSummaryCards() {
-  const totalSdl = 150;
-  const activeSdl = 120;
-  const inactiveSdl = 30;
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getSdls = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/get_active_and_non_active_sdl/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
 
+        setData(response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getSdls();
+  }, []);
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <Card className="@container/card">
@@ -18,7 +36,7 @@ export function SdlSummaryCards() {
               <Building2 className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums ml-2">
-              {totalSdl}
+              {data?.total_sdl}
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums ml-2">
@@ -32,9 +50,12 @@ export function SdlSummaryCards() {
           <CheckCircle2 className="h-4 w-4 text-secondary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{activeSdl.toLocaleString()}</div>
+          <div className="text-2xl font-bold">
+            {data?.achat_cafes_sdl?.toLocaleString()}
+          </div>
           <p className="text-xs text-muted-foreground">
-            {((activeSdl / totalSdl) * 100).toFixed(1)}% du total
+            {((data?.achat_cafes_sdl / data?.total_sdl) * 100)?.toFixed(1)}% du
+            total
           </p>
         </CardContent>
       </Card>
@@ -45,10 +66,11 @@ export function SdlSummaryCards() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {inactiveSdl.toLocaleString()}
+            {data?.inactive_sdl?.toLocaleString()}
           </div>
           <p className="text-xs text-muted-foreground">
-            {((inactiveSdl / totalSdl) * 100).toFixed(1)}% du total
+            {((data?.inactive_sdl / data?.total_sdl) * 100)?.toFixed(1)}% du
+            total
           </p>
         </CardContent>
       </Card>

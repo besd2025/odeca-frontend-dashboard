@@ -38,7 +38,6 @@ function CultivatorData() {
         }));
 
         setData(cultivatorsData);
-        console.log("Cultivators data fetched:", cultivatorsData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }

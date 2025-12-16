@@ -21,13 +21,7 @@ import {
   CartesianGrid,
   LabelList,
 } from "recharts";
-
-const stockData = [
-  { grade: "Grade A1", amount: 45.2, fill: "var(--color-gradeA1)" },
-  { grade: "Grade A2", amount: 12.8, fill: "var(--color-gradeA2)" },
-  { grade: "Grade B1", amount: 50.2, fill: "var(--color-gradeB1)" },
-  { grade: "Grade B2", amount: 10.8, fill: "var(--color-gradeB2)" },
-];
+import { fetchData } from "@/app/_utils/api";
 
 const chartConfig = {
   amount: {
@@ -52,6 +46,44 @@ const chartConfig = {
 };
 
 export function StockTypeChart() {
+  const [data, setData] = React.useState({});
+  React.useEffect(() => {
+    const getDatas = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `/cafe/detail_rendements/get_rendement_cerise_total_group_by_grade/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
+        const chatData = response?.map((item) => ({
+          grade: item?.grade__grade_name,
+          amount: item?.total_cerise,
+          fill:
+            item?.grade === "A1"
+              ? "var(--color-gradeA1)"
+              : item?.grade === "A2"
+              ? "var(--color-gradeA2)"
+              : item?.grade === "B1"
+              ? "var(--color-gradeB1)"
+              : item?.grade === "B2"
+              ? "var(--color-gradeB2)"
+              : "var(--color-gradeA2)",
+        }));
+        setData(chatData);
+        console.log("rendement par grade", chatData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getDatas();
+  }, []);
+
   return (
     <Card className="lg:col-span-1">
       <CardHeader>
@@ -65,7 +97,7 @@ export function StockTypeChart() {
         >
           <BarChart
             accessibilityLayer
-            data={stockData}
+            data={data}
             layout="vertical"
             margin={{
               right: 16,

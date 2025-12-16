@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sprout, Trees, Scale, MoreHorizontal } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import { Button } from "@/components/ui/button";
+import { fetchData } from "@/app/_utils/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,75 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-
-const topFields = [
-  {
-    image: "/images/logo_1.jpg",
-    name: "Jean Dupont",
-    value: 12,
-    sub: "Champs",
-  },
-  {
-    image: "/images/logo_2.jpg",
-    name: "Marie Curie",
-    value: 10,
-    sub: "Champs",
-  },
-  { image: "/images/logo_3.jpg", name: "Paul Martin", value: 9, sub: "Champs" },
-  {
-    image: "/images/logo_4.jpg",
-    name: "Alice Wonderland",
-    value: 8,
-    sub: "Champs",
-  },
-  { image: "/images/logo_5.jpg", name: "Bob Builder", value: 7, sub: "Champs" },
-];
-
-const topTrees = [
-  {
-    image: "/images/logo_1.jpg",
-    name: "Jean Dupont",
-    value: 1500,
-    sub: "Pieds",
-  },
-  {
-    image: "/images/logo_2.jpg",
-    name: "Marie Curie",
-    value: 1200,
-    sub: "Pieds",
-  },
-  {
-    image: "/images/logo_3.jpg",
-    name: "Paul Martin",
-    value: 1150,
-    sub: "Pieds",
-  },
-  {
-    image: "/images/logo_4.jpg",
-    name: "Alice Wonderland",
-    value: 1000,
-    sub: "Pieds",
-  },
-  {
-    image: "/images/logo_5.jpg",
-    name: "Bob Builder",
-    value: 950,
-    sub: "Pieds",
-  },
-];
-
-const topQuantity = [
-  { image: "/images/logo_1.jpg", name: "Jean Dupont", value: 5000, sub: "Kg" },
-  { image: "/images/logo_2.jpg", name: "Marie Curie", value: 4200, sub: "Kg" },
-  { image: "/images/logo_3.jpg", name: "Paul Martin", value: 3800, sub: "Kg" },
-  {
-    image: "/images/logo_4.jpg",
-    name: "Alice Wonderland",
-    value: 3500,
-    sub: "Kg",
-  },
-  { image: "/images/logo_5.jpg", name: "Bob Builder", value: 3200, sub: "Kg" },
-];
 
 function TopListCard({ title, icon, data }) {
   return (
@@ -127,22 +59,112 @@ function TopListCard({ title, icon, data }) {
 }
 
 export function TopFiveCards() {
+  const [datatopChamps, setDataTopChamps] = React.useState([]);
+  const [datatopPieds, setDataTopPieds] = React.useState([]);
+  const [datatopQtes, setDataTopQtes] = React.useState([]);
+  React.useEffect(() => {
+    const getChamps = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/get_top_5_clutivateurs_avec_beaucoup_de_champs_by_count/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const topChamps = response.map((item) => ({
+          image:
+            process.env.NEXT_PUBLIC_IMAGE_URL +
+            item?.cultivateur_champ__cultivator_photo,
+          name:
+            item?.cultivateur_champ__cultivator_first_name +
+            " " +
+            item?.cultivateur_champ__cultivator_last_name,
+          value: item?.champs,
+          sub: "Champs",
+        }));
+        setDataTopChamps(topChamps);
+        console.log(topChamps);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+    const getTopPieds = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/get_top_5_clutivateurs_avec_beaucoup_de_pieds_by_count/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const topPieds = response.map((item) => ({
+          image:
+            process.env.NEXT_PUBLIC_IMAGE_URL +
+            item?.cultivateur_champ__cultivator_photo,
+          name:
+            item?.cultivateur_champ__cultivator_first_name +
+            " " +
+            item?.cultivateur_champ__cultivator_last_name,
+          value: item?.pieds,
+          sub: "Pieds",
+        }));
+        setDataTopPieds(topPieds);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+    const getTopQtes = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/get_top_5_clutivateurs_avec_beaucoup_de_quantite_by_count/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const topQtes = response.map((item) => ({
+          image:
+            process.env.NEXT_PUBLIC_IMAGE_URL +
+            item?.cafeiculteur__cultivator_photo,
+          name:
+            item?.cafeiculteur__cultivator_last_name +
+            " " +
+            item?.cafeiculteur__cultivator_first_name,
+          value: item?.total_cerise,
+          sub: "Pieds",
+        }));
+        setDataTopQtes(topQtes);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+    getChamps();
+    getTopPieds();
+    getTopQtes();
+  }, []);
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <TopListCard
         title="Top 5 - Nombre de Champs"
         icon={<Sprout className="h-4 w-4" />}
-        data={topFields}
+        data={datatopChamps}
       />
       <TopListCard
         title="Top 5 - Nombre de Pieds"
         icon={<Trees className="h-4 w-4" />}
-        data={topTrees}
+        data={datatopPieds}
       />
       <TopListCard
         title="Top 5 - Quantité Produite"
         icon={<Scale className="h-4 w-4" />}
-        data={topQuantity}
+        data={datatopQtes}
       />
     </div>
   );

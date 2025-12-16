@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-
+import { fetchData } from "@/app/_utils/api";
 const movements = [
   {
     date: "2024-06-15",
@@ -57,6 +57,36 @@ const movements = [
 ];
 
 export function RecentMovementsTable() {
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getDatas = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `/cafe/transfert_sdl_usine_detail/get_rendement_5_recement/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const gradeData = response?.map((item) => ({
+          date: item?.date_entre,
+          lot: item?.grade__grade_name,
+          type: "sortie",
+          quantity: item?.total_cerise + " Kg",
+          origin: item?.origine,
+          destination: item?.destination,
+        }));
+        setData(gradeData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getDatas();
+  }, []);
+
   return (
     <Card className="col-span-1 lg:col-span-4">
       <CardHeader>
@@ -69,13 +99,14 @@ export function RecentMovementsTable() {
             <TableRow>
               <TableHead>Date</TableHead>
               <TableHead>Type</TableHead>
-              <TableHead>Lot</TableHead>
+              <TableHead>Grade</TableHead>
               <TableHead>Quantité</TableHead>
-              <TableHead>Origine/Destination</TableHead>
+              <TableHead>Origine</TableHead>
+              <TableHead>Destination</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {movements.map((movement, index) => (
+            {data.map((movement, index) => (
               <TableRow key={index}>
                 <TableCell>{movement.date}</TableCell>
                 <TableCell>
@@ -90,6 +121,7 @@ export function RecentMovementsTable() {
                 <TableCell className="font-medium">{movement.lot}</TableCell>
                 <TableCell>{movement.quantity}</TableCell>
                 <TableCell>{movement.origin}</TableCell>
+                <TableCell>{movement.destination}</TableCell>
               </TableRow>
             ))}
           </TableBody>
