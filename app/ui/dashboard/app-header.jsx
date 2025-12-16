@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -25,6 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserContext } from "../context/User_Context";
+
 import {
   IconChartBar,
   IconCreditCard,
@@ -63,6 +66,11 @@ const deconnecter = () => {
 };
 
 export function AppHeader() {
+  const user = React.useContext(UserContext);
+  const initials = `${user?.session?.first_name?.[0] || ""}${
+    user?.session?.last_name?.[0] || ""
+  }`.toUpperCase();
+
   return (
     <div className="">
       <nav className=" inset-x-4 h-16  border-b  dark:border-slate-700/70   bg-linear-to-r from-white dark:from-black  via-white dark:via-gray-900 to-primary dark:to-primary border-gray-200 dark:bg-gray-900">
@@ -102,7 +110,8 @@ export function AppHeader() {
                 >
                   <Avatar className="h-8 w-8 border-2 border-white rounded-full grayscale">
                     <AvatarFallback className="rounded-lg text-primary dark:text-foreground">
-                      AD
+                      {user?.session?.first_name?.charAt(0).toUpperCase()}
+                      {user?.session?.last_name?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </SidebarMenuButton>
@@ -120,14 +129,18 @@ export function AppHeader() {
                         src={menuItems.user.avatar}
                         alt={menuItems.user.name}
                       />
-                      <AvatarFallback className="rounded-lg">AD</AvatarFallback>
+                      <AvatarFallback className="rounded-lg">
+                        {" "}
+                        {user?.session?.first_name?.charAt(0).toUpperCase()}
+                        {user?.session?.last_name?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium">
-                        {menuItems.user.name}
+                        {user?.session?.first_name} {user?.session?.last_name}
                       </span>
                       <span className="text-muted-foreground truncate text-xs">
-                        {menuItems.user.email}
+                        {user?.session?.identifiant}
                       </span>
                     </div>
                   </div>

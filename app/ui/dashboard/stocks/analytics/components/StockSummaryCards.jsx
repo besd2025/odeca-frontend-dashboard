@@ -9,8 +9,41 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Package, DollarSign, Layers, Grape } from "lucide-react";
-
+import { fetchData } from "@/app/_utils/api";
 export function StockSummaryCards() {
+  const [data, setData] = React.useState({});
+  const [rendement, setRendement] = React.useState({});
+  React.useEffect(() => {
+    const getDatas = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `/cafe/achat_cafe/get_total_achat/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
+        const rendement = await fetchData(
+          "get",
+          `/cafe/rendements/get_rendement_lot/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        setData(response);
+        setRendement(rendement);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getDatas();
+  }, []);
   return (
     <div className="grid gap-4 md:grid-cols-4">
       <Card className="@container/card">
@@ -20,7 +53,20 @@ export function StockSummaryCards() {
               <Package className="h-4 w-4" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums ml-2">
-              58.2 T
+              {data?.total_cerise_achat >= 1000 ? (
+                <>
+                  {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  <span className="text-base">T</span>
+                </>
+              ) : (
+                <>
+                  {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}{" "}
+                  <span className="text-sm">Kg</span>
+                </>
+              )}
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums ml-2">
@@ -39,7 +85,23 @@ export function StockSummaryCards() {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                7845 <span className="text-sm">Kg</span>
+                {data?.total_cerise_a_achat >= 1000 ? (
+                  <>
+                    {(data?.total_cerise_a_achat / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}{" "}
+                    <span className="text-base">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
               </CardDescription>
             </div>
             <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg w-full h-1/2">
@@ -50,7 +112,23 @@ export function StockSummaryCards() {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                7845 <span className="text-sm">Kg</span>
+                {data?.total_cerise_b_achat >= 1000 ? (
+                  <>
+                    {(data?.total_cerise_b_achat / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}{" "}
+                    <span className="text-base">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
               </CardDescription>
             </div>
           </div>
@@ -63,7 +141,13 @@ export function StockSummaryCards() {
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">53M FBU</div>
+          <div className="text-2xl font-bold">
+            {" "}
+            {(data?.total_montant_achat ?? 0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+            FBU
+          </div>
           <p className="text-xs text-muted-foreground">
             Basé sur les prix actuels du marché
           </p>
@@ -75,10 +159,10 @@ export function StockSummaryCards() {
           <Layers className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">124</div>
-          <p className="text-xs text-muted-foreground">
-            12 nouveaux lots cette semaine
-          </p>
+          <div className="text-2xl font-bold">{rendement?.nombre_lot}</div>
+          {/* <p className="text-xs text-muted-foreground">
+            nouveaux lots cette semaine
+          </p> */}
         </CardContent>
       </Card>
     </div>

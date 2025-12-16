@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { AreaChart, CartesianGrid, Area, XAxis } from "recharts";
 import {
   Card,
@@ -18,7 +18,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { fetchData } from "@/app/_utils/api";
+import config from "@/postcss.config.mjs";
 const stockDataByPeriod = {
   mois: [
     { date: "Jan", amount: 40, ca: 120, cb: 20 },
@@ -55,6 +56,49 @@ const chartConfig = {
 
 export function StockEvolutionChart() {
   const [period, setPeriod] = useState("mois");
+  const [dataByPeriod, setDataByPeriod] = useState({}); // ← nouveau nom
+
+  const handleTimePeriodChange = (value) => {
+    setPeriod(value);
+  };
+
+  React.useEffect(() => {
+    async function getData() {
+      try {
+        const periodParam =
+          period === "jour"
+            ? "day"
+            : period === "semaine"
+            ? "week"
+            : period === "annee"
+            ? "year"
+            : "month";
+        console.log("Fetching data for period:", periodParam);
+        const results = await fetchData(
+          "get",
+          `/cafe/stationslavage/get_recent_total_7_cultivators_per_days_or_weeks_or_months_for_line_chart?period=${periodParam}`,
+          { params: {}, additionalHeaders: {}, body: {} }
+        );
+
+        if (!Array.isArray(results)) return;
+
+        const chartData = results.map((item) => ({
+          date: item.period,
+          amount: item.total_stock || 0,
+          ca: item.quantite_cerise_a || 0,
+          cb: item.quantite_cerise_b || 0,
+        }));
+        setDataByPeriod((prev) => ({
+          ...prev,
+          [period]: chartData,
+        }));
+      } catch (error) {
+        console.error("Erreur API :", error);
+      }
+    }
+
+    getData();
+  }, [period]);
 
   return (
     <Card className="lg:col-span-4">
@@ -66,7 +110,7 @@ export function StockEvolutionChart() {
         <Tabs
           defaultValue="mois"
           value={period}
-          onValueChange={setPeriod}
+          onValueChange={handleTimePeriodChange}
           className="w-full lg:w-[200px]"
         >
           <TabsList className="grid w-full grid-cols-2">
@@ -82,7 +126,7 @@ export function StockEvolutionChart() {
         >
           <AreaChart
             accessibilityLayer
-            data={stockDataByPeriod[period]}
+            data={dataByPeriod[period]}
             margin={{
               left: 12,
               right: 12,

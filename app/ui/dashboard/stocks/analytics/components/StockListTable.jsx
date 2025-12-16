@@ -19,57 +19,54 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-
-const stockLots = [
-  {
-    id: "LOT-2024-001",
-    type: "Cerise A",
-    grade: "A1",
-    quantity: "15.2 T",
-    entryDate: "2024-05-20",
-    status: "En Stock",
-  },
-  {
-    id: "LOT-2024-002",
-    type: "Cerise B",
-    grade: "B1",
-    quantity: "8.0 T",
-    entryDate: "2024-05-22",
-    status: "En Traitement",
-  },
-  {
-    id: "LOT-2024-003",
-    type: "Cerise A",
-    grade: "A2",
-    quantity: "12.5 T",
-    entryDate: "2024-05-25",
-    status: "En Stock",
-  },
-  {
-    id: "LOT-2024-004",
-    type: "Cerise A",
-    grade: "A1",
-    quantity: "10.0 T",
-    entryDate: "2024-05-28",
-    status: "Prêt pour Export",
-  },
-  {
-    id: "LOT-2024-005",
-    type: "Cerise B",
-    grade: "B2",
-    quantity: "5.0 T",
-    entryDate: "2024-06-01",
-    status: "En Stock",
-  },
-];
+import { fetchData } from "@/app/_utils/api";
 
 export function StockListTable() {
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getDatas = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `/cafe/detail_rendements/get_rendement_5_avec_grande_quantite/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const gradeData = response?.map((item) => ({
+          id: item?.rendement__numero_lot,
+          type:
+            item?.grade__grade_name === "A1" ||
+            item?.grade__grade_name === "A2" ||
+            item?.grade__grade_name === "A3"
+              ? "Cerise A"
+              : item?.grade__grade_name === "B1" ||
+                item?.grade__grade_name === "B2"
+              ? "Cerise B"
+              : "Inconnu",
+          grade: item?.grade__grade_name,
+          quantity: item?.total_cerise + " Kg",
+          entryDate: item?.date_entre,
+          status: "En Stock",
+        }));
+        setData(gradeData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getDatas();
+  }, []);
   return (
     <Card className="col-span-1 lg:col-span-3">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Liste des Lots</CardTitle>
-          <CardDescription>Aperçu des lots actuellement en stock</CardDescription>
+          <CardDescription>
+            Aperçu des lots actuellement en stock
+          </CardDescription>
         </div>
         <Button variant="outline" size="sm" className="gap-1">
           Voir Tout <ArrowRight className="h-4 w-4" />
@@ -88,8 +85,8 @@ export function StockListTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {stockLots.map((lot) => (
-              <TableRow key={lot.id}>
+            {data.map((lot, idd = 1) => (
+              <TableRow key={idd + 1}>
                 <TableCell className="font-medium">{lot.id}</TableCell>
                 <TableCell>{lot.type}</TableCell>
                 <TableCell>{lot.grade}</TableCell>
