@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserContext } from "../context/User_Context";
+import { UserContext } from "@/app/ui/context/User_Context";
 
 import {
   IconChartBar,
