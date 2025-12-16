@@ -11,10 +11,22 @@ import {
   QrCode,
   ShieldUser,
   User,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 function DetailsCard({ id }) {
   const [data, setData] = React.useState([]);
+  const [isExpanded, setIsExpanded] = React.useState(true);
+
+  const toggleSidebar = () => setIsExpanded(!isExpanded);
   React.useEffect(() => {
     const getSdls = async () => {
       try {
@@ -38,81 +50,143 @@ function DetailsCard({ id }) {
   }, [id]);
 
   return (
-    <Card className="w-full lg:w-[300px] lg:max-w-sm p-6 space-y-4 rounded-xl shadow-sm">
-      <div className="flex flex-col items-center space-y-3 text-center">
-        <div className="w-32 h-32 mx-auto">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="size-full text-accent-foreground/80"
+    <Card
+      className={cn(
+        "relative lg:sticky lg:top-5 transition-all duration-300 ease-in-out border-r shadow-sm bg-card rounded-xl h-max",
+        isExpanded
+          ? "w-full lg:w-[300px] p-6 space-y-4"
+          : "w-[80px] p-4 flex flex-col items-center"
+      )}
+    >
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden lg:flex absolute -right-3 top-6 h-9 w-9 rounded-full border bg-secondary shadow-sm hover:bg-primary dark:hover:bg-primary z-10 text-white hover:text-white cursor-pointer "
+            onClick={toggleSidebar}
           >
-            <path
-              fillRule="evenodd"
-              d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
-        <div className="space-y-1">
-          <p className="text-xl font-semibold">{data?.ct_nom}</p>
-          <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
-            {""}
-          </p>
-        </div>
-        <Badge
-          className="px-3 py-1 text-lg text-secondary rounded "
-          variant="outline"
-        >
-          <QrCode size={30} />
-          <span className="">{data?.ct_code}</span>
-        </Badge>
-      </div>
+            {isExpanded ? (
+              <ChevronLeft className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Voir details</p>
+        </TooltipContent>
+      </Tooltip>
 
-      {/* <Button className="w-full bg-black text-white hover:bg-black/90">
+      {!isExpanded ? (
+        <div className="flex flex-col items-center gap-4 mt-2">
+          <div className="w-16 h-16 mx-auto border-2 p-2 border-secondary/50 rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="size-full text-accent-foreground/80"
+            >
+              <path
+                fillRule="evenodd"
+                d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          <div className="text-xs font-semibold text-center truncate w-full">
+            CT{" "}
+            {data?.ct_nom
+              ? data.ct_nom.slice(0, 2).toUpperCase() + "..."
+              : "--"}
+          </div>
+          <Separator className="my-2" />
+          <MapPinHouse size={20} />
+          <Separator className="my-2" />
+          <ShieldUser size={20} />
+          <Separator className="my-2" />
+          <Phone size={20} />
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-col items-center space-y-3 text-center animate-in fade-in duration-300">
+            <div className="w-32 h-32 mx-auto">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="size-full text-accent-foreground/80"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xl font-semibold">CT {data?.ct_nom}</p>
+              <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
+                {""}
+              </p>
+            </div>
+            <Badge
+              className="px-3 py-1 text-lg text-secondary rounded "
+              variant="outline"
+            >
+              <QrCode size={30} />
+              <span className="">{data?.ct_code}</span>
+            </Badge>
+          </div>
+
+          {/* <Button className="w-full bg-black text-white hover:bg-black/90">
         Message
       </Button> */}
 
-      <div className="space-y-3">
-        <div>
-          <div className="flex items-center justify-between text-sm flex-col gap-y-1">
-            <span className="text-muted-foreground flex gap-x-1">
-              <MapPinHouse size={20} />
-              Localité
-            </span>
-            <span className="font-medium text-right">
-              {
-                data?.ct_adress?.zone_code?.commune_code?.province_code
-                  ?.province_name
-              }
-              / {data?.ct_adress?.zone_code?.commune_code?.commune_name}
-            </span>
+          <div className="space-y-3">
+            <div>
+              <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                <span className="text-muted-foreground flex gap-x-1">
+                  <MapPinHouse size={20} />
+                  Localité
+                </span>
+                <span className="font-medium text-right">
+                  {
+                    data?.ct_adress?.zone_code?.commune_code?.province_code
+                      ?.province_name
+                  }
+                  / {data?.ct_adress?.zone_code?.commune_code?.commune_name}
+                </span>
+              </div>
+              <Separator className="my-2" />
+            </div>
+            <div>
+              <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                <span className="text-secondary flex gap-x-1">
+                  <ShieldUser size={20} />
+                  Responsable
+                </span>
+                <span className="font-medium text-right">
+                  {data?.responsable?.first_name} {data?.responsable?.last_name}
+                </span>
+              </div>
+              <Separator className="my-2" />
+            </div>
+            <div>
+              <div className="flex items-center justify-between text-sm ">
+                <span className="text-muted-foreground flex gap-x-1">
+                  <Phone size={20} />
+                  Téléphone
+                </span>
+                <span className="font-medium">
+                  {data?.responsable?.telephone}
+                </span>
+              </div>
+              <Separator className="my-2" />
+            </div>
           </div>
-          <Separator className="my-2" />
-        </div>
-        <div>
-          <div className="flex items-center justify-between text-sm flex-col gap-y-1">
-            <span className="text-secondary flex gap-x-1">
-              <ShieldUser size={20} />
-              Responsable
-            </span>
-            <span className="font-medium text-right">
-              {data?.responsable?.first_name} {data?.responsable?.last_name}
-            </span>
-          </div>
-          <Separator className="my-2" />
-        </div>
-        <div>
-          <div className="flex items-center justify-between text-sm ">
-            <span className="text-muted-foreground flex gap-x-1">
-              <Phone size={20} />
-              Téléphone
-            </span>
-            <span className="font-medium">{data?.responsable?.telephone}</span>
-          </div>
-          <Separator className="my-2" />
-        </div>
-      </div>
+        </>
+      )}
     </Card>
   );
 }

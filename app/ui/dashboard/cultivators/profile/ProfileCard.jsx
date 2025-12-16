@@ -58,9 +58,9 @@ function ProfileCard({ cult_id }) {
   return (
     <Card
       className={cn(
-        "relative transition-all duration-300 ease-in-out border-r shadow-sm bg-card rounded-xl h-max",
+        " relative lg:sticky lg:top-5 transition-all duration-300 ease-in-out border-r shadow-sm bg-card rounded-xl h-max",
         isExpanded
-          ? "w-full lg:w-[300px] p-6 space-y-4"
+          ? "w-full lg:w-[300px] p-6 space-y-4 "
           : "w-[80px] p-4 flex flex-col items-center"
       )}
     >
@@ -84,7 +84,7 @@ function ProfileCard({ cult_id }) {
         </TooltipContent>
       </Tooltip>
       {!isExpanded ? (
-        <div className="flex flex-col items-center gap-4 mt-2">
+        <div className="flex flex-col items-center gap-4 mt-2 ">
           <Avatar
             className="h-16 w-16 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={toggleSidebar}
@@ -107,6 +107,9 @@ function ProfileCard({ cult_id }) {
               ? data.cultivator_first_name.slice(0, 2).toUpperCase()
               : "--"}
           </div>
+          <Separator className="my-2" />
+          <QrCode size={20} />
+          <Separator className="my-2" />
           <MapPinHouse size={20} />
           <Separator className="my-2" />
           <Phone size={20} />
@@ -115,7 +118,7 @@ function ProfileCard({ cult_id }) {
         </div>
       ) : (
         <>
-          <div className="flex flex-col items-center space-y-3 text-center">
+          <div className="flex flex-col items-center space-y-3 text-center animate-in fade-in duration-300">
             <Avatar className="w-32 h-32 mx-auto">
               <AvatarImage
                 src={data?.cultivator_photo || null}
