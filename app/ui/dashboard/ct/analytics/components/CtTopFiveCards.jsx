@@ -13,34 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { fetchData } from "@/app/_utils/api";
-const topQuantity = [
-  { image: "/images/logo_1.jpg", name: "CT Alpha", value: 45000, sub: "Kg" },
-  { image: "/images/logo_2.jpg", name: "CT Beta", value: 38000, sub: "Kg" },
-  { image: "/images/logo_3.jpg", name: "CT Gamma", value: 35000, sub: "Kg" },
-  { image: "/images/logo_4.jpg", name: "CT Delta", value: 30000, sub: "Kg" },
-  { image: "/images/logo_5.jpg", name: "CT Epsilon", value: 28000, sub: "Kg" },
-];
-
-const topMembers = [
-  { image: "/images/logo_1.jpg", name: "CT Alpha", value: 120, sub: "Membres" },
-  { image: "/images/logo_2.jpg", name: "CT Beta", value: 100, sub: "Membres" },
-  { image: "/images/logo_3.jpg", name: "CT Gamma", value: 90, sub: "Membres" },
-  { image: "/images/logo_4.jpg", name: "CT Delta", value: 85, sub: "Membres" },
-  {
-    image: "/images/logo_5.jpg",
-    name: "CT Epsilon",
-    value: 80,
-    sub: "Membres",
-  },
-];
-
-const topCapacity = [
-  { image: "/images/logo_1.jpg", name: "CT Alpha", value: 90, sub: "Tonnes" },
-  { image: "/images/logo_2.jpg", name: "CT Beta", value: 75, sub: "Tonnes" },
-  { image: "/images/logo_3.jpg", name: "CT Gamma", value: 70, sub: "Tonnes" },
-  { image: "/images/logo_4.jpg", name: "CT Delta", value: 60, sub: "Tonnes" },
-  { image: "/images/logo_5.jpg", name: "CT Epsilon", value: 50, sub: "Tonnes" },
-];
 
 function TopListCard({ title, icon, data }) {
   return (
@@ -146,11 +118,6 @@ export function CtTopFiveCards() {
         title="Top 5 - Nombre de Membres"
         icon={<Users className="h-4 w-4" />}
         data={datatopMembers}
-      />
-      <TopListCard
-        title="Top 5 - Capacité Stockage"
-        icon={<Warehouse className="h-4 w-4" />}
-        data={topCapacity}
       />
     </div>
   );

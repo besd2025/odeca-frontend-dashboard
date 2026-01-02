@@ -13,9 +13,15 @@ function CultivatorData() {
   useEffect(() => {
     const getCultivators = async () => {
       try {
-        const response = await fetchData("get", "cultivators/", {});
+        const response = await fetchData("get", "cultivators/", {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+          limit: 1000,
+          offset: 0,
+        });
         const results = response?.results;
-        console.log(results);
+
         const cultivatorsData = results.map((cultivator) => ({
           id: cultivator.id,
           cultivator: {

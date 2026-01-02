@@ -4,8 +4,6 @@ import { ChartPieSdlCtActive } from "./charts/sdl-ct-active";
 import { ChartLineAchats } from "./charts/sdl-ct-achats";
 import { StockSummaryCard } from "./stock-card";
 import { KPIGrid } from "./kpi-stats";
-import { RecentTransactions } from "./recent-transactions";
-import { TopPerformers } from "./top-performers";
 
 function DashboardContainer() {
   return (
@@ -30,16 +28,6 @@ function DashboardContainer() {
             </div>
             <div className="col-span-5 lg:col-span-4">
               <ChartLineAchats />
-            </div>
-          </div>
-
-          {/* New Bottom Section: Transactions & Top Performers */}
-          <div className="px-4 lg:px-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2">
-              <RecentTransactions />
-            </div>
-            <div className="lg:col-span-1">
-              <TopPerformers />
             </div>
           </div>
         </div>
