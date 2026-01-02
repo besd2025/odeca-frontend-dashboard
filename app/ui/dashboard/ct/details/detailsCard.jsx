@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -25,7 +25,11 @@ import { Button } from "@/components/ui/button";
 function DetailsCard({ id }) {
   const [data, setData] = React.useState([]);
   const [isExpanded, setIsExpanded] = React.useState(true);
-
+  useEffect(() => {
+    setTimeout(() => {
+      setIsExpanded(false);
+    }, 2500);
+  }, []);
   const toggleSidebar = () => setIsExpanded(!isExpanded);
   React.useEffect(() => {
     const getSdls = async () => {

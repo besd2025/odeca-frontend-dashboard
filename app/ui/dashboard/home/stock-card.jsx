@@ -130,7 +130,7 @@ export function StockSummaryCard() {
             <span className="font-medium">Grades A</span>
             <div className="flex flex-wrap gap-4 text-sm  text-muted-foreground">
               <div className="flex flex-col">
-                <span>
+                <span className="text-base">
                   A1 :
                   {grade_a1 >= 1000 ? (
                     <>
@@ -138,16 +138,16 @@ export function StockSummaryCard() {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
-                      <span className="text-base"> T</span>
+                      <span className="text-sm"> T</span>
                     </>
                   ) : (
                     <>
                       {grade_a1?.toLocaleString("fr-FR") || 0}
-                      <span className="text-base"> Kg</span>
+                      <span className="text-sm"> Kg</span>
                     </>
                   )}
                 </span>
-                <span>
+                <span className="text-base">
                   A2 :{" "}
                   {grade_a2 >= 1000 ? (
                     <>
@@ -155,18 +155,18 @@ export function StockSummaryCard() {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
-                      <span className="text-base"> T</span>
+                      <span className="text-sm"> T</span>
                     </>
                   ) : (
                     <>
                       {grade_a2?.toLocaleString("fr-FR") || 0}
-                      <span className="text-base"> Kg</span>
+                      <span className="text-sm"> Kg</span>
                     </>
                   )}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span>
+                <span className="text-base">
                   A3 :{" "}
                   {grade_a3 >= 1000 ? (
                     <>
@@ -174,12 +174,12 @@ export function StockSummaryCard() {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
-                      <span className="text-base"> T</span>
+                      <span className="text-sm"> T</span>
                     </>
                   ) : (
                     <>
                       {grade_a3?.toLocaleString("fr-FR") || 0}
-                      <span className="text-base"> Kg</span>
+                      <span className="text-sm"> Kg</span>
                     </>
                   )}
                 </span>
@@ -190,7 +190,7 @@ export function StockSummaryCard() {
             <span className="font-medium">Grades B</span>
             <div className="flex flex-wrap gap-4 text-sm  text-muted-foreground">
               <div className="flex flex-col">
-                <span>
+                <span className="text-base">
                   B1 :
                   {grade_b1 >= 1000 ? (
                     <>
@@ -198,16 +198,16 @@ export function StockSummaryCard() {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
-                      <span className="text-base"> T</span>
+                      <span className="text-sm"> T</span>
                     </>
                   ) : (
                     <>
                       {grade_b1?.toLocaleString("fr-FR") || 0}
-                      <span className="text-base"> Kg</span>
+                      <span className="text-sm"> Kg</span>
                     </>
                   )}
                 </span>
-                <span>
+                <span className="text-base">
                   B2 :
                   {grade_b2 >= 1000 ? (
                     <>
@@ -215,12 +215,12 @@ export function StockSummaryCard() {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
-                      <span className="text-base"> T</span>
+                      <span className="text-sm"> T</span>
                     </>
                   ) : (
                     <>
                       {grade_b2?.toLocaleString("fr-FR") || 0}
-                      <span className="text-base"> Kg</span>
+                      <span className="text-sm"> Kg</span>
                     </>
                   )}
                 </span>

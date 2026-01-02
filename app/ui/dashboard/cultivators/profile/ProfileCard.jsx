@@ -36,6 +36,11 @@ function ProfileCard({ cult_id }) {
   const [data, setData] = React.useState({});
   const [isExpanded, setIsExpanded] = useState(true);
   useEffect(() => {
+    setTimeout(() => {
+      setIsExpanded(false);
+    }, 2500);
+  }, []);
+  useEffect(() => {
     const getCultivators = async () => {
       try {
         const response = await fetchData("get", `/cultivators/${cult_id}/`, {
