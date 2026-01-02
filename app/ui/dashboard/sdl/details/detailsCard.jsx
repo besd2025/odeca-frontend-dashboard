@@ -25,7 +25,11 @@ import { Button } from "@/components/ui/button";
 function DetailsCard({ id }) {
   const [data, setData] = useState([]);
   const [isExpanded, setIsExpanded] = useState(true);
-
+  useEffect(() => {
+    setTimeout(() => {
+      setIsExpanded(false);
+    }, 2500);
+  }, []);
   const toggleSidebar = () => setIsExpanded(!isExpanded);
   useEffect(() => {
     const getSdls = async () => {
