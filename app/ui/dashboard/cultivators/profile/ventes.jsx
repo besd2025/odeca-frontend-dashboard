@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { fetchData } from "@/app/_utils/api";
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import PaginationControls from "@/components/ui/pagination-controls";
-
+import { useSearchParams } from "next/navigation";
 const products = [
   {
     id: 101,
@@ -39,13 +40,12 @@ const products = [
   },
 ];
 
-export default function Ventes() {
+export default function Ventes({ cult_id }) {
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
 
   const totalItems = products.length;
   const totalPages = Math.max(Math.ceil(totalItems / pageSize), 1);
-
   React.useEffect(() => {
     if (page > totalPages) {
       setPage(totalPages);
@@ -56,6 +56,40 @@ export default function Ventes() {
     const start = (page - 1) * pageSize;
     return products.slice(start, start + pageSize);
   }, [page, pageSize]);
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getCultivators = async () => {
+      try {
+        const valuesdata = await fetchData(
+          "get",
+          `/cultivators/${cult_id}/get_cafe_cafeiculteur_achat_cafe/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+        const AchatsData = valuesdata?.results?.map((item) => ({
+          id: item?.id,
+          date: item?.date_achat,
+          sdl_ct_type: "SDL",
+          sdl_ct_name: "Ngome",
+          No_fiche: 59.99,
+          No_recus: item?.numero_recu,
+          ca: item?.quantite_cerise_a,
+          cb: item?.quantite_cerise_b,
+          fiche_photo: item?.photo_fiche,
+          montant: 5555555,
+        }));
+
+        setData(AchatsData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getCultivators();
+  }, [cult_id]);
 
   return (
     <div className="w-full">
@@ -75,7 +109,7 @@ export default function Ventes() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedProducts.map((product) => (
+            {data.map((product) => (
               <TableRow key={product.id} className="odd:bg-muted/50">
                 <TableCell className="pl-4">{product.id}</TableCell>
                 <TableCell className="font-medium">{product.date}</TableCell>

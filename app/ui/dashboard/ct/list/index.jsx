@@ -201,7 +201,7 @@ export default function CtsListTable() {
         const localite = row.original.localite;
         return (
           <div className="text-sm">
-            {localite?.commune}, {localite?.province}
+            {localite?.province},{localite?.commune}
           </div>
         );
       },

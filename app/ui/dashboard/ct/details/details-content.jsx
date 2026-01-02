@@ -27,23 +27,6 @@ import TransferCtDep from "./tranfer/transfer-ct";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
 function DetailsContent({ id }) {
-  const transferData = [
-    {
-      id: "cultivator_001",
-      from_ct: "Ngome",
-      to_depulpeur_name: "NGANE",
-      society: "ODECA",
-      qte_tranferer: {
-        ca: 78452,
-        cb: 741,
-      },
-      photo_fiche: "/images/logo_1.jpg",
-      localite: {
-        province: "Buja",
-        commune: "Ntahangwa",
-      },
-    },
-  ];
   const [tab, setTab] = useState("cultivators");
   const [data, setData] = React.useState([]);
   const [dataAchat, setAchatDate] = React.useState([]);
