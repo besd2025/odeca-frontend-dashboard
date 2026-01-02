@@ -43,7 +43,7 @@ function TopListCard({ title, icon, data }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
-                  <Link href={`/odeca-dashboard/sdl/profile/?id=${456}`}>
+                  <Link href={`/odeca-dashboard/sdl/details/?id=${item?.id}`}>
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                   </Link>
                 </DropdownMenuContent>

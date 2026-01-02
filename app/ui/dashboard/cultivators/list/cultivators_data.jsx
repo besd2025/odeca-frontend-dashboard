@@ -13,15 +13,17 @@ function CultivatorData() {
   useEffect(() => {
     const getCultivators = async () => {
       try {
-        const response = await fetchData("get", "cultivators/", {
-          params: {},
-          additionalHeaders: {},
-          body: {},
-          limit: 1000,
-          offset: 0,
-        });
+        const response = await fetchData(
+          "get",
+          "cultivators/get_cafe_cultivators/?cafeiculteur_type=personne",
+          {
+            params: { limit: 1000, offset: 0 },
+            additionalHeaders: {},
+            body: {},
+          }
+        );
         const results = response?.results;
-
+        console.log("data cultivators: ", results);
         const cultivatorsData = results.map((cultivator) => ({
           id: cultivator.id,
           cultivator: {
@@ -30,8 +32,8 @@ function CultivatorData() {
             last_name: cultivator?.cultivator_last_name,
             image_url: cultivator?.cultivator_photo,
           },
-          sdl_ct: "NGome",
-          society: "ODECA",
+          sdl_ct: cultivator?.ct_sdl_name,
+          society: cultivator?.societe_name,
           localite: {
             province:
               cultivator?.cultivator_adress?.zone_code?.commune_code
@@ -40,7 +42,7 @@ function CultivatorData() {
               cultivator?.cultivator_adress?.zone_code?.commune_code
                 ?.commune_name,
           },
-          champs: 4,
+          champs: cultivator?.nombre_champs,
         }));
 
         setData(cultivatorsData);
