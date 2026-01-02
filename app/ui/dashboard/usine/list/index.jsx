@@ -12,7 +12,6 @@ import { ArrowUpDownIcon, MoreHorizontal, Phone, Search } from "lucide-react";
 import * as React from "react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { fetchData } from "@/app/_utils/api";
 import {
   DropdownMenu,
@@ -31,16 +30,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 import ExportButton from "@/components/ui/export_button";
 import Filter from "../filter";
-import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Edit from "../edit";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 
-export default function SdlsListTable() {
+export default function UsineListTable() {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -50,19 +47,19 @@ export default function SdlsListTable() {
     pageIndex: 0,
     pageSize: 10,
   });
+
   useEffect(() => {
-    const getSdls = async () => {
+    const getUsines = async () => {
       try {
         const response = await fetchData("get", "cafe/stationslavage/", {});
-        const results = response?.results;
+        const results = response?.results || [];
         const sdlData = results.map((sdl) => ({
           id: sdl?.id,
           sdl: {
             sdl_code: sdl?.sdl_code,
             sdl_name: sdl?.sdl_nom,
-            type: "",
           },
-          society: sdl?.societe?.nom_societe || "",
+          // society: sdl?.societe?.nom_societe || "", // Assuming Usines might verify society
           responsable: {
             first_name: sdl?.sdl_responsable?.user?.first_name || "",
             last_name: sdl?.sdl_responsable?.user?.last_name || "",
@@ -74,17 +71,19 @@ export default function SdlsListTable() {
                 ?.province_name || "",
             commune:
               sdl?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
+            zone: sdl?.sdl_adress?.zone_code?.zone_name || "",
           },
         }));
 
         setData(sdlData);
       } catch (error) {
-        console.error("Error fetching cultivators data:", error);
+        console.error("Error fetching sdl data:", error);
       }
     };
 
-    getSdls();
+    getUsines();
   }, []);
+
   const columns = [
     {
       id: "actions",
@@ -111,7 +110,7 @@ export default function SdlsListTable() {
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href={`/odeca-dashboard/sdl/details/?id=${sdl?.id}`}>
+              <Link href={`/odeca-dashboard/usine/details/?id=${sdl?.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
               <div>
@@ -130,7 +129,7 @@ export default function SdlsListTable() {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            SDL
+            Nom Usine
             <ArrowUpDownIcon />
           </Button>
         );
@@ -145,66 +144,50 @@ export default function SdlsListTable() {
         );
       },
       cell: ({ row }) => {
-        const sdls = row.original.sdl;
+        const sdl = row.original.sdl;
         return (
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-              {" "}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 className="size-6 text-gray-500"
               >
+                <path d="M11.584 2.376a.75.75 0 0 1 .832 0l9 6a.75.75 0 1 1-.832 1.248L12 3.901 3.416 9.624a.75.75 0 0 1-.832-1.248l9-6Z" />
                 <path
                   fillRule="evenodd"
-                  d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
+                  d="M20.25 10.332v9.918H21a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1 0-1.5h.75v-9.918a.75.75 0 0 1 .634-.74A49.109 49.109 0 0 1 12 9c2.59 0 5.134.202 7.616.592a.75.75 0 0 1 .634.74Zm-7.5 2.418a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Zm3-.75a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-1.5 0v-6.75a.75.75 0 0 1 .75-.75ZM9 12.75a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Z"
                   clipRule="evenodd"
                 />
+                <path d="M12 7.875a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" />
               </svg>
             </div>
 
-            <div className="relative w-max flex ">
-              <div>
-                <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                  {sdls.sdl_name}
-                </span>
-                <span className="block text-gray-500 text-theme-xs dark:text-gray-400 mt-2">
-                  {sdls.sdl_code}
-                </span>
-              </div>
-
-              <Badge className="size-max ml-2 text-xs">SDL</Badge>
+            <div className="relative w-max flex flex-col">
+              <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
+                {sdl.sdl_name}
+              </span>
+              <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                {sdl.sdl_code}
+              </span>
             </div>
+            <Badge className="size-max ml-2 text-xs">USINE</Badge>
           </div>
         );
       },
     },
     {
-      accessorKey: "society",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Société
-            <ArrowUpDownIcon />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="font-medium">{row.getValue("society")}</div>
-      ),
-    },
-    {
       id: "localite",
-      header: "Localité",
+      header: "Adresse",
       cell: ({ row }) => {
         const localite = row.original.localite;
         return (
           <div className="text-sm">
-            {localite?.commune}, {localite?.province}
+            <span className="block font-medium">{localite?.province}</span>
+            <span className="text-muted-foreground">
+              {localite?.commune}, {localite?.zone}
+            </span>
           </div>
         );
       },
@@ -216,13 +199,25 @@ export default function SdlsListTable() {
         const responsable = row.original.responsable;
         return (
           <div className="text-sm flex flex-col gap-y-1">
-            <span>
+            <span className="font-medium">
               {responsable?.first_name} {responsable?.last_name}
             </span>
-            <span className="flex flex-row gap-x-2 text-accent-foreground/70">
-              <Phone size={18} />
-              {responsable?.telephone}
+            <span className="text-xs text-muted-foreground">
+              Responsable Usine
             </span>
+          </div>
+        );
+      },
+    },
+    {
+      id: "contact",
+      header: "Contact Responsable",
+      cell: ({ row }) => {
+        const responsable = row.original.responsable;
+        return (
+          <div className="flex items-center gap-x-2 text-sm text-gray-700 dark:text-gray-300">
+            <Phone size={16} className="text-gray-500" />
+            {responsable?.telephone || "N/A"}
           </div>
         );
       },
@@ -256,7 +251,7 @@ export default function SdlsListTable() {
         <div className="relative ">
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
           <Input
-            placeholder="Rechercher..."
+            placeholder="Rechercher Usine..."
             value={table.getColumn("sdl")?.getFilterValue() ?? ""}
             onChange={(event) =>
               table.getColumn("sdl")?.setFilterValue(event.target.value)
@@ -270,12 +265,7 @@ export default function SdlsListTable() {
             <Filter />
           </div>
           <div className="flex items-center gap-3 text-gray-700">
-            <ExportButton
-            //   onClickExportButton={exportSdlsToExcel}
-            //   onClickDownloadButton={DownloadSdlsToExcel}
-            //   loading={loadingEportBtn}
-            //   activedownloadBtn={activedownloadBtn}
-            />
+            <ExportButton />
           </div>
         </div>
       </div>

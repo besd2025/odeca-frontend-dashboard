@@ -119,7 +119,7 @@ const menuItems = {
 
     {
       title: "Usine de dépachage",
-      url: "/odeca-dashboard/depachage",
+      url: "/odeca-dashboard/usine",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -135,7 +135,7 @@ const menuItems = {
           <path d="M12 7.875a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" />
         </svg>
       ),
-      keyword: "deparchage",
+      keyword: "usine",
     },
     {
       title: "Stocks",
