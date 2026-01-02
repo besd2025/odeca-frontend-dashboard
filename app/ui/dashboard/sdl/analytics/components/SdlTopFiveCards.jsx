@@ -13,78 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { fetchData } from "@/app/_utils/api";
-const topQuantity = [
-  { image: "/images/logo_1.jpg", name: "SDL Alpha", value: 50000, sub: "Kg" },
-  { image: "/images/logo_2.jpg", name: "SDL Beta", value: 42000, sub: "Kg" },
-  { image: "/images/logo_3.jpg", name: "SDL Gamma", value: 38000, sub: "Kg" },
-  { image: "/images/logo_4.jpg", name: "SDL Delta", value: 35000, sub: "Kg" },
-  { image: "/images/logo_5.jpg", name: "SDL Epsilon", value: 32000, sub: "Kg" },
-];
-
-const topMembers = [
-  {
-    image: "/images/logo_1.jpg",
-    name: "SDL Alpha",
-    value: 150,
-    sub: "Membres",
-  },
-  { image: "/images/logo_2.jpg", name: "SDL Beta", value: 120, sub: "Membres" },
-  {
-    image: "/images/logo_3.jpg",
-    name: "SDL Gamma",
-    value: 115,
-    sub: "Membres",
-  },
-  {
-    image: "/images/logo_4.jpg",
-    name: "SDL Delta",
-    value: 100,
-    sub: "Membres",
-  },
-  {
-    image: "/images/logo_5.jpg",
-    name: "SDL Epsilon",
-    value: 95,
-    sub: "Membres",
-  },
-];
-
-const topCapacity = [
-  { image: "/images/logo_1.jpg", name: "SDL Alpha", value: 100, sub: "Tonnes" },
-  { image: "/images/logo_2.jpg", name: "SDL Beta", value: 80, sub: "Tonnes" },
-  { image: "/images/logo_3.jpg", name: "SDL Gamma", value: 75, sub: "Tonnes" },
-  { image: "/images/logo_4.jpg", name: "SDL Delta", value: 60, sub: "Tonnes" },
-  {
-    image: "/images/logo_5.jpg",
-    name: "SDL Epsilon",
-    value: 50,
-    sub: "Tonnes",
-  },
-];
 
 function TopListCard({ title, icon, data }) {
-  // const [data, setData] = React.useState([]);
-  // React.useEffect(() => {
-  //   const getSdls = async () => {
-  //     try {
-  //       const response = await fetchData(
-  //         "get",
-  //         `cafe/stationslavage/get_active_and_non_active_sdl/`,
-  //         {
-  //           params: {},
-  //           additionalHeaders: {},
-  //           body: {},
-  //         }
-  //       );
-
-  //       setData(response);
-  //     } catch (error) {
-  //       console.error("Error fetching cultivators data:", error);
-  //     }
-  //   };
-
-  //   getSdls();
-  // }, []);
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -188,11 +118,6 @@ export function SdlTopFiveCards() {
         title="Top 5 - Nombre de Membres"
         icon={<Users className="h-4 w-4" />}
         data={datatopMembers}
-      />
-      <TopListCard
-        title="Top 5 - Capacité Stockage"
-        icon={<Warehouse className="h-4 w-4" />}
-        data={topCapacity}
       />
     </div>
   );

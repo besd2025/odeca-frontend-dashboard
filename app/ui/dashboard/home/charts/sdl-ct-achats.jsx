@@ -24,7 +24,7 @@ const chartConfig = {
 };
 
 export function ChartLineAchats() {
-  const [period, setPeriod] = useState("jour");
+  const [period, setPeriod] = useState("mois");
   const [dataByPeriod, setDataByPeriod] = useState({}); // ← nouveau nom
 
   const handleTimePeriodChange = (value) => {

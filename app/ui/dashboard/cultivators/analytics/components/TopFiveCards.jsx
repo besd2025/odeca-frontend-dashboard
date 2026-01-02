@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 
 function TopListCard({ title, icon, data }) {
+  console.log("data in TopListCard:", data);
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -44,7 +45,7 @@ function TopListCard({ title, icon, data }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
                   <Link
-                    href={`/odeca-dashboard/cultivators/profile/?id=${456}`}
+                    href={`/odeca-dashboard/cultivators/profile/?id=${item.id}`}
                   >
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                   </Link>
@@ -75,6 +76,7 @@ export function TopFiveCards() {
           }
         );
         const topChamps = response.map((item) => ({
+          id: item?.cultivateur_champ__id,
           image:
             process.env.NEXT_PUBLIC_IMAGE_URL +
             item?.cultivateur_champ__cultivator_photo,
@@ -86,7 +88,6 @@ export function TopFiveCards() {
           sub: "Champs",
         }));
         setDataTopChamps(topChamps);
-        console.log(topChamps);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
@@ -103,6 +104,7 @@ export function TopFiveCards() {
           }
         );
         const topPieds = response.map((item) => ({
+          id: item?.cultivateur_champ__id,
           image:
             process.env.NEXT_PUBLIC_IMAGE_URL +
             item?.cultivateur_champ__cultivator_photo,
@@ -113,6 +115,7 @@ export function TopFiveCards() {
           value: item?.pieds,
           sub: "Pieds",
         }));
+
         setDataTopPieds(topPieds);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -130,6 +133,7 @@ export function TopFiveCards() {
           }
         );
         const topQtes = response.map((item) => ({
+          id: item?.cafeiculteur__id,
           image:
             process.env.NEXT_PUBLIC_IMAGE_URL +
             item?.cafeiculteur__cultivator_photo,
@@ -161,11 +165,11 @@ export function TopFiveCards() {
         icon={<Trees className="h-4 w-4" />}
         data={datatopPieds}
       />
-      <TopListCard
+      {/* <TopListCard
         title="Top 5 - Quantité Produite"
         icon={<Scale className="h-4 w-4" />}
         data={datatopQtes}
-      />
+      /> */}
     </div>
   );
 }
