@@ -41,7 +41,7 @@ const locationData = {
 
 const locationConfig = {
   count: {
-    label: "SDLs",
+    label: "USINEs",
     color: "var(--chart-4)",
   },
 };

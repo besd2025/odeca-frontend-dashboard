@@ -140,9 +140,17 @@ function Sidebar({
   collapsible = "offcanvas",
   className,
   children,
+  onMouseEnter,
+  onMouseLeave,
   ...props
 }) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const {
+    isMobile,
+    state: internalState,
+    openMobile,
+    setOpenMobile,
+  } = useSidebar();
+  const state = props["data-state"] || internalState;
 
   if (collapsible === "none") {
     return (
@@ -190,6 +198,8 @@ function Sidebar({
       data-variant={variant}
       data-side={side}
       data-slot="sidebar"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {/* This is what handles the sidebar gap on desktop */}
       <div

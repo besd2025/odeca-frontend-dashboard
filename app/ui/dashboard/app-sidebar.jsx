@@ -265,9 +265,18 @@ export function AppSidebar({ ...props }) {
   // Function that checks if menu item is active
   const isActive = (keyword) => pathname.includes(keyword);
   const { isMobile, state } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  const [isHovered, setIsHovered] = React.useState(false);
+  const isCollapsed = state === "collapsed" && !isHovered;
+
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar
+      collapsible="icon"
+      {...props}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      data-state={isCollapsed ? "collapsed" : "expanded"}
+      data-collapsible={isCollapsed ? "icon" : ""}
+    >
       <SidebarHeader className="mb-3 flex items-center">
         <Image src="/images/logo_1.png" alt="Logo" width={100} height={100} />
       </SidebarHeader>

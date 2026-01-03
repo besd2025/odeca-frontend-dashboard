@@ -36,7 +36,7 @@ export function UsineTypeChart() {
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader>
-        <CardTitle>Type de SDL</CardTitle>
+        <CardTitle>Type de USINE</CardTitle>
         <CardDescription>Privées vs Publiques</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

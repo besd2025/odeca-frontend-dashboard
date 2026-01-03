@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock, Package } from "lucide-react";
+import { StockChart } from "./stock-chart";
 
 export default function Stocks({ data = [] }) {
   // Mock data representing current stock state
@@ -112,14 +113,7 @@ export default function Stocks({ data = [] }) {
 
       {/* Future: Historique / Evolution Chart can go here */}
       <Card className="shadow-none">
-        <CardHeader>
-          <CardTitle className="text-muted-foreground text-base">
-            Historique d'Évolution du Stock
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="h-32 flex items-center justify-center text-muted-foreground text-sm italic">
-          Graphique d'évolution à implémenter ici (Chart.js / Recharts)
-        </CardContent>
+        <StockChart />
       </Card>
     </div>
   );

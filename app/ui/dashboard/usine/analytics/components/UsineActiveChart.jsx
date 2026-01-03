@@ -65,7 +65,7 @@ export function UsineActiveChart() {
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader>
-        <CardTitle>Statut des SDLs</CardTitle>
+        <CardTitle>Statut des USINEs</CardTitle>
         <CardDescription>Actif vs Non Actif</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

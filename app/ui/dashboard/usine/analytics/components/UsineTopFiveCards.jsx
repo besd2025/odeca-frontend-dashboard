@@ -110,15 +110,15 @@ export function TopFiveCards() {
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <TopListCard
-        title="Top 5 - Quantité Collectée"
+        title="Top 5 - Quantité Transferée"
         icon={<Scale className="h-4 w-4" />}
         data={datatopAchats}
       />
-      <TopListCard
+      {/* <TopListCard
         title="Top 5 - Nombre de Membres"
         icon={<Users className="h-4 w-4" />}
         data={datatopMembers}
-      />
+      /> */}
     </div>
   );
 }

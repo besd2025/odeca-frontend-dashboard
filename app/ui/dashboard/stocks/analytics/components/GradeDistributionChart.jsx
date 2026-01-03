@@ -64,14 +64,14 @@ export function GradeDistributionChart() {
           value: item?.total_cerise,
           fill:
             item?.grade === "A1"
-              ? "var(--color-a1)"
+              ? "var(--chart-5)"
               : item?.grade === "A2"
-              ? "var(--color-a2)"
+              ? "var(--chart-4)"
               : item?.grade === "B1"
-              ? "var(--color-b1)"
+              ? "var(--chart-1)"
               : item?.grade === "B2"
-              ? "var(--color-b2)"
-              : "var(--color-a3)",
+              ? "var(--chart-2)"
+              : "var(--chart-3)",
         }));
         setData(chatData);
       } catch (error) {

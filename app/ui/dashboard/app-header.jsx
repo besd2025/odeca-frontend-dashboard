@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 // import { Logo } from "@/components/logo";
-import { Search } from "lucide-react";
+import { Grape, Search } from "lucide-react";
 import { ModeToggle } from "../toggle-theme-button";
 import {
   Tooltip,
@@ -81,7 +81,10 @@ export function AppHeader() {
               orientation="vertical"
               className="mx-2 data-[orientation=vertical]:h-4"
             />
-            <h1 className="text-base font-bold">XXX</h1>
+            <h1 className="text-base font-bold flex gap-x-1 items-center">
+              <Grape className="h-5 w-5" />
+              CAFE
+            </h1>
             {/* <Logo className="shrink-0" /> */}
 
             <div className="relative hidden md:blo/ck">

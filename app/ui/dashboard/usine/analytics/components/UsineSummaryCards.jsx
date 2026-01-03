@@ -1,53 +1,42 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Grape, ArrowDownToLine } from "lucide-react";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Building2,
+  Grape,
+  ArrowDownToLine,
+  Factory,
+  Leaf,
+  Truck,
+} from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 
 export function UsineSummaryCards() {
   const [data, setData] = React.useState({
     total_usine: 0,
+    qty_recu: 0,
+    total_traite: 0,
+    total_produit: 0,
+    total_sorti: 0,
     stock_cafe_vert: 0,
-    qty_recu_transfert: 0,
   });
 
   React.useEffect(() => {
     const getData = async () => {
       try {
-        // Trying to fetch global Usine stats.
-        // Assuming endpoint or calculating from list locally if global endpoint doesn't exist.
-        // For now, I'll try to fetch a summary endpoint if it exists, roughly mirroring SDL.
-        // If specific endpoints for these totals don't exist, we might need to aggregate or mocking for now.
-
-        // Placeholder implementation for "Cafe Vert" and "Transfert Recu" as these are new requirements
-        // and might not have a dedicated global endpoint yet.
-        // Using `cafe/usines/get_stats/` as a hypothetical endpoint or similar.
-
-        // Retaining the 'active/inactive' fetch structure from SDL but adapting to Usine if needed
-        // For this specific request "Cafe Vert" and "Quantite recu", I will add cards for them.
-
-        // const response = await fetchData("get", `cafe/usines/get_global_stats/`, {});
-
-        // Since I don't have the backend, I will set dummy data structure to request from backend
-        // or attempt to fetch and fallback.
-
-        // Replicating SDL fetch for total Count first:
         const responseUsines = await fetchData("get", "cafe/usines/", {});
         const totalUsines = responseUsines?.count || 0;
 
-        setData((prev) => ({ ...prev, total_usine: totalUsines }));
-
-        // Hypothetical fetch for Cafe Vert Stock and Transfer Received
-        // const stockResponse = await fetchData("get", "cafe/usines/get_total_stock_cafe_vert/", {});
-        // const transferResponse = await fetchData("get", "cafe/usines/get_total_transfer_received/", {});
-
-        // Setting mock/placeholder data for visualization as requested
-        setData((prev) => ({
-          ...prev,
-          stock_cafe_vert: 12500, // Placeholder
-          qty_recu_transfert: 45000, // Placeholder
-        }));
+        // Mock data for new KPIs as global endpoints might not exist yet
+        setData({
+          total_usine: totalUsines,
+          qty_recu: 45000,
+          total_traite: 35000,
+          total_produit: 28000,
+          total_sorti: 15000,
+          stock_cafe_vert: 12500,
+        });
       } catch (error) {
         console.error("Error fetching usine stats:", error);
       }
@@ -56,51 +45,77 @@ export function UsineSummaryCards() {
     getData();
   }, []);
 
+  const cards = [
+    {
+      title: "Effectif Total des Usines",
+      value: data.total_usine,
+      icon: Building2,
+      color: "bg-primary",
+      unit: "",
+      desc: "Nombre d'usines",
+    },
+    {
+      title: "Qte. Réceptionnée",
+      value: data.qty_recu,
+      icon: ArrowDownToLine,
+      color: "bg-blue-600",
+      unit: "Kg",
+      desc: "Depuis les SDLs",
+    },
+    {
+      title: "Qte. Usinée",
+      value: data.total_traite,
+      icon: Factory,
+      color: "bg-orange-500",
+      unit: "Kg",
+      desc: "Total traité",
+    },
+    {
+      title: "Qte. Café Vert Produit",
+      value: data.total_produit,
+      icon: Leaf,
+      color: "bg-green-600",
+      unit: "Kg",
+      desc: "Production nette",
+    },
+    {
+      title: "Qte. Café Vert Sorti",
+      value: data.total_sorti,
+      icon: Truck,
+      color: "bg-red-500",
+      unit: "Kg",
+      desc: "Expéditions",
+    },
+    {
+      title: "Stock Café Vert",
+      value: data.stock_cafe_vert,
+      icon: Grape,
+      color: "bg-emerald-600",
+      unit: "Kg",
+      desc: "Global",
+    },
+  ];
+
   return (
-    <div className="grid gap-4 md:grid-cols-3">
-      <Card className="@container/card">
-        <CardHeader>
-          <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-primary p-2 rounded-md">
-              <Building2 className="text-white" />
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {cards.map((card, index) => (
+        <Card key={index} className="@container/card">
+          <CardHeader>
+            <div className="flex flex-row gap-x-2 items-center">
+              <div className={`${card.color} p-2 rounded-md`}>
+                <card.icon className="text-white w-5 h-5" />
+              </div>
+              <CardTitle className="text-xl font-semibold tracking-tight tabular-nums ml-1">
+                {card.value.toLocaleString()}
+                {card.unit && <span className="text-sm ml-1">{card.unit}</span>}
+              </CardTitle>
             </div>
-            <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums ml-2">
-              {data.total_usine}
+            <CardTitle className="text-base font-medium text-muted-foreground mt-2 ml-1">
+              {card.title}
             </CardTitle>
-          </div>
-          <CardTitle className="text-lg font-semibold tabular-nums ml-2">
-            Effectif Total des Usines
-          </CardTitle>
-        </CardHeader>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
-          <CardTitle className="font-medium">Stock Café Vert</CardTitle>
-          <Grape className="h-4 w-4 text-green-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {data.stock_cafe_vert.toLocaleString()}{" "}
-            <span className="text-sm font-normal">Kg</span>
-          </div>
-          <p className="text-xs text-muted-foreground">Global</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
-          <CardTitle className="font-medium">Reçu (Transfert)</CardTitle>
-          <ArrowDownToLine className="h-4 w-4 text-blue-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {data.qty_recu_transfert.toLocaleString()}{" "}
-            <span className="text-sm font-normal">Kg</span>
-          </div>
-          <p className="text-xs text-muted-foreground">Depuis les SDLs</p>
-        </CardContent>
-      </Card>
+          </CardHeader>
+        </Card>
+      ))}
     </div>
   );
 }

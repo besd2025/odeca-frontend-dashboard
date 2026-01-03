@@ -107,11 +107,6 @@ function DetailsContent({ id }) {
             <Package className="w-4 h-4 mr-2" /> Stocks
           </TabsTrigger>
 
-          {/* Legacy / Other tabs */}
-          <TabsTrigger value="rh" className="hidden lg:flex shrink-0">
-            <ScrollText className="w-4 h-4 mr-2" /> RH
-          </TabsTrigger>
-
           {/* MOBILE DROPDOWN */}
           <div className="block lg:hidden ml-auto">
             <DropdownMenu>
@@ -152,11 +147,6 @@ function DetailsContent({ id }) {
 
         <TabsContent value="stocks">
           <Stocks />
-        </TabsContent>
-
-        <TabsContent value="rh">
-          <h1 className="text-xl font-semibold m-2">Rapport H</h1>
-          <RHlist data={RHData} />
         </TabsContent>
       </Tabs>
     </Card>
