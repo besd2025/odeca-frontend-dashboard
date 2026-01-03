@@ -54,7 +54,7 @@ export default function Stocks({ data = [] }) {
     <div className="space-y-6">
       {/* Top Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Stock Total Usine
@@ -70,28 +70,11 @@ export default function Stocks({ data = [] }) {
             </p>
           </CardContent>
         </Card>
-
-        <Card
-          className={totalBlocked > 0 ? "border-red-500/50 bg-red-50/10" : ""}
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Stock Bloqué</CardTitle>
-            <Lock className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {totalBlocked.toLocaleString()} kg
-            </div>
-            <p className="text-xs text-muted-foreground">
-              En attente / Contrôle
-            </p>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Stock par Grade */}
-        <Card>
+        <Card className="shadow-none">
           <CardHeader>
             <CardTitle>Stock par Grade</CardTitle>
           </CardHeader>
@@ -109,7 +92,7 @@ export default function Stocks({ data = [] }) {
         </Card>
 
         {/* Stock par Propriétaire */}
-        <Card>
+        <Card className="shadow-none">
           <CardHeader>
             <CardTitle>Stock par Propriétaire</CardTitle>
           </CardHeader>
@@ -128,7 +111,7 @@ export default function Stocks({ data = [] }) {
       </div>
 
       {/* Future: Historique / Evolution Chart can go here */}
-      <Card className="bg-muted/10 border-dashed">
+      <Card className="shadow-none">
         <CardHeader>
           <CardTitle className="text-muted-foreground text-base">
             Historique d'Évolution du Stock

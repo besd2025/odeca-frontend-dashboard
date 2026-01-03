@@ -11,60 +11,146 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import PaginationControls from "@/components/ui/pagination-controls";
 
 export default function Receptions({ data = [] }) {
-  // Mock data if none provided (or replace 'data' prop usage with internal state/api call)
-  const receptions =
-    data.length > 0
-      ? data
-      : [
-          {
-            id: 1,
-            date: "2024-05-15",
-            proprietaire: "Coopérative KAWA",
-            categorie: "Cerise Grade A",
-            quantite: 5000,
-            lot: "LOT-24-001",
-            statut: "Validé",
-          },
-          {
-            id: 2,
-            date: "2024-05-16",
-            proprietaire: "SOGESTAL",
-            categorie: "Cerise Grade B",
-            quantite: 3200,
-            lot: "LOT-24-002",
-            statut: "En attente",
-          },
-          {
-            id: 3,
-            date: "2024-05-18",
-            proprietaire: "Coopérative KAWA",
-            categorie: "Parche",
-            quantite: 1500,
-            lot: "LOT-24-003",
-            statut: "Validé",
-          },
-        ];
+  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
-  // Calculations for Totals
-  const totalByCategorie = receptions.reduce((acc, curr) => {
-    acc[curr.categorie] = (acc[curr.categorie] || 0) + curr.quantite;
-    return acc;
-  }, {});
+  // Mock data handling
+  const defaultData = React.useMemo(
+    () => [
+      {
+        id: 1,
+        date: "2024-05-15",
+        proprietaire: "Coopérative KAWA",
+        categorie: "Cerise Grade A",
+        quantite: 5000,
+        lot: "LOT-24-001",
+        statut: "Validé",
+      },
+      {
+        id: 2,
+        date: "2024-05-16",
+        proprietaire: "SOGESTAL",
+        categorie: "Cerise Grade B",
+        quantite: 3200,
+        lot: "LOT-24-002",
+        statut: "En attente",
+      },
+      {
+        id: 3,
+        date: "2024-05-18",
+        proprietaire: "Coopérative KAWA",
+        categorie: "Parche",
+        quantite: 1500,
+        lot: "LOT-24-003",
+        statut: "Validé",
+      },
+    ],
+    []
+  );
 
-  const totalByProprietaire = receptions.reduce((acc, curr) => {
-    acc[curr.proprietaire] = (acc[curr.proprietaire] || 0) + curr.quantite;
-    return acc;
-  }, {});
+  const tableData = data.length > 0 ? data : defaultData;
 
-  const totalPeriode = receptions.reduce((acc, curr) => acc + curr.quantite, 0);
+  // Columns definition
+  const columns = React.useMemo(
+    () => [
+      {
+        accessorKey: "date",
+        header: "Date",
+        cell: (info) => info.getValue(),
+      },
+      {
+        accessorKey: "proprietaire",
+        header: "Propriétaire",
+        cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+      },
+      {
+        accessorKey: "categorie",
+        header: "Catégorie",
+        cell: (info) => info.getValue(),
+      },
+      {
+        accessorKey: "quantite",
+        header: "Quantité (kg)",
+        cell: (info) => info.getValue().toLocaleString(),
+      },
+      {
+        accessorKey: "lot",
+        header: "Lot",
+        cell: (info) => info.getValue(),
+      },
+      {
+        accessorKey: "statut",
+        header: "Statut",
+        cell: (info) => (
+          <Badge
+            variant={info.getValue() === "Validé" ? "success" : "secondary"}
+          >
+            {info.getValue()}
+          </Badge>
+        ),
+      },
+    ],
+    []
+  );
+
+  const table = useReactTable({
+    data: tableData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: setPagination,
+    state: {
+      sorting,
+      columnFilters,
+      pagination,
+    },
+  });
+
+  // Calculations for Totals (using full dataset)
+  const totalByCategorie = React.useMemo(() => {
+    return tableData.reduce((acc, curr) => {
+      acc[curr.categorie] = (acc[curr.categorie] || 0) + curr.quantite;
+      return acc;
+    }, {});
+  }, [tableData]);
+
+  const totalByProprietaire = React.useMemo(() => {
+    return tableData.reduce((acc, curr) => {
+      acc[curr.proprietaire] = (acc[curr.proprietaire] || 0) + curr.quantite;
+      return acc;
+    }, {});
+  }, [tableData]);
+
+  const totalPeriode = React.useMemo(() => {
+    return tableData.reduce((acc, curr) => acc + curr.quantite, 0);
+  }, [tableData]);
 
   return (
     <div className="space-y-6">
       {/* Totals Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="shadow-none">
           <CardHeader className="">
             <CardTitle className="text-sm font-medium">Total Période</CardTitle>
           </CardHeader>
@@ -78,7 +164,7 @@ export default function Receptions({ data = [] }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-none">
           <CardHeader className="">
             <CardTitle className="text-sm font-medium">Par Catégorie</CardTitle>
           </CardHeader>
@@ -96,7 +182,7 @@ export default function Receptions({ data = [] }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-none">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
               Par Propriétaire
@@ -118,47 +204,91 @@ export default function Receptions({ data = [] }) {
       </div>
 
       {/* List Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Liste des Réceptions</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="w-full bg-sidebar p-2 rounded-lg">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4">
+          <div className="relative">
+            <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5" />
+            <Input
+              placeholder="Rechercher par propriétaire..."
+              value={table.getColumn("proprietaire")?.getFilterValue() ?? ""}
+              onChange={(event) =>
+                table
+                  .getColumn("proprietaire")
+                  ?.setFilterValue(event.target.value)
+              }
+              className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+            />
+          </div>
+        </div>
+
+        <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Propriétaire</TableHead>
-                <TableHead>Catégorie</TableHead>
-                <TableHead>Quantité (kg)</TableHead>
-                <TableHead>Lot</TableHead>
-                <TableHead>Statut</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {receptions.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.date}</TableCell>
-                  <TableCell className="font-medium">
-                    {item.proprietaire}
-                  </TableCell>
-                  <TableCell>{item.categorie}</TableCell>
-                  <TableCell>{item.quantite.toLocaleString()}</TableCell>
-                  <TableCell>{item.lot}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        item.statut === "Validé" ? "success" : "secondary"
-                      }
-                    >
-                      {item.statut}
-                    </Badge>
-                  </TableCell>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow
+                  key={headerGroup.id}
+                  className="sticky top-0 bg-background z-10 hover:bg-background"
+                >
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
                 </TableRow>
               ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
+          <div className="flex-1 text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <PaginationControls
+            page={table.getState().pagination.pageIndex + 1}
+            pageSize={table.getState().pagination.pageSize}
+            totalItems={table.getFilteredRowModel().rows.length}
+            totalPages={table.getPageCount()}
+            onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
+            onPageSizeChange={(size) => table.setPageSize(size)}
+            hasNextPage={table.getCanNextPage()}
+            hasPreviousPage={table.getCanPreviousPage()}
+          />
+        </div>
+      </div>
     </div>
   );
 }

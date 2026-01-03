@@ -144,7 +144,8 @@ function ProfileCard({ cult_id }) {
             </Avatar>
             <div className="space-y-1 flex flex-col items-center gap-y-2">
               <p className="text-xl font-semibold">
-                {data?.cultivator_first_name} {data?.cultivator_last_name}
+                {data?.cultivator_assoc_name ||
+                  `${data?.cultivator_first_name} ${data?.cultivator_last_name}`}
               </p>
               <p className="text-sm text-muted-foreground flex flex-row gap-x-2">
                 <Grape className="text-primary size-5" />
@@ -160,34 +161,91 @@ function ProfileCard({ cult_id }) {
             </Badge>
           </div>
 
-          {/* <Button className="w-full bg-black text-white hover:bg-black/90">
-        Message
-      </Button> */}
-
           <div className="space-y-3">
-            <div>
-              <div className="flex items-center justify-between text-sm flex-col gap-y-1">
-                <span className="text-muted-foreground">CNI</span>
-                <span className="font-medium">{data?.cultivator_cni}</span>
-              </div>
-              <Separator className="my-2" />
-            </div>
+            {data?.cultivator_assoc_name ? (
+              <>
+                <div>
+                  <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                    <span className="text-muted-foreground">Représentant</span>
+                    <span className="font-medium text-center">
+                      {data?.cultivator_assoc_rep_name}
+                    </span>
+                  </div>
+                  <Separator className="my-2" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                    <span className="text-muted-foreground">NIF</span>
+                    <span className="font-medium">
+                      {data?.cultivator_assoc_nif}
+                    </span>
+                  </div>
+                  <Separator className="my-2" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                    <span className="text-muted-foreground">Numéro Fiche</span>
+                    <span className="font-medium">
+                      {data?.cultivator_assoc_numero_fiche}
+                    </span>
+                  </div>
+                  <Separator className="my-2" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                    <span className="text-muted-foreground">
+                      Tel Représentant
+                    </span>
+                    <span className="font-medium">
+                      {data?.cultivator_assoc_rep_phone}
+                    </span>
+                  </div>
+                  <Separator className="my-2" />
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                    <span className="text-muted-foreground">CNI</span>
+                    <span className="font-medium">{data?.cultivator_cni}</span>
+                  </div>
+                  <Separator className="my-2" />
+                </div>
 
-            <div>
-              <div className="flex items-center justify-between text-sm flex-col gap-y-1">
-                <span className="text-muted-foreground">Date de Naissance</span>
-                <span className="font-medium">{data?.date_naissance}</span>
-              </div>
-              <Separator className="my-2" />
-            </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                    <span className="text-muted-foreground">
+                      Date de Naissance
+                    </span>
+                    <span className="font-medium">{data?.date_naissance}</span>
+                  </div>
+                  <Separator className="my-2" />
+                </div>
 
-            <div>
-              <div className="flex items-center justify-between text-sm ">
-                <span className="text-muted-foreground">Sexe</span>
-                <span className="font-medium">{data?.cultivator_gender}</span>
-              </div>
-              <Separator className="my-2" />
-            </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm ">
+                    <span className="text-muted-foreground">Sexe</span>
+                    <span className="font-medium">
+                      {data?.cultivator_gender}
+                    </span>
+                  </div>
+                  <Separator className="my-2" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm ">
+                    <span className="text-muted-foreground flex gap-x-1">
+                      <Phone size={20} />
+                      Téléphone
+                    </span>
+                    <span className="font-medium">
+                      {data?.cultivator_telephone}
+                    </span>
+                  </div>
+                  <Separator className="my-2" />
+                </div>
+              </>
+            )}
 
             <div>
               <div className="flex items-center justify-between text-sm flex-col gap-y-1">
@@ -202,19 +260,6 @@ function ProfileCard({ cult_id }) {
                   }
                   /{data?.cultivator_adress?.zone_code?.zone_name}/
                   {data?.cultivator_adress?.colline_name}
-                </span>
-              </div>
-              <Separator className="my-2" />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between text-sm ">
-                <span className="text-muted-foreground flex gap-x-1">
-                  <Phone size={20} />
-                  Téléphone
-                </span>
-                <span className="font-medium">
-                  {data?.cultivator_telephone}
                 </span>
               </div>
               <Separator className="my-2" />

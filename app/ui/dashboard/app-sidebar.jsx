@@ -22,22 +22,22 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import {
-  IconDashboard,
   IconDotsVertical,
   IconLogout,
   IconNotification,
-  IconSettings,
   IconUserCircle,
-  IconUsers,
 } from "@tabler/icons-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { BanknoteArrowDown, Warehouse } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 // This is sample data.
 const menuItems = {
@@ -139,6 +139,20 @@ const menuItems = {
     },
     {
       title: "Stocks",
+      items: [
+        {
+          title: "Details",
+          url: "/odeca-dashboard/stocks",
+        },
+        {
+          title: "Achats",
+          url: "/odeca-dashboard/stocks/achats",
+        },
+        {
+          title: "Transfers",
+          url: "/odeca-dashboard/stocks/transfers",
+        },
+      ],
       url: "/odeca-dashboard/stocks",
       icon: (
         <svg
@@ -179,7 +193,72 @@ const menuItems = {
     avatar: "/avatars/shadcn.jpg",
   },
 };
-// Each menu item defines a keyword for activation
+
+function CollapsibleMenuItem({ item, isCollapsed, isActive }) {
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = React.useState(isActive);
+
+  // Automatically open if one of the subitems is active
+  React.useEffect(() => {
+    if (isActive) {
+      setIsOpen(true);
+    }
+  }, [isActive]);
+
+  const Icon = item.icon;
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        tooltip={item.title}
+        isActive={isActive}
+        className="flex items-center group/collapsible-btn w-full"
+        size="lg"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {item.icon &&
+          (React.isValidElement(item.icon) ? (
+            React.cloneElement(item.icon, {
+              className: cn(
+                isActive ? "text-white" : "text-sidebar-foreground/70",
+                isCollapsed ? "size-6! ml-1" : "size-8!",
+                item.icon.props?.className
+              ),
+            })
+          ) : (
+            <Icon className={isCollapsed ? "size-6!" : "size-8!"} />
+          ))}
+        <span className="flex-1 text-left">{item.title}</span>
+        <ChevronRight
+          className={cn(
+            "ml-auto h-4 w-4 transition-transform duration-200",
+            isOpen && "rotate-90"
+          )}
+        />
+      </SidebarMenuButton>
+
+      {isOpen && !isCollapsed && (
+        <SidebarMenuSub className="mt-2">
+          {item.items.map((subItem) => {
+            const isSubActive = pathname === subItem.url;
+            return (
+              <SidebarMenuSubItem key={subItem.title}>
+                <SidebarMenuSubButton asChild isActive={isSubActive}>
+                  <a href={subItem.url} className="flex items-center">
+                    {isSubActive && (
+                      <div className="h-2 w-2 rounded-full bg-primary mr-2" />
+                    )}
+                    <span>{subItem.title}</span>
+                  </a>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            );
+          })}
+        </SidebarMenuSub>
+      )}
+    </SidebarMenuItem>
+  );
+}
 
 export function AppSidebar({ ...props }) {
   const pathname = usePathname();
@@ -200,18 +279,30 @@ export function AppSidebar({ ...props }) {
             >
               {menuItems.navMain.map((item) => {
                 const active = isActive(item.keyword);
-                // Support both component references (Icon) and already-instantiated
-                // React elements (e.g. an inline <svg />). If item.icon is a
-                // React element, clone it to inject className. If it's a
-                // component/function, render it normally.
+
+                if (item.items && item.items.length > 0) {
+                  return (
+                    <CollapsibleMenuItem
+                      key={item.title}
+                      item={item}
+                      isCollapsed={isCollapsed}
+                      isActive={active}
+                    />
+                  );
+                }
+
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <Link href={item.url} className="flex items-center gap-3">
-                      <SidebarMenuButton
-                        tooltip={item.title}
-                        isActive={active}
-                        className="flex items-center"
-                        size="lg"
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={active}
+                      className="flex items-center"
+                      size="lg"
+                    >
+                      <Link
+                        href={item.url}
+                        className="flex items-center gap-3 w-full"
                       >
                         {item.icon &&
                           (React.isValidElement(item.icon) ? (
@@ -230,8 +321,8 @@ export function AppSidebar({ ...props }) {
                             />
                           ))}
                         <span>{item.title}</span>
-                      </SidebarMenuButton>
-                    </Link>
+                      </Link>
+                    </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
               })}

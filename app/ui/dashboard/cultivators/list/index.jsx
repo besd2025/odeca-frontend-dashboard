@@ -8,7 +8,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, MoreHorizontal, Search } from "lucide-react";
+import {
+  ArrowUpDownIcon,
+  MoreHorizontal,
+  Search,
+  User,
+  Users,
+} from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -36,7 +42,9 @@ import Edit from "../edit";
 import Link from "next/link";
 import PaginationControls from "@/components/ui/pagination-controls";
 
-export default function CultivatorsListTable({ data, isCultivatorsPage }) {
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+function DataTable({ data, isCultivatorsPage }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -110,25 +118,38 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
         if (!filterValue) return true;
         const search = filterValue.toLowerCase();
         return (
-          cultivator.first_name.toLowerCase().includes(search) ||
-          cultivator.last_name.toLowerCase().includes(search) ||
-          cultivator.cultivator_code.toLowerCase().includes(search)
+          cultivator?.first_name?.toLowerCase().includes(search) ||
+          cultivator?.last_name?.toLowerCase().includes(search) ||
+          cultivator?.cultivator_code?.toLowerCase().includes(search) ||
+          cultivator?.cultivator_assoc_name?.toLowerCase().includes(search)
         );
       },
       cell: ({ row }) => {
         const cultivators = row.original.cultivator;
+        const isAssociation = !!cultivators?.cultivator_assoc_name;
+
         return (
           <div className="flex items-center gap-3">
             <ViewImageDialog
               imageUrl={cultivators?.image_url || null}
-              alt={`${cultivators?.last_name} ${cultivators?.first_name}`}
+              alt={
+                isAssociation
+                  ? cultivators?.cultivator_assoc_name
+                  : `${cultivators?.last_name} ${cultivators?.first_name}`
+              }
             />
             <div>
               <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                {cultivators?.last_name} {cultivators?.first_name}
+                {isAssociation
+                  ? cultivators?.cultivator_assoc_name
+                  : `${cultivators?.last_name} ${cultivators?.first_name}`}
               </span>
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                {cultivators?.cultivator_code}
+                {isAssociation ? (
+                  <span>Rep: {cultivators?.cultivator_assoc_rep_name}</span>
+                ) : (
+                  cultivators?.cultivator_code
+                )}
               </span>
             </div>
           </div>
@@ -319,5 +340,43 @@ export default function CultivatorsListTable({ data, isCultivatorsPage }) {
         />
       </div>
     </div>
+  );
+}
+
+export default function CultivatorsListTable({
+  data,
+  individualData,
+  associationData,
+  isCultivatorsPage,
+}) {
+  const individuals = individualData ?? data ?? [];
+  const associations = associationData ?? [];
+
+  return (
+    <Tabs defaultValue="individual" className="w-full mt-4">
+      <TabsList className="p-0 h-auto bg-background gap-1">
+        <TabsTrigger
+          value="individual"
+          className="data-[state=active]:shadow-[0_0_8px_1px_rgba(0,0,0,0.1)] dark:data-[state=active]:shadow-[0_0_8px_1px_rgba(255,255,255,0.2)]"
+        >
+          <User />
+          Individuels
+        </TabsTrigger>
+        <TabsTrigger
+          value="association"
+          className="data-[state=active]:shadow-[0_0_8px_1px_rgba(0,0,0,0.1)] dark:data-[state=active]:shadow-[0_0_8px_1px_rgba(255,255,255,0.2)]"
+        >
+          <Users />
+          Associations / Coopératives
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="individual" className="mt-4">
+        <DataTable data={individuals} isCultivatorsPage={isCultivatorsPage} />
+      </TabsContent>
+      <TabsContent value="association" className="mt-4">
+        <DataTable data={associations} isCultivatorsPage={isCultivatorsPage} />
+      </TabsContent>
+    </Tabs>
   );
 }

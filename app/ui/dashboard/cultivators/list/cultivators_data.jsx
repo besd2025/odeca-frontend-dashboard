@@ -8,12 +8,14 @@ import { fetchData } from "@/app/_utils/api";
 import CultivatorAnalytics from "../analytics";
 
 function CultivatorData() {
-  const [data, setData] = useState([]);
+  const [individualData, setIndividualData] = useState([]);
+  const [associationData, setAssociationData] = useState([]);
 
   useEffect(() => {
     const getCultivators = async () => {
       try {
-        const response = await fetchData(
+        // Fetch Individuals
+        const responseIndividuals = await fetchData(
           "get",
           "cultivators/get_cafe_cultivators/?cafeiculteur_type=personne",
           {
@@ -22,30 +24,55 @@ function CultivatorData() {
             body: {},
           }
         );
-        const results = response?.results;
-        console.log("data cultivators: ", results);
-        const cultivatorsData = results.map((cultivator) => ({
-          id: cultivator.id,
-          cultivator: {
-            cultivator_code: cultivator?.cultivator_code,
-            first_name: cultivator?.cultivator_first_name,
-            last_name: cultivator?.cultivator_last_name,
-            image_url: cultivator?.cultivator_photo,
-          },
-          sdl_ct: cultivator?.ct_sdl_name,
-          society: cultivator?.societe_name,
-          localite: {
-            province:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
-            commune:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
-          },
-          champs: cultivator?.nombre_champs,
-        }));
 
-        setData(cultivatorsData);
+        // Fetch Associations
+        const responseAssociations = await fetchData(
+          "get",
+          "cultivators/get_cafe_cultivators/?cafeiculteur_type=association",
+          {
+            params: { limit: 1000, offset: 0 },
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
+        const formatData = (results) => {
+          return results.map((cultivator) => ({
+            id: cultivator.id,
+            cultivator: {
+              cultivator_code: cultivator?.cultivator_code,
+              first_name: cultivator?.cultivator_first_name,
+              last_name: cultivator?.cultivator_last_name,
+              image_url: cultivator?.cultivator_photo,
+              // Association specific fields
+              cultivator_assoc_name: cultivator?.cultivator_assoc_name,
+              cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,
+              cultivator_assoc_nif: cultivator?.cultivator_assoc_nif,
+              cultivator_assoc_rep_phone:
+                cultivator?.cultivator_assoc_rep_phone,
+              cultivator_assoc_numero_fiche:
+                cultivator?.cultivator_assoc_numero_fiche,
+            },
+            sdl_ct: cultivator?.ct_sdl_name,
+            society: cultivator?.societe_name,
+            localite: {
+              province:
+                cultivator?.cultivator_adress?.zone_code?.commune_code
+                  ?.province_code?.province_name,
+              commune:
+                cultivator?.cultivator_adress?.zone_code?.commune_code
+                  ?.commune_name,
+            },
+            champs: cultivator?.nombre_champs,
+          }));
+        };
+
+        if (responseIndividuals?.results) {
+          setIndividualData(formatData(responseIndividuals.results));
+        }
+        if (responseAssociations?.results) {
+          setAssociationData(formatData(responseAssociations.results));
+        }
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
@@ -69,7 +96,11 @@ function CultivatorData() {
         </TabsList>
         <TabsContent value="list">
           <h1 className="text-2xl font-semibold m-2">Liste des cultivateurs</h1>
-          <CultivatorsListTable data={data} isCultivatorsPage={true} />
+          <CultivatorsListTable
+            individualData={individualData}
+            associationData={associationData}
+            isCultivatorsPage={true}
+          />
         </TabsContent>
         <TabsContent value="details">
           <CultivatorAnalytics />

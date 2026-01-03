@@ -24,12 +24,12 @@ import {
   Users,
 } from "lucide-react";
 import CultivatorsListTable from "../../cultivators/list";
-import Achats from "./achats/achats";
-import TransferSdlDep from "./tranfer/transfer-sdl";
+import AchatsListTable from "@/app/ui/dashboard/stocks/achats/achats-list-table";
 import ReceiptSdlCt from "./receipt/receipt-sdl";
 import RedementC from "./rendement";
 import RHlist from "./RH";
 import { Button } from "@/components/ui/button";
+import TransferSdlDep from "@/app/ui/dashboard/stocks/transfers/components/sdl-transfers/transfer-sdl";
 
 function DetailsContent({ id }) {
   const cultivatorsData = [
@@ -179,7 +179,9 @@ function DetailsContent({ id }) {
   const [tab, setTab] = useState("cultivators");
 
   const [data, setData] = React.useState([]);
-  const [dataAchat, setAchatDate] = React.useState([]);
+  const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
+  const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
+
   React.useEffect(() => {
     const getAchatsSDls = async () => {
       try {
@@ -189,13 +191,17 @@ function DetailsContent({ id }) {
           {}
         );
         const results = response?.results;
-        const AchatsSDLData = results?.map((achats) => ({
+        const formatData = (achats) => ({
           id: achats?.id,
           cultivator: {
             cultivator_code: achats?.cafeiculteur?.cultivator_code,
             first_name: achats?.cafeiculteur?.cultivator_first_name,
             last_name: achats?.cafeiculteur?.cultivator_last_name,
             image_url: achats?.cafeiculteur?.cultivator_photo,
+            // Association fields
+            cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
+            cultivator_assoc_rep_name:
+              achats?.cafeiculteur?.cultivator_assoc_rep_name,
           },
           localite: {
             province:
@@ -211,8 +217,16 @@ function DetailsContent({ id }) {
           ca: achats?.quantite_cerise_a,
           cb: achats?.quantite_cerise_b,
           date: achats?.date_achat,
-        }));
-        setAchatDate(AchatsSDLData);
+          isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
+        });
+
+        const formattedResults = results?.map(formatData) || [];
+        setIndividualAchatsData(
+          formattedResults.filter((a) => !a.isAssociation)
+        );
+        setAssociationAchatsData(
+          formattedResults.filter((a) => a.isAssociation)
+        );
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
@@ -364,12 +378,18 @@ function DetailsContent({ id }) {
         </TabsContent>
         <TabsContent value="achats">
           <h1 className="text-xl font-semibold m-2">Achats effectues</h1>
-          <Achats data={dataAchat} />
+          <AchatsListTable
+            individualData={individualAchatsData}
+            associationData={associationAchatsData}
+            isCultivatorsPage={false}
+          />
         </TabsContent>
 
         <TabsContent value="maps">En cours...</TabsContent>
         <TabsContent value="transferSdl">
-          <h1 className="text-xl font-semibold m-2">Transfers effectues</h1>
+          <h1 className="text-xl font-semibold m-2">
+            Transferts vers dépulpeur
+          </h1>
           <TransferSdlDep data={transferData} />
         </TabsContent>
         <TabsContent value="receptionSdl">

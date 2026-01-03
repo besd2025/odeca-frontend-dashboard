@@ -1,0 +1,109 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChartColumn, List } from "lucide-react";
+import AchatsListTable from "./achats-list-table";
+import { fetchData } from "@/app/_utils/api";
+
+function AchatsData() {
+  const [individualAchats, setIndividualAchats] = useState([]);
+  const [associationAchats, setAssociationAchats] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getAchats = async () => {
+      try {
+        setLoading(true);
+        // Attempting to fetch all achats.
+        // We will split them locally based on cultivator type.
+        const response = await fetchData("get", "cafe/get_all_achats/", {
+          params: { limit: 2000, offset: 0 },
+          additionalHeaders: {},
+          body: {},
+        });
+
+        const formatData = (results) => {
+          return results.map((achat) => ({
+            id: achat?.id,
+            cultivator: {
+              cultivator_code: achat?.cafeiculteur?.cultivator_code,
+              first_name: achat?.cafeiculteur?.cultivator_first_name,
+              last_name: achat?.cafeiculteur?.cultivator_last_name,
+              image_url: achat?.cafeiculteur?.cultivator_photo,
+              // Association fields
+              cultivator_assoc_name: achat?.cafeiculteur?.cultivator_assoc_name,
+              cultivator_assoc_rep_name:
+                achat?.cafeiculteur?.cultivator_assoc_rep_name,
+            },
+            sdl_ct: achat?.ct_sdl_name || "N/A",
+            society: achat?.societe_name || "N/A",
+            localite: {
+              province:
+                achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                  ?.province_code?.province_name || "N/A",
+              commune:
+                achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                  ?.commune_name || "N/A",
+            },
+            num_fiche: achat?.num_fiche || "N/A",
+            num_recu: achat?.numero_recu || "N/A",
+            photo_fiche: achat?.photo_fiche,
+            ca: achat?.quantite_cerise_a || 0,
+            cb: achat?.quantite_cerise_b || 0,
+            date: achat?.date_achat || "N/A",
+            // Type identification
+            isAssociation: !!achat?.cafeiculteur?.cultivator_assoc_name,
+          }));
+        };
+
+        let results = [];
+        if (response?.results) {
+          results = formatData(response.results);
+        } else if (Array.isArray(response)) {
+          results = formatData(response);
+        }
+
+        setIndividualAchats(results.filter((item) => !item.isAssociation));
+        setAssociationAchats(results.filter((item) => item.isAssociation));
+      } catch (error) {
+        console.error("Error fetching achats data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getAchats();
+  }, []);
+
+  return (
+    <div className="p-4">
+      <Tabs defaultValue="list" className="w-full">
+        <TabsList className="w-full h-10 lg:w-[50%]">
+          <TabsTrigger value="list">
+            <List />
+            <span>Liste</span>
+          </TabsTrigger>
+          <TabsTrigger value="details">
+            <ChartColumn />
+            <span>Analytics</span>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="list">
+          <h1 className="text-2xl font-semibold m-2">Liste des achats</h1>
+          <AchatsListTable
+            individualData={individualAchats}
+            associationData={associationAchats}
+            isCultivatorsPage={true}
+          />
+        </TabsContent>
+        <TabsContent value="details">
+          <div className="p-4 border rounded-lg bg-background text-center">
+            Analytics for Achats coming soon...
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+export default AchatsData;

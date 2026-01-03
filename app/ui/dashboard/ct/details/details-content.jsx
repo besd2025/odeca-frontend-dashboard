@@ -22,31 +22,36 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import CultivatorsListTable from "../../cultivators/list";
-import Achats from "./achats/achats";
-import TransferCtDep from "./tranfer/transfer-ct";
+import AchatsListTable from "@/app/ui/dashboard/stocks/achats/achats-list-table";
+import TransferCtDep from "@/app/ui/dashboard/stocks/transfers/components/ct-transfers/transfer-ct";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
 function DetailsContent({ id }) {
   const [tab, setTab] = useState("cultivators");
   const [data, setData] = React.useState([]);
-  const [dataAchat, setAchatDate] = React.useState([]);
+  const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
+  const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
   const [dataTransfert, setDataTransfert] = React.useState([]);
   React.useEffect(() => {
     const getAchatsHangars = async () => {
       try {
         const response = await fetchData(
           "get",
-          `cafe/centres_transite/${id}/get_achats/`,
+          `cafe/hangars/${id}/get_achats/`,
           {}
         );
         const results = response?.results;
-        const AchatsCTData = results?.map((achats) => ({
+        const formatData = (achats) => ({
           id: achats?.id,
           cultivator: {
             cultivator_code: achats?.cafeiculteur?.cultivator_code,
             first_name: achats?.cafeiculteur?.cultivator_first_name,
             last_name: achats?.cafeiculteur?.cultivator_last_name,
             image_url: achats?.cafeiculteur?.cultivator_photo,
+            // Association fields
+            cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
+            cultivator_assoc_rep_name:
+              achats?.cafeiculteur?.cultivator_assoc_rep_name,
           },
           localite: {
             province:
@@ -62,8 +67,16 @@ function DetailsContent({ id }) {
           ca: achats?.quantite_cerise_a,
           cb: achats?.quantite_cerise_b,
           date: achats?.date_achat,
-        }));
-        setAchatDate(AchatsCTData);
+          isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
+        });
+
+        const formattedResults = results?.map(formatData) || [];
+        setIndividualAchatsData(
+          formattedResults.filter((a) => !a.isAssociation)
+        );
+        setAssociationAchatsData(
+          formattedResults.filter((a) => a.isAssociation)
+        );
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
@@ -187,7 +200,11 @@ function DetailsContent({ id }) {
         </TabsContent>
         <TabsContent value="achats">
           <h1 className="text-xl font-semibold m-2">Achats effectues</h1>
-          <Achats data={dataAchat} isCultivatorsPage={false} />
+          <AchatsListTable
+            individualData={individualAchatsData}
+            associationData={associationAchatsData}
+            isCultivatorsPage={false}
+          />
         </TabsContent>
 
         <TabsContent value="maps">En cours...</TabsContent>

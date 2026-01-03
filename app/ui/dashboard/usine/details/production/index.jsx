@@ -11,68 +11,130 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import PaginationControls from "@/components/ui/pagination-controls";
 
 export default function Production({ data = [] }) {
-  // Mock data
-  const production =
-    data.length > 0
-      ? data
-      : [
-          {
-            id: 1,
-            grade: "Grade AA",
-            proprietaire: "Coopérative KAWA",
-            lot: "LOT-24-001",
-            quantite: 2500,
-          },
-          {
-            id: 2,
-            grade: "Grade A",
-            proprietaire: "Coopérative KAWA",
-            lot: "LOT-24-001",
-            quantite: 1500,
-          },
-          {
-            id: 3,
-            grade: "Grade B",
-            proprietaire: "Coopérative KAWA",
-            lot: "LOT-24-001",
-            quantite: 500,
-          },
-          {
-            id: 4,
-            grade: "Grade AA",
-            proprietaire: "SOGESTAL",
-            lot: "LOT-24-002",
-            quantite: 1200,
-          },
-          {
-            id: 5,
-            grade: "Brisures",
-            proprietaire: "SOGESTAL",
-            lot: "LOT-24-002",
-            quantite: 300,
-          },
-        ];
+  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
-  // Aggregations
-  const totalProduction = production.reduce(
+  // Mock data
+  const defaultData = React.useMemo(
+    () => [
+      {
+        id: 1,
+        grade: "Grade AA",
+        proprietaire: "Coopérative KAWA",
+        lot: "LOT-24-001",
+        quantite: 2500,
+      },
+      {
+        id: 2,
+        grade: "Grade A",
+        proprietaire: "Coopérative KAWA",
+        lot: "LOT-24-001",
+        quantite: 1500,
+      },
+      {
+        id: 3,
+        grade: "Grade B",
+        proprietaire: "Coopérative KAWA",
+        lot: "LOT-24-001",
+        quantite: 500,
+      },
+      {
+        id: 4,
+        grade: "Grade AA",
+        proprietaire: "SOGESTAL",
+        lot: "LOT-24-002",
+        quantite: 1200,
+      },
+      {
+        id: 5,
+        grade: "Brisures",
+        proprietaire: "SOGESTAL",
+        lot: "LOT-24-002",
+        quantite: 300,
+      },
+    ],
+    []
+  );
+
+  const tableData = data.length > 0 ? data : defaultData;
+
+  // Columns definition
+  const columns = React.useMemo(
+    () => [
+      {
+        accessorKey: "proprietaire",
+        header: "Propriétaire",
+        cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+      },
+      {
+        accessorKey: "lot",
+        header: "Lot",
+        cell: (info) => info.getValue(),
+      },
+      {
+        accessorKey: "grade",
+        header: "Grade",
+        cell: (info) => info.getValue(),
+      },
+      {
+        accessorKey: "quantite",
+        header: "Quantité (kg)",
+        cell: (info) => (
+          <div className="text-right font-mono">
+            {info.getValue().toLocaleString()}
+          </div>
+        ),
+      },
+    ],
+    []
+  );
+
+  const table = useReactTable({
+    data: tableData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: setPagination,
+    state: {
+      sorting,
+      columnFilters,
+      pagination,
+    },
+  });
+
+  // Aggregations (using full dataset)
+  const totalProduction = tableData.reduce(
     (acc, curr) => acc + curr.quantite,
     0
   );
 
-  const byGrade = production.reduce((acc, curr) => {
+  const byGrade = tableData.reduce((acc, curr) => {
     acc[curr.grade] = (acc[curr.grade] || 0) + curr.quantite;
     return acc;
   }, {});
 
-  const byOwnerGrade = production.reduce((acc, curr) => {
-    const key = `${curr.proprietaire} - ${curr.grade}`;
-    acc[key] = (acc[key] || 0) + curr.quantite;
-    return acc;
-  }, {});
-
-  const byLot = production.reduce((acc, curr) => {
+  const byLot = tableData.reduce((acc, curr) => {
     acc[curr.lot] = (acc[curr.lot] || 0) + curr.quantite;
     return acc;
   }, {});
@@ -81,7 +143,7 @@ export default function Production({ data = [] }) {
     <div className="space-y-6">
       {/* Total Production */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="col-span-1 lg:col-span-4 bg-primary/10">
+        <Card className="col-span-1 lg:col-span-4 bg-secondary/10 border-none">
           <CardContent className="flex items-center justify-between p-6">
             <div>
               <h3 className="text-lg font-medium">Total Production Usine</h3>
@@ -139,37 +201,91 @@ export default function Production({ data = [] }) {
       </div>
 
       {/* Detailed List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Détail Production (Par Propriétaire & Grade)</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="w-full bg-sidebar p-2 rounded-lg">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4">
+          <div className="relative">
+            <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5" />
+            <Input
+              placeholder="Rechercher par propriétaire..."
+              value={table.getColumn("proprietaire")?.getFilterValue() ?? ""}
+              onChange={(event) =>
+                table
+                  .getColumn("proprietaire")
+                  ?.setFilterValue(event.target.value)
+              }
+              className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+            />
+          </div>
+        </div>
+
+        <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Propriétaire</TableHead>
-                <TableHead>Lot</TableHead>
-                <TableHead>Grade</TableHead>
-                <TableHead className="text-right">Quantité (kg)</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {production.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">
-                    {item.proprietaire}
-                  </TableCell>
-                  <TableCell>{item.lot}</TableCell>
-                  <TableCell>{item.grade}</TableCell>
-                  <TableCell className="text-right font-mono">
-                    {item.quantite.toLocaleString()}
-                  </TableCell>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow
+                  key={headerGroup.id}
+                  className="sticky top-0 bg-background z-10 hover:bg-background"
+                >
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
                 </TableRow>
               ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
+          <div className="flex-1 text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <PaginationControls
+            page={table.getState().pagination.pageIndex + 1}
+            pageSize={table.getState().pagination.pageSize}
+            totalItems={table.getFilteredRowModel().rows.length}
+            totalPages={table.getPageCount()}
+            onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
+            onPageSizeChange={(size) => table.setPageSize(size)}
+            hasNextPage={table.getCanNextPage()}
+            hasPreviousPage={table.getCanPreviousPage()}
+          />
+        </div>
+      </div>
     </div>
   );
 }

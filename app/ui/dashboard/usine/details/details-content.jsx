@@ -30,8 +30,6 @@ import {
 } from "lucide-react";
 import CultivatorsListTable from "../../cultivators/list";
 import Achats from "./achats/achats";
-import TransferSdlDep from "./tranfer/transfer-sdl";
-import ReceiptSdlCt from "./receipt/receipt-sdl";
 import RedementC from "./rendement";
 import RHlist from "./RH";
 import { Button } from "@/components/ui/button";
