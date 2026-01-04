@@ -23,21 +23,6 @@ import {
   LabelList,
 } from "recharts";
 import { fetchData } from "@/app/_utils/api";
-const locationData = {
-  province: [
-    { name: "Province A", count: 45 },
-    { name: "Province B", count: 35 },
-    { name: "Province C", count: 25 },
-    { name: "Province D", count: 15 },
-  ],
-  region: [
-    { name: "Region X", count: 20 },
-    { name: "Region Y", count: 18 },
-    { name: "Region Z", count: 15 },
-    { name: "Region W", count: 12 },
-    { name: "Region V", count: 10 },
-  ],
-};
 
 const locationConfig = {
   count: {
@@ -50,7 +35,6 @@ export function SdlLocationChart() {
   const [locFilter, setLocFilter] = useState("province");
   const [data, setData] = useState({
     province: [],
-    region: [],
   });
 
   React.useEffect(() => {
@@ -71,16 +55,8 @@ export function SdlLocationChart() {
           count: item?.count,
         }));
 
-        const regionData = [
-          { name: "Region X", count: 15 },
-          { name: "Region Y", count: 12 },
-          { name: "Region Z", count: 10 },
-          { name: "Region W", count: 8 },
-          { name: "Region V", count: 5 },
-        ];
         setData({
           province: provinceData,
-          region: regionData,
         });
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -104,7 +80,7 @@ export function SdlLocationChart() {
         >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="province">Province</TabsTrigger>
-            <TabsTrigger value="region">Région</TabsTrigger>
+            {/* <TabsTrigger value="region">Région</TabsTrigger> */}
           </TabsList>
         </Tabs>
       </CardHeader>

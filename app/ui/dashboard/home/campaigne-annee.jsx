@@ -17,16 +17,16 @@ const workspaces = [
     name: "Campagne actuelle",
     interval: "2025",
   },
-  {
-    id: 2,
-    name: "Campagne recente",
-    interval: "2024",
-  },
-  {
-    id: 3,
-    name: "Campagne ancienne",
-    interval: "2023",
-  },
+  // {
+  //   id: 2,
+  //   name: "Campagne recente",
+  //   interval: "2024",
+  // },
+  // {
+  //   id: 3,
+  //   name: "Campagne ancienne",
+  //   interval: "2023",
+  // },
 ];
 
 export default function CampaigneAnnee() {

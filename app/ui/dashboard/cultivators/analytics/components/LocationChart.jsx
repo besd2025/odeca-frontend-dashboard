@@ -89,7 +89,7 @@ export function LocationChart() {
         >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="province">Province</TabsTrigger>
-            <TabsTrigger value="region">Région</TabsTrigger>
+            {/* <TabsTrigger value="region">Région</TabsTrigger> */}
           </TabsList>
         </Tabs>
       </CardHeader>

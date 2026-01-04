@@ -16,42 +16,28 @@ export default function TransfersPage() {
     const getAllTransfers = async () => {
       try {
         setLoading(true);
-        // Assuming global endpoints or filtering a main transfers endpoint
-        // Using distinct endpoints is a safer guess given the API structure seen elsewhere
-        // If these endpoints don't exist, they should be updated to matches the backend routes.
-
-        // Fetch SDL Transfers
-        // Try to fetch all SDL transfers. Assuming 'cafe/transferts/' might return all or separate endpoints exist.
-        // Given 'cafe/stationslavage/' lists SDLs, maybe 'cafe/transferts/' lists all.
-        // Let's try fetching 'cafe/transferts/' and filtering, or separate calls if documented.
-        // Since I don't have docs, I'll attempt a generic 'cafe/transferts/' and check structure,
-        // or attempt likely specific endpoints.
-        // Let's assume there is a general endpoint for now.
-        const response = await fetchData("get", "cafe/transferts/", {});
+        const response = await fetchData("get", "cafe/transfert_sdl_usine/", {
+          body: { limit: 1000, offset: 0 },
+        });
+        const response_ct_sdl = await fetchData(
+          "get",
+          "cafe/transfer_ct_sdl/",
+          {
+            body: { limit: 1000, offset: 0 },
+          }
+        );
         const results = response?.results || [];
-
-        // Filter or Map data based on type if the API returns mixed data
-        // For now, I'll assume the API returns a list and we might need to separate them if they are mixed
-        // or if we use different endpoints.
-        // Let's assume "cafe/transferts/" returns mixed and we filter by source type or presence of keys.
-
-        // Mocking/Mapping logic based on previous file's structure:
-        // SDL Transfers usually have 'from_sdl' (mapped from API response?)
-        // The previous code mapped:
-        // from_sdl: "Ngome" (hardcoded/dynamic?), to_depulpeur_name: "NGANE", etc.
-
-        // Let's implement a mapper that tries to handle the data assuming standard fields
-
+        const results2 = response_ct_sdl.results || [];
         const mappedSdlTransfers = results
           .filter((t) => t.sdl && !t.ct) // Assuming if it has SDL source and no CT source
           .map((transfer) => ({
             id: transfer.id,
             from_sdl: transfer.sdl?.sdl_nom || "Inconnu",
-            to_depulpeur_name: transfer.usinage?.usine_nom || "Inconnu", // Guessing destination structure
+            usine: transfer.usine_deparchage?.usine_name || "Inconnu", // Guessing destination structure
             society: transfer.sdl?.societe?.nom_societe,
+            date: transfer?.transfer_date,
             qte_tranferer: {
-              ca: transfer.quantite_cerise_a,
-              cb: transfer.quantite_cerise_b,
+              ca: transfer?.total_parche,
             },
             photo_fiche: transfer.photo_fiche, // Adjust if needed
             localite: {
@@ -63,19 +49,20 @@ export default function TransfersPage() {
             },
           }));
 
-        const mappedCtTransfers = results
+        const mappedCtTransfers = results2
           .filter((t) => t.ct) // Assuming presence of CT source
           .map((transfer) => ({
             id: transfer.id,
             from_ct: transfer.ct?.ct_nom || "Inconnu",
-            to_depulpeur_name: transfer.sdl?.sdl_nom || "Inconnu", // CT usually goes to SDL? Or Usine?
-            // In details-content.jsx for CT, it went to SDL (to_depulpeur_name mapped from sdl.sdl_nom)
+            to_depulpeur_name: transfer.sdl?.sdl_nom || "Inconnu",
             society: transfer.sdl?.societe?.nom_societe,
+            date: transfer?.transfer_date,
+            status: transfer?.est_confirme,
             qte_tranferer: {
-              ca: transfer.quantite_cerise_a,
+              ca: transfer?.quantite_cerise_a,
               cb: transfer.quantite_cerise_b,
             },
-            photo_fiche: transfer.photo_fiche,
+            photo_fiche: transfer.photo_bordereau,
             localite: {
               province:
                 transfer.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
@@ -84,7 +71,7 @@ export default function TransfersPage() {
                 transfer.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
             },
           }));
-
+        console.log(results2);
         setSdlTransfers(mappedSdlTransfers);
         setCtTransfers(mappedCtTransfers);
       } catch (error) {

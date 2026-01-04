@@ -35,7 +35,6 @@ export function CtLocationChart() {
   const [locFilter, setLocFilter] = useState("province");
   const [data, setData] = useState({
     province: [],
-    region: [],
   });
 
   React.useEffect(() => {
@@ -57,19 +56,8 @@ export function CtLocationChart() {
           count: item?.count,
         }));
 
-        // Région : si aucune API réelle, on met les valeurs statiques
-        const regionData = [
-          { name: "Region X", count: 15 },
-          { name: "Region Y", count: 12 },
-          { name: "Region Z", count: 10 },
-          { name: "Region W", count: 8 },
-          { name: "Region V", count: 5 },
-        ];
-
-        // Mise à jour des données FORMAT NORMALISÉ
         setData({
           province: provinceData,
-          region: regionData,
         });
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -84,7 +72,7 @@ export function CtLocationChart() {
       <CardHeader className="flex flex-col gap-y-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <CardTitle>Répartition Géographique</CardTitle>
-          <CardDescription>Par Province ou Région</CardDescription>
+          <CardDescription>Par Province</CardDescription>
         </div>
 
         <Tabs
@@ -95,7 +83,6 @@ export function CtLocationChart() {
         >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="province">Province</TabsTrigger>
-            <TabsTrigger value="region">Région</TabsTrigger>
           </TabsList>
         </Tabs>
       </CardHeader>
@@ -107,7 +94,7 @@ export function CtLocationChart() {
         >
           <BarChart
             accessibilityLayer
-            data={data[locFilter]}   // ✔ fonctionne maintenant !
+            data={data[locFilter]} // ✔ fonctionne maintenant !
             layout="vertical"
             margin={{ right: 16 }}
           >

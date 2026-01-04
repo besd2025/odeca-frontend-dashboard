@@ -66,11 +66,7 @@ export default function TransferCtDep({ data }) {
                 Actions
               </DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    `${transfer.from_ct} -> ${transfer.to_depulpeur_name}`
-                  )
-                }
+                onClick={() => navigator.clipboard.writeText(`${transfer.id}`)}
               >
                 Copier trajet
               </DropdownMenuItem>
@@ -191,6 +187,30 @@ export default function TransferCtDep({ data }) {
           ) : (
             "-"
           )}
+        </div>
+      ),
+    },
+    {
+      id: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          <div className="flex justify-center">
+            {row.original.status === true ? (
+              <span className="h-3 w-3 rounded-full bg-green-500" />
+            ) : (
+              <span className="h-3 w-3 rounded-full bg-yellow-400" />
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "date",
+      header: "Date transfert",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          {row.original.date ?? 0}
         </div>
       ),
     },

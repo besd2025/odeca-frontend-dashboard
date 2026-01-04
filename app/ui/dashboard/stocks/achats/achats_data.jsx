@@ -14,57 +14,95 @@ function AchatsData() {
     const getAchats = async () => {
       try {
         setLoading(true);
-        // Attempting to fetch all achats.
-        // We will split them locally based on cultivator type.
-        const response = await fetchData("get", "cafe/get_all_achats/", {
+        const response = await fetchData("get", "cafe/achat_cafe/", {
           params: { limit: 2000, offset: 0 },
           additionalHeaders: {},
           body: {},
         });
+        const response_associate = await fetchData(
+          "get",
+          "cafe/achat_cafe/get_achat_associations/",
+          {
+            params: { limit: 2000, offset: 0 },
+            additionalHeaders: {},
+            body: {},
+          }
+        );
 
-        const formatData = (results) => {
-          return results.map((achat) => ({
-            id: achat?.id,
-            cultivator: {
-              cultivator_code: achat?.cafeiculteur?.cultivator_code,
-              first_name: achat?.cafeiculteur?.cultivator_first_name,
-              last_name: achat?.cafeiculteur?.cultivator_last_name,
-              image_url: achat?.cafeiculteur?.cultivator_photo,
-              // Association fields
-              cultivator_assoc_name: achat?.cafeiculteur?.cultivator_assoc_name,
-              cultivator_assoc_rep_name:
-                achat?.cafeiculteur?.cultivator_assoc_rep_name,
-            },
-            sdl_ct: achat?.ct_sdl_name || "N/A",
-            society: achat?.societe_name || "N/A",
-            localite: {
-              province:
-                achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-                  ?.province_code?.province_name || "N/A",
-              commune:
-                achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-                  ?.commune_name || "N/A",
-            },
-            num_fiche: achat?.num_fiche || "N/A",
-            num_recu: achat?.numero_recu || "N/A",
-            photo_fiche: achat?.photo_fiche,
-            ca: achat?.quantite_cerise_a || 0,
-            cb: achat?.quantite_cerise_b || 0,
-            date: achat?.date_achat || "N/A",
-            // Type identification
-            isAssociation: !!achat?.cafeiculteur?.cultivator_assoc_name,
-          }));
-        };
+        const dataAchat = response?.results?.map((achat) => ({
+          id: achat?.id,
+          cultivator: {
+            cultivator_code: achat?.cafeiculteur?.cultivator_code,
+            first_name: achat?.cafeiculteur?.cultivator_first_name,
+            last_name: achat?.cafeiculteur?.cultivator_last_name,
+            image_url: achat?.cafeiculteur?.cultivator_photo,
+            // Association fields
+            cultivator_assoc_name: achat?.cafeiculteur?.cultivator_assoc_name,
+            cultivator_assoc_rep_name:
+              achat?.cafeiculteur?.cultivator_assoc_rep_name,
+          },
+          sdl_ct: achat?.responsable?.sdl_ct?.sdl?.sdl_nom
+            ? "SDL " + achat.responsable.sdl_ct.sdl.sdl_nom
+            : "CT " + achat?.responsable?.sdl_ct?.ct?.ct_nom,
 
-        let results = [];
-        if (response?.results) {
-          results = formatData(response.results);
-        } else if (Array.isArray(response)) {
-          results = formatData(response);
-        }
+          society:
+            achat?.responsable?.sdl_ct?.sdl?.societe?.nom_societe ||
+            achat?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
+          localite: {
+            province:
+              achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name || "N/A",
+            commune:
+              achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name || "N/A",
+          },
+          num_fiche: achat?.numero_fiche || "0",
+          num_recu: achat?.numero_recu || "N/A",
+          photo_fiche: achat?.photo_fiche,
+          ca: achat?.quantite_cerise_a || 0,
+          cb: achat?.quantite_cerise_b || 0,
+          date: achat?.date_achat || "N/A",
+          // Type identification
+        }));
 
-        setIndividualAchats(results.filter((item) => !item.isAssociation));
-        setAssociationAchats(results.filter((item) => item.isAssociation));
+        const data_associate = response_associate?.results?.map((achat) => ({
+          id: achat?.id,
+          cultivator: {
+            cultivator_code: achat?.cafeiculteur?.cultivator_code,
+            first_name: achat?.cafeiculteur?.cultivator_first_name,
+            last_name: achat?.cafeiculteur?.cultivator_last_name,
+            image_url: achat?.cafeiculteur?.cultivator_photo,
+            // Association fields
+            cultivator_assoc_name: achat?.cafeiculteur?.cultivator_assoc_name,
+            cultivator_assoc_rep_name:
+              achat?.cafeiculteur?.cultivator_assoc_rep_name,
+          },
+          sdl_ct: achat?.responsable?.sdl_ct?.sdl?.sdl_nom
+            ? "SDL " + achat.responsable.sdl_ct.sdl.sdl_nom
+            : "CT " + achat?.responsable?.sdl_ct?.ct?.ct_nom,
+
+          society:
+            achat?.responsable?.sdl_ct?.sdl?.societe?.nom_societe ||
+            achat?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
+          localite: {
+            province:
+              achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name || "N/A",
+            commune:
+              achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name || "N/A",
+          },
+          num_fiche: achat?.numero_fiche || "0",
+          num_recu: achat?.numero_recu || "N/A",
+          photo_fiche: achat?.photo_fiche,
+          ca: achat?.quantite_cerise_a || 0,
+          cb: achat?.quantite_cerise_b || 0,
+          date: achat?.date_achat || "N/A",
+          // Type identification
+          isAssociation: !!achat?.cafeiculteur?.cultivator_assoc_name,
+        }));
+        setIndividualAchats(dataAchat);
+        setAssociationAchats(data_associate);
       } catch (error) {
         console.error("Error fetching achats data:", error);
       } finally {

@@ -51,27 +51,27 @@ export default function UsineListTable() {
   useEffect(() => {
     const getUsines = async () => {
       try {
-        const response = await fetchData("get", "cafe/stationslavage/", {});
+        const response = await fetchData("get", "cafe/usine_deparchage/", {});
         const results = response?.results || [];
-        const sdlData = results.map((sdl) => ({
-          id: sdl?.id,
+        const sdlData = results.map((usine) => ({
+          id: usine?.id,
           sdl: {
-            sdl_code: sdl?.sdl_code,
-            sdl_name: sdl?.sdl_nom,
+            sdl_code: usine?.usine_code,
+            sdl_name: usine?.usine_name,
           },
           // society: sdl?.societe?.nom_societe || "", // Assuming Usines might verify society
           responsable: {
-            first_name: sdl?.sdl_responsable?.user?.first_name || "",
-            last_name: sdl?.sdl_responsable?.user?.last_name || "",
-            telephone: sdl?.sdl_responsable?.user?.phone || "",
+            first_name: usine?.usine_responsable?.user?.first_name || "",
+            last_name: usine?.usine_responsable?.user?.last_name || "",
+            telephone: usine?.usine_responsable?.user?.phone || "",
           },
           localite: {
             province:
-              sdl?.sdl_adress?.zone_code?.commune_code?.province_code
+              usine?.usine_adress?.zone_code?.commune_code?.province_code
                 ?.province_name || "",
             commune:
-              sdl?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
-            zone: sdl?.sdl_adress?.zone_code?.zone_name || "",
+              usine?.usine_adress?.zone_code?.commune_code?.commune_name || "",
+            zone: usine?.sdl_adress?.zone_code?.zone_name || "",
           },
         }));
 

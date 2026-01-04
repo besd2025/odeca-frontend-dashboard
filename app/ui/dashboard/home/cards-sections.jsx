@@ -21,6 +21,7 @@ import { fetchData } from "@/app/_utils/api";
 export function SectionCards() {
   const [data, setData] = React.useState({});
   const [rendement, setRendement] = React.useState({});
+  const [cafe_vert_produit, setCafeVertProduit] = React.useState({});
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -43,8 +44,19 @@ export function SectionCards() {
             body: {},
           }
         );
+        const cafe_vert = await fetchData(
+          "get",
+          `cafe/usinages/get_cafe_vert_produits/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
+
         setData(response);
         setRendement(rendement);
+        setCafeVertProduit(cafe_vert);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
@@ -263,7 +275,25 @@ export function SectionCards() {
               <Grape className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              0 <span className="text-base">T</span>
+              {cafe_vert_produit?.total_cafe_vert >= 1000 ? (
+                <>
+                  {(cafe_vert_produit?.total_cafe_vert / 1000).toLocaleString(
+                    "fr-FR",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
+                  <span className="text-sm">T</span>
+                </>
+              ) : (
+                <>
+                  {cafe_vert_produit?.total_cafe_vert?.toLocaleString(
+                    "fr-FR"
+                  ) || 0}{" "}
+                  <span className="text-sm">Kg</span>
+                </>
+              )}
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">

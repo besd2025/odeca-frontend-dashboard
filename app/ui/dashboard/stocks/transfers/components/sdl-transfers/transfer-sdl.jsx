@@ -66,11 +66,7 @@ export default function TransferSdlDep({ data }) {
                 Actions
               </DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    `${transfer.from_sdl} -> ${transfer.to_depulpeur_name}`
-                  )
-                }
+                onClick={() => navigator.clipboard.writeText(`${transfer.id}`)}
               >
                 Copier trajet
               </DropdownMenuItem>
@@ -83,7 +79,7 @@ export default function TransferSdlDep({ data }) {
               <div>
                 <EditTransfers
                   from_sdl={transfer.from_sdl}
-                  to_depulpeur_name={transfer.to_depulpeur_name}
+                  to_depulpeur_name={transfer.usine}
                   society={transfer.society}
                   localite={transfer.localite}
                   qte_tranferer={transfer.qte_tranferer}
@@ -107,6 +103,7 @@ export default function TransferSdlDep({ data }) {
         </Button>
       ),
       filterFn: (row, columnId, filterValue) => {
+        console.log("row: ", row);
         if (!filterValue) return true;
         const source = row.original.from_sdl ?? "";
         const target = row.original.to_depulpeur_name ?? "";
@@ -120,21 +117,7 @@ export default function TransferSdlDep({ data }) {
         <div className="font-medium">{row.getValue("from_sdl")}</div>
       ),
     },
-    {
-      accessorKey: "to_depulpeur_name",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Dépulpeur
-          <ArrowUpDownIcon />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <div className="font-medium">{row.getValue("to_depulpeur_name")}</div>
-      ),
-    },
+
     {
       accessorKey: "society",
       header: ({ column }) => (
@@ -161,23 +144,30 @@ export default function TransferSdlDep({ data }) {
       },
     },
     {
+      accessorKey: "usine",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Usine
+          <ArrowUpDownIcon />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("usine")}</div>
+      ),
+    },
+    {
       id: "ca",
-      header: "CA transféré (kg)",
+      header: "Qte transféré (kg)",
       cell: ({ row }) => (
         <div className="text-center font-semibold">
           {row.original.qte_tranferer?.ca ?? 0}
         </div>
       ),
     },
-    {
-      id: "cb",
-      header: "CB transféré (kg)",
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">
-          {row.original.qte_tranferer?.cb ?? 0}
-        </div>
-      ),
-    },
+
     {
       id: "photo_fiche",
       header: "Fiche",
@@ -192,6 +182,15 @@ export default function TransferSdlDep({ data }) {
           ) : (
             "-"
           )}
+        </div>
+      ),
+    },
+    {
+      id: "date",
+      header: "Date transfert",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">
+          {row.original.date ?? 0}
         </div>
       ),
     },

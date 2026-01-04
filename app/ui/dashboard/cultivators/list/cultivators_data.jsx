@@ -35,7 +35,6 @@ function CultivatorData() {
             body: {},
           }
         );
-
         const formatData = (results) => {
           return results.map((cultivator) => ({
             id: cultivator.id,
