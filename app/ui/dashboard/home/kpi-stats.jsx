@@ -1,79 +1,56 @@
+"use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Scale, Tag, Wallet } from "lucide-react";
-
-const kpiData = [
-  // {
-  //   title: "Qualité (Cerise A)",
-  //   value: "78%",
-  //   trend: "+2.4%",
-  //   trendUp: true,
-  //   icon: Scale,
-  //   color: "text-blue-500",
-  //   bgColor: "bg-blue-500/10",
-  // },
-  {
-    title: "Prix Achat CA",
-    value: "2800",
-    trend: "+50 FBU",
-    trendUp: true,
-    icon: Tag,
-    color: "text-orange-500",
-    bgColor: "bg-orange-500/10",
-  },
-  {
-    title: "Prix Achat CB",
-    value: "1400",
-    trend: "+50 FBU",
-    trendUp: true,
-    icon: Tag,
-    color: "text-secondary",
-    bgColor: "bg-secondary/10",
-  },
-  // {
-  //   title: "Prix Vente",
-  //   value: "1,250 FBU",
-  //   trend: "-10 FBU",
-  //   trendUp: false,
-  //   icon: Wallet,
-  //   color: "text-green-500",
-  //   bgColor: "bg-green-500/10",
-  // },
-  // {
-  //   title: "Marge Brute",
-  //   value: "32%",
-  //   trend: "+1.2%",
-  //   trendUp: true,
-  //   icon: TrendingUp,
-  //   color: "text-purple-500",
-  //   bgColor: "bg-purple-500/10",
-  // },
-];
-
+import { fetchData } from "@/app/_utils/api";
 export function KPIGrid() {
+  const [data, setData] = React.useState([]);
+  React.useEffect(() => {
+    const getDatas = async () => {
+      try {
+        const response = await fetchData("get", `cafe/cafe_prices/current/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+
+        const kpiData = [
+          {
+            title: "Prix Achat CA",
+            value: response?.cerise_a,
+            trendUp: true,
+            icon: Tag,
+            color: "text-orange-500",
+            bgColor: "bg-orange-500/10",
+          },
+          {
+            title: "Prix Achat CB",
+            value: response?.cerise_b,
+            trendUp: true,
+            icon: Tag,
+            color: "text-secondary",
+            bgColor: "bg-secondary/10",
+          },
+        ];
+
+        setData(kpiData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+
+    getDatas();
+  }, []);
+
   return (
     <div className="grid grid-rows-2 gap-4">
-      {kpiData.map((kpi, index) => (
+      {data.map((kpi, index) => (
         <Card key={index} className="shadow-sm">
           <CardContent className=" flex flex-col justify-between h-full gap-2">
             <div className="flex justify-between items-start">
               <div className={`p-2 rounded-md ${kpi.bgColor}`}>
                 <kpi.icon className={`w-4 h-4 ${kpi.color}`} />
               </div>
-              {kpi.trend && (
-                <div
-                  className={`flex items-center text-xs font-medium ${
-                    kpi.trendUp ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {kpi.trendUp ? (
-                    <TrendingUp className="w-3 h-3 mr-1" />
-                  ) : (
-                    <TrendingDown className="w-3 h-3 mr-1" />
-                  )}
-                  {kpi.trend}
-                </div>
-              )}
             </div>
             <div>
               <div className="text-2xl font-bold tabular-nums">
