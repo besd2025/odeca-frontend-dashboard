@@ -25,17 +25,43 @@ export function UsineSummaryCards() {
   React.useEffect(() => {
     const getData = async () => {
       try {
-        const responseUsines = await fetchData("get", "cafe/usines/", {});
-        const totalUsines = responseUsines?.count || 0;
+        const responseUsines = await fetchData(
+          "get",
+          "cafe/usine_deparchage/get_total_usine_deparchage/",
+          {}
+        );
+        const qteRecu = await fetchData(
+          "get",
+          "cafe/usine_deparchage/get_quantite_receptionne/",
+          {}
+        );
+        const qteVendu = await fetchData(
+          "get",
+          "cafe/usine_deparchage/get_quanitite_vert_vendu/",
+          {}
+        );
+        const qteProduit = await fetchData(
+          "get",
+          "cafe/usine_deparchage/get_quanitite_vert_produit/",
+          {}
+        );
+        const qteUsinee = await fetchData(
+          "get",
+          "cafe/usine_deparchage/get_quantite_usinee/",
+          {}
+        );
+
+        const totalUsines = responseUsines?.total_usine_deparchage || 0;
 
         // Mock data for new KPIs as global endpoints might not exist yet
         setData({
           total_usine: totalUsines,
-          qty_recu: 45000,
-          total_traite: 35000,
-          total_produit: 28000,
-          total_sorti: 15000,
-          stock_cafe_vert: 12500,
+          qty_recu: qteRecu?.quantite_receptionne || 0,
+          total_traite: qteUsinee?.quantite_usinee || 0,
+          total_produit: qteProduit?.quantite_produit || 0,
+          total_sorti: qteVendu?.quantite_vert_vendu || 0,
+          stock_cafe_vert:
+            qteProduit?.quantite_produit - qteVendu?.quantite_vert_vendu || 0,
         });
       } catch (error) {
         console.error("Error fetching usine stats:", error);

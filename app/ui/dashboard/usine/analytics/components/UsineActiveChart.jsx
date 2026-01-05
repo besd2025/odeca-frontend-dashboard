@@ -35,7 +35,7 @@ export function UsineActiveChart() {
       try {
         const response = await fetchData(
           "get",
-          `cafe/stationslavage/get_active_and_non_active_sdl/`,
+          `cafe/usine_deparchage/get_usine_active_non_active/`,
           {
             params: {},
             additionalHeaders: {},
@@ -45,12 +45,12 @@ export function UsineActiveChart() {
         const chartData = [
           {
             status: "Actif",
-            count: response?.achat_cafes_sdl,
+            count: response?.active,
             fill: "var(--color-actif)",
           },
           {
             status: "Non Actif",
-            count: response?.inactive_sdl,
+            count: response?.non_active,
             fill: "var(--color-inactif)",
           },
         ];

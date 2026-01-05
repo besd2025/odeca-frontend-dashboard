@@ -52,8 +52,8 @@ export function CtLocationChart() {
 
         // Construire la liste des provinces
         const provinceData = response.map((item) => ({
-          name: item?.ct_adress__zone_code__commune_code__province_code__province_name,
-          count: item?.count,
+          name: item?.province_name,
+          count: item?.count_ct,
         }));
 
         setData({

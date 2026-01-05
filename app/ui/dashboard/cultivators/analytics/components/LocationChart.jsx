@@ -53,8 +53,8 @@ export function LocationChart() {
         );
 
         const provinceData = response.map((item) => ({
-          name: item?.cultivator_adress__zone_code__commune_code__province_code__province_name,
-          count: item?.count,
+          name: item?.province_name,
+          count: item?.count_cultivators,
         }));
 
         const regionData = [

@@ -37,7 +37,7 @@ function DetailsContent({ id }) {
       try {
         const response = await fetchData(
           "get",
-          `cafe/hangars/${id}/get_achats/`,
+          `cafe/centres_transite/${id}/get_achats/`,
           {}
         );
         const results = response?.results;
