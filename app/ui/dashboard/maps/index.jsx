@@ -19,7 +19,7 @@ function MapFlyTo({ position }) {
   const map = useMap();
   React.useEffect(() => {
     if (position) {
-      map.flyTo(position, 14, { duration: 1.5 });
+      map.flyTo(position, 18, { duration: 1.5 });
     }
   }, [position, map]);
   return null;
@@ -188,7 +188,7 @@ export default function GeoLocalistion() {
   };
 
   return (
-    <div className="h-[calc(90vh-64px)] w-full relative">
+    <div className="lg:h-[calc(90vh-64px)] h-[calc(100vh-64px)] w-full relative">
       <div className="absolute top-4 left-4 z-1000 w-full max-w-sm flex flex-col gap-4">
         {/* Search Bar */}
         <div className="relative">
@@ -351,7 +351,7 @@ export default function GeoLocalistion() {
             darkUrl="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
           />
 
-          <div className="absolute top-4 right-4 z-1000 flex flex-col gap-2 items-center">
+          <div className="absolute top-20 lg:top-4 right-4 z-1000 flex flex-col gap-2 items-center">
             <MapLayersControl className="bg-secondary dark:bg-zinc-800 shadow-lg border-0 rounded-lg size-10 flex items-center justify-center relative top-0 right-0" />
             <MapLocateControl
               onLocationFound={(location) => setMyCoordinates(location.latlng)}

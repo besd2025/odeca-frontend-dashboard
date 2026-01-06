@@ -92,7 +92,7 @@ export function SectionCards() {
           <CardTitle className="text-lg font-semibold tabular-nums  ">
             Qte collectee (CAB)
           </CardTitle>
-          <CardFooter className="flex flex-row justify-end lg:absolute top-[35%] right-2">
+          <CardFooter className="flex flex-row justify-end lg:absolute top-[35%] right-2 w-full">
             {/* <div className="text-muted-foreground">Qte totale (CA+CB)</div> */}
             <div className="ml-2 flex flex-col justify-end gap-y-1">
               <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">

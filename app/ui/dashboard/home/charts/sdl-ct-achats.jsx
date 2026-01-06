@@ -153,7 +153,7 @@ export function ChartLineAchats() {
               type="natural"
               fill="url(#fillCeriseB)"
               stroke="var(--color-ceriseB)"
-              stackId="b"
+              stackId="a"
             />
             <Area
               dataKey="ceriseA"

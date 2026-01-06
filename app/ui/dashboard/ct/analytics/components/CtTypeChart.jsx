@@ -24,11 +24,11 @@ const chartConfig = {
   },
   privee: {
     label: "Privée",
-    color: "var(--chart-2)",
+    color: "var(--chart-3)",
   },
   publique: {
     label: "Publique",
-    color: "var(--chart-4)",
+    color: "var(--chart-5)",
   },
 };
 
@@ -42,7 +42,7 @@ export function CtTypeChart() {
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="[&_.recharts-text]:fill-background mx-auto aspect-square max-h-[250px]"
+          className="[&_.recharts-text]:fill-black mx-auto aspect-square max-h-[250px]"
         >
           <PieChart>
             <ChartTooltip
@@ -51,7 +51,7 @@ export function CtTypeChart() {
             <Pie data={chartData} dataKey="count">
               <LabelList
                 dataKey="type"
-                className="fill-background"
+                className="fill-black"
                 stroke="none"
                 fontSize={12}
                 formatter={(value) =>

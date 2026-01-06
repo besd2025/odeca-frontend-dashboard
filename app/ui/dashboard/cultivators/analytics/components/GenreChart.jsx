@@ -14,6 +14,8 @@ import {
 import {
   ChartConfig,
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -48,12 +50,12 @@ export function GenreChart() {
         );
         const chartData = [
           {
-            browser: "Homme",
+            browser: "hommes",
             visitors: response?.hommes,
             fill: "var(--color-hommes)",
           },
           {
-            browser: "Femme",
+            browser: "femmes",
             visitors: response?.femmes,
             fill: "var(--color-femmes)",
           },
@@ -75,7 +77,7 @@ export function GenreChart() {
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="[&_.recharts-text]:fill-background mx-auto aspect-square max-h-[250px]"
+          className="[&_.recharts-text]:fill-black mx-auto aspect-square max-h-[250px]"
         >
           <PieChart>
             <ChartTooltip
@@ -84,12 +86,16 @@ export function GenreChart() {
             <Pie data={data} dataKey="visitors">
               <LabelList
                 dataKey="browser"
-                className="fill-background"
+                className="fill-black"
                 stroke="none"
                 fontSize={12}
                 formatter={(value) => chartConfig[value]?.label}
               />
             </Pie>
+            <ChartLegend
+              content={<ChartLegendContent nameKey="browser" />}
+              className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+            />
           </PieChart>
         </ChartContainer>
       </CardContent>

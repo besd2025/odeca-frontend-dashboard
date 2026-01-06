@@ -112,7 +112,7 @@ export function AgeChart() {
                 dataKey="count"
                 position="insideRight"
                 offset={8}
-                className="fill-white"
+                className="fill-black"
                 fontSize={12}
               />
             </Bar>

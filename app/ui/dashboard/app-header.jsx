@@ -39,6 +39,7 @@ import {
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react";
+import CampaigneAnnee from "./home/campaigne-annee";
 const menuItems = {
   navMain: [
     {
@@ -97,9 +98,10 @@ export function AppHeader() {
           </div>
 
           <div className="flex items-center gap-2">
+            <CampaigneAnnee />
             <Button
               size="icon"
-              className="bg-muted text-foreground hover:bg-accent shadow-none rounded-full md:hidden"
+              className="bg-muted text-foreground hover:bg-accent shadow-none rounded-full hidden md:hidden"
             >
               <Search className="h-5! w-5!" />
             </Button>
