@@ -32,6 +32,7 @@ function AchatsData() {
         const dataAchat = response?.results?.map((achat) => ({
           id: achat?.id,
           cultivator: {
+            cultivator_id: achat?.cafeiculteur?.id,
             cultivator_code: achat?.cafeiculteur?.cultivator_code,
             first_name: achat?.cafeiculteur?.cultivator_first_name,
             last_name: achat?.cafeiculteur?.cultivator_last_name,

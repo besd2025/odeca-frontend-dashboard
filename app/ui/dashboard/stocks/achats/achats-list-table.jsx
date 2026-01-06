@@ -51,6 +51,7 @@ function DataTable({ data, isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 10,
   });
+  console.log(data);
 
   const columns = [
     {
@@ -82,7 +83,9 @@ function DataTable({ data, isCultivatorsPage }) {
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href="/odeca-dashboard/cultivators/profile">
+              <Link
+                href={`/odeca-dashboard/cultivators/profile?id=${cultivator.cultivator.cultivator_id}`}
+              >
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
               <div>
