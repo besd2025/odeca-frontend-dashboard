@@ -125,15 +125,32 @@ function ProfileCard({ cult_id }) {
         <>
           <div className="flex flex-col items-center space-y-3 text-center animate-in fade-in duration-300">
             <Avatar className="w-32 h-32 mx-auto">
-              <AvatarImage
-                src={data?.cultivator_photo || null}
-                alt={data?.cultivator_first_name}
-                className="object-cover "
-              />
-              <ViewImageDialog
-                imageUrl={data?.cultivator_photo}
-                className="size-full object-cover"
-              />
+              {data?.cultivator_entity_type == "personne" ? (
+                <>
+                  <AvatarImage
+                    src={data?.cultivator_photo || null}
+                    alt={data?.cultivator_first_name}
+                    className="object-cover "
+                  />
+                  <ViewImageDialog
+                    imageUrl={data?.cultivator_photo}
+                    className="size-full object-cover"
+                  />
+                </>
+              ) : (
+                <>
+                  <AvatarImage
+                    src={data?.cultivator_photo || null}
+                    alt={data?.cultivator_assoc_name}
+                    className="object-cover "
+                  />
+                  <ViewImageDialog
+                    imageUrl={data?.cultivator_photo}
+                    className="size-full object-cover"
+                  />
+                </>
+              )}
+
               {/* <AvatarFallback>
             {data?.cultivator_first_name
               .split(" ")
@@ -144,13 +161,23 @@ function ProfileCard({ cult_id }) {
             </Avatar>
             <div className="space-y-1 flex flex-col items-center gap-y-2">
               <p className="text-xl font-semibold">
-                {data?.cultivator_assoc_name ||
-                  `${data?.cultivator_first_name} ${data?.cultivator_last_name}`}
+                {data?.cultivator_entity_type === "personne"
+                  ? data?.cultivator_first_name +
+                    " " +
+                    data?.cultivator_last_name
+                  : data?.cultivator_assoc_name}
               </p>
-              <p className="text-sm text-muted-foreground flex flex-row gap-x-2">
-                <Grape className="text-primary size-5" />
-                {data?.cultivator_code}
-              </p>
+              {data?.cultivator_entity_type === "personne" ? (
+                <p className="text-sm text-muted-foreground flex flex-row gap-x-2">
+                  <Grape className="text-primary size-5" />
+                  cafeiculteur
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground flex flex-row gap-x-2">
+                  <Grape className="text-primary size-5" />
+                  association des cafeiculteurs
+                </p>
+              )}
             </div>
             <Badge
               className="px-3 py-1 text-lg text-secondary rounded "
@@ -162,7 +189,7 @@ function ProfileCard({ cult_id }) {
           </div>
 
           <div className="space-y-3">
-            {data?.cultivator_assoc_name ? (
+            {data?.cultivator_entity_type !== "personne" ? (
               <>
                 <div>
                   <div className="flex items-center justify-between text-sm flex-col gap-y-1">
@@ -206,6 +233,12 @@ function ProfileCard({ cult_id }) {
             ) : (
               <>
                 <div>
+                  <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                    <span className="text-muted-foreground">Numéro Fiche</span>
+                    <span className="font-medium">
+                      {data?.cultivator_assoc_numero_fiche}
+                    </span>
+                  </div>
                   <div className="flex items-center justify-between text-sm flex-col gap-y-1">
                     <span className="text-muted-foreground">CNI</span>
                     <span className="font-medium">{data?.cultivator_cni}</span>

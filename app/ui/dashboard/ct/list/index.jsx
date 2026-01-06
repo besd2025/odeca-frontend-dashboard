@@ -66,9 +66,9 @@ export default function CtsListTable() {
           },
           society: ct?.sdl?.societe?.nom_societe,
           responsable: {
-            first_name: ct?.responsable?.first_name || "",
-            last_name: ct?.responsable?.last_name || "",
-            telephone: ct?.responsable?.telephone || "",
+            first_name: ct?.ct_responsable?.user?.first_name || "",
+            last_name: ct?.ct_responsable?.user?.last_name || "",
+            telephone: ct?.ct_responsable?.user?.phone || "",
           },
           localite: {
             province:

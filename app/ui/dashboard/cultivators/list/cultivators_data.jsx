@@ -43,6 +43,7 @@ function CultivatorData() {
               first_name: cultivator?.cultivator_first_name,
               last_name: cultivator?.cultivator_last_name,
               image_url: cultivator?.cultivator_photo,
+              telephone: cultivator?.cultivator_telephone,
               // Association specific fields
               cultivator_assoc_name: cultivator?.cultivator_assoc_name,
               cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,

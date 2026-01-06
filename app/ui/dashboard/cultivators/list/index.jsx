@@ -156,6 +156,20 @@ function DataTable({ data, isCultivatorsPage }) {
         );
       },
     },
+
+    {
+      id: "Telephone",
+      header: "Téléphone",
+      cell: ({ row }) => {
+        const cultivator = row.original.cultivator;
+        return (
+          <div className="text-center font-semibold">
+            {cultivator?.telephone}
+          </div>
+        );
+      },
+    },
+
     ...(isCultivatorsPage
       ? [
           {

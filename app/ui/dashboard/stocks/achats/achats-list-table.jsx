@@ -133,29 +133,36 @@ function DataTable({ data, isCultivatorsPage }) {
       },
       cell: ({ row }) => {
         const cultivators = row.original.cultivator;
+        console.log("Cultivators in cell:", cultivators);
         const isAssociation = !!cultivators?.cultivator_assoc_name;
 
         return (
           <div className="flex items-center gap-3">
             <ViewImageDialog
-              imageUrl={cultivators.image_url}
+              imageUrl={cultivators?.image_url}
               alt={
-                isAssociation
+                cultivators?.cultivator_type === "association"
                   ? cultivators?.cultivator_assoc_name
-                  : `${cultivators.last_name} ${cultivators.first_name}`
+                  : `${cultivators?.last_name ?? ""} ${
+                      cultivators?.first_name ?? ""
+                    }`
               }
             />
+
             <div>
               <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                {isAssociation
+                {cultivators?.cultivator_type === "association"
                   ? cultivators?.cultivator_assoc_name
-                  : `${cultivators.last_name} ${cultivators.first_name}`}
+                  : `${cultivators?.last_name ?? ""} ${
+                      cultivators?.first_name ?? ""
+                    }`}
               </span>
+
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                {isAssociation ? (
+                {cultivators?.cultivator_type === "association" ? (
                   <span>Rep: {cultivators?.cultivator_assoc_rep_name}</span>
                 ) : (
-                  cultivators.cultivator_code
+                  cultivators?.cultivator_code
                 )}
               </span>
             </div>

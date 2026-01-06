@@ -171,7 +171,8 @@ function DetailsCard({ id }) {
                   Responsable
                 </span>
                 <span className="font-medium text-right">
-                  {data?.responsable?.first_name} {data?.responsable?.last_name}
+                  {data?.ct_responsable?.user?.first_name}{" "}
+                  {data?.ct_responsable?.user?.last_name}
                 </span>
               </div>
               <Separator className="my-2" />
@@ -183,7 +184,7 @@ function DetailsCard({ id }) {
                   Téléphone
                 </span>
                 <span className="font-medium">
-                  {data?.responsable?.telephone}
+                  {data?.ct_responsable?.user?.phone}
                 </span>
               </div>
               <Separator className="my-2" />

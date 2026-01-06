@@ -16,7 +16,7 @@ import React from "react";
 import { fetchData } from "@/app/_utils/api";
 const chartConfig = {
   count: {
-    label: "SDLs",
+    label: "Usines de deparchage ",
   },
   actif: {
     label: "Actif",
