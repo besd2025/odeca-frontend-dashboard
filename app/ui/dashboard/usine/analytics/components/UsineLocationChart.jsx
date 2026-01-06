@@ -124,14 +124,14 @@ export function UsineLocationChart() {
                 dataKey={"name"}
                 position="insideLeft"
                 offset={8}
-                className="fill-white"
+                className="fill-black dark:fill-white"
                 fontSize={12}
               />
               <LabelList
                 dataKey="count"
                 position="insideRight"
                 offset={8}
-                className="fill-white"
+                className="fill-black dark:fill-white"
                 fontSize={12}
               />
             </Bar>

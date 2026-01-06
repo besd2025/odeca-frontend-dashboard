@@ -21,7 +21,7 @@ const chartConfig = {
   },
   actif: {
     label: "Actif",
-    color: "var(--chart-2)",
+    color: "var(--chart-3)",
   },
   inactif: {
     label: "Non Actif",
@@ -72,7 +72,7 @@ export function CtActiveChart() {
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="[&_.recharts-text]:fill-background mx-auto aspect-square max-h-[250px]"
+          className="[&_.recharts-text]:fill-black mx-auto aspect-square max-h-[250px]"
         >
           <PieChart>
             <ChartTooltip
@@ -81,7 +81,7 @@ export function CtActiveChart() {
             <Pie data={data} dataKey="count">
               <LabelList
                 dataKey="status"
-                className="fill-background"
+                className="fill-white"
                 stroke="none"
                 fontSize={12}
                 formatter={(value) =>

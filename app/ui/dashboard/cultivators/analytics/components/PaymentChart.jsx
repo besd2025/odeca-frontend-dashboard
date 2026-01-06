@@ -25,7 +25,7 @@ const paymentConfig = {
 };
 
 export function PaymentChart() {
-  const [data, setData] = React.useState({});
+  const [data, setData] = React.useState([]);
   React.useEffect(() => {
     const getCultivators = async () => {
       try {
@@ -38,16 +38,18 @@ export function PaymentChart() {
             body: {},
           }
         );
-        const chartData = response.map((item) => ({
-          mode: item?.cultivator_payment_type,
-          visitors: item?.count,
-          fill:
-            item?.cultivator_payment_type === "mobile_money"
-              ? "var(--color-mobile)"
-              : item?.cultivator_payment_type === "bank_transfer"
-              ? "var(--color-bancaire)"
-              : "var(--color-sans_compte)",
-        }));
+        const chartData = response.map((item) => {
+          const type = item?.cultivator_payment_type;
+          let key = "sans_compte";
+          if (type === "mobile_money") key = "mobile";
+          else if (type === "bank_transfer") key = "bancaire";
+
+          return {
+            mode: key,
+            visitors: item?.count,
+            fill: `var(--color-${key})`,
+          };
+        });
         setData(chartData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);

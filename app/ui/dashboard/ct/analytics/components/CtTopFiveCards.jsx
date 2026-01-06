@@ -24,30 +24,34 @@ function TopListCard({ title, icon, data }) {
       <CardContent>
         <div className="space-y-4 mt-2">
           {data.map((item, i) => (
-            <div key={i} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div key={i} className="grid grid-cols-3">
+              <div className="flex items-center gap-2 col-span-1 ">
                 {/* <ViewImageDialog imageUrl={item.image} /> */}
                 <span className="text-sm font-medium leading-none">
                   {item.name}
                 </span>
               </div>
-              <div className="text-sm text-muted-foreground">
-                {item.value.toLocaleString()}{" "}
-                <span className="text-xs">{item.sub}</span>
+              <div className="flex items-center justify-center col-span-1">
+                <div className="text-sm text-muted-foreground ">
+                  {item.value.toLocaleString()}{" "}
+                  <span className="text-xs">{item.sub}</span>
+                </div>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <Link href={`/odeca-dashboard/ct/profile/?id=${456}`}>
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                  </Link>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="col-span-1 flex justify-end">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <Link href={`/odeca-dashboard/ct/profile/?id=${456}`}>
+                      <DropdownMenuItem>Profile</DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           ))}
         </div>

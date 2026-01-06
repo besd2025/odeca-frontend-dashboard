@@ -81,8 +81,8 @@ export function CtLocationChart() {
           onValueChange={setLocFilter}
           className="w-full lg:w-[250px]"
         >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="province">Province</TabsTrigger>
+          <TabsList className="gri/d w-full grid-cols-2 hidden">
+            {/* <TabsTrigger value="province">Province</TabsTrigger> */}
           </TabsList>
         </Tabs>
       </CardHeader>
@@ -106,6 +106,8 @@ export function CtLocationChart() {
               tickLine={false}
               tickMargin={10}
               axisLine={false}
+              tickFormatter={(value) => value.slice(0, 1)}
+              hide
             />
 
             <XAxis dataKey="count" type="number" />
@@ -126,14 +128,14 @@ export function CtLocationChart() {
                 dataKey="name"
                 position="insideLeft"
                 offset={8}
-                className="fill-white"
+                className="fill-black dark:fill-white"
                 fontSize={12}
               />
               <LabelList
                 dataKey="count"
                 position="insideRight"
                 offset={8}
-                className="fill-white"
+                className="fill-black dark:fill-white"
                 fontSize={12}
               />
             </Bar>

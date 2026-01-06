@@ -57,7 +57,7 @@ export function SummaryCards() {
           </CardAction> */}
         </CardHeader>
       </Card>
-      <Card>
+      {/* <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
           <CardTitle className=" font-medium">Hommes</CardTitle>
           <User className="h-4 w-4 text-muted-foreground" />
@@ -74,6 +74,34 @@ export function SummaryCards() {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
           <CardTitle className="font-medium">Femmes</CardTitle>
           <User className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{data?.femmes}</div>
+          <p className="text-xs text-muted-foreground">
+            {((data?.femmes / data?.total_cultivators) * 100).toFixed(1)}% du
+            total
+          </p>
+        </CardContent>
+      </Card> */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
+          <CardTitle className=" font-medium">Individuels</CardTitle>
+          <User className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{data?.hommes}</div>
+          <p className="text-xs text-muted-foreground">
+            {((data?.hommes / data?.total_cultivators) * 100).toFixed(1)}% du
+            total
+          </p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
+          <CardTitle className="font-medium">
+            Associations/Cooperatives
+          </CardTitle>
+          <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{data?.femmes}</div>

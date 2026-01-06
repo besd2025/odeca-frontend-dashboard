@@ -27,7 +27,7 @@ import { fetchData } from "@/app/_utils/api";
 const locationConfig = {
   count: {
     label: "Caféiculteurs",
-    color: "var(--chart-5)",
+    color: "var(--chart-4)",
   },
 };
 
@@ -80,16 +80,16 @@ export function LocationChart() {
       <CardHeader className="flex flex-col gap-y-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <CardTitle>Répartition Géographique</CardTitle>
-          <CardDescription>Par Province ou Région</CardDescription>
+          <CardDescription>Par Province</CardDescription>
         </div>
         <Tabs
           defaultValue="province"
           onValueChange={setLocFilter}
           className="w-full lg:w-[250px]"
         >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="province">Province</TabsTrigger>
-            {/* <TabsTrigger value="region">Région</TabsTrigger> */}
+          <TabsList className="grid w-full grid-cols-2 hidden">
+            {/* <TabsTrigger value="province">Province</TabsTrigger>
+            <TabsTrigger value="region">Région</TabsTrigger> */}
           </TabsList>
         </Tabs>
       </CardHeader>
@@ -132,14 +132,14 @@ export function LocationChart() {
                 dataKey={"name"}
                 position="insideLeft"
                 offset={8}
-                className="fill-white"
+                className="fill-black dark:fill-white"
                 fontSize={12}
               />
               <LabelList
                 dataKey="count"
                 position="insideRight"
                 offset={8}
-                className="fill-white"
+                className="fill-black dark:fill-white"
                 fontSize={12}
               />
             </Bar>

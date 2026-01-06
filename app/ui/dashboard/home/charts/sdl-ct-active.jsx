@@ -44,7 +44,7 @@ export function ChartPieSdlCtActive() {
         );
         const chartData = [
           {
-            entity: "Usines",
+            entity: "UDPs",
             active: response?.usine_active,
             inactive: response?.total_usine - response?.usine_active,
           },

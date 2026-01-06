@@ -12,8 +12,10 @@ import {
   ArrowUpDownIcon,
   MoreHorizontal,
   Search,
+  ShieldUser,
   User,
   Users,
+  UserStar,
 } from "lucide-react";
 import * as React from "react";
 
@@ -146,7 +148,10 @@ function DataTable({ data, isCultivatorsPage }) {
               </span>
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                 {isAssociation ? (
-                  <span>Rep: {cultivators?.cultivator_assoc_rep_name}</span>
+                  <span className="flex items-center">
+                    <ShieldUser size={18} /> rep:{" "}
+                    {cultivators?.cultivator_assoc_rep_name}
+                  </span>
                 ) : (
                   cultivators?.cultivator_code
                 )}
