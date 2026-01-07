@@ -17,8 +17,10 @@ import {
   Venus,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 function StatsCard({ id }) {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getSdls = async () => {
       try {
@@ -44,11 +46,24 @@ function StatsCard({ id }) {
         setData(response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getSdls();
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <SimpleCardSkeleton />
+        <SimpleCardSkeleton />
+        <SimpleCardSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Card className="@container/card">

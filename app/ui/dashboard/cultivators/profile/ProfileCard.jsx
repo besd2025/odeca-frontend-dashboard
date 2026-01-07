@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { fetchData } from "@/app/_utils/api";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -34,6 +35,7 @@ import {
 
 function ProfileCard({ cult_id }) {
   const [data, setData] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
   useEffect(() => {
     setTimeout(() => {
@@ -42,6 +44,7 @@ function ProfileCard({ cult_id }) {
   }, []);
   useEffect(() => {
     const getCultivators = async () => {
+      setLoading(true);
       try {
         const response = await fetchData("get", `/cultivators/${cult_id}/`, {
           params: {},
@@ -52,6 +55,8 @@ function ProfileCard({ cult_id }) {
         console.log("Cultivators data fetched:", response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -160,13 +165,17 @@ function ProfileCard({ cult_id }) {
           </AvatarFallback> */}
             </Avatar>
             <div className="space-y-1 flex flex-col items-center gap-y-2">
-              <p className="text-xl font-semibold">
-                {data?.cultivator_entity_type === "personne"
-                  ? data?.cultivator_first_name +
-                    " " +
-                    data?.cultivator_last_name
-                  : data?.cultivator_assoc_name}
-              </p>
+              {loading ? (
+                <Skeleton className="h-7 w-48 mx-auto" />
+              ) : (
+                <p className="text-xl font-semibold">
+                  {data?.cultivator_entity_type === "personne"
+                    ? data?.cultivator_first_name +
+                      " " +
+                      data?.cultivator_last_name
+                    : data?.cultivator_assoc_name}
+                </p>
+              )}
               {data?.cultivator_entity_type === "personne" ? (
                 <p className="text-sm text-muted-foreground flex flex-row gap-x-2">
                   <Grape className="text-primary size-5" />
@@ -184,7 +193,13 @@ function ProfileCard({ cult_id }) {
               variant="outline"
             >
               <QrCode size={30} />
-              <span className="">{data?.cultivator_code}</span>
+              <span className="">
+                {loading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  data?.cultivator_code
+                )}
+              </span>
             </Badge>
           </div>
 
@@ -195,7 +210,11 @@ function ProfileCard({ cult_id }) {
                   <div className="flex items-center justify-between text-sm flex-col gap-y-1">
                     <span className="text-muted-foreground">Représentant</span>
                     <span className="font-medium text-center">
-                      {data?.cultivator_assoc_rep_name}
+                      {loading ? (
+                        <Skeleton className="h-5 w-32 mx-auto" />
+                      ) : (
+                        data?.cultivator_assoc_rep_name
+                      )}
                     </span>
                   </div>
                   <Separator className="my-2" />
@@ -204,7 +223,11 @@ function ProfileCard({ cult_id }) {
                   <div className="flex items-center justify-between text-sm flex-col gap-y-1">
                     <span className="text-muted-foreground">NIF</span>
                     <span className="font-medium">
-                      {data?.cultivator_assoc_nif}
+                      {loading ? (
+                        <Skeleton className="h-5 w-24 mx-auto" />
+                      ) : (
+                        data?.cultivator_assoc_nif
+                      )}
                     </span>
                   </div>
                   <Separator className="my-2" />
@@ -224,7 +247,11 @@ function ProfileCard({ cult_id }) {
                       Tel Représentant
                     </span>
                     <span className="font-medium">
-                      {data?.cultivator_assoc_rep_phone}
+                      {loading ? (
+                        <Skeleton className="h-5 w-24 mx-auto" />
+                      ) : (
+                        data?.cultivator_assoc_rep_phone
+                      )}
                     </span>
                   </div>
                   <Separator className="my-2" />
@@ -241,7 +268,13 @@ function ProfileCard({ cult_id }) {
                   </div>
                   <div className="flex items-center justify-between text-sm flex-col gap-y-1">
                     <span className="text-muted-foreground">CNI</span>
-                    <span className="font-medium">{data?.cultivator_cni}</span>
+                    <span className="font-medium">
+                      {loading ? (
+                        <Skeleton className="h-5 w-24 mx-auto" />
+                      ) : (
+                        data?.cultivator_cni
+                      )}
+                    </span>
                   </div>
                   <Separator className="my-2" />
                 </div>
@@ -251,7 +284,13 @@ function ProfileCard({ cult_id }) {
                     <span className="text-muted-foreground">
                       Date de Naissance
                     </span>
-                    <span className="font-medium">{data?.date_naissance}</span>
+                    <span className="font-medium">
+                      {loading ? (
+                        <Skeleton className="h-5 w-24 mx-auto" />
+                      ) : (
+                        data?.date_naissance
+                      )}
+                    </span>
                   </div>
                   <Separator className="my-2" />
                 </div>
@@ -260,7 +299,11 @@ function ProfileCard({ cult_id }) {
                   <div className="flex items-center justify-between text-sm ">
                     <span className="text-muted-foreground">Sexe</span>
                     <span className="font-medium">
-                      {data?.cultivator_gender}
+                      {loading ? (
+                        <Skeleton className="h-5 w-20 ml-auto" />
+                      ) : (
+                        data?.cultivator_gender
+                      )}
                     </span>
                   </div>
                   <Separator className="my-2" />
@@ -272,7 +315,11 @@ function ProfileCard({ cult_id }) {
                       Téléphone
                     </span>
                     <span className="font-medium">
-                      {data?.cultivator_telephone}
+                      {loading ? (
+                        <Skeleton className="h-5 w-24 ml-auto" />
+                      ) : (
+                        data?.cultivator_telephone
+                      )}
                     </span>
                   </div>
                   <Separator className="my-2" />

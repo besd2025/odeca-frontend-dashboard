@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/card";
 import { Package, DollarSign, Layers, Grape } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 export function StockSummaryCards() {
   const [data, setData] = React.useState({});
   const [rendement, setRendement] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -39,11 +41,24 @@ export function StockSummaryCards() {
         setRendement(rendement);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getDatas();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <SimpleCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-4">
       <Card className="@container/card">

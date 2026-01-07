@@ -23,6 +23,7 @@ import {
   LabelList,
 } from "recharts";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 
 const locationConfig = {
   count: {
@@ -37,6 +38,7 @@ export function LocationChart() {
     province: [],
     region: [],
   });
+  const [loading, setLoading] = useState(true);
 
   React.useEffect(() => {
     const getCtsProvince = async () => {
@@ -70,11 +72,16 @@ export function LocationChart() {
         });
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCtsProvince();
   }, []);
+
+  if (loading) return <ChartSkeleton />;
+
   return (
     <Card className="lg:col-span-1">
       <CardHeader className="flex flex-col gap-y-3 lg:flex-row lg:items-center lg:justify-between">
@@ -87,7 +94,7 @@ export function LocationChart() {
           onValueChange={setLocFilter}
           className="w-full lg:w-[250px]"
         >
-          <TabsList className="grid w-full grid-cols-2 hidden">
+          <TabsList className="w-full hidden">
             {/* <TabsTrigger value="province">Province</TabsTrigger>
             <TabsTrigger value="region">Région</TabsTrigger> */}
           </TabsList>

@@ -20,9 +20,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { TableSkeleton } from "@/components/ui/skeletons";
 
 export function StockListTable() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -54,11 +56,16 @@ export function StockListTable() {
         setData(gradeData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getDatas();
   }, []);
+
+  if (loading) return <TableSkeleton rows={5} columns={6} />;
+
   return (
     <Card className="col-span-1 lg:col-span-3">
       <CardHeader className="flex flex-row items-center justify-between">

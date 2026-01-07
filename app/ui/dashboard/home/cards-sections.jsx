@@ -18,12 +18,15 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { StatsCardSkeleton } from "@/components/ui/skeletons";
 export function SectionCards() {
   const [data, setData] = React.useState({});
   const [rendement, setRendement] = React.useState({});
   const [cafe_vert_produit, setCafeVertProduit] = React.useState({});
+  const [isLoading, setIsLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
+      setIsLoading(true);
       try {
         const response = await fetchData(
           "get",
@@ -59,11 +62,30 @@ export function SectionCards() {
         setCafeVertProduit(cafe_vert);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     getDatas();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-7">
+        <div className="col-span-3">
+          <StatsCardSkeleton />
+        </div>
+        <div className="col-span-2">
+          <StatsCardSkeleton />
+        </div>
+        <div className="col-span-2">
+          <StatsCardSkeleton />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-7">
       <Card className="@container/card col-span-3 relative">
@@ -299,7 +321,7 @@ export function SectionCards() {
           <CardTitle className="text-lg font-semibold tabular-nums  ">
             Cafe vert
           </CardTitle>
-          <div className="flex flex-col gap-y-1 hidden">
+          <div className="hidden flex-col gap-y-1">
             <div className="flex flex-row gap-x-2 items-center">
               <div className="rounded-md">
                 <CircleDollarSign className="text-yellow-500" />

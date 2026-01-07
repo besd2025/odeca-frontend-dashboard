@@ -22,6 +22,7 @@ import {
   LabelList,
 } from "recharts";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 
 const chartConfig = {
   amount: {
@@ -47,6 +48,7 @@ const chartConfig = {
 
 export function StockTypeChart() {
   const [data, setData] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -78,11 +80,15 @@ export function StockTypeChart() {
         console.log("rendement par grade", chatData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getDatas();
   }, []);
+
+  if (loading) return <ChartSkeleton />;
 
   return (
     <Card className="lg:col-span-1">

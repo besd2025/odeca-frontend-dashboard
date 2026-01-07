@@ -16,6 +16,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 
 const chartConfig = {
   active: {
@@ -30,8 +31,10 @@ const chartConfig = {
 
 export function ChartPieSdlCtActive() {
   const [data, setData] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
+      setIsLoading(true);
       try {
         const response = await fetchData(
           "get",
@@ -63,11 +66,17 @@ export function ChartPieSdlCtActive() {
         setData(chartData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     getDatas();
   }, []);
+
+  if (isLoading) {
+    return <ChartSkeleton />;
+  }
 
   return (
     <Card>

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/chart";
 import { PieChart, Pie, LabelList } from "recharts";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 const paymentConfig = {
   visitors: { label: "Paiements" },
   mobile: { label: "Mobile Money", color: "var(--chart-2)" },
@@ -26,6 +27,7 @@ const paymentConfig = {
 
 export function PaymentChart() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getCultivators = async () => {
       try {
@@ -53,11 +55,16 @@ export function PaymentChart() {
         setData(chartData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCultivators();
   }, []);
+
+  if (loading) return <ChartSkeleton />;
+
   return (
     <Card className="col-span-1">
       <CardHeader>

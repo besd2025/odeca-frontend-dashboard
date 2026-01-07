@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 import { TrendingUp } from "lucide-react";
 import { LabelList, Pie, PieChart } from "recharts";
 import {
@@ -36,6 +37,7 @@ const chartConfig = {
 
 export function GenreChart() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getCultivators = async () => {
       try {
@@ -63,11 +65,16 @@ export function GenreChart() {
         setData(chartData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCultivators();
   }, []);
+
+  if (loading) return <ChartSkeleton />;
+
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader>

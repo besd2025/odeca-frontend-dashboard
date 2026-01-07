@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/chart";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 
 const chartConfig = {
   ceriseA: { label: "Cerise A", color: "var(--chart-5)" },
@@ -26,6 +27,7 @@ const chartConfig = {
 export function ChartLineAchats() {
   const [period, setPeriod] = useState("mois");
   const [dataByPeriod, setDataByPeriod] = useState({}); // ← nouveau nom
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const handleTimePeriodChange = (value) => {
     setPeriod(value);
@@ -33,6 +35,7 @@ export function ChartLineAchats() {
 
   React.useEffect(() => {
     async function getData() {
+      setIsLoading(true);
       try {
         const periodParam =
           period === "jour"
@@ -65,11 +68,17 @@ export function ChartLineAchats() {
         }));
       } catch (error) {
         console.error("Erreur API :", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
     getData();
   }, [period]);
+
+  if (isLoading && !dataByPeriod[period]) {
+    return <ChartSkeleton />;
+  }
 
   return (
     <Card>

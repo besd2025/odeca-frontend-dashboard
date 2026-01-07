@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/chart";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 import config from "@/postcss.config.mjs";
 const stockDataByPeriod = {
   mois: [
@@ -57,6 +58,7 @@ const chartConfig = {
 export function StockEvolutionChart() {
   const [period, setPeriod] = useState("mois");
   const [dataByPeriod, setDataByPeriod] = useState({}); // ← nouveau nom
+  const [loading, setLoading] = useState(true);
 
   const handleTimePeriodChange = (value) => {
     setPeriod(value);
@@ -64,6 +66,7 @@ export function StockEvolutionChart() {
 
   React.useEffect(() => {
     async function getData() {
+      setLoading(true);
       try {
         const periodParam =
           period === "jour"
@@ -94,11 +97,15 @@ export function StockEvolutionChart() {
         }));
       } catch (error) {
         console.error("Erreur API :", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     getData();
   }, [period]);
+
+  if (loading) return <ChartSkeleton />;
 
   return (
     <Card className="lg:col-span-4">

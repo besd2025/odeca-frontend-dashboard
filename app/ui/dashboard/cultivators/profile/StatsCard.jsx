@@ -14,10 +14,12 @@ import {
   Landmark,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 
 function StatsCard({ cult_id }) {
   const [data, setData] = React.useState({});
   const [values, setValues] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
   useEffect(() => {
     const getCultivators = async () => {
       try {
@@ -39,11 +41,24 @@ function StatsCard({ cult_id }) {
         setValues(valuesdata);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCultivators();
   }, [cult_id]);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <SimpleCardSkeleton />
+        <SimpleCardSkeleton />
+        <SimpleCardSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <Card className="@container/card">

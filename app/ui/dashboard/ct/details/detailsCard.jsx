@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { fetchData } from "@/app/_utils/api";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Grape,
   MapPinHouse,
@@ -24,6 +25,7 @@ import { Button } from "@/components/ui/button";
 
 function DetailsCard({ id }) {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   const [isExpanded, setIsExpanded] = React.useState(true);
   useEffect(() => {
     setTimeout(() => {
@@ -33,6 +35,7 @@ function DetailsCard({ id }) {
   const toggleSidebar = () => setIsExpanded(!isExpanded);
   React.useEffect(() => {
     const getSdls = async () => {
+      setLoading(true);
       try {
         const response = await fetchData(
           "get",
@@ -47,6 +50,8 @@ function DetailsCard({ id }) {
         setData(response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -129,7 +134,11 @@ function DetailsCard({ id }) {
               </svg>
             </div>
             <div className="space-y-1">
-              <p className="text-xl font-semibold">CT {data?.ct_nom}</p>
+              {loading ? (
+                <Skeleton className="h-7 w-48 mx-auto" />
+              ) : (
+                <p className="text-xl font-semibold">CT {data?.ct_nom}</p>
+              )}
               <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
                 {""}
               </p>
@@ -139,7 +148,9 @@ function DetailsCard({ id }) {
               variant="outline"
             >
               <QrCode size={30} />
-              <span className="">{data?.ct_code}</span>
+              <span className="">
+                {loading ? <Skeleton className="h-6 w-24" /> : data?.ct_code}
+              </span>
             </Badge>
           </div>
 
@@ -155,11 +166,17 @@ function DetailsCard({ id }) {
                   Localité
                 </span>
                 <span className="font-medium text-right">
-                  {
-                    data?.ct_adress?.zone_code?.commune_code?.province_code
-                      ?.province_name
-                  }
-                  / {data?.ct_adress?.zone_code?.commune_code?.commune_name}
+                  {loading ? (
+                    <Skeleton className="h-5 w-32 ml-auto" />
+                  ) : (
+                    <>
+                      {
+                        data?.ct_adress?.zone_code?.commune_code?.province_code
+                          ?.province_name
+                      }
+                      / {data?.ct_adress?.zone_code?.commune_code?.commune_name}
+                    </>
+                  )}
                 </span>
               </div>
               <Separator className="my-2" />
@@ -171,8 +188,14 @@ function DetailsCard({ id }) {
                   Responsable
                 </span>
                 <span className="font-medium text-right">
-                  {data?.ct_responsable?.user?.first_name}{" "}
-                  {data?.ct_responsable?.user?.last_name}
+                  {loading ? (
+                    <Skeleton className="h-5 w-32 ml-auto" />
+                  ) : (
+                    <>
+                      {data?.ct_responsable?.user?.first_name}{" "}
+                      {data?.ct_responsable?.user?.last_name}
+                    </>
+                  )}
                 </span>
               </div>
               <Separator className="my-2" />
@@ -184,7 +207,11 @@ function DetailsCard({ id }) {
                   Téléphone
                 </span>
                 <span className="font-medium">
-                  {data?.ct_responsable?.user?.phone}
+                  {loading ? (
+                    <Skeleton className="h-5 w-24" />
+                  ) : (
+                    data?.ct_responsable?.user?.phone
+                  )}
                 </span>
               </div>
               <Separator className="my-2" />

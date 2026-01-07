@@ -13,6 +13,7 @@ import {
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { useSearchParams } from "next/navigation";
+import { TableSkeleton } from "@/components/ui/skeletons";
 const products = [
   {
     id: 101,
@@ -43,6 +44,7 @@ const products = [
 export default function Ventes({ cult_id }) {
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
+  const [loading, setLoading] = React.useState(true);
 
   const totalItems = products.length;
   const totalPages = Math.max(Math.ceil(totalItems / pageSize), 1);
@@ -59,6 +61,7 @@ export default function Ventes({ cult_id }) {
   const [data, setData] = React.useState([]);
   React.useEffect(() => {
     const getCultivators = async () => {
+      setLoading(true);
       try {
         const valuesdata = await fetchData(
           "get",
@@ -87,11 +90,15 @@ export default function Ventes({ cult_id }) {
         setData(AchatsData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCultivators();
   }, [cult_id]);
+
+  if (loading) return <TableSkeleton rows={5} columns={9} />;
 
   return (
     <div className="w-full">

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartColumn, List } from "lucide-react";
 import AchatsListTable from "./achats-list-table";
 import { fetchData } from "@/app/_utils/api";
+import { TableSkeleton } from "@/components/ui/skeletons";
 
 function AchatsData() {
   const [individualAchats, setIndividualAchats] = useState([]);
@@ -127,11 +128,15 @@ function AchatsData() {
         </TabsList>
         <TabsContent value="list">
           <h1 className="text-2xl font-semibold m-2">Liste des achats</h1>
-          <AchatsListTable
-            individualData={individualAchats}
-            associationData={associationAchats}
-            isCultivatorsPage={true}
-          />
+          {loading ? (
+            <TableSkeleton rows={10} columns={6} />
+          ) : (
+            <AchatsListTable
+              individualData={individualAchats}
+              associationData={associationAchats}
+              isCultivatorsPage={true}
+            />
+          )}
         </TabsContent>
         <TabsContent value="details">
           <div className="p-4 border rounded-lg bg-background text-center">

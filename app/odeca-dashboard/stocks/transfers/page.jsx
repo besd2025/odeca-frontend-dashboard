@@ -6,6 +6,7 @@ import { ArrowRightLeft, Building2, Factory } from "lucide-react";
 import TransferSdlDep from "@/app/ui/dashboard/stocks/transfers/components/sdl-transfers/transfer-sdl";
 import TransferCtDep from "@/app/ui/dashboard/stocks/transfers/components/ct-transfers/transfer-ct";
 import { fetchData } from "@/app/_utils/api";
+import { TableSkeleton } from "@/components/ui/skeletons";
 
 export default function TransfersPage() {
   const [sdlTransfers, setSdlTransfers] = useState([]);
@@ -113,7 +114,11 @@ export default function TransfersPage() {
                 usines/dépulpeurs.
               </p>
             </div>
-            <TransferSdlDep data={sdlTransfers} />
+            {loading ? (
+              <TableSkeleton rows={5} columns={5} />
+            ) : (
+              <TransferSdlDep data={sdlTransfers} />
+            )}
           </div>
         </TabsContent>
 
@@ -127,7 +132,11 @@ export default function TransfersPage() {
                 Liste des transferts effectués depuis les CT vers les SDL.
               </p>
             </div>
-            <TransferCtDep data={ctTransfers} />
+            {loading ? (
+              <TableSkeleton rows={5} columns={5} />
+            ) : (
+              <TransferCtDep data={ctTransfers} />
+            )}
           </div>
         </TabsContent>
       </Tabs>

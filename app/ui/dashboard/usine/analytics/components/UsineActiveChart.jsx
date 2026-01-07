@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/chart";
 import React from "react";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 const chartConfig = {
   count: {
     label: "Usines de deparchage ",
@@ -30,8 +31,10 @@ const chartConfig = {
 
 export function UsineActiveChart() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
-    const getSdls = async () => {
+    const getDatas = async () => {
+      setLoading(true);
       try {
         const response = await fetchData(
           "get",
@@ -57,13 +60,18 @@ export function UsineActiveChart() {
         setData(chartData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    getSdls();
+    getDatas();
   }, []);
+
+  if (loading) return <ChartSkeleton />;
+
   return (
-    <Card className="col-span-1 lg:col-span-2">
+    <Card className="col-span-1 md:col-span-2 lg:col-span-2">
       <CardHeader>
         <CardTitle>Statut des USINEs</CardTitle>
         <CardDescription>Actif vs Non Actif</CardDescription>
