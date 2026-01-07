@@ -120,10 +120,12 @@ function DataTable({ data, isCultivatorsPage }) {
         if (!filterValue) return true;
         const search = filterValue.toLowerCase();
         return (
-          cultivator?.first_name?.toLowerCase().includes(search) ||
-          cultivator?.last_name?.toLowerCase().includes(search) ||
-          cultivator?.cultivator_code?.toLowerCase().includes(search) ||
-          cultivator?.cultivator_assoc_name?.toLowerCase().includes(search)
+          (cultivator?.first_name || "").toLowerCase().includes(search) ||
+          (cultivator?.last_name || "").toLowerCase().includes(search) ||
+          (cultivator?.cultivator_code || "").toLowerCase().includes(search) ||
+          (cultivator?.cultivator_assoc_name || "")
+            .toLowerCase()
+            .includes(search)
         );
       },
       cell: ({ row }) => {
