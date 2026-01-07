@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -46,7 +46,13 @@ import PaginationControls from "@/components/ui/pagination-controls";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-function DataTable({ data, isCultivatorsPage }) {
+function DataTable({
+  data,
+  isCultivatorsPage,
+  typeExport,
+  onExportToExcel,
+  onExportAssociationToExcel,
+}) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -55,6 +61,7 @@ function DataTable({ data, isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 10,
   });
+
   const columns = [
     {
       id: "actions",
@@ -281,10 +288,14 @@ function DataTable({ data, isCultivatorsPage }) {
           </div>
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
-            //   onClickExportButton={exportCultivatorsToExcel}
-            //   onClickDownloadButton={DownloadCultivatorsToExcel}
-            //   loading={loadingEportBtn}
-            //   activedownloadBtn={activedownloadBtn}
+              typeExport={typeExport}
+              onExportToExcel={onExportToExcel}
+              onExportAssociationToExcel={onExportAssociationToExcel}
+              // onExportAssociationToExcel={onExportAssociationToExcel}
+              //   onClickExportButton={exportCultivatorsToExcel}
+              //   onClickDownloadButton={DownloadCultivatorsToExcel}
+              //   loading={loadingEportBtn}
+              //   activedownloadBtn={activedownloadBtn}
             />
           </div>
         </div>
@@ -367,12 +378,25 @@ export default function CultivatorsListTable({
   individualData,
   associationData,
   isCultivatorsPage,
+  onExportToExcel,
+  onExportAssociationToExcel,
+  typeExport,
+  onClickTyepeExport,
 }) {
   const individuals = individualData ?? data ?? [];
   const associations = associationData ?? [];
-
+  const [tabValue, setTabValue] = useState("individual");
+  const handleChange = (value) => {
+    onClickTyepeExport(value);
+    setTabValue(value);
+  };
   return (
-    <Tabs defaultValue="individual" className="w-full mt-4">
+    <Tabs
+      value={tabValue}
+      onValueChange={handleChange}
+      defaultValue="individual"
+      className="w-full mt-4"
+    >
       <TabsList className="p-0 h-auto bg-background gap-1">
         <TabsTrigger
           value="individual"
@@ -391,10 +415,20 @@ export default function CultivatorsListTable({
       </TabsList>
 
       <TabsContent value="individual" className="mt-4">
-        <DataTable data={individuals} isCultivatorsPage={isCultivatorsPage} />
+        <DataTable
+          data={individuals}
+          isCultivatorsPage={isCultivatorsPage}
+          onExportToExcel={onExportToExcel}
+        />
       </TabsContent>
       <TabsContent value="association" className="mt-4">
-        <DataTable data={associations} isCultivatorsPage={isCultivatorsPage} />
+        <DataTable
+          data={associations}
+          isCultivatorsPage={isCultivatorsPage}
+          onExportToExcel={onExportToExcel}
+          onExportAssociationToExcel={onExportAssociationToExcel}
+          typeExport={tabValue}
+        />
       </TabsContent>
     </Tabs>
   );

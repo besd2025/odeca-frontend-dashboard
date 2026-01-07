@@ -11,7 +11,11 @@ function ExportButton({
   onClickDownloadButton,
   loading = false,
   activedownloadBtn = false,
+  typeExport,
+  onExportToExcel,
+  onExportAssociationToExcel,
 }) {
+  const value = typeExport || "individuel";
   return (
     <>
       {!activedownloadBtn ? (
@@ -19,7 +23,13 @@ function ExportButton({
           <TooltipTrigger asChild>
             <Button
               className={`bg-green-600 text-white hover:bg-green-700 px-3 py-2 text-sm`}
-              onClick={onClickExportButton}
+              onClick={() => {
+                if (value === "individuel") {
+                  onExportToExcel();
+                } else if (value === "association") {
+                  onExportAssociationToExcel();
+                }
+              }}
               loading={loading}
               loadingType="spinner"
               size=""
