@@ -35,7 +35,7 @@ export default function CampaigneAnnee() {
   return (
     <div className="px-4 lg:px-6">
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2 bg-accent py-2 px-2.5 rounded">
+        <DropdownMenuTrigger className="flex items-center gap-2 bg-accent py-2 px-2.5 rounded border border-primary/30">
           <Avatar className="rounded-lg h-8 w-8">
             <AvatarFallback className="rounded-lg bg-primary text-primary-foreground">
               <Combine />

@@ -40,6 +40,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import CampaigneAnnee from "./home/campaigne-annee";
+import Image from "next/image";
 const menuItems = {
   navMain: [
     {
@@ -83,7 +84,12 @@ export function AppHeader() {
               className="mx-2 data-[orientation=vertical]:h-4"
             />
             <h1 className="text-base font-bold flex gap-x-1 items-center">
-              <Grape className="h-5 w-5" />
+              <Image
+                src="/images/ThreeSeeds.png"
+                alt="Logo"
+                width={40}
+                height={40}
+              />
               CAFE
             </h1>
             {/* <Logo className="shrink-0" /> */}
