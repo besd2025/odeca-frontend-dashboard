@@ -80,15 +80,14 @@ export function LoginForm({ className, ...props }) {
       }
       setLoading(true);
       const data = await response.json();
-      console.log("Login successful:", data);
-      document.cookie = `accessToken=${data.access}; path=/; max-age=3600; secure`;
-      localStorage.setItem("accessToken", data.access);
       const user = DecodeToJwt(data.access);
       if (
         user?.category === "Admin" ||
         //user?.category === "Anagessa" ||
         user?.category === "General"
       ) {
+        document.cookie = `accessToken=${data.access}; path=/; max-age=3600; secure`;
+        localStorage.setItem("accessToken", data.access);
         router.push("/odeca-dashboard/home");
         // } else if (user?.category === "Communal") {
         //   router.push("/municipal/cultivators");
