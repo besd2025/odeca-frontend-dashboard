@@ -96,6 +96,7 @@ function DetailsContent({ id }) {
             first_name: cultivator?.cultivator_first_name,
             last_name: cultivator?.cultivator_last_name,
             image_url: cultivator?.cultivator_photo,
+            telephone: cultivator?.cultivator_telephone,
           },
           sdl_ct: "NGome",
           society: "ODECA",

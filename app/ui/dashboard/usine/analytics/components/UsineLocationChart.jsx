@@ -43,7 +43,7 @@ export function UsineLocationChart() {
       try {
         const response = await fetchData(
           "get",
-          `cafe/stationslavage/get_count_sdl_par_provinces/`,
+          `cafe/usine_deparchage/get_count_usine_par_provinces/`,
           {
             params: {},
             additionalHeaders: {},
@@ -52,8 +52,8 @@ export function UsineLocationChart() {
         );
 
         const provinceData = response.map((item) => ({
-          name: item?.sdl_adress__zone_code__commune_code__province_code__province_name,
-          count: item?.count,
+          name: item?.province_name,
+          count: item?.count_usine,
         }));
 
         setData({

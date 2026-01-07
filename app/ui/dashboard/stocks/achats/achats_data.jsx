@@ -41,6 +41,7 @@ function AchatsData() {
             cultivator_assoc_name: achat?.cafeiculteur?.cultivator_assoc_name,
             cultivator_assoc_rep_name:
               achat?.cafeiculteur?.cultivator_assoc_rep_name,
+            cultivator_type: "personel",
           },
           sdl_ct: achat?.responsable?.sdl_ct?.sdl?.sdl_nom
             ? "SDL " + achat.responsable.sdl_ct.sdl.sdl_nom
@@ -65,18 +66,16 @@ function AchatsData() {
           date: achat?.date_achat || "N/A",
           // Type identification
         }));
-
         const data_associate = response_associate?.results?.map((achat) => ({
           id: achat?.id,
           cultivator: {
             cultivator_code: achat?.cafeiculteur?.cultivator_code,
-            first_name: achat?.cafeiculteur?.cultivator_first_name,
-            last_name: achat?.cafeiculteur?.cultivator_last_name,
             image_url: achat?.cafeiculteur?.cultivator_photo,
             // Association fields
             cultivator_assoc_name: achat?.cafeiculteur?.cultivator_assoc_name,
             cultivator_assoc_rep_name:
               achat?.cafeiculteur?.cultivator_assoc_rep_name,
+            cultivator_type: "association",
           },
           sdl_ct: achat?.responsable?.sdl_ct?.sdl?.sdl_nom
             ? "SDL " + achat.responsable.sdl_ct.sdl.sdl_nom
@@ -100,7 +99,6 @@ function AchatsData() {
           cb: achat?.quantite_cerise_b || 0,
           date: achat?.date_achat || "N/A",
           // Type identification
-          isAssociation: !!achat?.cafeiculteur?.cultivator_assoc_name,
         }));
         setIndividualAchats(dataAchat);
         setAssociationAchats(data_associate);

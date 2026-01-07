@@ -53,11 +53,11 @@ function StatsCard({ cult_id }) {
               <Archive className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {values?.montant_cerise_a + values?.montant_cerise_b >= 1000 ? (
+              {values?.cerise_a + values?.cerise_b >= 1000 ? (
                 <>
                   {(
-                    values?.montant_cerise_a +
-                    values?.montant_cerise_b / 1000
+                    (values?.cerise_a + values?.cerise_b) /
+                    1000
                   ).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -66,9 +66,9 @@ function StatsCard({ cult_id }) {
                 </>
               ) : (
                 <>
-                  {(
-                    values?.montant_cerise_a + values?.montant_cerise_b
-                  )?.toLocaleString("fr-FR") || 0}{" "}
+                  {(values?.cerise_a + values?.cerise_b)?.toLocaleString(
+                    "fr-FR"
+                  ) || 0}{" "}
                   <span className="text-base">Kg</span>
                 </>
               )}{" "}
@@ -95,9 +95,9 @@ function StatsCard({ cult_id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {values?.montant_cerise_a >= 1000 ? (
+                {values?.cerise_a >= 1000 ? (
                   <>
-                    {(values?.montant_cerise_a / 1000).toLocaleString("fr-FR", {
+                    {(values?.cerise_a / 1000).toLocaleString("fr-FR", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
@@ -105,7 +105,7 @@ function StatsCard({ cult_id }) {
                   </>
                 ) : (
                   <>
-                    {values?.montant_cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                    {values?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}{" "}
@@ -119,9 +119,9 @@ function StatsCard({ cult_id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {values?.montant_cerise_b >= 1000 ? (
+                {values?.cerise_b >= 1000 ? (
                   <>
-                    {(values?.montant_cerise_b / 1000).toLocaleString("fr-FR", {
+                    {(values?.cerise_b / 1000).toLocaleString("fr-FR", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
@@ -129,7 +129,7 @@ function StatsCard({ cult_id }) {
                   </>
                 ) : (
                   <>
-                    {values?.montant_cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                    {values?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}{" "}

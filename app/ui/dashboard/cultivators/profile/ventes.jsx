@@ -73,13 +73,15 @@ export default function Ventes({ cult_id }) {
           id: item?.id,
           date: item?.date_achat,
           sdl_ct_type: "SDL",
-          sdl_ct_name: "Ngome",
+          sdl_ct: item?.responsable?.sdl_ct?.sdl?.sdl_nom
+            ? "SDL " + item.responsable.sdl_ct.sdl.sdl_nom
+            : "CT " + item?.responsable?.sdl_ct?.ct?.ct_nom,
           No_fiche: 59.99,
           No_recus: item?.numero_recu,
           ca: item?.quantite_cerise_a,
           cb: item?.quantite_cerise_b,
           fiche_photo: item?.photo_fiche,
-          montant: 5555555,
+          montant: item?.montant_total,
         }));
 
         setData(AchatsData);
@@ -113,9 +115,7 @@ export default function Ventes({ cult_id }) {
               <TableRow key={product.id} className="odd:bg-muted/50">
                 <TableCell className="pl-4">{product.id}</TableCell>
                 <TableCell className="font-medium">{product.date}</TableCell>
-                <TableCell>
-                  {product.sdl_ct_type} {product.sdl_ct_name}
-                </TableCell>
+                <TableCell>{product.sdl_ct}</TableCell>
                 <TableCell>{product.No_fiche}</TableCell>
                 <TableCell>{product.No_recus}</TableCell>
                 <TableCell>{product.ca}</TableCell>
@@ -126,7 +126,12 @@ export default function Ventes({ cult_id }) {
                     profile={false}
                   />
                 </TableCell>
-                <TableCell>{product.montant} Fbu</TableCell>
+                <TableCell>
+                  {(product.ca * 2800 + product.cb * 1400 ?? 0)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+                  Fbu
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
