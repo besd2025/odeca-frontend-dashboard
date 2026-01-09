@@ -75,7 +75,7 @@ export function ChartSkeleton({ className }) {
           <Skeleton
             key={i}
             className="flex-1 rounded-t-lg"
-            style={{ height: `${Math.floor(Math.random() * 60) + 20}%` }}
+            style={{ height: `${[40, 70, 45, 80, 55, 60][i % 6]}%` }}
           />
         ))}
       </CardContent>
