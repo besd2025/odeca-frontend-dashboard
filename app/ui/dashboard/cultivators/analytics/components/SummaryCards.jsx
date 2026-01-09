@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/card";
 import { Users, User, Grape } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 export function SummaryCards() {
   const [data, setData] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getCultivators = async () => {
       try {
@@ -28,11 +30,23 @@ export function SummaryCards() {
         setData(response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCultivators();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <SimpleCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-3">

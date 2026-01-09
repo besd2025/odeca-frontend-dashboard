@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 
 function TopListCard({ title, icon, data }) {
   return (
@@ -59,6 +60,7 @@ function TopListCard({ title, icon, data }) {
 export function TopFiveCards() {
   const [datatopMembers, setDataTopMembers] = React.useState([]);
   const [datatopAchats, setDataTopAchats] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getSdls = async () => {
       try {
@@ -104,9 +106,25 @@ export function TopFiveCards() {
       }
     };
 
-    getTopAchats();
-    getSdls();
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([getTopAchats(), getSdls()]);
+      setLoading(false);
+    };
+
+    loadData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-3">
+        <SimpleCardSkeleton />
+        <SimpleCardSkeleton />
+        <SimpleCardSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <TopListCard

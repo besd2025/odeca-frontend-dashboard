@@ -3,8 +3,10 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Scale, Tag, Wallet } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { StatsCardSkeleton } from "@/components/ui/skeletons";
 export function KPIGrid() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -36,11 +38,22 @@ export function KPIGrid() {
         setData(kpiData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getDatas();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="grid grid-rows-2 gap-4">
+        <StatsCardSkeleton />
+        <StatsCardSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-rows-2 gap-4">

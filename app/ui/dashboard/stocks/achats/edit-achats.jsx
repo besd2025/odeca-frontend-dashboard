@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { SquarePen } from "lucide-react";
+import { SquarePen, Loader2 } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 
 export default function EditAchats({
@@ -44,6 +44,7 @@ export default function EditAchats({
   const [purchaseDate, setPurchaseDate] = React.useState(date || "");
   const [photoFicheUrl, setPhotoFicheUrl] = React.useState(photo_fiche || "");
   const [photoRecu, setPhotoRecu] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   React.useEffect(() => {
     // keep local state in sync if props change
     setCode(cultivator.cultivator_code || "");
@@ -76,25 +77,32 @@ export default function EditAchats({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: call API / lift state to parent. For now just log values.
-    const payload = {
-      cultivator_code: code,
-      first_name: firstName,
-      last_name: lastName,
-      sdl_ct: sdl,
-      society: soc,
-      localite: { province, commune },
-      num_fiche: ficheNumber,
-      num_recu: recuNumber,
-      ca: caValue,
-      cb: cbValue,
-      date: purchaseDate,
-      photo_fiche: photoFicheUrl,
-    };
-    // For now output to console; caller can replace with API call
-    // eslint-disable-next-line no-console
-    console.log("Submitting cultivator update", payload);
-    setOpen(false);
+    setLoading(true);
+    try {
+      // TODO: call API / lift state to parent. For now just log values.
+      const payload = {
+        cultivator_code: code,
+        first_name: firstName,
+        last_name: lastName,
+        sdl_ct: sdl,
+        society: soc,
+        localite: { province, commune },
+        num_fiche: ficheNumber,
+        num_recu: recuNumber,
+        ca: caValue,
+        cb: cbValue,
+        date: purchaseDate,
+        photo_fiche: photoFicheUrl,
+      };
+      // For now output to console; caller can replace with API call
+      // eslint-disable-next-line no-console
+      console.log("Submitting cultivator update", payload);
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -239,7 +247,10 @@ export default function EditAchats({
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit">Enregistrer</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Enregistrer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

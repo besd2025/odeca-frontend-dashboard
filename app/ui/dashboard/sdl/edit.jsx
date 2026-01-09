@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { SquarePen } from "lucide-react";
+import { SquarePen, Loader2 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 export default function Edit({ id }) {
   // local state initialized from props
@@ -28,6 +28,8 @@ export default function Edit({ id }) {
   const [soc, setSoc] = React.useState("");
   const [province, setProvince] = React.useState("");
   const [commune, setCommune] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
   React.useEffect(() => {
     const getSdls = async () => {
       try {
@@ -60,6 +62,7 @@ export default function Edit({ id }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const formData = {
       sdl_nom: sdlName,
     };
@@ -79,6 +82,8 @@ export default function Edit({ id }) {
     } catch (error) {
       setError(error);
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -192,7 +197,8 @@ export default function Edit({ id }) {
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit}>
+            <Button type="submit" onClick={handleSubmit} disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enregistrer
             </Button>
           </DialogFooter>

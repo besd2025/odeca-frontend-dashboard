@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { fetchData } from "@/app/_utils/api";
+import { TableSkeleton } from "@/components/ui/skeletons";
 const movements = [
   {
     date: "2024-06-15",
@@ -58,6 +59,7 @@ const movements = [
 
 export function RecentMovementsTable() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -81,11 +83,15 @@ export function RecentMovementsTable() {
         setData(gradeData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getDatas();
   }, []);
+
+  if (loading) return <TableSkeleton rows={5} columns={6} />;
 
   return (
     <Card className="col-span-1 lg:col-span-4">

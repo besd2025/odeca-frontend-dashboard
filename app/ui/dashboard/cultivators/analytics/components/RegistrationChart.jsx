@@ -28,9 +28,11 @@ const chartConfig = {
   },
 };
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 export function RegistrationChart() {
   const [period, setPeriod] = useState("mois");
   const [dataByPeriod, setDataByPeriod] = useState({}); // ← nouveau nom
+  const [loading, setLoading] = useState(true);
 
   const handleTimePeriodChange = (value) => {
     setPeriod(value);
@@ -38,6 +40,7 @@ export function RegistrationChart() {
 
   React.useEffect(() => {
     async function getData() {
+      setLoading(true);
       try {
         const periodParam =
           period === "jour"
@@ -70,11 +73,16 @@ export function RegistrationChart() {
         }));
       } catch (error) {
         console.error("Erreur API :", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     getData();
   }, [period]);
+
+  if (loading) return <ChartSkeleton />;
+
   return (
     <Card className="lg:col-span-5">
       <CardHeader className="flex flex-col gap-y-3 lg:flex-row lg:items-center lg:justify-between">

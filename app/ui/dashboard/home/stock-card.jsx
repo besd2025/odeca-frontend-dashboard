@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Package, DollarSign, TrendingUp } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { StockCardSkeleton } from "@/components/ui/skeletons";
 
 export function StockSummaryCard() {
   const [data, setData] = React.useState({});
@@ -17,8 +18,10 @@ export function StockSummaryCard() {
   const [grade_a3, setGradeA3] = React.useState(0);
   const [grade_b1, setGradeB1] = React.useState(0);
   const [grade_b2, setGradeB2] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
+      setIsLoading(true);
       try {
         const response = await fetchData(
           "get",
@@ -54,11 +57,17 @@ export function StockSummaryCard() {
         });
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     getDatas();
   }, []);
+
+  if (isLoading) {
+    return <StockCardSkeleton />;
+  }
 
   return (
     <Card className="@container/stock h-full">

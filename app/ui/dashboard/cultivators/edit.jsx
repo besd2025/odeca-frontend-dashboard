@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { SquarePen } from "lucide-react";
+import { SquarePen, Loader2 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 export default function Edit({
   cultivator,
@@ -44,6 +44,7 @@ export default function Edit({
   const [collector_code, setCollectorCode] = React.useState("");
   const [address_code, setAdressCode] = React.useState("");
   const [error, setError] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
   React.useEffect(() => {
     async function getData() {
       // keep local state in sync if props change
@@ -101,6 +102,7 @@ export default function Edit({
       cultivator_adress_code: address_code,
       collector_code: collector_code,
     };
+    setLoading(true);
 
     try {
       const results = await fetchData("patch", `/cultivators/${cultivator}/`, {
@@ -117,6 +119,8 @@ export default function Edit({
     } catch (error) {
       setError(error);
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -316,7 +320,8 @@ export default function Edit({
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit}>
+            <Button type="submit" onClick={handleSubmit} disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enregistrer
             </Button>
           </DialogFooter>

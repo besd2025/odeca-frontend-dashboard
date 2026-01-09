@@ -6,6 +6,7 @@ import CultivatorsListTable from "@/app/ui/dashboard/cultivators/list";
 import ProfilePage from "@/app/ui/dashboard/cultivators/profile/ProfilePage";
 import { fetchData } from "@/app/_utils/api";
 import CultivatorAnalytics from "../analytics";
+import { TableSkeleton } from "@/components/ui/skeletons";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 function CultivatorData() {
@@ -17,6 +18,7 @@ function CultivatorData() {
   const [data_association, setDataAssociation] = useState([]);
   const [cultivateur_type, setCultivateur_type] = useState("individuel");
   const getCultivators = async () => {
+    setLoading(true);
     setTypeExport("individuel");
     try {
       // Fetch Individuals
@@ -62,9 +64,12 @@ function CultivatorData() {
       setData(data);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
+    } finally {
+      setLoading(false);
     }
   };
   const getCultivatorsAssociation = async () => {
+    setLoading(true);
     try {
       // Fetch Associations
       const responseAssociations = await fetchData(
@@ -113,6 +118,8 @@ function CultivatorData() {
       setTypeExport("association");
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -355,15 +362,19 @@ function CultivatorData() {
         </TabsList>
         <TabsContent value="list">
           <h1 className="text-2xl font-semibold m-2">Liste des cultivateurs</h1>
-          <CultivatorsListTable
-            individualData={data}
-            associationData={data_association}
-            isCultivatorsPage={true}
-            onExportToExcel={exportCultivatorsToExcel}
-            onExportAssociationToExcel={exportAssociationToExcel}
-            typeExport={typeExport}
-            onClickTyepeExport={onClickTyepeExport}
-          />
+          {loading ? (
+            <TableSkeleton columns={6} rows={10} />
+          ) : (
+            <CultivatorsListTable
+              individualData={data}
+              associationData={data_association}
+              isCultivatorsPage={true}
+              onExportToExcel={exportCultivatorsToExcel}
+              onExportAssociationToExcel={exportAssociationToExcel}
+              typeExport={typeExport}
+              onClickTyepeExport={onClickTyepeExport}
+            />
+          )}
         </TabsContent>
         <TabsContent value="details">
           <CultivatorAnalytics />

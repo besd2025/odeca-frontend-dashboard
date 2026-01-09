@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { SquarePen } from "lucide-react";
+import { SquarePen, Loader2 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 
 export default function EditUsine({ id }) {
@@ -27,6 +27,7 @@ export default function EditUsine({ id }) {
   const [soc, setSoc] = React.useState("");
   const [province, setProvince] = React.useState("");
   const [commune, setCommune] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     const getUsine = async () => {
@@ -65,6 +66,7 @@ export default function EditUsine({ id }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const formData = {
       usine_nom: usineName,
       // Add other fields here if the API supports patching them (e.g. responsable details usually require nested updates or separate endpoints depending on backend implementation. For now updating Name is safest minimum).
@@ -85,6 +87,8 @@ export default function EditUsine({ id }) {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -206,7 +210,8 @@ export default function EditUsine({ id }) {
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit}>
+            <Button type="submit" onClick={handleSubmit} disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enregistrer
             </Button>
           </DialogFooter>

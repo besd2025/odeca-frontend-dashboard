@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { fetchData } from "@/app/_utils/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function TopListCard({ title, icon, data }) {
   return (
@@ -61,6 +62,7 @@ function TopListCard({ title, icon, data }) {
 }
 
 export function SdlTopFiveCards() {
+  const [loading, setLoading] = React.useState(true);
   const [datatopMembers, setDataTopMembers] = React.useState([]);
   const [datatopAchats, setDataTopAchats] = React.useState([]);
   React.useEffect(() => {
@@ -108,9 +110,39 @@ export function SdlTopFiveCards() {
       }
     };
 
-    getTopAchats();
-    getSdls();
+    const fetchAll = async () => {
+      setLoading(true);
+      await Promise.all([getTopAchats(), getSdls()]);
+      setLoading(false);
+    };
+    fetchAll();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, idx) => (
+          <Card key={idx}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 mt-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <TopListCard

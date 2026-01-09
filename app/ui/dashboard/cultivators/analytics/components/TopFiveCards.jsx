@@ -6,6 +6,7 @@ import { Sprout, Trees, Scale, MoreHorizontal } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,6 +65,7 @@ function TopListCard({ title, icon, data }) {
 }
 
 export function TopFiveCards() {
+  const [loading, setLoading] = React.useState(true);
   const [datatopChamps, setDataTopChamps] = React.useState([]);
   const [datatopPieds, setDataTopPieds] = React.useState([]);
   const [datatopQtes, setDataTopQtes] = React.useState([]);
@@ -153,10 +155,59 @@ export function TopFiveCards() {
         console.error("Error fetching cultivators data:", error);
       }
     };
-    getChamps();
-    getTopPieds();
-    getTopQtes();
+    const fetchAll = async () => {
+      setLoading(true);
+      await Promise.all([getChamps(), getTopPieds(), getTopQtes()]);
+      setLoading(false);
+    };
+    fetchAll();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 mt-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 mt-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <TopListCard

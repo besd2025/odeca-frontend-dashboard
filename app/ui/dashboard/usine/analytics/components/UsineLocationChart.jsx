@@ -23,6 +23,7 @@ import {
   LabelList,
 } from "recharts";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 
 const locationConfig = {
   count: {
@@ -37,6 +38,7 @@ export function UsineLocationChart() {
     province: [],
     region: [],
   });
+  const [loading, setLoading] = useState(true);
 
   React.useEffect(() => {
     const getCtsProvince = async () => {
@@ -61,11 +63,15 @@ export function UsineLocationChart() {
         });
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCtsProvince();
   }, []);
+
+  if (loading) return <ChartSkeleton />;
 
   return (
     <Card className="lg:col-span-1">

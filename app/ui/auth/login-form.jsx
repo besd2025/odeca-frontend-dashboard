@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "../toggle-theme-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircleIcon } from "lucide-react";
+import { AlertCircleIcon, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchData } from "@/app/_utils/api";
 import { useRouter } from "next/navigation";
@@ -78,7 +78,6 @@ export function LoginForm({ className, ...props }) {
         const errorData = await response.json();
         throw new Error(errorData?.detail || "Échec de connexion.");
       }
-      setLoading(true);
       const data = await response.json();
       const user = DecodeToJwt(data.access);
       if (
@@ -109,7 +108,7 @@ export function LoginForm({ className, ...props }) {
     <div className={cn("flex flex-col gap-6 relative", className)} {...props}>
       <div className="absolute inset-0 -z-10">
         <Image
-          src="/images/login-images/img1.jpg"
+          src="/images/login-images/img7.png"
           alt="Background"
           fill
           className="object-cover"
@@ -124,9 +123,7 @@ export function LoginForm({ className, ...props }) {
                 <h1 className="text-2xl font-bold">Se connecter</h1>
                 <p className="text-muted-foreground text-balance">
                   Connectez-vous à votre compte{" "}
-                  <span className="font-bold text-primary text-lg">
-                    Agricole Burundi
-                  </span>
+                  <span className="font-bold text-primary text-lg">ODECA</span>
                 </p>
               </div>
 
@@ -162,7 +159,8 @@ export function LoginForm({ className, ...props }) {
                 </Alert>
               )}
               <Field>
-                <Button type="submit" onClick={handleLogin}>
+                <Button type="submit" onClick={handleLogin} disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Se connecter
                 </Button>
               </Field>
@@ -170,7 +168,7 @@ export function LoginForm({ className, ...props }) {
           </form>
           <div className="bg-muted relative hidden md:block">
             <Image
-              src="/images/login-images/img1.jpg"
+              src="/images/login-images/img7.png"
               alt="Image"
               fill
               className="object-cover dark:brightness-[0.7]"

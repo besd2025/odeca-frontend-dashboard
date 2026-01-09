@@ -23,6 +23,7 @@ import {
   LabelList,
 } from "recharts";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 const ageData = [
   { range: "-18 ans", count: 50, fill: "var(--color-age1)" },
   { range: "18-25 ans", count: 320, fill: "var(--color-age2)" },
@@ -46,6 +47,7 @@ const ageConfig = {
 
 export function AgeChart() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getCultivators = async () => {
       try {
@@ -80,11 +82,16 @@ export function AgeChart() {
         setData(chartData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCultivators();
   }, []);
+
+  if (loading) return <ChartSkeleton />;
+
   return (
     <Card>
       <CardHeader>

@@ -11,6 +11,7 @@ import {
   Truck,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 
 export function UsineSummaryCards() {
   const [data, setData] = React.useState({
@@ -21,6 +22,7 @@ export function UsineSummaryCards() {
     total_sorti: 0,
     stock_cafe_vert: 0,
   });
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const getData = async () => {
@@ -65,6 +67,8 @@ export function UsineSummaryCards() {
         });
       } catch (error) {
         console.error("Error fetching usine stats:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -121,6 +125,16 @@ export function UsineSummaryCards() {
       desc: "Global",
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <SimpleCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

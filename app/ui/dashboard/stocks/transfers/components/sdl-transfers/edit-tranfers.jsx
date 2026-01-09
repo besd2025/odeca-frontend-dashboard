@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { SquarePen } from "lucide-react";
+import { SquarePen, Loader2 } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 
 export default function EditTransfers({
@@ -33,6 +33,7 @@ export default function EditTransfers({
   const [caValue, setCaValue] = React.useState(qte_tranferer?.ca || 0);
   const [cbValue, setCbValue] = React.useState(qte_tranferer?.cb || 0);
   const [photoFicheUrl, setPhotoFicheUrl] = React.useState(photo_fiche || "");
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     setFromSdl(from_sdl || "");
@@ -54,16 +55,23 @@ export default function EditTransfers({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const payload = {
-      from_sdl: fromSdl,
-      to_depulpeur_name: toDepulpeur,
-      society: soc,
-      localite: { province, commune },
-      qte_tranferer: { ca: caValue, cb: cbValue },
-      photo_fiche: photoFicheUrl,
-    };
-    console.log("Submitting cultivator update", payload);
-    setOpen(false);
+    setLoading(true);
+    try {
+      const payload = {
+        from_sdl: fromSdl,
+        to_depulpeur_name: toDepulpeur,
+        society: soc,
+        localite: { province, commune },
+        qte_tranferer: { ca: caValue, cb: cbValue },
+        photo_fiche: photoFicheUrl,
+      };
+      console.log("Submitting cultivator update", payload);
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -198,7 +206,10 @@ export default function EditTransfers({
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit">Enregistrer</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Enregistrer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

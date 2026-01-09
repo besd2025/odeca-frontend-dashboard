@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/chart";
 import React from "react";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 const chartConfig = {
   count: {
     label: "SDLs",
@@ -30,6 +31,7 @@ const chartConfig = {
 
 export function SdlActiveChart() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getSdls = async () => {
       try {
@@ -57,11 +59,16 @@ export function SdlActiveChart() {
         setData(chartData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getSdls();
   }, []);
+
+  if (loading) return <ChartSkeleton />;
+
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader>

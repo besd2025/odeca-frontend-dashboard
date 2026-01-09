@@ -15,6 +15,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 const chartData = [
   { name: "Grade A1", value: 30, fill: "var(--color-a1)" },
   { name: "Grade A2", value: 15.2, fill: "var(--color-a2)" },
@@ -46,6 +47,7 @@ const chartConfig = {
 
 export function GradeDistributionChart() {
   const [data, setData] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -76,11 +78,15 @@ export function GradeDistributionChart() {
         setData(chatData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getDatas();
   }, []);
+
+  if (loading) return <ChartSkeleton />;
 
   return (
     <Card className="col-span-1 lg:col-span-3">

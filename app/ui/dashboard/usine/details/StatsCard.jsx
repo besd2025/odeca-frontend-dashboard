@@ -17,8 +17,10 @@ import {
   Activity,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 
 function StatsCard({ id }) {
+  const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState({
     total_recu: 0,
     total_usine: 0,
@@ -31,6 +33,7 @@ function StatsCard({ id }) {
 
   React.useEffect(() => {
     const getUsineStats = async () => {
+      setLoading(true);
       try {
         // Placeholder for API calls
         // const response = await fetchData("get", `cafe/usines/${id}/stats/`, {});
@@ -46,11 +49,23 @@ function StatsCard({ id }) {
         });
       } catch (error) {
         console.error("Error fetching usine stats:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getUsineStats();
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <SimpleCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
 
   const cards = [
     {
