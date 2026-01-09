@@ -61,9 +61,26 @@ function StatsCard({ id }) {
               <Archive className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {data?.qte_achete?.montant_cerise_a +
-                data?.qte_achete?.montant_cerise_b}{" "}
-              <span className="text-base">Kg</span>
+              {data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b >=
+              1000 ? (
+                <>
+                  {(
+                    (data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) /
+                    1000
+                  ).toLocaleString("fr-FR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  <span className="text-sm">T</span>
+                </>
+              ) : (
+                <>
+                  {(
+                    data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b
+                  )?.toLocaleString("fr-FR") || 0}
+                  <span className="text-sm">Kg</span>
+                </>
+              )}
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
@@ -81,8 +98,23 @@ function StatsCard({ id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.montant_cerise_a}
-                <span className="text-sm">T</span>
+                {data?.qte_achete?.cerise_a >= 1000 ? (
+                  <>
+                    {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
+                    <span className="text-sm">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
               </CardDescription>
             </div>
             <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
@@ -93,8 +125,23 @@ function StatsCard({ id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.montant_cerise_b}
-                <span className="text-sm">T</span>
+                {data?.qte_achete?.cerise_b >= 1000 ? (
+                  <>
+                    {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
+                    <span className="text-sm">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
               </CardDescription>
             </div>
           </div>
