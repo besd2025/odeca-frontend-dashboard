@@ -116,7 +116,7 @@ function AchatsData() {
   return (
     <div className="p-4">
       <Tabs defaultValue="list" className="w-full">
-        <TabsList className="w-full h-10 lg:w-[50%]">
+        <TabsList className="w-full h-10 lg:w-[50%] hidden">
           {/* <TabsTrigger value="list">
             <List />
             <span>Liste</span>
@@ -128,15 +128,12 @@ function AchatsData() {
         </TabsList>
         <TabsContent value="list">
           <h1 className="text-2xl font-semibold m-2">Liste des achats</h1>
-          {loading ? (
-            <TableSkeleton rows={10} columns={6} />
-          ) : (
-            <AchatsListTable
-              individualData={individualAchats}
-              associationData={associationAchats}
-              isCultivatorsPage={true}
-            />
-          )}
+          <AchatsListTable
+            individualData={individualAchats}
+            associationData={associationAchats}
+            isCultivatorsPage={true}
+            isLoading={loading}
+          />
         </TabsContent>
         <TabsContent value="details">
           <div className="p-4 border rounded-lg bg-background text-center">

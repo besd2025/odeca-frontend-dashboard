@@ -4,7 +4,6 @@ import { ChartPieSdlCtActive } from "./charts/sdl-ct-active";
 import { ChartLineAchats } from "./charts/sdl-ct-achats";
 import { StockSummaryCard } from "./stock-card";
 import { KPIGrid } from "./kpi-stats";
-import CampaigneAnnee from "./campaigne-annee";
 
 function DashboardContainer() {
   return (

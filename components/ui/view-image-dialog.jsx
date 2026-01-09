@@ -205,8 +205,8 @@ const ViewImageDialog = ({
         <Image
           src={finalSrc}
           alt={alt}
-          fill
-          sizes="40px"
+          width={80}
+          height={80}
           className="object-cover"
           unoptimized
         />

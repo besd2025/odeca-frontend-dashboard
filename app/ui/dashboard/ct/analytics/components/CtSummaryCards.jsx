@@ -4,10 +4,13 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Factory, CheckCircle2, XCircle } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 export function CtSummaryCards() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getCts = async () => {
+      setLoading(true);
       try {
         const response = await fetchData(
           "get",
@@ -22,11 +25,22 @@ export function CtSummaryCards() {
         setData(response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCts();
   }, []);
+
+  if (loading)
+    return (
+      <div className="grid gap-4 md:grid-cols-3">
+        <SimpleCardSkeleton />
+        <SimpleCardSkeleton />
+        <SimpleCardSkeleton />
+      </div>
+    );
 
   return (
     <div className="grid gap-4 md:grid-cols-3">

@@ -86,7 +86,12 @@ export function GradeDistributionChart() {
     getDatas();
   }, []);
 
-  if (loading) return <ChartSkeleton />;
+  if (loading)
+    return (
+      <div className="col-span-1 lg:col-span-3">
+        <ChartSkeleton />
+      </div>
+    );
 
   return (
     <Card className="col-span-1 lg:col-span-3">

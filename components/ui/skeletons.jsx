@@ -5,21 +5,22 @@ import {
   CardFooter,
   CardContent,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export function StatsCardSkeleton() {
   return (
-    <Card className="@container/card relative overflow-hidden">
+    <Card className="@container/card relative overflow-hidden gap-0">
       <CardHeader className="flex flex-col gap-2">
         <div className="flex flex-row gap-x-2 items-center">
           <Skeleton className="size-10 rounded-md" />
-          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-6 w-24" />
         </div>
-        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-4 w-32" />
       </CardHeader>
       <CardFooter className="flex flex-row justify-end pt-0">
         <div className="flex flex-col gap-y-1 items-end">
-          <Skeleton className="h-8 w-28 rounded-lg" />
-          <Skeleton className="h-8 w-28 rounded-lg" />
+          <Skeleton className="h-6 w-28 rounded-lg" />
+          <Skeleton className="h-6 w-28 rounded-lg" />
         </div>
       </CardFooter>
       <div className="px-6 pb-4">
@@ -28,7 +29,7 @@ export function StatsCardSkeleton() {
             <Skeleton className="size-4 rounded-full" />
             <Skeleton className="h-4 w-20" />
           </div>
-          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-5 w-32" />
         </div>
       </div>
     </Card>
@@ -37,7 +38,7 @@ export function StatsCardSkeleton() {
 
 export function TableRowSkeleton({ columns = 5 }) {
   return (
-    <div className="flex items-center space-x-4 py-4 px-4 border-b border-border/50">
+    <div className="flex items-center space-x-4 py-4 px-4 b/order-b border-border/50">
       {Array.from({ length: columns }).map((_, i) => (
         <Skeleton key={i} className="h-4 flex-1" />
       ))}
@@ -60,9 +61,9 @@ export function TableSkeleton({ rows = 5, columns = 5 }) {
   );
 }
 
-export function ChartSkeleton() {
+export function ChartSkeleton({ className }) {
   return (
-    <Card className="flex flex-col h-full">
+    <Card className={cn("flex flex-col h-full", className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="space-y-1">
           <Skeleton className="h-5 w-32" />

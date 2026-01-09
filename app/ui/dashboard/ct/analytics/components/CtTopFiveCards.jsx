@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function TopListCard({ title, icon, data }) {
   return (
@@ -63,41 +65,34 @@ function TopListCard({ title, icon, data }) {
 export function CtTopFiveCards() {
   const [datatopMembers, setDataTopMembers] = React.useState([]);
   const [datatopAchats, setDataTopAchats] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
   React.useEffect(() => {
-    const getSdls = async () => {
+    const getDatas = async () => {
+      setLoading(true);
       try {
-        const response = await fetchData(
-          "get",
-          `cafe/centres_transite/get_top_5_ct_with_more_cultivators_ordered_by_count/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          }
-        );
-        const topMembers = response.map((item) => ({
+        const [membersResponse, achatsResponse] = await Promise.all([
+          fetchData(
+            "get",
+            `cafe/centres_transite/get_top_5_ct_with_more_cultivators_ordered_by_count/`,
+            {}
+          ),
+          fetchData(
+            "get",
+            `cafe/centres_transite/get_top_5_ct_with_more_quantity_cerise_ordered_by_count/`,
+            {}
+          ),
+        ]);
+
+        const topMembers = membersResponse.map((item) => ({
           image: "/images/logo_1.jpg",
           name: item?.collector__responsable_ct__ct__ct_nom,
           value: item?.count,
           sub: "Membres",
         }));
         setDataTopMembers(topMembers);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-    const getTopAchats = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/centres_transite/get_top_5_ct_with_more_quantity_cerise_ordered_by_count/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          }
-        );
-        const topAchats = response.map((item) => ({
+
+        const topAchats = achatsResponse.map((item) => ({
           name: item?.responsable__responsable_ct__ct__ct_nom,
           value: item?.total_cerise,
           sub: "Kg",
@@ -105,12 +100,37 @@ export function CtTopFiveCards() {
         setDataTopAchats(topAchats);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    getTopAchats();
-    getSdls();
+    getDatas();
   }, []);
+
+  if (loading)
+    return (
+      <div className="grid gap-4 md:grid-cols-3">
+        {Array.from({ length: 2 }).map((_, idx) => (
+          <Card key={idx}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 mt-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <TopListCard

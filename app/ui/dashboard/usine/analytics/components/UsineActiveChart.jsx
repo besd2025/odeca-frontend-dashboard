@@ -68,7 +68,12 @@ export function UsineActiveChart() {
     getDatas();
   }, []);
 
-  if (loading) return <ChartSkeleton />;
+  if (loading)
+    return (
+      <div className="col-span-1 md:col-span-2 lg:col-span-2">
+        <ChartSkeleton />
+      </div>
+    );
 
   return (
     <Card className="col-span-1 md:col-span-2 lg:col-span-2">

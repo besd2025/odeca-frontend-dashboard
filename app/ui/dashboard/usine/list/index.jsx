@@ -38,7 +38,7 @@ import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { TableSkeleton } from "@/components/ui/skeletons";
 
-export default function UsineListTable() {
+export default function UsineListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -49,6 +49,8 @@ export default function UsineListTable() {
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const isActuallyLoading = externalLoading ?? loading;
 
   useEffect(() => {
     const getUsines = async () => {
@@ -252,101 +254,103 @@ export default function UsineListTable() {
 
   return (
     <div className="w-full bg-sidebar p-4 rounded-lg">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
-        <div className="relative ">
-          <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
-          <Input
-            placeholder="Rechercher Usine..."
-            value={table.getColumn("sdl")?.getFilterValue() ?? ""}
-            onChange={(event) =>
-              table.getColumn("sdl")?.setFilterValue(event.target.value)
-            }
-            className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
-          />
-        </div>
-
-        <div className="flex flex-row justify-between gap-x-3">
-          <div className="flex items-center gap-3">
-            <Filter />
-          </div>
-          <div className="flex items-center gap-3 text-gray-700">
-            <ExportButton />
-          </div>
-        </div>
-      </div>
-      {loading ? (
+      {isActuallyLoading ? (
         <TableSkeleton rows={10} columns={5} />
       ) : (
-        <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow
-                  key={headerGroup.id}
-                  className=" sticky top-0 bg-background z-10 hover:bg-background"
-                >
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
+        <>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
+            <div className="relative ">
+              <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
+              <input
+                placeholder="Rechercher Usine..."
+                value={table.getColumn("sdl")?.getFilterValue() ?? ""}
+                onChange={(event) =>
+                  table.getColumn("sdl")?.setFilterValue(event.target.value)
+                }
+                className="pl-10 h-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
+              />
+            </div>
+
+            <div className="flex flex-row justify-between gap-x-3">
+              <div className="flex items-center gap-3">
+                <Filter />
+              </div>
+              <div className="flex items-center gap-3 text-gray-700">
+                <ExportButton />
+              </div>
+            </div>
+          </div>
+          <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
+                    key={headerGroup.id}
+                    className=" sticky top-0 bg-background z-10 hover:bg-background"
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>
+            <PaginationControls
+              page={table.getState().pagination.pageIndex + 1}
+              pageSize={table.getState().pagination.pageSize}
+              totalItems={table.getFilteredRowModel().rows.length}
+              totalPages={table.getPageCount()}
+              onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
+              onPageSizeChange={(size) => table.setPageSize(size)}
+              hasNextPage={table.getCanNextPage()}
+              hasPreviousPage={table.getCanPreviousPage()}
+            />
+          </div>
+        </>
       )}
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <PaginationControls
-          page={table.getState().pagination.pageIndex + 1}
-          pageSize={table.getState().pagination.pageSize}
-          totalItems={table.getFilteredRowModel().rows.length}
-          totalPages={table.getPageCount()}
-          onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
-          onPageSizeChange={(size) => table.setPageSize(size)}
-          hasNextPage={table.getCanNextPage()}
-          hasPreviousPage={table.getCanPreviousPage()}
-        />
-      </div>
     </div>
   );
 }

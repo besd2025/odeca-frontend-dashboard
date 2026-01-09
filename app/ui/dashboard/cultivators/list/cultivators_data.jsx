@@ -362,19 +362,20 @@ function CultivatorData() {
         </TabsList>
         <TabsContent value="list">
           <h1 className="text-2xl font-semibold m-2">Liste des cultivateurs</h1>
-          {loading ? (
-            <TableSkeleton columns={6} rows={10} />
-          ) : (
-            <CultivatorsListTable
-              individualData={data}
-              associationData={data_association}
-              isCultivatorsPage={true}
-              onExportToExcel={exportCultivatorsToExcel}
-              onExportAssociationToExcel={exportAssociationToExcel}
-              typeExport={typeExport}
-              onClickTyepeExport={onClickTyepeExport}
-            />
-          )}
+          {/* {loading ? (
+            <TableSkeleton columns={6} rows={5} />
+          ) : ( */}
+          <CultivatorsListTable
+            individualData={data}
+            associationData={data_association}
+            isCultivatorsPage={true}
+            onExportToExcel={exportCultivatorsToExcel}
+            onExportAssociationToExcel={exportAssociationToExcel}
+            typeExport={typeExport}
+            onClickTyepeExport={onClickTyepeExport}
+            isLoading={loading}
+          />
+          {/* )} */}
         </TabsContent>
         <TabsContent value="details">
           <CultivatorAnalytics />

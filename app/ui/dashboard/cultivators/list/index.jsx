@@ -45,6 +45,7 @@ import Link from "next/link";
 import PaginationControls from "@/components/ui/pagination-controls";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TableSkeleton } from "@/components/ui/skeletons";
 
 function DataTable({
   data,
@@ -384,6 +385,7 @@ export default function CultivatorsListTable({
   onExportAssociationToExcel,
   typeExport,
   onClickTyepeExport,
+  isLoading,
 }) {
   const individuals = individualData ?? data ?? [];
   const associations = associationData ?? [];
@@ -392,6 +394,7 @@ export default function CultivatorsListTable({
     onClickTyepeExport(value);
     setTabValue(value);
   };
+  const [pageSize, setPageSize] = React.useState(10);
   return (
     <Tabs
       value={tabValue}
@@ -417,20 +420,28 @@ export default function CultivatorsListTable({
       </TabsList>
 
       <TabsContent value="individual" className="mt-4">
-        <DataTable
-          data={individuals}
-          isCultivatorsPage={isCultivatorsPage}
-          onExportToExcel={onExportToExcel}
-        />
+        {isLoading ? (
+          <TableSkeleton columns={6} rows={10} />
+        ) : (
+          <DataTable
+            data={individuals}
+            isCultivatorsPage={isCultivatorsPage}
+            onExportToExcel={onExportToExcel}
+          />
+        )}
       </TabsContent>
       <TabsContent value="association" className="mt-4">
-        <DataTable
-          data={associations}
-          isCultivatorsPage={isCultivatorsPage}
-          onExportToExcel={onExportToExcel}
-          onExportAssociationToExcel={onExportAssociationToExcel}
-          typeExport={tabValue}
-        />
+        {isLoading ? (
+          <TableSkeleton columns={6} rows={10} />
+        ) : (
+          <DataTable
+            data={associations}
+            isCultivatorsPage={isCultivatorsPage}
+            onExportToExcel={onExportToExcel}
+            onExportAssociationToExcel={onExportAssociationToExcel}
+            typeExport={tabValue}
+          />
+        )}
       </TabsContent>
     </Tabs>
   );

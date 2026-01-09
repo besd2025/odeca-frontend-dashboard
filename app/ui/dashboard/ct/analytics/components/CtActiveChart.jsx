@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/chart";
 import React from "react";
 import { fetchData } from "@/app/_utils/api";
+import { ChartSkeleton } from "@/components/ui/skeletons";
 
 const chartConfig = {
   count: {
@@ -31,8 +32,11 @@ const chartConfig = {
 
 export function CtActiveChart() {
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
   React.useEffect(() => {
     const getCts = async () => {
+      setLoading(true);
       try {
         const response = await fetchData(
           "get",
@@ -58,11 +62,20 @@ export function CtActiveChart() {
         setData(chartData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     getCts();
   }, []);
+
+  if (loading)
+    return (
+      <div className="col-span-1 lg:col-span-2">
+        <ChartSkeleton />
+      </div>
+    );
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader>

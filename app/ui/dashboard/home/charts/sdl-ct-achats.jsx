@@ -77,7 +77,11 @@ export function ChartLineAchats() {
   }, [period]);
 
   if (isLoading && !dataByPeriod[period]) {
-    return <ChartSkeleton />;
+    return (
+      <div className=" w-full">
+        <ChartSkeleton className="h-[500px]" />
+      </div>
+    );
   }
 
   return (

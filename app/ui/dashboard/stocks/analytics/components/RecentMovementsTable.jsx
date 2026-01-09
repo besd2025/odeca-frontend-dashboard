@@ -57,9 +57,12 @@ const movements = [
   },
 ];
 
-export function RecentMovementsTable() {
+export function RecentMovementsTable({ isLoading: externalLoading }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+
+  const isActuallyLoading = externalLoading ?? loading;
+
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -91,7 +94,7 @@ export function RecentMovementsTable() {
     getDatas();
   }, []);
 
-  if (loading) return <TableSkeleton rows={5} columns={6} />;
+  if (isActuallyLoading) return <TableSkeleton rows={5} columns={6} />;
 
   return (
     <Card className="col-span-1 lg:col-span-4">

@@ -105,7 +105,12 @@ export function StockEvolutionChart() {
     getData();
   }, [period]);
 
-  if (loading) return <ChartSkeleton />;
+  if (loading)
+    return (
+      <div className="lg:col-span-4">
+        <ChartSkeleton />
+      </div>
+    );
 
   return (
     <Card className="lg:col-span-4">

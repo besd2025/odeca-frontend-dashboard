@@ -88,7 +88,12 @@ export function StockTypeChart() {
     getDatas();
   }, []);
 
-  if (loading) return <ChartSkeleton />;
+  if (loading)
+    return (
+      <div className="lg:col-span-1">
+        <ChartSkeleton />
+      </div>
+    );
 
   return (
     <Card className="lg:col-span-1">

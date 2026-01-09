@@ -81,7 +81,12 @@ export function RegistrationChart() {
     getData();
   }, [period]);
 
-  if (loading) return <ChartSkeleton />;
+  if (loading)
+    return (
+      <div className="lg:col-span-5">
+        <ChartSkeleton />
+      </div>
+    );
 
   return (
     <Card className="lg:col-span-5">

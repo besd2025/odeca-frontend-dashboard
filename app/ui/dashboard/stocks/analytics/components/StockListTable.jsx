@@ -22,9 +22,12 @@ import { ArrowRight } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { TableSkeleton } from "@/components/ui/skeletons";
 
-export function StockListTable() {
+export function StockListTable({ isLoading: externalLoading }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+
+  const isActuallyLoading = externalLoading ?? loading;
+
   React.useEffect(() => {
     const getDatas = async () => {
       try {
@@ -64,7 +67,12 @@ export function StockListTable() {
     getDatas();
   }, []);
 
-  if (loading) return <TableSkeleton rows={5} columns={6} />;
+  if (isActuallyLoading)
+    return (
+      <div className="col-span-1 lg:col-span-3">
+        <TableSkeleton rows={5} columns={6} />
+      </div>
+    );
 
   return (
     <Card className="col-span-1 lg:col-span-3">

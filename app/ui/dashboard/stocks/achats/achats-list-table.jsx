@@ -41,6 +41,7 @@ import Link from "next/link";
 import EditAchats from "./edit-achats";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TableSkeleton } from "@/components/ui/skeletons";
 
 function DataTable({ data, isCultivatorsPage }) {
   const [sorting, setSorting] = React.useState([]);
@@ -422,6 +423,7 @@ export default function AchatsListTable({
   individualData,
   associationData,
   isCultivatorsPage,
+  isLoading,
 }) {
   const individuals = individualData ?? data ?? [];
   const associations = associationData ?? [];
@@ -446,10 +448,21 @@ export default function AchatsListTable({
       </TabsList>
 
       <TabsContent value="individual" className="mt-4">
-        <DataTable data={individuals} isCultivatorsPage={isCultivatorsPage} />
+        {isLoading ? (
+          <TableSkeleton rows={10} columns={6} />
+        ) : (
+          <DataTable data={individuals} isCultivatorsPage={isCultivatorsPage} />
+        )}
       </TabsContent>
       <TabsContent value="association" className="mt-4">
-        <DataTable data={associations} isCultivatorsPage={isCultivatorsPage} />
+        {isLoading ? (
+          <TableSkeleton rows={10} columns={6} />
+        ) : (
+          <DataTable
+            data={associations}
+            isCultivatorsPage={isCultivatorsPage}
+          />
+        )}
       </TabsContent>
     </Tabs>
   );

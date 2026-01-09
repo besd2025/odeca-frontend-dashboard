@@ -67,7 +67,12 @@ export function SdlActiveChart() {
     getSdls();
   }, []);
 
-  if (loading) return <ChartSkeleton />;
+  if (loading)
+    return (
+      <div className="col-span-1 lg:col-span-2">
+        <ChartSkeleton />
+      </div>
+    );
 
   return (
     <Card className="col-span-1 lg:col-span-2">
