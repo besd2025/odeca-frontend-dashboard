@@ -278,7 +278,7 @@ export default function GeoLocalisation({
               <div className="mt-4 pt-4 border-t border-dashed border-gray-200 dark:border-zinc-800 space-y-4">
                 {/* Flight Distance */}
                 {distance && (
-                  <div className="flex items-center justify-between opacity-60">
+                  <div className="flex items-center justify-between ">
                     <span className="text-xs text-gray-900 dark:text-gray-100">
                       Vol d'oiseau
                     </span>
