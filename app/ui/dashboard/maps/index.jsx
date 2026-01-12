@@ -252,7 +252,7 @@ export default function Maps() {
       flyToPosition={selectedPosition}
       mainMap={true}
     >
-      <div className="absolute top-4 left-4 z-1000 w-full max-w-sm flex flex-col gap-4">
+      <div className="absolute top-4 left-4 z-1000 w-screen lg:w-full max-w-sm flex flex-col gap-4">
         {/* Search Bar */}
         <div className="relative">
           <input
