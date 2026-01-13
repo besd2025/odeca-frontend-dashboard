@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   ChartNoAxesCombined,
+  FileSpreadsheet,
   History,
   MapPinHouse,
   MoreHorizontal,
@@ -27,10 +28,11 @@ import CultivatorsListTable from "../../cultivators/list";
 import AchatsListTable from "@/app/ui/dashboard/stocks/achats/achats-list-table";
 import ReceiptSdlCt from "./receipt/receipt-sdl";
 import RedementC from "./rendement";
-import RHlist from "./RH";
+import RHlist from "./rapports/RH";
 import { Button } from "@/components/ui/button";
 import TransferSdlDep from "@/app/ui/dashboard/stocks/transfers/components/sdl-transfers/transfer-sdl";
 import SharedGeoLocalisation from "@/components/ui/geo-localisation";
+import Rapports from "./rapports";
 
 function DetailsContent({ id }) {
   const cultivatorsData = [
@@ -159,24 +161,7 @@ function DetailsContent({ id }) {
       },
     },
   ];
-  const RHData = [
-    {
-      id: "cultivator_001",
-      cultivator: {
-        cultivator_code: "2530-522-7545",
-        first_name: "Brave",
-        last_name: "Eddy",
-        image_url: "/images/logo_1.jpg",
-      },
-      cni: "74/565",
-      ca: 78,
-      ca_price: 7855,
-      cb: 785,
-      cb_price: 4544,
-      qte_total: 555,
-      total_price: 457,
-    },
-  ];
+
   const [tab, setTab] = useState("cultivators");
 
   const [data, setData] = React.useState([]);
@@ -330,12 +315,8 @@ function DetailsContent({ id }) {
             <Spline className="w-4 h-4" /> Reception(CT)
           </TabsTrigger>
 
-          <TabsTrigger value="rendement" className="hidden lg:flex shrink-0">
-            <ChartNoAxesCombined className="w-4 h-4" /> Rendement
-          </TabsTrigger>
-
           <TabsTrigger value="rh" className="hidden lg:flex shrink-0">
-            <ScrollText className="w-4 h-4" /> RH
+            <ScrollText className="w-4 h-4" /> Rapports
           </TabsTrigger>
 
           <TabsTrigger value="maps" className="hidden lg:flex shrink-0">
@@ -480,13 +461,12 @@ function DetailsContent({ id }) {
           <h1 className="text-xl font-semibold m-2">Receptions</h1>
           <ReceiptSdlCt data={transferData} />
         </TabsContent>
-        <TabsContent value="rendement">
-          <h1 className="text-xl font-semibold m-2">Rendements Cerise</h1>
-          <RedementC />
-        </TabsContent>
+
         <TabsContent value="rh">
-          <h1 className="text-xl font-semibold m-2">Rapport H</h1>
-          <RHlist data={RHData} />
+          <h1 className="text-xl font-semibold m-2">
+            Selectionner les Rapports
+          </h1>
+          <Rapports />
         </TabsContent>
       </Tabs>
     </Card>
