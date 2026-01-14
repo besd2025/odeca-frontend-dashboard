@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Card } from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -27,131 +27,129 @@ import TransferCtDep from "@/app/ui/dashboard/stocks/transfers/components/ct-tra
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
 import SharedGeoLocalisation from "@/components/ui/geo-localisation";
-
+const XLSX = require("xlsx");
+import { saveAs } from "file-saver";
 function DetailsContent({ id }) {
   const [tab, setTab] = useState("cultivators");
   const [data, setData] = React.useState([]);
   const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
   const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
   const [dataTransfert, setDataTransfert] = React.useState([]);
-  React.useEffect(() => {
-    const getAchatsHangars = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/centres_transite/${id}/get_achats/`,
-          {}
-        );
-        const results = response?.results;
-        const formatData = (achats) => ({
-          id: achats?.id,
-          cultivator: {
-            cultivator_code: achats?.cafeiculteur?.cultivator_code,
-            first_name: achats?.cafeiculteur?.cultivator_first_name,
-            last_name: achats?.cafeiculteur?.cultivator_last_name,
-            image_url: achats?.cafeiculteur?.cultivator_photo,
-            // Association fields
-            cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
-            cultivator_assoc_rep_name:
-              achats?.cafeiculteur?.cultivator_assoc_rep_name,
-          },
-          localite: {
-            province:
-              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
-            commune:
-              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
-          },
-          num_fiche: 784,
-          num_recu: achats?.numero_recu,
-          photo_fiche: achats?.photo_fiche,
-          ca: achats?.quantite_cerise_a,
-          cb: achats?.quantite_cerise_b,
-          date: achats?.date_achat,
-          isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
-        });
+  const [data_association, setDataAssociation] = useState([]);
+  const [cultivateur_type, setCultivateur_type] = useState("individuel");
 
-        const formattedResults = results?.map(formatData) || [];
-        setIndividualAchatsData(
-          formattedResults.filter((a) => !a.isAssociation)
-        );
-        setAssociationAchatsData(
-          formattedResults.filter((a) => a.isAssociation)
-        );
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-    const getCultivators = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/centres_transite/${id}/get_cultivators/`,
-          {}
-        );
-        const results = response?.results;
-        const cultivatorsData = results?.map((cultivator) => ({
-          id: cultivator?.id,
-          cultivator: {
-            cultivator_code: cultivator?.cultivator_code,
-            first_name: cultivator?.cultivator_first_name,
-            last_name: cultivator?.cultivator_last_name,
-            image_url: cultivator?.cultivator_photo,
-            telephone: cultivator?.cultivator_telephone,
-          },
-          sdl_ct: "NGome",
-          society: "ODECA",
-          localite: {
-            province:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
-            commune:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
-          },
-          champs: 4,
-        }));
-        setData(cultivatorsData);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-    const getTransfers = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/centres_transite/${id}/get_transferts/`,
-          {}
-        );
-        const results = response?.results;
-        const transfersData = results?.map((transfer) => ({
-          id: transfer?.id,
-          from_ct: transfer?.ct?.ct_nom,
-          to_depulpeur_name: transfer?.sdl?.sdl_nom,
-          society: transfer?.sdl?.societe?.nom_societe,
-          qte_tranferer: {
-            ca: transfer?.quantite_cerise_a,
-            cb: transfer?.quantite_cerise_b,
-          },
-          photo_fiche: "/images/logo_1.jpg",
-          localite: {
-            province:
-              transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
-                ?.province_name,
-            commune:
-              transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
-          },
-        }));
-        setDataTransfert(transfersData);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-    getTransfers();
-    getAchatsHangars();
-    getCultivators();
-  }, [id]);
+  const getAchatsHangars = async () => {
+    try {
+      const response = await fetchData(
+        "get",
+        `cafe/centres_transite/${id}/get_achats/`,
+        {}
+      );
+      const results = response?.results;
+      const formatData = (achats) => ({
+        id: achats?.id,
+        cultivator: {
+          cultivator_code: achats?.cafeiculteur?.cultivator_code,
+          first_name: achats?.cafeiculteur?.cultivator_first_name,
+          last_name: achats?.cafeiculteur?.cultivator_last_name,
+          image_url: achats?.cafeiculteur?.cultivator_photo,
+          // Association fields
+          cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
+          cultivator_assoc_rep_name:
+            achats?.cafeiculteur?.cultivator_assoc_rep_name,
+        },
+        localite: {
+          province:
+            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
+        },
+        num_fiche: 784,
+        num_recu: achats?.numero_recu,
+        photo_fiche: achats?.photo_fiche,
+        ca: achats?.quantite_cerise_a,
+        cb: achats?.quantite_cerise_b,
+        date: achats?.date_achat,
+        isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
+      });
+
+      const formattedResults = results?.map(formatData) || [];
+      setIndividualAchatsData(formattedResults.filter((a) => !a.isAssociation));
+      setAssociationAchatsData(formattedResults.filter((a) => a.isAssociation));
+    } catch (error) {
+      console.error("Error fetching cultivators data:", error);
+    }
+  };
+  const getCultivators = async () => {
+    try {
+      const response = await fetchData(
+        "get",
+        `cafe/centres_transite/${id}/get_cultivators/`,
+        {}
+      );
+      const results = response?.results;
+      const cultivatorsData = results?.map((cultivator) => ({
+        id: cultivator?.id,
+        cultivator: {
+          cultivator_code: cultivator?.cultivator_code,
+          first_name: cultivator?.cultivator_first_name,
+          last_name: cultivator?.cultivator_last_name,
+          image_url: cultivator?.cultivator_photo,
+          telephone: cultivator?.cultivator_telephone,
+        },
+        sdl_ct: "NGome",
+        society: "ODECA",
+        localite: {
+          province:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
+        },
+        champs: 4,
+      }));
+      setData(cultivatorsData);
+    } catch (error) {
+      console.error("Error fetching cultivators data:", error);
+    }
+  };
+  const getTransfers = async () => {
+    try {
+      const response = await fetchData(
+        "get",
+        `cafe/centres_transite/${id}/get_transferts/`,
+        {}
+      );
+      const results = response?.results;
+      const transfersData = results?.map((transfer) => ({
+        id: transfer?.id,
+        from_ct: transfer?.ct?.ct_nom,
+        to_depulpeur_name: transfer?.sdl?.sdl_nom,
+        society: transfer?.sdl?.societe?.nom_societe,
+        qte_tranferer: {
+          ca: transfer?.quantite_cerise_a,
+          cb: transfer?.quantite_cerise_b,
+        },
+        photo_fiche: "/images/logo_1.jpg",
+        localite: {
+          province:
+            transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
+              ?.province_name,
+          commune:
+            transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
+        },
+      }));
+      setDataTransfert(transfersData);
+    } catch (error) {
+      console.error("Error fetching cultivators data:", error);
+    }
+  };
+  // getTransfers();
+  // getAchatsHangars();
+  // getCultivators();
 
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -161,6 +159,235 @@ function DetailsContent({ id }) {
     setSelectedPosition(place?.coordinates);
   };
 
+  const [typeExport, setTypeExport] = useState("individual");
+  useEffect(() => {
+    getTransfers();
+    getAchatsHangars();
+    try {
+      if (cultivateur_type === "individuel") {
+        setTypeExport("individuel");
+
+        getCultivators();
+      } else if (cultivateur_type === "association") {
+        getCultivators();
+      }
+    } catch (error) {
+      console.error("Error fetching cultivators data:", error);
+    }
+  }, [id]);
+
+  const exportCultivatorsToExcel = async () => {
+    try {
+      const initResponse = await fetchData(
+        "get",
+        `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
+        { params: { limit: 1 } }
+      );
+
+      const totalCount = initResponse?.count || 0;
+      if (totalCount === 0) return;
+
+      const response = await fetchData(
+        "get",
+        `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
+        {
+          params: {
+            limit: totalCount,
+          },
+        }
+      );
+
+      const allData = response.results || [];
+      const uniqueData = Array.from(
+        new Map(allData.map((item) => [item.id, item])).values()
+      );
+
+      const formattedData = uniqueData.map((item) => {
+        const formattedItem = {
+          code_cultivateur: item.cultivator_code || "",
+          Type: item.cultivator_entity_type || "",
+          Nom: item.cultivator_first_name || "",
+          Prénom: item.cultivator_last_name || "",
+          Genre: item.cultivator_gender || "",
+          CNI: item.cultivator_cni || "",
+          // association: item.cultivator_assoc_name || "",
+          // Représentant_de_lassociation: item.cultivator_assoc_rep_name || "",
+          // numero_fiche: item.cultivator_assoc_numero_fiche || "",
+          // NIF_de_lassociation: item.cultivator_assoc_nif || "",
+          Province:
+            item.cultivator_adress?.zone_code?.commune_code?.province_code
+              ?.province_name || "",
+          Commune:
+            item.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+          Zone: item.cultivator_adress?.zone_code?.zone_name || "",
+          Colline: item.cultivator_adress?.colline_name || "",
+          Societte: item?.collector?.hangar?.hangar_name || "",
+          Nombre_de_champs: item.nombre_champs || 0,
+          Superficie_totale_des_champs: item.superficie_totale_champs || 0,
+          Telephone: item.cultivator_telephone || "",
+        };
+
+        // Mode de paiement
+        if (
+          item?.cultivator_bank_name == "banque" ||
+          item?.cultivator_bank_name == "microfinance"
+        ) {
+          formattedItem.mode_payement =
+            item?.cultivator_bank_name.toUpperCase();
+          formattedItem.Banque_ou_microfinance = item?.cultivator_bank_name;
+          formattedItem.Numero_compte = item?.cultivator_bank_account || "";
+        } else if (item?.cultivator_payment_type == "mobile_money") {
+          formattedItem.mode_payement = item?.cultivator_payment_type
+            .replaceAll("_", " ")
+            .toUpperCase();
+          // const phone = item.cultivator_mobile_payment.toString();
+          // if (phone.startsWith("6") || phone.startsWith("3")) {
+          //   formattedItem.nom_service =
+          //     item.cultivator_mobile_payment_service || "L";
+          // } else if (phone.startsWith("7")) {
+          //   formattedItem.nom_service = "ECOCASH";
+          // }
+          formattedItem.nom_service = item.cultivator_mobile_payment_name || "";
+          formattedItem.Numero_de_telephone_de_payement =
+            item.cultivator_mobile_payment_account || "";
+          formattedItem.proprietaire = item.cultivator_account_owner || "";
+          formattedItem.date_enregistrement = item.created_at || "";
+        } else {
+          formattedItem.mode_payement = "";
+        }
+
+        return formattedItem;
+      });
+
+      // Génération du fichier Excel
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Cultivateurs");
+
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      });
+
+      saveAs(
+        blob,
+        `cultivateurs_${new Date().toISOString().split("T")[0]}.xlsx`
+      );
+    } catch (error) {
+      console.error("Erreur exportation Excel :", error);
+    }
+  };
+  const exportAssociationToExcel = async () => {
+    try {
+      const initResponse = await fetchData(
+        "get",
+        `cultivators/get_cafe_cultivators?cafeiculteur_type=association`,
+        { params: { limit: 1 } }
+      );
+
+      const totalCount = initResponse?.count || 0;
+      if (totalCount === 0) return;
+
+      const response = await fetchData(
+        "get",
+        `cultivators/get_cafe_cultivators?cafeiculteur_type=association`,
+        {
+          params: {
+            limit: totalCount,
+          },
+        }
+      );
+
+      const allData = response.results || [];
+      const uniqueData = Array.from(
+        new Map(allData.map((item) => [item.id, item])).values()
+      );
+
+      const formattedData = uniqueData.map((item) => {
+        const formattedItem = {
+          code_cultivateur: item.cultivator_code || "",
+          Type: item.cultivator_entity_type || "",
+          association: item.cultivator_assoc_name || "",
+          Représentant_de_lassociation: item.cultivator_assoc_rep_name || "",
+          telephone_du_représentant: item.cultivator_assoc_rep_phone || "",
+          numero_fiche: item.cultivator_assoc_numero_fiche || "",
+          NIF_de_lassociation: item.cultivator_assoc_nif || "",
+
+          Province:
+            item.cultivator_adress?.zone_code?.commune_code?.province_code
+              ?.province_name || "",
+          Commune:
+            item.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+          Zone: item.cultivator_adress?.zone_code?.zone_name || "",
+          Colline: item.cultivator_adress?.colline_name || "",
+          Societte: item?.collector?.hangar?.hangar_name || "",
+          Nombre_de_champs: item.nombre_champs || 0,
+          Superficie_totale_des_champs: item.superficie_totale_champs || 0,
+          // Telephone: item.cultivator_telephone || "",
+        };
+
+        // Mode de paiement
+        if (
+          item?.cultivator_bank_name == "banque" ||
+          item?.cultivator_bank_name == "microfinance"
+        ) {
+          formattedItem.mode_payement =
+            item?.cultivator_bank_name.toUpperCase();
+          formattedItem.Banque_ou_microfinance = item?.cultivator_bank_name;
+          formattedItem.Numero_compte = item?.cultivator_bank_account || "";
+        } else if (item?.cultivator_payment_type == "mobile_money") {
+          formattedItem.mode_payement = item?.cultivator_payment_type
+            .replaceAll("_", " ")
+            .toUpperCase();
+          // const phone = item.cultivator_mobile_payment.toString();
+          // if (phone.startsWith("6") || phone.startsWith("3")) {
+          //   formattedItem.nom_service =
+          //     item.cultivator_mobile_payment_service || "L";
+          // } else if (phone.startsWith("7")) {
+          //   formattedItem.nom_service = "ECOCASH";
+          // }
+          formattedItem.nom_service = item.cultivator_mobile_payment_name || "";
+          formattedItem.Numero_de_telephone_de_payement =
+            item.cultivator_mobile_payment_account || "";
+          formattedItem.proprietaire = item.cultivator_account_owner || "";
+          formattedItem.date_enregistrement = item.created_at || "";
+        } else {
+          formattedItem.mode_payement = "";
+        }
+
+        return formattedItem;
+      });
+
+      // Génération du fichier Excel
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "associations");
+
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      });
+
+      saveAs(
+        blob,
+        `associations_${new Date().toISOString().split("T")[0]}.xlsx`
+      );
+    } catch (error) {
+      console.error("Erreur exportation Excel :", error);
+    }
+  };
+
+  const onClickTyepeExport = (type) => {
+    setCultivateur_type(type);
+  };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
       <Tabs value={tab} className="space-y-6 w-full" onValueChange={setTab}>
@@ -207,7 +434,16 @@ function DetailsContent({ id }) {
         </TabsList>
         <TabsContent value="cultivators">
           <h1 className="text-xl font-semibold m-2">Liste des Cafeiculteurs</h1>
-          <CultivatorsListTable data={data} isCultivatorsPage={false} />
+          <CultivatorsListTable
+            individualData={data}
+            associationData={data}
+            data={data}
+            isCultivatorsPage={false}
+            onExportToExcel={exportCultivatorsToExcel}
+            onExportAssociationToExcel={exportAssociationToExcel}
+            typeExport={typeExport}
+            onClickTyepeExport={onClickTyepeExport}
+          />
         </TabsContent>
         <TabsContent value="achats">
           <h1 className="text-xl font-semibold m-2">Achats effectues</h1>
