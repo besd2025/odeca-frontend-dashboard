@@ -43,7 +43,7 @@ import PaginationControls from "@/components/ui/pagination-controls";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TableSkeleton } from "@/components/ui/skeletons";
 
-function DataTable({ data, isCultivatorsPage }) {
+function DataTable({ data, isCultivatorsPage, exportType }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -52,8 +52,6 @@ function DataTable({ data, isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 10,
   });
-  console.log(data);
-
   const columns = [
     {
       id: "actions",
@@ -134,7 +132,6 @@ function DataTable({ data, isCultivatorsPage }) {
       },
       cell: ({ row }) => {
         const cultivators = row.original.cultivator;
-        console.log("Cultivators in cell:", cultivators);
         const isAssociation = !!cultivators?.cultivator_assoc_name;
 
         return (
@@ -337,10 +334,11 @@ function DataTable({ data, isCultivatorsPage }) {
         <div className="flex flex-row justify-between gap-x-3">
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
-            //   onClickExportButton={exportCultivatorsToExcel}
-            //   onClickDownloadButton={DownloadCultivatorsToExcel}
-            //   loading={loadingEportBtn}
-            //   activedownloadBtn={activedownloadBtn}
+              exportType={exportType}
+              //   onClickExportButton={exportCultivatorsToExcel}
+              //   onClickDownloadButton={DownloadCultivatorsToExcel}
+              //   loading={loadingEportBtn}
+              //   activedownloadBtn={activedownloadBtn}
             />
           </div>
         </div>
@@ -451,7 +449,11 @@ export default function AchatsListTable({
         {isLoading ? (
           <TableSkeleton rows={10} columns={6} />
         ) : (
-          <DataTable data={individuals} isCultivatorsPage={isCultivatorsPage} />
+          <DataTable
+            data={individuals}
+            isCultivatorsPage={isCultivatorsPage}
+            exportType="achats_individual"
+          />
         )}
       </TabsContent>
       <TabsContent value="association" className="mt-4">
@@ -461,6 +463,7 @@ export default function AchatsListTable({
           <DataTable
             data={associations}
             isCultivatorsPage={isCultivatorsPage}
+            exportType="achats_association"
           />
         )}
       </TabsContent>
