@@ -25,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const products = [
   {
+    id: 1,
     date: "12/8/2025",
     lot_num: 40,
     grade_A: { A1: 10, A2: 20, A3: 30 },
@@ -61,7 +62,7 @@ export default function RedementC() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="w-full border rounded-md overflow-hidden">
+        <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>

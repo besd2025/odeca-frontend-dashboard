@@ -4,6 +4,8 @@ import RHlist from "./RH";
 import { FileSpreadsheet } from "lucide-react";
 import RBSdl from "./RB";
 import RedementC from "../rendement";
+import RA from "./RA";
+import RG from "./RG";
 const RHData = [
   {
     id: "cultivator_001",
@@ -23,7 +25,7 @@ const RHData = [
   },
 ];
 export default function Rapports() {
-  const [rapports, setRapports] = useState("rapportB");
+  const [rapports, setRapports] = useState("rapportA");
   return (
     <div>
       <Tabs
@@ -33,14 +35,14 @@ export default function Rapports() {
       >
         {/* TABS LIST */}
         <TabsList className="overflow-x-auto flex-nowrap gap-2 w-full">
+          <TabsTrigger value="rapportA" className="shrink-0">
+            <FileSpreadsheet className="w-4 h-4" /> Rapport A
+          </TabsTrigger>
           <TabsTrigger value="rapportB" className="shrink-0">
             <FileSpreadsheet className="w-4 h-4" /> Rapport B
           </TabsTrigger>
           <TabsTrigger value="rapportC" className="shrink-0">
             <FileSpreadsheet className="w-4 h-4" /> Rapport C
-          </TabsTrigger>
-          <TabsTrigger value="rapportD" className="shrink-0">
-            <FileSpreadsheet className="w-4 h-4" /> Rapport D
           </TabsTrigger>
           <TabsTrigger value="rapportG" className="shrink-0">
             <FileSpreadsheet className="w-4 h-4" /> Rapport G
@@ -49,17 +51,17 @@ export default function Rapports() {
             <FileSpreadsheet className="w-4 h-4" /> Rapport H
           </TabsTrigger>
         </TabsList>
+        <TabsContent value="rapportA">
+          <RA />
+        </TabsContent>
         <TabsContent value="rapportB">
           <RBSdl />
         </TabsContent>
         <TabsContent value="rapportC">
           <RedementC />
         </TabsContent>
-        <TabsContent value="rapportD">
-          <h1 className="text-xl font-semibold m-2">Rapport D</h1>
-        </TabsContent>
         <TabsContent value="rapportG">
-          <h1 className="text-xl font-semibold m-2">Rapport G</h1>
+          <RG />
         </TabsContent>
         <TabsContent value="rapportH">
           <h1 className="text-xl font-semibold m-2">Rapport H</h1>

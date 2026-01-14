@@ -279,7 +279,7 @@ export default function RBSdl() {
       </CardHeader>
 
       <CardContent>
-        <div className="rounded-xl border overflow-hidden">
+        <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md overflow-hidden">
           <Table>
             <TableHeader className="bg-muted/40">
               <TableRow>

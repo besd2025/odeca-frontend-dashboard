@@ -199,7 +199,7 @@ function DetailsContent({ id }) {
 
           {/* Hidden on Mobile */}
           <TabsTrigger value="transferSdl" className="hidden lg:flex shrink-0">
-            <Spline className="w-4 h-4" /> Transfer(SDL → Depulpage)
+            <Spline className="w-4 h-4" /> Transfer(SDL → Deparchage)
           </TabsTrigger>
 
           <TabsTrigger value="receptionSdl" className="hidden lg:flex shrink-0">
@@ -343,13 +343,9 @@ function DetailsContent({ id }) {
           />
         </TabsContent>
         <TabsContent value="transferSdl">
-          <h1 className="text-xl font-semibold m-2">
-            Transferts vers dépulpeur
-          </h1>
           <TransferSdlDep data={transferData} />
         </TabsContent>
         <TabsContent value="receptionSdl">
-          <h1 className="text-xl font-semibold m-2">Receptions</h1>
           <ReceiptSdlCt data={transferData} />
         </TabsContent>
 
