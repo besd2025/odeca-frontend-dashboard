@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { fetchData } from "@/app/_utils/api";
 
-function Filter() {
+function Filter({ handleFilter }) {
   const [selectedProvince, setSelectedProvince] = React.useState("");
   const [selectedCommune, setSelectedCommune] = React.useState("");
   const [selectedZone, setSelectedZone] = React.useState("");
@@ -130,7 +130,17 @@ function Filter() {
     }
     getData();
   }, []);
-
+  const handleFilters = (e) => {
+    e.preventDefault();
+    const filterData = {
+      province: selectedProvince,
+      commune: selectedCommune,
+      zone: selectedZone,
+      colline: selectedColline,
+      societe: selectedSociete,
+    };
+    handleFilter(filterData);
+  };
   return (
     <Dialog>
       <form>
@@ -288,7 +298,9 @@ function Filter() {
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit">Filtrer</Button>
+            <Button type="submit" onClick={handleFilters}>
+              Filtrer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

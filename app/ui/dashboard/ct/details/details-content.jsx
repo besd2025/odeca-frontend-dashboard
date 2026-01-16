@@ -388,6 +388,11 @@ function DetailsContent({ id }) {
   const onClickTyepeExport = (type) => {
     setCultivateur_type(type);
   };
+  const handleFilter = (filterData) => {
+    // Implement filtering logic here based on filterData
+    console.log("Received filter data ffffhhh:", filterData);
+    // You can use filterData to fetch filtered cultivators from the API
+  };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
       <Tabs value={tab} className="space-y-6 w-full" onValueChange={setTab}>
@@ -443,6 +448,7 @@ function DetailsContent({ id }) {
             onExportAssociationToExcel={exportAssociationToExcel}
             typeExport={typeExport}
             onClickTyepeExport={onClickTyepeExport}
+            handleFilter={handleFilter}
           />
         </TabsContent>
         <TabsContent value="achats">

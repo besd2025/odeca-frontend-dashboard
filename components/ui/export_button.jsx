@@ -15,6 +15,11 @@ function ExportButton({
   typeExport,
   onExportToExcel,
   onExportAssociationToExcel,
+  handleExportUsines,
+  handleExportSDLs,
+  handleExportCTs,
+  onExportAchat_IndividuelToExcel,
+  onExportAchat_AssociationToExcel,
   exportType,
 }) {
   const value = typeExport || "individuel";
@@ -36,10 +41,16 @@ function ExportButton({
                   onExportToExcel();
                 } else if (exportTypeState === "cultivator_association") {
                   onExportAssociationToExcel();
-                  // } else if (exportTypeState === "achat_individuel") {
-                  //   onExportAchat_IndividuelToExcel();
-                  // } else if (exportTypeState === "achat_association") {
-                  //   onExportAchat_AssociationToExcel();
+                } else if (exportTypeState === "achat_individuel") {
+                  onExportAchat_IndividuelToExcel();
+                } else if (exportTypeState === "achat_association") {
+                  onExportAchat_AssociationToExcel();
+                } else if (exportTypeState === "usine_data") {
+                  handleExportUsines();
+                } else if (exportTypeState === "sdl_data") {
+                  handleExportSDLs();
+                } else if (exportTypeState === "ct_data") {
+                  handleExportCTs();
                 }
               }}
               loading={loading}

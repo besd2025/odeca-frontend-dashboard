@@ -183,7 +183,11 @@ function DetailsContent({ id }) {
     setSelectedPlace(place);
     setSelectedPosition(place?.coordinates);
   };
-
+  const handleFilter = (filterData) => {
+    // Implement filtering logic here based on filterData
+    console.log("Received filter data ffffhhh:", filterData);
+    // You can use filterData to fetch filtered cultivators from the API
+  };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
       <Tabs value={tab} className="space-y-6 w-full" onValueChange={setTab}>
@@ -255,7 +259,11 @@ function DetailsContent({ id }) {
         </TabsList>
         <TabsContent value="cultivators">
           <h1 className="text-xl font-semibold m-2">Liste des Cafeiculteurs</h1>
-          <CultivatorsListTable data={data} isCultivatorsPage={false} />
+          <CultivatorsListTable
+            data={data}
+            isCultivatorsPage={false}
+            handleFilter={handleFilter}
+          />
         </TabsContent>
         <TabsContent value="achats">
           <h1 className="text-xl font-semibold m-2">Achats effectues</h1>

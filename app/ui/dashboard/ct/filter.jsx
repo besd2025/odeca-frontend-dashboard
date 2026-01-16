@@ -13,16 +13,16 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { fetchData } from "@/app/_utils/api";
-function Filter() {
+function Filter({ handleFilter }) {
   const [selectedProvince, setSelectedProvince] = React.useState("");
   const [selectedCommune, setSelectedCommune] = React.useState("");
   const [selectedZone, setSelectedZone] = React.useState("");
   const [selectedColline, setSelectedColline] = React.useState("");
-  const [ageMin, setAgeMin] = React.useState("");
-  const [ageMax, setAgeMax] = React.useState("");
+  const [selectedSociete, setSelectedSociete] = React.useState("");
+  const [QteMin, setQteMin] = React.useState("");
+  const [QteMax, setQteMax] = React.useState("");
   const [dateFrom, setDateFrom] = React.useState("");
   const [dateTo, setDateTo] = React.useState("");
-
   const [province, setProvince] = React.useState([]);
   const [commune, setCommune] = React.useState([]);
   const [zones, setZones] = React.useState([]);
@@ -77,7 +77,7 @@ function Filter() {
       return;
     }
     const collines = await fetchData("get", `adress/colline/`, {
-      params: {},
+      params: { zone: value },
       additionalHeaders: {},
       body: {},
     });
@@ -130,7 +130,22 @@ function Filter() {
     }
     getData();
   }, []);
-
+  const handleFilters = (e) => {
+    e.preventDefault();
+    const filterData = {
+      province: selectedProvince,
+      commune: selectedCommune,
+      zone: selectedZone,
+      colline: selectedColline,
+      qteMin: QteMin,
+      qteMax: QteMax,
+      societe: selectedColline,
+      sdl_ct: selectedColline,
+      dateTo: dateTo,
+      dateFrom: dateFrom,
+    };
+    handleFilter(filterData);
+  };
   return (
     <Dialog>
       <form>
@@ -283,14 +298,14 @@ function Filter() {
                 </div>
                 <div className="col-span-2 lg:col-span-1">
                   <div className="space-y-2">
-                    <Label>SDL ou CT</Label>
+                    <Label>CT</Label>
                     <div className="relative">
                       <select
                         value={selectedColline}
                         onChange={handleSelectCollineChange}
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
-                        <option value="">Selectionner Colline</option>
+                        <option value="">Selectionner la SDL</option>
                         {collines.map((c) => (
                           <option key={c.value} value={c.value}>
                             {c.label}
@@ -302,13 +317,13 @@ function Filter() {
                 </div>
                 <div className="col-span-2 lg:col-span-1">
                   <div className="space-y-2">
-                    <Label>AGE MIN</Label>
+                    <Label>Quantité MIN</Label>
                     <div className="relative">
                       <Input
                         type="number"
-                        placeholder="Entrer l'age minimum"
-                        value={ageMin}
-                        onChange={(e) => setAgeMin(e.target.value)}
+                        placeholder="Entrer la quantité minimum"
+                        value={QteMin}
+                        onChange={(e) => setQteMin(e.target.value)}
                         className="dark:bg-dark-900"
                       />
                     </div>
@@ -316,13 +331,13 @@ function Filter() {
                 </div>
                 <div className="col-span-2 lg:col-span-1">
                   <div className="space-y-2">
-                    <Label>AGE MAX</Label>
+                    <Label>Quantité MAX</Label>
                     <div className="relative">
                       <Input
                         type="number"
-                        placeholder="Entrer l'age minimum"
-                        value={ageMax}
-                        onChange={(e) => setAgeMax(e.target.value)}
+                        placeholder="Entrer la quantité maximum"
+                        value={QteMax}
+                        onChange={(e) => setQteMax(e.target.value)}
                         className="dark:bg-dark-900"
                       />
                     </div>
@@ -374,7 +389,9 @@ function Filter() {
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit">Filtrer</Button>
+            <Button type="submit" onClick={handleFilters}>
+              Filtrer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

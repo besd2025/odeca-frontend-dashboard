@@ -45,6 +45,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [filterData, setFilterData] = React.useState([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
@@ -93,7 +94,14 @@ export default function CtsListTable({ isLoading: externalLoading }) {
 
     getSdls();
   }, []);
-
+  const handleFilter = (filteredData) => {
+    setFilterData(filteredData);
+    console.log("Filtered Data:", filteredData);
+  };
+  const handleExportCTs = () => {
+    // Logic to export CT data
+    console.log("Exporting CT Data...");
+  };
   const columns = [
     {
       id: "actions",
@@ -278,14 +286,12 @@ export default function CtsListTable({ isLoading: externalLoading }) {
 
             <div className="flex flex-row justify-between gap-x-3">
               <div className="flex items-center gap-3">
-                <Filter />
+                <Filter handleFilter={handleFilter} />
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <ExportButton
-                //   onClickExportButton={exportCtsToExcel}
-                //   onClickDownloadButton={DownloadCtsToExcel}
-                //   loading={loadingEportBtn}
-                //   activedownloadBtn={activedownloadBtn}
+                  exportType="ct_data"
+                  handleExportCTs={handleExportCTs}
                 />
               </div>
             </div>

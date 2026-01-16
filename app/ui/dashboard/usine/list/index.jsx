@@ -45,6 +45,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [filterData, setFilterData] = React.useState([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
@@ -91,6 +92,14 @@ export default function UsineListTable({ isLoading: externalLoading }) {
     getUsines();
   }, []);
 
+  const handleFilter = (filteredData) => {
+    setFilterData(filteredData);
+    console.log("Filtered Data:", filteredData);
+  };
+  const handleExportUsines = () => {
+    // Logic to export usine data
+    console.log("Exporting Usine Data...");
+  };
   const columns = [
     {
       id: "actions",
@@ -273,10 +282,13 @@ export default function UsineListTable({ isLoading: externalLoading }) {
 
             <div className="flex flex-row justify-between gap-x-3">
               <div className="flex items-center gap-3">
-                <Filter />
+                <Filter handleFilter={handleFilter} />
               </div>
               <div className="flex items-center gap-3 text-gray-700">
-                <ExportButton />
+                <ExportButton
+                  handleExportUsines={handleExportUsines}
+                  exportType="usine_data"
+                />
               </div>
             </div>
           </div>

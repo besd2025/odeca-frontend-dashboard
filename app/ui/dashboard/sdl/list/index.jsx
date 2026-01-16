@@ -52,7 +52,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
     pageIndex: 0,
     pageSize: 10,
   });
-
+  const [filterData, setFilterData] = React.useState([]);
   const isActuallyLoading = externalLoading ?? loading;
 
   useEffect(() => {
@@ -94,6 +94,14 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
     getSdls();
   }, []);
 
+  const handleFilter = (filteredData) => {
+    setFilterData(filteredData);
+    console.log("Filtered Data:", filteredData);
+  };
+  const handleExportSDLs = () => {
+    // Logic to export SDL data
+    console.log("Exporting SDL Data...");
+  };
   const columns = [
     {
       id: "actions",
@@ -280,10 +288,13 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
 
             <div className="flex flex-row justify-between gap-x-3">
               <div className="flex items-center gap-3">
-                <Filter />
+                <Filter handleFilter={handleFilter} />
               </div>
               <div className="flex items-center gap-3 text-gray-700">
-                <ExportButton />
+                <ExportButton
+                  handleExportSDLs={handleExportSDLs}
+                  exportType="sdl_data"
+                />
               </div>
             </div>
           </div>
