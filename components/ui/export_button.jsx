@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Button } from "./button";
 import {
@@ -14,8 +15,15 @@ function ExportButton({
   typeExport,
   onExportToExcel,
   onExportAssociationToExcel,
+  exportType,
 }) {
   const value = typeExport || "individuel";
+  const [exportTypeState, setExportTypeState] = React.useState("");
+
+  React.useEffect(() => {
+    setExportTypeState(exportType);
+  }, [exportType]);
+
   return (
     <>
       {!activedownloadBtn ? (
@@ -24,10 +32,14 @@ function ExportButton({
             <Button
               className={`bg-green-600 text-white hover:bg-green-700 px-3 py-2 text-sm`}
               onClick={() => {
-                if (value === "individuel") {
+                if (exportTypeState === "cultivator_individual") {
                   onExportToExcel();
-                } else if (value === "association") {
+                } else if (exportTypeState === "cultivator_association") {
                   onExportAssociationToExcel();
+                  // } else if (exportTypeState === "achat_individuel") {
+                  //   onExportAchat_IndividuelToExcel();
+                  // } else if (exportTypeState === "achat_association") {
+                  //   onExportAchat_AssociationToExcel();
                 }
               }}
               loading={loading}

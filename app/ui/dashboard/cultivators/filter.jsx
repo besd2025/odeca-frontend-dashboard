@@ -1,3 +1,4 @@
+" use client";
 import React from "react";
 import {
   Dialog,
@@ -12,8 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-
-function Filter() {
+import { fetchData } from "@/app/_utils/api";
+function Filter({ handleFilter }) {
   // Example options for the selects
   const provinceOptions = [
     { value: "buja", label: "Buja" },
@@ -37,20 +38,141 @@ function Filter() {
     { value: "colline_2", label: "Colline 2" },
   ];
 
-  // Local state and handlers for the example selects/inputs
+  const [province, setProvince] = React.useState([]);
+  const [commune, setCommune] = React.useState([]);
+  const [zones, setZones] = React.useState([]);
+  const [colline, setColline] = React.useState([]);
+  const [selectedColline, setSelectedColline] = React.useState("");
   const [selectedProvince, setSelectedProvince] = React.useState("");
   const [selectedCommune, setSelectedCommune] = React.useState("");
   const [selectedZone, setSelectedZone] = React.useState("");
-  const [selectedColline, setSelectedColline] = React.useState("");
+  const [error, setError] = React.useState(null);
+
   const [ageMin, setAgeMin] = React.useState("");
   const [ageMax, setAgeMax] = React.useState("");
   const [dateFrom, setDateFrom] = React.useState("");
   const [dateTo, setDateTo] = React.useState("");
 
-  const handleSelectProvinceChange = (e) => setSelectedProvince(e.target.value);
-  const handleSelectCommuneChange = (e) => setSelectedCommune(e.target.value);
-  const handleSelectZoneChange = (e) => setSelectedZone(e.target.value);
-  const handleSelectCollineChange = (e) => setSelectedColline(e.target.value);
+  const [loadingSearch, setLoadingSearch] = React.useState(false);
+
+  const handleSelectProvinceChange = async (e) => {
+    const value = e.target.value;
+    //console.log("Selected value:", value);
+    if (!value) {
+      setCommune([]);
+      return;
+    }
+    const communes = await fetchData(
+      "get",
+      `adress/commune/get_communes_by_province`,
+      {
+        params: { province: value },
+        additionalHeaders: {},
+        body: {},
+      }
+    );
+
+    const options = communes?.map((item) => ({
+      value: item.commune_name,
+      label: item.commune_name,
+    }));
+    setCommune(options);
+    setSelectedProvince(value);
+  };
+  const handleSelectCommuneChange = async (e) => {
+    const value = e.target.value;
+    if (!value) {
+      setCommune([]);
+      return;
+    }
+    const zones = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
+      params: { commune: value },
+      additionalHeaders: {},
+      body: {},
+    });
+    const options = zones?.map((item) => ({
+      value: item.zone_name,
+      label: item.zone_name,
+    }));
+    setZones(options);
+    setSelectedCommune(value);
+  };
+  React.useEffect(() => {
+    async function getData() {
+      try {
+        const provinces = await fetchData("get", `adress/province/`, {
+          params: { offset: 0, limit: 5 },
+          additionalHeaders: {},
+          body: {},
+        });
+
+        const options = provinces?.results?.map((item) => ({
+          value: item.province_name,
+          label: item.province_name,
+        }));
+        setProvince(options);
+        //setZones(zones);
+      } catch (error) {
+        setError(error);
+        console.error(error);
+      }
+    }
+    getData();
+  }, []);
+  const handleSelectZoneChange = async (e) => {
+    const value = e.target.value;
+    if (!value) {
+      setCommune([]);
+      return;
+    }
+
+    const collines = await fetchData("get", `adress/colline/`, {
+      params: { zone: value },
+      additionalHeaders: {},
+      body: {},
+    });
+    const options = collines?.results?.map((item) => ({
+      value: item.colline_name,
+      label: item.colline_name,
+    }));
+    setColline(options);
+    setSelectedZone(value);
+  };
+  const handleSelectCollineChange = (e) => {
+    setSelectedColline(e.target.value);
+  };
+  const handleFilters = (e) => {
+    e.preventDefault();
+    setLoadingSearch(true);
+    const filterData = {
+      province: selectedProvince,
+      commune: selectedCommune,
+      zone: selectedZone,
+      colline: selectedColline,
+      ageMin: ageMin,
+      ageMax: ageMax,
+      societe: selectedColline,
+      sdl_ct: selectedColline,
+      dateTo: dateTo,
+      dateFrom: dateFrom,
+    };
+    handleFilter(filterData);
+  };
+
+  // Local state and handlers for the example selects/inputs
+  // const [selectedProvince, setSelectedProvince] = React.useState("");
+  // const [selectedCommune, setSelectedCommune] = React.useState("");
+  // const [selectedZone, setSelectedZone] = React.useState("");
+  // const [selectedColline, setSelectedColline] = React.useState("");
+  // const [ageMin, setAgeMin] = React.useState("");
+  // const [ageMax, setAgeMax] = React.useState("");
+  // const [dateFrom, setDateFrom] = React.useState("");
+  // const [dateTo, setDateTo] = React.useState("");
+
+  // const handleSelectProvinceChange = (e) => setSelectedProvince(e.target.value);
+  // const handleSelectCommuneChange = (e) => setSelectedCommune(e.target.value);
+  // const handleSelectZoneChange = (e) => setSelectedZone(e.target.value);
+  // const handleSelectCollineChange = (e) => setSelectedColline(e.target.value);
 
   return (
     <Dialog>
@@ -116,7 +238,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner province</option>
-                        {provinceOptions.map((p) => (
+                        {province.map((p) => (
                           <option key={p.value} value={p.value}>
                             {p.label}
                           </option>
@@ -136,7 +258,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Commune</option>
-                        {communeOptions.map((c) => (
+                        {commune.map((c) => (
                           <option key={c.value} value={c.value}>
                             {c.label}
                           </option>
@@ -155,7 +277,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner zone</option>
-                        {zoneOptions.map((z) => (
+                        {zones.map((z) => (
                           <option key={z.value} value={z.value}>
                             {z.label}
                           </option>
@@ -174,7 +296,7 @@ function Filter() {
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Colline</option>
-                        {collineOptions.map((c) => (
+                        {colline.map((c) => (
                           <option key={c.value} value={c.value}>
                             {c.label}
                           </option>
@@ -295,7 +417,9 @@ function Filter() {
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit">Filtrer</Button>
+            <Button type="submit" onClick={handleFilters}>
+              Filtrer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

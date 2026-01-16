@@ -347,6 +347,11 @@ function CultivatorData() {
   const onClickTyepeExport = (type) => {
     setCultivateur_type(type);
   };
+  const handleFilter = (filterData) => {
+    // Implement filtering logic here based on filterData
+    console.log("Received filter data ffffhhh:", filterData);
+    // You can use filterData to fetch filtered cultivators from the API
+  };
   return (
     <div className="p-4">
       <Tabs defaultValue="list" className="w-full">
@@ -374,6 +379,7 @@ function CultivatorData() {
             typeExport={typeExport}
             onClickTyepeExport={onClickTyepeExport}
             isLoading={loading}
+            handleFilter={handleFilter}
           />
           {/* )} */}
         </TabsContent>

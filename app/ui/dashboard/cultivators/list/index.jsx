@@ -53,15 +53,22 @@ function DataTable({
   typeExport,
   onExportToExcel,
   onExportAssociationToExcel,
+  exportType,
+  handleFilterData,
 }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [typeExportState, setTypeExportState] = React.useState("");
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [filterData, setFilterData] = React.useState(null);
+  React.useEffect(() => {
+    setTypeExportState(exportType);
+  }, [exportType]);
 
   const columns = [
     {
@@ -269,7 +276,12 @@ function DataTable({
       pagination,
     },
   });
-
+  const handleFilter = (filterData) => {
+    setFilterData(filterData);
+  };
+  React.useEffect(() => {
+    handleFilterData(filterData);
+  }, [filterData]);
   return (
     <div className="w-full bg-sidebar p-2 rounded-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
@@ -287,10 +299,11 @@ function DataTable({
 
         <div className="flex flex-row justify-between gap-x-3">
           <div className="flex items-center gap-3">
-            <Filter />
+            <Filter handleFilter={handleFilter} />
           </div>
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
+              exportType={typeExportState}
               typeExport={typeExport}
               onExportToExcel={onExportToExcel}
               onExportAssociationToExcel={onExportAssociationToExcel}
@@ -386,15 +399,23 @@ export default function CultivatorsListTable({
   typeExport,
   onClickTyepeExport,
   isLoading,
+  handleFilter,
 }) {
   const individuals = individualData ?? data ?? [];
   const associations = associationData ?? [];
   const [tabValue, setTabValue] = useState("individual");
+  const [filterData, setFilterData] = React.useState(null);
   const handleChange = (value) => {
     onClickTyepeExport(value);
     setTabValue(value);
   };
   const [pageSize, setPageSize] = React.useState(10);
+  const handleFilterData = (filterData) => {
+    setFilterData(filterData);
+  };
+  React.useEffect(() => {
+    handleFilter(filterData);
+  }, [filterData]);
   return (
     <Tabs
       value={tabValue}
@@ -427,6 +448,8 @@ export default function CultivatorsListTable({
             data={individuals}
             isCultivatorsPage={isCultivatorsPage}
             onExportToExcel={onExportToExcel}
+            exportType="cultivator_individual"
+            handleFilterData={handleFilterData}
           />
         )}
       </TabsContent>
@@ -440,6 +463,8 @@ export default function CultivatorsListTable({
             onExportToExcel={onExportToExcel}
             onExportAssociationToExcel={onExportAssociationToExcel}
             typeExport={tabValue}
+            exportType="cultivator_association"
+            handleFilterData={handleFilterData}
           />
         )}
       </TabsContent>
