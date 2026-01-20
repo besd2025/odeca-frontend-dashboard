@@ -31,7 +31,7 @@ function StatsCard({ id }) {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         const nombre_cultivateurs = await fetchData(
           "get",
@@ -40,7 +40,7 @@ function StatsCard({ id }) {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         const response = { qte_achete, nombre_cultivateurs };
         setData(response);
@@ -120,8 +120,13 @@ function StatsCard({ id }) {
             </CardTitle>
           </div>
           <CardTitle className="text-3xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-            {data?.qte_achete?.montant_cerise_a +
-              data?.qte_achete?.montant_cerise_b}
+            {(
+              data?.qte_achete?.montant_cerise_a +
+                data?.qte_achete?.montant_cerise_b ?? 0
+            )
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+            FBU
             <span className="text-base">FBU</span>
           </CardTitle>
           <div className="mt-3">

@@ -25,7 +25,7 @@ export default function TransfersPage() {
           "cafe/transfer_ct_sdl/",
           {
             body: { limit: 1000, offset: 0 },
-          }
+          },
         );
         const results = response?.results || [];
         const results2 = response_ct_sdl.results || [];
@@ -72,7 +72,6 @@ export default function TransfersPage() {
                 transfer.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
             },
           }));
-        console.log(results2);
         setSdlTransfers(mappedSdlTransfers);
         setCtTransfers(mappedCtTransfers);
       } catch (error) {

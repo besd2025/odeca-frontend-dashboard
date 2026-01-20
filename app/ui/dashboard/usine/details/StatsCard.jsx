@@ -36,14 +36,33 @@ function StatsCard({ id }) {
       setLoading(true);
       try {
         // Placeholder for API calls
-        // const response = await fetchData("get", `cafe/usines/${id}/stats/`, {});
-
+        const response = await fetchData(
+          "get",
+          `cafe/usine_deparchage/${id}/get_quantite_receptionne_par_hangar/`,
+          {}
+        );
+        const usinee = await fetchData(
+          "get",
+          `cafe/usine_deparchage/${id}/get_quantite_usinee_par_hangar/`,
+          {}
+        );
+        const produit = await fetchData(
+          "get",
+          `cafe/usine_deparchage/${id}/get_quanitite_vert_produit_par_usine/`,
+          {}
+        );
+        const qteVendu = await fetchData(
+          "get",
+          `cafe/usine_deparchage/${id}/get_quanitite_vert_vendu_par_usine/`,
+          {}
+        );
         setData({
-          total_recu: 25000,
-          total_usine: 20000,
-          total_vert_produit: 16000,
-          total_vert_sorti: 10000,
-          stock_actuel: 6000,
+          total_recu: response?.quantite_receptionne || 0,
+          total_usine: usinee?.quantite_usinee || 0,
+          total_vert_produit: produit?.quantite_vert_produit || 0,
+          total_vert_sorti: qteVendu?.quantite_vert_vendu || 0,
+          stock_actuel:
+            produit?.quantite_vert_produit - qteVendu?.quantite_vert_vendu || 0,
           rendement_moyen: 80,
           lots_actifs: 5,
         });
@@ -108,22 +127,22 @@ function StatsCard({ id }) {
       color: "bg-emerald-600",
       desc: "Disponible en stock",
     },
-    {
-      title: "Rendement Moyen",
-      value: data.rendement_moyen,
-      unit: "%",
-      icon: Activity,
-      color: "bg-purple-500",
-      desc: "Performance moyenne",
-    },
-    {
-      title: "Nombre de Lots Actifs",
-      value: data.lots_actifs,
-      unit: "",
-      icon: Layers,
-      color: "bg-indigo-500",
-      desc: "Lots en cours de traitement",
-    },
+    // {
+    //   title: "Rendement Moyen",
+    //   value: data.rendement_moyen,
+    //   unit: "%",
+    //   icon: Activity,
+    //   color: "bg-purple-500",
+    //   desc: "Performance moyenne",
+    // },
+    // {
+    //   title: "Nombre de Lots Actifs",
+    //   value: data.lots_actifs,
+    //   unit: "",
+    //   icon: Layers,
+    //   color: "bg-indigo-500",
+    //   desc: "Lots en cours de traitement",
+    // },
   ];
 
   return (

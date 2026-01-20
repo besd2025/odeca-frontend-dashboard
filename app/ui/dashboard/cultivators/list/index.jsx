@@ -331,7 +331,7 @@ function DataTable({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -350,7 +350,7 @@ function DataTable({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -397,7 +397,7 @@ export default function CultivatorsListTable({
   onExportToExcel,
   onExportAssociationToExcel,
   typeExport,
-  onClickTyepeExport,
+  //onClickTyepeExport,
   isLoading,
   handleFilter,
 }) {
@@ -406,7 +406,7 @@ export default function CultivatorsListTable({
   const [tabValue, setTabValue] = useState("individual");
   const [filterData, setFilterData] = React.useState(null);
   const handleChange = (value) => {
-    onClickTyepeExport(value);
+    //onClickTyepeExport(value);
     setTabValue(value);
   };
   const [pageSize, setPageSize] = React.useState(10);

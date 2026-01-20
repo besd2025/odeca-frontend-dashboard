@@ -146,7 +146,7 @@ function DetailsContent({ id }) {
         </TabsList>
 
         <TabsContent value="details">
-          <StatsCard />
+          <StatsCard id={id} />
         </TabsContent>
         <TabsContent value="receptions">
           <Receptions />

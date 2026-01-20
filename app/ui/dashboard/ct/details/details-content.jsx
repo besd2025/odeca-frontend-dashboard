@@ -43,7 +43,7 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_achats/`,
-        {}
+        {},
       );
       const results = response?.results;
       const formatData = (achats) => ({
@@ -87,7 +87,7 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_cultivators/`,
-        {}
+        {},
       );
       const results = response?.results;
       const cultivatorsData = results?.map((cultivator) => ({
@@ -121,7 +121,7 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_transferts/`,
-        {}
+        {},
       );
       const results = response?.results;
       const transfersData = results?.map((transfer) => ({
@@ -133,7 +133,7 @@ function DetailsContent({ id }) {
           ca: transfer?.quantite_cerise_a,
           cb: transfer?.quantite_cerise_b,
         },
-        photo_fiche: "/images/logo_1.jpg",
+        photo_fiche: transfer?.photo_bordereau || null,
         localite: {
           province:
             transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
@@ -181,7 +181,7 @@ function DetailsContent({ id }) {
       const initResponse = await fetchData(
         "get",
         `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
-        { params: { limit: 1 } }
+        { params: { limit: 1 } },
       );
 
       const totalCount = initResponse?.count || 0;
@@ -194,12 +194,12 @@ function DetailsContent({ id }) {
           params: {
             limit: totalCount,
           },
-        }
+        },
       );
 
       const allData = response.results || [];
       const uniqueData = Array.from(
-        new Map(allData.map((item) => [item.id, item])).values()
+        new Map(allData.map((item) => [item.id, item])).values(),
       );
 
       const formattedData = uniqueData.map((item) => {
@@ -275,7 +275,7 @@ function DetailsContent({ id }) {
 
       saveAs(
         blob,
-        `cultivateurs_${new Date().toISOString().split("T")[0]}.xlsx`
+        `cultivateurs_${new Date().toISOString().split("T")[0]}.xlsx`,
       );
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
@@ -286,7 +286,7 @@ function DetailsContent({ id }) {
       const initResponse = await fetchData(
         "get",
         `cultivators/get_cafe_cultivators?cafeiculteur_type=association`,
-        { params: { limit: 1 } }
+        { params: { limit: 1 } },
       );
 
       const totalCount = initResponse?.count || 0;
@@ -299,12 +299,12 @@ function DetailsContent({ id }) {
           params: {
             limit: totalCount,
           },
-        }
+        },
       );
 
       const allData = response.results || [];
       const uniqueData = Array.from(
-        new Map(allData.map((item) => [item.id, item])).values()
+        new Map(allData.map((item) => [item.id, item])).values(),
       );
 
       const formattedData = uniqueData.map((item) => {
@@ -378,7 +378,7 @@ function DetailsContent({ id }) {
 
       saveAs(
         blob,
-        `associations_${new Date().toISOString().split("T")[0]}.xlsx`
+        `associations_${new Date().toISOString().split("T")[0]}.xlsx`,
       );
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
