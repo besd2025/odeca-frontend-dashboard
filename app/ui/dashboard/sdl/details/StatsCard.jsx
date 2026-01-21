@@ -45,7 +45,6 @@ function StatsCard({ id }) {
         );
 
         const response = { qte_achete, nombre_cultivateurs };
-        console.log("::::", response);
         setData(response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);

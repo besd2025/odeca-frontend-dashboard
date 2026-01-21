@@ -390,9 +390,9 @@ function DataTable({
 }
 
 export default function CultivatorsListTable({
-  data,
   individualData,
   associationData,
+
   isCultivatorsPage,
   onExportToExcel,
   onExportAssociationToExcel,
@@ -400,15 +400,15 @@ export default function CultivatorsListTable({
   //onClickTyepeExport,
   isLoading,
   handleFilter,
+  fetchCultivatorsByType,
 }) {
-  const individuals = individualData ?? data ?? [];
-  const associations = associationData ?? [];
   const [tabValue, setTabValue] = useState("individual");
   const [filterData, setFilterData] = React.useState(null);
   const handleChange = (value) => {
     //onClickTyepeExport(value);
     setTabValue(value);
   };
+
   const [pageSize, setPageSize] = React.useState(10);
   const handleFilterData = (filterData) => {
     setFilterData(filterData);
@@ -416,6 +416,9 @@ export default function CultivatorsListTable({
   React.useEffect(() => {
     handleFilter(filterData);
   }, [filterData]);
+  const handleTabClick = (value) => {
+    fetchCultivatorsByType(value);
+  };
   return (
     <Tabs
       value={tabValue}
@@ -426,6 +429,7 @@ export default function CultivatorsListTable({
       <TabsList className="p-0 h-auto bg-background gap-1">
         <TabsTrigger
           value="individual"
+          onClick={() => handleTabClick("cultivator_individual")}
           className="data-[state=active]:shadow-[0_0_8px_1px_rgba(0,0,0,0.1)] dark:data-[state=active]:shadow-[0_0_8px_1px_rgba(255,255,255,0.2)]"
         >
           <User />
@@ -433,6 +437,7 @@ export default function CultivatorsListTable({
         </TabsTrigger>
         <TabsTrigger
           value="association"
+          onClick={() => handleTabClick("cultivator_association")}
           className="data-[state=active]:shadow-[0_0_8px_1px_rgba(0,0,0,0.1)] dark:data-[state=active]:shadow-[0_0_8px_1px_rgba(255,255,255,0.2)]"
         >
           <Users />
@@ -445,7 +450,7 @@ export default function CultivatorsListTable({
           <TableSkeleton columns={6} rows={10} />
         ) : (
           <DataTable
-            data={individuals}
+            data={individualData}
             isCultivatorsPage={isCultivatorsPage}
             onExportToExcel={onExportToExcel}
             exportType="cultivator_individual"
@@ -458,7 +463,7 @@ export default function CultivatorsListTable({
           <TableSkeleton columns={6} rows={10} />
         ) : (
           <DataTable
-            data={associations}
+            data={associationData}
             isCultivatorsPage={isCultivatorsPage}
             onExportToExcel={onExportToExcel}
             onExportAssociationToExcel={onExportAssociationToExcel}

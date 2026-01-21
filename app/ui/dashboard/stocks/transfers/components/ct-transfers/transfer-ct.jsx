@@ -36,7 +36,7 @@ import ViewImageDialog from "@/components/ui/view-image-dialog";
 import PaginationControls from "@/components/ui/pagination-controls";
 import DetailsTransfer from "./details-transfer";
 
-export default function TransferCtDep({ data }) {
+export default function TransferCtDep({ data, fethTransfertbtnLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -45,6 +45,11 @@ export default function TransferCtDep({ data }) {
     pageIndex: 0,
     pageSize: 10,
   });
+
+  React.useEffect(() => {
+    fethTransfertbtnLoading(true);
+  }, [fethTransfertbtnLoading]);
+
   const columns = [
     {
       id: "actions",
@@ -278,7 +283,7 @@ export default function TransferCtDep({ data }) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -297,7 +302,7 @@ export default function TransferCtDep({ data }) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

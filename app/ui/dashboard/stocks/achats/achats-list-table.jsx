@@ -75,7 +75,7 @@ function DataTable({ data, isCultivatorsPage, exportType }) {
               <DropdownMenuItem
                 onClick={() =>
                   navigator.clipboard.writeText(
-                    cultivator.cultivator.cultivator_code
+                    cultivator.cultivator.cultivator_code,
                   )
                 }
               >
@@ -358,7 +358,7 @@ function DataTable({ data, isCultivatorsPage, exportType }) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -377,7 +377,7 @@ function DataTable({ data, isCultivatorsPage, exportType }) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -422,15 +422,21 @@ export default function AchatsListTable({
   associationData,
   isCultivatorsPage,
   isLoading,
+  fetchCultivatorsByType,
 }) {
+  console.log("AchatsListTable individualData:", individualData);
+  console.log("AchatsListTable associationData:", associationData);
   const individuals = individualData ?? data ?? [];
   const associations = associationData ?? [];
-
+  const handleTabClick = (value) => {
+    fetchCultivatorsByType(value);
+  };
   return (
     <Tabs defaultValue="individual" className="w-full mt-4">
       <TabsList className="p-0 h-auto bg-background gap-1">
         <TabsTrigger
           value="individual"
+          onClick={() => handleTabClick("achat_cultivator_individual")}
           className="data-[state=active]:shadow-[0_0_8px_1px_rgba(0,0,0,0.1)] dark:data-[state=active]:shadow-[0_0_8px_1px_rgba(255,255,255,0.2)]"
         >
           <User />
@@ -438,6 +444,7 @@ export default function AchatsListTable({
         </TabsTrigger>
         <TabsTrigger
           value="association"
+          onClick={() => handleTabClick("achat_cultivator_association")}
           className="data-[state=active]:shadow-[0_0_8px_1px_rgba(0,0,0,0.1)] dark:data-[state=active]:shadow-[0_0_8px_1px_rgba(255,255,255,0.2)]"
         >
           <Users />
@@ -450,7 +457,7 @@ export default function AchatsListTable({
           <TableSkeleton rows={10} columns={6} />
         ) : (
           <DataTable
-            data={individuals}
+            data={individualData}
             isCultivatorsPage={isCultivatorsPage}
             exportType="achats_individual"
           />
@@ -461,7 +468,7 @@ export default function AchatsListTable({
           <TableSkeleton rows={10} columns={6} />
         ) : (
           <DataTable
-            data={associations}
+            data={associationData}
             isCultivatorsPage={isCultivatorsPage}
             exportType="achats_association"
           />

@@ -27,7 +27,7 @@ function AchatsData() {
             params: { limit: 2000, offset: 0 },
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
 
         const dataAchat = response?.results?.map((achat) => ({
@@ -112,7 +112,9 @@ function AchatsData() {
 
     getAchats();
   }, []);
-
+  const fetchCultivatorsByType = (type) => {
+    console.log("Fetch cultivators of typeffff:", type);
+  };
   return (
     <div className="p-4">
       <Tabs defaultValue="list" className="w-full">
@@ -133,6 +135,7 @@ function AchatsData() {
             associationData={associationAchats}
             isCultivatorsPage={true}
             isLoading={loading}
+            fetchCultivatorsByType={fetchCultivatorsByType}
           />
         </TabsContent>
         <TabsContent value="details">

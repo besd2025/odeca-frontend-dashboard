@@ -58,14 +58,17 @@ function DetailsContent({ id }) {
   const [data, setData] = React.useState([]);
   const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
   const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
-
+  const [individualCultivatorsData, setIndividualCultivatorsData] =
+    React.useState([]);
+  const [associationCultivatorsData, setAssociationCultivatorsData] =
+    React.useState([]);
   React.useEffect(() => {
     const getAchatsSDls = async () => {
       try {
         const response = await fetchData(
           "get",
           `cafe/stationslavage/${id}/get_achats/`,
-          {}
+          {},
         );
         const results = response?.results;
         const formatData = (achats) => ({
@@ -99,10 +102,10 @@ function DetailsContent({ id }) {
 
         const formattedResults = results?.map(formatData) || [];
         setIndividualAchatsData(
-          formattedResults.filter((a) => !a.isAssociation)
+          formattedResults.filter((a) => !a.isAssociation),
         );
         setAssociationAchatsData(
-          formattedResults.filter((a) => a.isAssociation)
+          formattedResults.filter((a) => a.isAssociation),
         );
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -113,7 +116,7 @@ function DetailsContent({ id }) {
         const response = await fetchData(
           "get",
           `cafe/stationslavage/${id}/get_cultivators/`,
-          {}
+          {},
         );
         const results = response?.results;
         const cultivatorsData = results?.map((cultivator) => ({
@@ -123,6 +126,9 @@ function DetailsContent({ id }) {
             first_name: cultivator?.cultivator_first_name,
             last_name: cultivator?.cultivator_last_name,
             image_url: cultivator?.cultivator_photo,
+            cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
+            cultivator_assoc_numero_fiche:
+              cultivator?.cultivator_assoc_numero_fiche,
           },
           sdl_ct: "NGome",
           society: "ODECA",
@@ -134,9 +140,45 @@ function DetailsContent({ id }) {
               cultivator?.cultivator_adress?.zone_code?.commune_code
                 ?.commune_name,
           },
-          champs: 4,
+          champs: cultivator?.nombre_champs,
         }));
-        setData(cultivatorsData);
+        setIndividualCultivatorsData(cultivatorsData);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+    const getCultivatorsAssociations = async () => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_cultivators_association/`,
+          {},
+        );
+        const results = response?.results;
+        const cultivatorsData = results?.map((cultivator) => ({
+          id: cultivator?.id,
+          cultivator: {
+            cultivator_code: cultivator?.cultivator_code,
+            first_name: cultivator?.cultivator_assoc_name,
+            last_name: cultivator?.cultivator_last_name,
+            image_url: cultivator?.cultivator_photo,
+            cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
+            cultivator_assoc_numero_fiche:
+              cultivator?.cultivator_assoc_numero_fiche,
+          },
+          sdl_ct: "NGome",
+          society: "fffffff",
+          localite: {
+            province:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name,
+            commune:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name,
+          },
+          champs: cultivator?.nombre_champs,
+        }));
+        setAssociationCultivatorsData(cultivatorsData);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       }
@@ -146,10 +188,9 @@ function DetailsContent({ id }) {
         const response = await fetchData(
           "get",
           `cafe/stationslavage/${id}/get_transferts/`,
-          {}
+          {},
         );
         const results = response?.results;
-        console.log("transfert: ", response);
         const transfersData = results?.map((transfer) => ({
           id: transfer?.id,
 
@@ -174,6 +215,7 @@ function DetailsContent({ id }) {
     getAchatsSDls();
     getCultivators();
     getTransfers();
+    getCultivatorsAssociations();
   }, [id]);
 
   const [selectedPosition, setSelectedPosition] = useState(null);
@@ -260,7 +302,8 @@ function DetailsContent({ id }) {
         <TabsContent value="cultivators">
           <h1 className="text-xl font-semibold m-2">Liste des Cafeiculteurs</h1>
           <CultivatorsListTable
-            data={data}
+            individualData={individualCultivatorsData}
+            associationData={associationCultivatorsData}
             isCultivatorsPage={false}
             handleFilter={handleFilter}
           />

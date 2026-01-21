@@ -16,7 +16,11 @@ function CultivatorData() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [data_association, setDataAssociation] = useState([]);
-  const [cultivateur_type, setCultivateur_type] = useState("individuel");
+  const [cultivateur_type, setCultivateur_type] = useState("");
+  const [individualCultivatorsData, setIndividualCultivatorsData] =
+    React.useState([]);
+  const [associationCultivatorsData, setAssociationCultivatorsData] =
+    React.useState([]);
   const getCultivators = async () => {
     setLoading(true);
     setTypeExport("individuel");
@@ -29,7 +33,7 @@ function CultivatorData() {
           params: { limit: 1000, offset: 0 },
           additionalHeaders: {},
           body: {},
-        }
+        },
       );
       // Format Individual Data
       const data = responseIndividuals.results.map((cultivator) => ({
@@ -60,8 +64,7 @@ function CultivatorData() {
         },
         champs: cultivator?.nombre_champs,
       }));
-      setCultivateur_type("individuel");
-      setData(data);
+      setIndividualCultivatorsData(data);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     } finally {
@@ -79,7 +82,7 @@ function CultivatorData() {
           params: { limit: 1000, offset: 0 },
           additionalHeaders: {},
           body: {},
-        }
+        },
       );
 
       let data = [];
@@ -114,7 +117,7 @@ function CultivatorData() {
         champs: cultivator?.nombre_champs,
       }));
 
-      setDataAssociation(data);
+      setAssociationCultivatorsData(data);
       setTypeExport("association");
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
@@ -124,10 +127,10 @@ function CultivatorData() {
   };
   useEffect(() => {
     try {
-      if (cultivateur_type === "individuel") {
+      if (cultivateur_type === "cultivator_individual") {
         setTypeExport("individuel");
         getCultivators();
-      } else if (cultivateur_type === "association") {
+      } else if (cultivateur_type === "cultivator_association") {
         getCultivatorsAssociation();
       }
     } catch (error) {
@@ -140,7 +143,7 @@ function CultivatorData() {
       const initResponse = await fetchData(
         "get",
         `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
-        { params: { limit: 1 } }
+        { params: { limit: 1 } },
       );
 
       const totalCount = initResponse?.count || 0;
@@ -153,12 +156,12 @@ function CultivatorData() {
           params: {
             limit: totalCount,
           },
-        }
+        },
       );
 
       const allData = response.results || [];
       const uniqueData = Array.from(
-        new Map(allData.map((item) => [item.id, item])).values()
+        new Map(allData.map((item) => [item.id, item])).values(),
       );
 
       const formattedData = uniqueData.map((item) => {
@@ -234,7 +237,7 @@ function CultivatorData() {
 
       saveAs(
         blob,
-        `cultivateurs_${new Date().toISOString().split("T")[0]}.xlsx`
+        `cultivateurs_${new Date().toISOString().split("T")[0]}.xlsx`,
       );
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
@@ -245,7 +248,7 @@ function CultivatorData() {
       const initResponse = await fetchData(
         "get",
         `cultivators/get_cafe_cultivators?cafeiculteur_type=association`,
-        { params: { limit: 1 } }
+        { params: { limit: 1 } },
       );
 
       const totalCount = initResponse?.count || 0;
@@ -258,12 +261,12 @@ function CultivatorData() {
           params: {
             limit: totalCount,
           },
-        }
+        },
       );
 
       const allData = response.results || [];
       const uniqueData = Array.from(
-        new Map(allData.map((item) => [item.id, item])).values()
+        new Map(allData.map((item) => [item.id, item])).values(),
       );
 
       const formattedData = uniqueData.map((item) => {
@@ -337,7 +340,7 @@ function CultivatorData() {
 
       saveAs(
         blob,
-        `associations_${new Date().toISOString().split("T")[0]}.xlsx`
+        `associations_${new Date().toISOString().split("T")[0]}.xlsx`,
       );
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
@@ -351,6 +354,10 @@ function CultivatorData() {
     // Implement filtering logic here based on filterData
     console.log("Received filter data ffffhhh:", filterData);
     // You can use filterData to fetch filtered cultivators from the API
+  };
+
+  const fetchCultivatorsByType = (type) => {
+    setCultivateur_type(type);
   };
   return (
     <div className="p-4">
@@ -371,8 +378,8 @@ function CultivatorData() {
             <TableSkeleton columns={6} rows={5} />
           ) : ( */}
           <CultivatorsListTable
-            individualData={data}
-            associationData={data_association}
+            individualData={individualCultivatorsData}
+            associationData={associationCultivatorsData}
             isCultivatorsPage={true}
             onExportToExcel={exportCultivatorsToExcel}
             onExportAssociationToExcel={exportAssociationToExcel}
@@ -380,6 +387,7 @@ function CultivatorData() {
             onClickTyepeExport={onClickTyepeExport}
             isLoading={loading}
             handleFilter={handleFilter}
+            fetchCultivatorsByType={fetchCultivatorsByType}
           />
           {/* )} */}
         </TabsContent>

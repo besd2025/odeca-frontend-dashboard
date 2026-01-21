@@ -30,17 +30,17 @@ export default function TransfersPage() {
         const results = response?.results || [];
         const results2 = response_ct_sdl.results || [];
         const mappedSdlTransfers = results
-          .filter((t) => t.sdl && !t.ct) // Assuming if it has SDL source and no CT source
+          .filter((t) => t.sdl && !t.ct)
           .map((transfer) => ({
             id: transfer.id,
             from_sdl: transfer.sdl?.sdl_nom || "Inconnu",
-            usine: transfer.usine_deparchage?.usine_name || "Inconnu", // Guessing destination structure
+            usine: transfer.usine_deparchage?.usine_name || "Inconnu",
             society: transfer.sdl?.societe?.nom_societe,
             date: transfer?.transfer_date,
             qte_tranferer: {
               ca: transfer?.total_parche,
             },
-            photo_fiche: transfer.photo_fiche, // Adjust if needed
+            photo_fiche: transfer.photo_fiche,
             localite: {
               province:
                 transfer.sdl?.sdl_adress?.zone_code?.commune_code?.province_code

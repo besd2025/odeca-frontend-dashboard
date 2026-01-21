@@ -35,9 +35,16 @@ function DetailsContent({ id }) {
   const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
   const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
   const [dataTransfert, setDataTransfert] = React.useState([]);
-  const [data_association, setDataAssociation] = useState([]);
-  const [cultivateur_type, setCultivateur_type] = useState("individuel");
-
+  const [cultivateur_type, setCultivateur_type] = useState(
+    "cultivator_individual",
+  );
+  const [individualCultivatorsData, setIndividualCultivatorsData] = useState(
+    [],
+  );
+  const [associationCultivatorsData, setAssociationCultivatorsData] = useState(
+    [],
+  );
+  const [transfertbtnLoading, setTransfertbtnLoading] = useState(false);
   const getAchatsHangars = async () => {
     try {
       const response = await fetchData(
@@ -76,13 +83,13 @@ function DetailsContent({ id }) {
       });
 
       const formattedResults = results?.map(formatData) || [];
-      setIndividualAchatsData(formattedResults.filter((a) => !a.isAssociation));
+      setIndividualAchatsData(formattedResults.filter((a) => a.isAssociation));
       setAssociationAchatsData(formattedResults.filter((a) => a.isAssociation));
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     }
   };
-  const getCultivators = async () => {
+  const getCultivatorsIndividual = async () => {
     try {
       const response = await fetchData(
         "get",
@@ -109,9 +116,43 @@ function DetailsContent({ id }) {
             cultivator?.cultivator_adress?.zone_code?.commune_code
               ?.commune_name,
         },
-        champs: 4,
+        champs: cultivator?.nombre_champs,
       }));
-      setData(cultivatorsData);
+      setIndividualCultivatorsData(cultivatorsData);
+    } catch (error) {
+      console.error("Error fetching cultivators data:", error);
+    }
+  };
+  const getCultivatorsAssociation = async () => {
+    try {
+      const response = await fetchData(
+        "get",
+        `cafe/centres_transite/${id}/get_cultivators_association/`,
+        {},
+      );
+      const results = response?.results;
+      const cultivatorsData = results?.map((cultivator) => ({
+        id: cultivator?.id,
+        cultivator: {
+          cultivator_code: cultivator?.cultivator_code,
+          first_name: cultivator?.cultivator_first_name,
+          last_name: cultivator?.cultivator_last_name,
+          image_url: cultivator?.cultivator_photo,
+          telephone: cultivator?.cultivator_telephone,
+        },
+        sdl_ct: "NGome",
+        society: "ODECA",
+        localite: {
+          province:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
+        },
+        champs: cultivator?.nombre_champs,
+      }));
+      setAssociationCultivatorsData(cultivatorsData);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     }
@@ -147,9 +188,6 @@ function DetailsContent({ id }) {
       console.error("Error fetching cultivators data:", error);
     }
   };
-  // getTransfers();
-  // getAchatsHangars();
-  // getCultivators();
 
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -158,23 +196,33 @@ function DetailsContent({ id }) {
     setSelectedPlace(place);
     setSelectedPosition(place?.coordinates);
   };
-
   const [typeExport, setTypeExport] = useState("individual");
   useEffect(() => {
-    getTransfers();
-    getAchatsHangars();
+    if (achatCultivateur_type === "achat_cultivator_individual") {
+      getAchatsHangars();
+    } else if (achatCultivateur_type === "achat_cultivator_association") {
+      getAchatsHangars();
+    }
+
     try {
-      if (cultivateur_type === "individuel") {
+      if (cultivateur_type === "cultivator_individual") {
         setTypeExport("individuel");
 
-        getCultivators();
-      } else if (cultivateur_type === "association") {
-        getCultivators();
+        getCultivatorsIndividual();
+      } else if (cultivateur_type === "cultivator_association") {
+        getCultivatorsAssociation();
+      }
+      console.log(
+        "Fetching transfers data due to loading state...",
+        transfertbtnLoading,
+      );
+      if (transfertbtnLoading) {
+        getTransfers();
       }
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     }
-  }, [id]);
+  }, [cultivateur_type]);
 
   const exportCultivatorsToExcel = async () => {
     try {
@@ -393,6 +441,21 @@ function DetailsContent({ id }) {
     console.log("Received filter data ffffhhh:", filterData);
     // You can use filterData to fetch filtered cultivators from the API
   };
+  const fetchCultivatorsByType = (type) => {
+    setCultivateur_type(type);
+  };
+  const [achatCultivateur_type, setAchatCultivateur_type] = useState(
+    "achat_cultivator_individual",
+  );
+
+  const fetchAchatCultivatorsByType = (type) => {
+    console.log("Fetch achat cultivators of type:", type);
+    setAchatCultivateur_type(type);
+  };
+
+  const fethTransfertbtnLoading = (loading) => {
+    setTransfertbtnLoading(loading);
+  };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
       <Tabs value={tab} className="space-y-6 w-full" onValueChange={setTab}>
@@ -440,8 +503,8 @@ function DetailsContent({ id }) {
         <TabsContent value="cultivators">
           <h1 className="text-xl font-semibold m-2">Liste des Cafeiculteurs</h1>
           <CultivatorsListTable
-            individualData={data}
-            associationData={data}
+            individualData={individualCultivatorsData}
+            associationData={associationCultivatorsData}
             data={data}
             isCultivatorsPage={false}
             onExportToExcel={exportCultivatorsToExcel}
@@ -449,6 +512,7 @@ function DetailsContent({ id }) {
             typeExport={typeExport}
             onClickTyepeExport={onClickTyepeExport}
             handleFilter={handleFilter}
+            fetchCultivatorsByType={fetchCultivatorsByType}
           />
         </TabsContent>
         <TabsContent value="achats">
@@ -457,6 +521,7 @@ function DetailsContent({ id }) {
             individualData={individualAchatsData}
             associationData={associationAchatsData}
             isCultivatorsPage={false}
+            fetchCultivatorsByType={fetchAchatCultivatorsByType}
           />
         </TabsContent>
 
@@ -537,7 +602,10 @@ function DetailsContent({ id }) {
         </TabsContent>
         <TabsContent value="transferCt">
           <h1 className="text-xl font-semibold m-2">Transfers effectues</h1>
-          <TransferCtDep data={dataTransfert} />
+          <TransferCtDep
+            data={dataTransfert}
+            fethTransfertbtnLoading={fethTransfertbtnLoading}
+          />
         </TabsContent>
       </Tabs>
     </Card>
