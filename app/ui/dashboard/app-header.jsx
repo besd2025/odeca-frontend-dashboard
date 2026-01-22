@@ -104,7 +104,9 @@ export function AppHeader() {
           </div>
 
           <div className="flex items-center gap-2">
-            <CampaigneAnnee />
+            <div className="hidden lg:block">
+              <CampaigneAnnee />
+            </div>
             <Button
               size="icon"
               className="bg-muted text-foreground hover:bg-accent shadow-none rounded-full hidden md:hidden"
