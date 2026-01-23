@@ -39,6 +39,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import CampaigneAnnee from "./home/campaigne-annee";
 
 // This is sample data.
 const menuItems = {
@@ -242,7 +243,7 @@ function CollapsibleMenuItem({ item, isCollapsed, isActive }) {
               className: cn(
                 isActive ? "text-white" : "text-sidebar-foreground/70",
                 isCollapsed ? "size-6! ml-1" : "size-8!",
-                item.icon.props?.className
+                item.icon.props?.className,
               ),
             })
           ) : (
@@ -252,7 +253,7 @@ function CollapsibleMenuItem({ item, isCollapsed, isActive }) {
         <ChevronRight
           className={cn(
             "ml-auto h-4 w-4 transition-transform duration-200",
-            isOpen && "rotate-90"
+            isOpen && "rotate-90",
           )}
         />
       </SidebarMenuButton>
@@ -307,6 +308,9 @@ export function AppSidebar({ ...props }) {
             <SidebarMenu
               className={cn("flex flex-col ", isCollapsed ? "gap-y-2" : "")}
             >
+              <div className=" lg:hidden w-full flex justify-center items-center">
+                <CampaigneAnnee />
+              </div>
               {menuItems.navMain.map((item) => {
                 const active = isActive(item.keyword);
 
@@ -342,7 +346,7 @@ export function AppSidebar({ ...props }) {
                                   ? "text-white"
                                   : "text-sidebar-foreground/70",
                                 isCollapsed ? "size-6! ml-1" : "size-8!",
-                                item.icon.props?.className
+                                item.icon.props?.className,
                               ),
                             })
                           ) : (

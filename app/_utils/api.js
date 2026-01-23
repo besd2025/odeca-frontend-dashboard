@@ -33,7 +33,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 /* ------------------------------------------------------------------ */
@@ -42,7 +42,7 @@ api.interceptors.request.use(
 export const fetchData = async (
   method,
   url,
-  { params = {}, body = null, additionalHeaders = {}, isBlob = false } = {}
+  { params = {}, body = null, additionalHeaders = {}, isBlob = false } = {},
 ) => {
   try {
     const headers = { ...additionalHeaders };
