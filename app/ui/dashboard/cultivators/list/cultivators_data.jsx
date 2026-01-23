@@ -16,7 +16,9 @@ function CultivatorData() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [data_association, setDataAssociation] = useState([]);
-  const [cultivateur_type, setCultivateur_type] = useState("");
+  const [cultivateur_type, setCultivateur_type] = useState(
+    "cultivator_individual",
+  );
   const [individualCultivatorsData, setIndividualCultivatorsData] =
     React.useState([]);
   const [associationCultivatorsData, setAssociationCultivatorsData] =

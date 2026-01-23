@@ -220,7 +220,7 @@ function DetailsContent({ id }) {
 
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
-
+  const [transfertbtnLoading, setTransfertbtnLoading] = useState(false);
   const handleSelectPlace = (place) => {
     setSelectedPlace(place);
     setSelectedPosition(place?.coordinates);
@@ -229,6 +229,9 @@ function DetailsContent({ id }) {
     // Implement filtering logic here based on filterData
     console.log("Received filter data ffffhhh:", filterData);
     // You can use filterData to fetch filtered cultivators from the API
+  };
+  const fethTransfertbtnLoading = (loading) => {
+    setTransfertbtnLoading(loading);
   };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
@@ -306,6 +309,7 @@ function DetailsContent({ id }) {
             associationData={associationCultivatorsData}
             isCultivatorsPage={false}
             handleFilter={handleFilter}
+            fetchCultivatorsByType={fethTransfertbtnLoading}
           />
         </TabsContent>
         <TabsContent value="achats">
