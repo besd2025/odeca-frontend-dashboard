@@ -68,7 +68,11 @@ function DetailsContent({ id }) {
         const response = await fetchData(
           "get",
           `cafe/stationslavage/${id}/get_achats/`,
-          {},
+          {
+            params: { limit: 1000, offset: 0 },
+            additionalHeaders: {},
+            body: {},
+          },
         );
         const results = response?.results;
         const formatData = (achats) => ({
@@ -116,7 +120,11 @@ function DetailsContent({ id }) {
         const response = await fetchData(
           "get",
           `cafe/stationslavage/${id}/get_cultivators/`,
-          {},
+          {
+            params: { limit: 1000, offset: 0 },
+            additionalHeaders: {},
+            body: {},
+          },
         );
         const results = response?.results;
         const cultivatorsData = results?.map((cultivator) => ({
@@ -152,7 +160,11 @@ function DetailsContent({ id }) {
         const response = await fetchData(
           "get",
           `cafe/stationslavage/${id}/get_cultivators_association/`,
-          {},
+          {
+            params: { limit: 1000, offset: 0 },
+            additionalHeaders: {},
+            body: {},
+          },
         );
         const results = response?.results;
         const cultivatorsData = results?.map((cultivator) => ({
@@ -188,7 +200,11 @@ function DetailsContent({ id }) {
         const response = await fetchData(
           "get",
           `cafe/stationslavage/${id}/get_transferts/`,
-          {},
+          {
+            params: { limit: 1000, offset: 0 },
+            additionalHeaders: {},
+            body: {},
+          },
         );
         const results = response?.results;
         const transfersData = results?.map((transfer) => ({

@@ -24,11 +24,17 @@ export function LoginForm({ className, ...props }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
-      router.push("/odeca-dashboard/home");
+      const user = DecodeToJwt(accessToken);
+      const now = new Date();
+      if (now < new Date(user?.exp * 1000)) {
+        router.push("/odeca-dashboard/home");
+      } else {
+        localStorage.removeItem("accessToken");
+        router.push("/");
+      }
     } else {
       router.push("/");
     }
@@ -42,7 +48,7 @@ export function LoginForm({ className, ...props }) {
         atob(base64)
           .split("")
           .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join("")
+          .join(""),
       );
       return JSON.parse(jsonPayload);
     } catch (error) {
@@ -70,7 +76,7 @@ export function LoginForm({ className, ...props }) {
             "X-Signature-web": process.env.NEXT_PUBLIC_SIGNATURE,
           },
           body: JSON.stringify({ identifiant, password }),
-        }
+        },
       );
 
       if (!response.ok) {
