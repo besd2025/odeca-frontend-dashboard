@@ -50,7 +50,11 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_achats/`,
-        {},
+        (params = {
+          params: { limit: 1000, offset: 0 },
+          additionalHeaders: {},
+          body: {},
+        }),
       );
       const results = response?.results;
       const formatData = (achats) => ({
@@ -94,7 +98,7 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_cultivators/`,
-        {},
+        { params: { limit: 1000, offset: 0 }, additionalHeaders: {}, body: {} },
       );
       const results = response?.results;
       const cultivatorsData = results?.map((cultivator) => ({
@@ -128,7 +132,7 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_cultivators_association/`,
-        {},
+        { params: { limit: 1000, offset: 0 }, additionalHeaders: {}, body: {} },
       );
       const results = response?.results;
       const cultivatorsData = results?.map((cultivator) => ({
@@ -162,7 +166,7 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_transferts/`,
-        {},
+        { params: { limit: 1000, offset: 0 }, additionalHeaders: {}, body: {} },
       );
       const results = response?.results;
       const transfersData = results?.map((transfer) => ({
@@ -229,7 +233,7 @@ function DetailsContent({ id }) {
       const initResponse = await fetchData(
         "get",
         `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
-        { params: { limit: 1 } },
+        { params: { limit: 1000, offset: 0 }, additionalHeaders: {}, body: {} },
       );
 
       const totalCount = initResponse?.count || 0;
@@ -240,7 +244,9 @@ function DetailsContent({ id }) {
         `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
         {
           params: {
-            limit: totalCount,
+            params: { limit: 1000, offset: 0 },
+            additionalHeaders: {},
+            body: {},
           },
         },
       );
