@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Ventes from "./ventes";
 import EditHistory from "./edit-history";
+import CultivatorMap from "./cultivator-map";
 import { History, MapPinHouse, ShoppingCart } from "lucide-react";
 
 function ActivityList({ cult_id }) {
@@ -27,7 +28,9 @@ function ActivityList({ cult_id }) {
         <TabsContent value="edits">
           <EditHistory />
         </TabsContent>
-        <TabsContent value="maps">En cours...</TabsContent>
+        <TabsContent value="maps">
+          <CultivatorMap cult_id={cult_id} />
+        </TabsContent>
       </Tabs>
     </Card>
   );
