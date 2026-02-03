@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-table";
 import {
   ArrowUpDownIcon,
+  IdCard,
   MoreHorizontal,
   Search,
   ShieldUser,
@@ -66,6 +67,8 @@ function DataTable({
     pageSize: 10,
   });
   const [filterData, setFilterData] = React.useState(null);
+  const isAssociation = exportType === "cultivator_association";
+
   React.useEffect(() => {
     setTypeExportState(exportType);
   }, [exportType]);
@@ -178,7 +181,42 @@ function DataTable({
         );
       },
     },
+    ...(isAssociation
+      ? []
+      : [
+          {
+            accessorKey: "CNI",
+            header: "CNI",
+            cell: ({ row }) => {
+              const cultivators = row.original.cultivator;
+              const isAssociation = !!cultivators?.cultivator_assoc_name;
 
+              return (
+                <div className="flex items-center gap-3">
+                  <ViewImageDialog
+                    imageUrl={cultivators?.cni_image_url || null}
+                    alt="CNI"
+                    profile={false}
+                  />
+                  <div>
+                    <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                      {isAssociation ? (
+                        <span className="flex items-center">
+                          <ShieldUser size={18} /> rep:{" "}
+                          {cultivators?.cultivator_assoc_rep_name}
+                        </span>
+                      ) : (
+                        <span className="flex justify-center items-center">
+                          <IdCard size={18} /> : {cultivators?.cni}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              );
+            },
+          },
+        ]),
     {
       id: "Telephone",
       header: "Téléphone",
@@ -433,7 +471,7 @@ export default function CultivatorsListTable({
           className="data-[state=active]:shadow-[0_0_8px_1px_rgba(0,0,0,0.1)] dark:data-[state=active]:shadow-[0_0_8px_1px_rgba(255,255,255,0.2)]"
         >
           <User />
-          Individuels
+          Physiques
         </TabsTrigger>
         <TabsTrigger
           value="association"

@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { toast } from "sonner";
 
 export default function EditUsine({ id }) {
   // local state initialized from props
@@ -49,10 +50,10 @@ export default function EditUsine({ id }) {
 
         setProvince(
           response?.usine_adress?.zone_code?.commune_code?.province_code
-            ?.province_name || ""
+            ?.province_name || "",
         );
         setCommune(
-          response?.usine_adress?.zone_code?.commune_code?.commune_name || ""
+          response?.usine_adress?.zone_code?.commune_code?.commune_name || "",
         );
       } catch (error) {
         console.error("Error fetching usine data:", error);
@@ -69,24 +70,41 @@ export default function EditUsine({ id }) {
     setLoading(true);
     const formData = {
       usine_nom: usineName,
-      // Add other fields here if the API supports patching them (e.g. responsable details usually require nested updates or separate endpoints depending on backend implementation. For now updating Name is safest minimum).
+      // Add other fields here if the API supports patching them
     };
 
-    try {
-      const results = await fetchData("patch", `/cafe/usines/${id}/`, {
-        params: {},
-        additionalHeaders: {},
-        body: formData,
-      });
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const results = await fetchData("patch", `/cafe/usines/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: formData,
+        });
 
-      if (results.status == 200 || results.id) {
-        // Check for success (sometimes returns object with ID)
-        window.location.reload();
-      } else {
-        console.log("error updating usine");
+        if (results.status == 200 || results.id) {
+          resolve({ code });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
       }
+    });
+
+    toast.promise(promise, {
+      loading: "Modification...",
+      success: (data) => {
+        setTimeout(() => window.location.reload(), 1000);
+        return `${data.code} a été modifié avec succès `;
+      },
+      error: "Donnée non modifiée",
+    });
+
+    try {
+      await promise;
     } catch (error) {
       console.error(error);
+      // setError(error); // Error already handled by toast
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { StatsCardSkeleton } from "@/components/ui/skeletons";
+import { Separator } from "@/components/ui/separator";
 export function SectionCards() {
   const [data, setData] = React.useState({});
   const [rendement, setRendement] = React.useState({});
@@ -35,7 +37,7 @@ export function SectionCards() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
 
         const rendement = await fetchData(
@@ -45,7 +47,7 @@ export function SectionCards() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         const cafe_vert = await fetchData(
           "get",
@@ -54,7 +56,7 @@ export function SectionCards() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
 
         setData(response);
@@ -85,6 +87,24 @@ export function SectionCards() {
       </div>
     );
   }
+  const formatUnit = (val) => {
+    if (!val) return { v: "0,00", u: "Kg" };
+    return val >= 1000
+      ? {
+          v: (val / 1000).toLocaleString("fr-FR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+          u: "T",
+        }
+      : { v: val.toLocaleString("fr-FR"), u: "Kg" };
+  };
+
+  const total = data?.total_cerise_achat || 0;
+  const percentageA =
+    total > 0 ? ((data?.total_cerise_a_achat || 0) / total) * 100 : 0;
+  const percentageB =
+    total > 0 ? ((data?.total_cerise_b_achat || 0) / total) * 100 : 0;
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-7">
@@ -114,10 +134,30 @@ export function SectionCards() {
           <CardTitle className="text-lg font-semibold tabular-nums  ">
             Qte collectee (CAB)
           </CardTitle>
-          <CardFooter className="flex flex-row justify-end lg:absolute top-[35%] right-2 w-full">
-            {/* <div className="text-muted-foreground">Qte totale (CA+CB)</div> */}
-            <div className="ml-2 flex flex-col justify-end gap-y-1">
+
+          <div className="mt-2 space-y-3 w-full">
+            <div className="flex justify-between items-end">
+              <span className="text-xs text-muted-foreground ">
+                Rapport Cerise A / B
+              </span>
+              {/* <span className="text-[10px] font-mono text-muted-foreground">
+                Ratio: 65%
+              </span> */}
+            </div>
+            {/* Barre de progression professionnelle */}
+            <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="bg-primary/90"
+                style={{ width: `${percentageA}%` }}
+              />
+              <div
+                className="bg-secondary/90"
+                style={{ width: `${percentageB}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-y-2 justify-between text-xs font-medium">
               <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
+                <span className="text-primary flex items-center gap-1">●</span>
                 <div className="flex flex-row gap-x-1 items-center">
                   <Grape className="text-primary size-5" />
                   <CardTitle className="text-md font-semibold text-primary">
@@ -132,7 +172,7 @@ export function SectionCards() {
                         {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
-                        }
+                        },
                       )}{" "}
                       <span className="text-sm">T</span>
                     </>
@@ -142,10 +182,16 @@ export function SectionCards() {
                       <span className="text-sm">Kg</span>
                     </>
                   )}
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({percentageA.toFixed(1)}%)
+                  </span>
                 </CardDescription>
               </div>
-
+              <span className="w-0.5 h-8 bg-black/20 hidden lg:block"></span>
               <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
+                <span className="text-secondary flex items-center gap-1">
+                  ●
+                </span>
                 <div className="flex flex-row gap-x-1 items-center">
                   <Grape className="text-secondary size-5" />
                   <CardTitle className="text-md font-semibold text-secondary">
@@ -160,7 +206,7 @@ export function SectionCards() {
                         {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
-                        }
+                        },
                       )}
                       <span className="text-sm">T</span>
                     </>
@@ -170,11 +216,14 @@ export function SectionCards() {
                       <span className="text-sm">Kg</span>
                     </>
                   )}
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({percentageB.toFixed(1)}%)
+                  </span>
                 </CardDescription>
               </div>
             </div>
-          </CardFooter>
-          <div className="flex flex-col gap-y-1 mt-8">
+          </div>
+          <div className="flex flex-col gap-y-1 mt-2 ">
             <div className="flex flex-row gap-x-2 items-center">
               <div className="rounded-md">
                 <CircleDollarSign className="text-yellow-500 size-4" />
@@ -194,7 +243,7 @@ export function SectionCards() {
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card col-span-2">
+      <Card className="@container/card col-span-2 h-max">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-chart-2 p-2 rounded-md">
@@ -227,13 +276,13 @@ export function SectionCards() {
             </Badge>
           </CardAction> */}
         </CardHeader>
-        <CardFooter className="flex flex-row justify-end ">
-          <div className="ml-2 flex flex-col gap-y-1">
+        <CardFooter className="flex flex-row ">
+          <div className="flex flex-wrap justify-between text-xs font-medium w-full">
             <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
               <div className="flex flex-row gap-x-1 items-center">
                 <Grape className="text-primary size-5" />
                 <CardTitle className="text-md font-semibold text-primary">
-                  A :
+                  CA :
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
@@ -244,25 +293,26 @@ export function SectionCards() {
                       {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      }
+                      },
                     )}
                     <span className="text-sm"> T</span>
                   </>
                 ) : (
                   <>
                     {rendement?.quantite_cerise_a_grade?.toLocaleString(
-                      "fr-FR"
+                      "fr-FR",
                     ) || 0}
                     <span className="text-sm"> Kg</span>
                   </>
                 )}
               </CardDescription>
             </div>
+            <span className="w-0.5 h-8 bg-black/20"></span>
             <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
               <div className="flex flex-row gap-x-1 items-center">
                 <Grape className="text-secondary size-5" />
                 <CardTitle className="text-md font-semibold text-secondary">
-                  B :
+                  CB :
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
@@ -273,14 +323,14 @@ export function SectionCards() {
                       {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      }
+                      },
                     )}
                     <span className="text-sm"> T</span>
                   </>
                 ) : (
                   <>
                     {rendement?.quantite_cerise_b_grade?.toLocaleString(
-                      "fr-FR"
+                      "fr-FR",
                     ) || 0}
                     <span className="text-sm"> Kg</span>
                   </>
@@ -290,7 +340,7 @@ export function SectionCards() {
           </div>
         </CardFooter>
       </Card>
-      <Card className="@container/card col-span-2">
+      <Card className="@container/card col-span-2 h-max">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-md">
@@ -304,14 +354,14 @@ export function SectionCards() {
                     {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    }
+                    },
                   )}
                   <span className="text-sm">T</span>
                 </>
               ) : (
                 <>
                   {cafe_vert_produit?.total_cafe_vert?.toLocaleString(
-                    "fr-FR"
+                    "fr-FR",
                   ) || 0}{" "}
                   <span className="text-sm">Kg</span>
                 </>
@@ -337,38 +387,6 @@ export function SectionCards() {
           </div>
         </CardHeader>
       </Card>
-      {/* <Card className="@container/card hidden">
-        <CardHeader>
-          <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-yellow-500 p-2 rounded-md">
-              <CircleDollarSign className="text-white" />
-            </div>
-            <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
-              Montant
-            </CardTitle>
-          </div>
-          <CardTitle className="text-3xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-            {(data?.total_montant_achat ?? 0)
-              .toString()
-              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
-
-            <span className="text-base">FBU</span>
-          </CardTitle>
-
-          <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-secondary p-2 rounded-md">
-              <Banknote className="text-white" />
-            </div>
-
-            <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
-              Revenues
-            </CardTitle>
-          </div>
-          <CardTitle className="text-3xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-            0 <span className="text-base">FBU</span>
-          </CardTitle>
-        </CardHeader>
-      </Card> */}
     </div>
   );
 }

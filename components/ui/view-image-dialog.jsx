@@ -4,6 +4,8 @@ import Image from "next/image";
 
 import { cn } from "@/lib/utils";
 
+import { createPortal } from "react-dom";
+
 // Fullscreen dialog that shows the large image.
 // This is kept internal and used by the main exported component below.
 const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
@@ -11,6 +13,12 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [rotation, setRotation] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -20,7 +28,7 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
     setRotation(0);
   }, [imageUrl, isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const handleZoomIn = () => setZoom((z) => Math.min(z + 0.25, 3));
   const handleZoomOut = () => setZoom((z) => Math.max(z - 0.25, 0.5));
@@ -45,13 +53,13 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
     event.stopPropagation();
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-9999 flex items-center justify-center bg-black/80"
+      className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80"
       onClick={handleBackdropClick}
     >
       <div
-        className="rel/ative max-w-full max-h-full p-4"
+        className="relative max-w-full max-h-full p-4"
         onClick={stopPropagation}
       >
         {(isLoading || !imageUrl) && !imageError && (
@@ -155,7 +163,8 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 
@@ -199,7 +208,7 @@ const ViewImageDialog = ({
           profile ? "rounded-full" : "rounded",
           "relative h-10 w-10 overflow-hidden border border-border bg-muted",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-          className
+          className,
         )}
       >
         <Image
@@ -207,7 +216,7 @@ const ViewImageDialog = ({
           alt={alt}
           width={80}
           height={80}
-          className="object-cover"
+          className={cn("object-cover", className)}
           unoptimized
         />
       </button>

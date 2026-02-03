@@ -287,7 +287,7 @@ export function AppSidebar({ ...props }) {
   const isActive = (keyword) => pathname.includes(keyword);
   const { isMobile, state } = useSidebar();
   const [isHovered, setIsHovered] = React.useState(false);
-  const isCollapsed = state === "collapsed" && !isHovered;
+  const isCollapsed = !isMobile && state === "collapsed" && !isHovered;
 
   return (
     <Sidebar

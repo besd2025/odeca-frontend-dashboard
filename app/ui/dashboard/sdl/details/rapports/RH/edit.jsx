@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SquarePen } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Edit({
   cultivator = {},
@@ -49,7 +50,6 @@ export default function Edit({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: call API / lift state to parent. For now just log values.
     const payload = {
       cultivator_code: code,
       first_name: firstName,
@@ -60,10 +60,23 @@ export default function Edit({
       localite: { province, commune },
       champs: nbChamps,
     };
-    // For now output to console; caller can replace with API call
-    // eslint-disable-next-line no-console
-    console.log("Submitting cultivator update", payload);
-    setOpen(false);
+
+    const promise = new Promise((resolve) => {
+      setTimeout(() => {
+        // Mock API call
+        console.log("Submitting cultivator update", payload);
+        resolve({ code });
+      }, 1000);
+    });
+
+    toast.promise(promise, {
+      loading: "Modification...",
+      success: (data) => {
+        setTimeout(() => setOpen(false), 500);
+        return `${data.code} a été modifié avec succès `;
+      },
+      error: "Donnée non modifiée",
+    });
   };
 
   return (

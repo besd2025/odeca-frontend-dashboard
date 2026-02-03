@@ -17,7 +17,7 @@ function ProfilePage() {
       <div className="flex flex-col lg:flex-row gap-6">
         <ProfileCard cult_id={id} />
 
-        <div className="relative flex-1 space-y-6">
+        <div className="relative flex-1 space-y-6 z-10">
           <section className="space-y-4">
             <StatsCard cult_id={id} />
           </section>

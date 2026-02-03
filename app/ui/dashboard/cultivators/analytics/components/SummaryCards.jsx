@@ -25,7 +25,7 @@ export function SummaryCards() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         setData(response);
       } catch (error) {
@@ -99,7 +99,7 @@ export function SummaryCards() {
       </Card> */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
-          <CardTitle className=" font-medium">Individuels</CardTitle>
+          <CardTitle className=" font-medium">Physiques</CardTitle>
           <User className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>

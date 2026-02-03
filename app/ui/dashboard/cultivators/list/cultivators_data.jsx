@@ -46,6 +46,8 @@ function CultivatorData() {
           last_name: cultivator?.cultivator_last_name,
           image_url: cultivator?.cultivator_photo,
           telephone: cultivator?.cultivator_telephone,
+          cni: cultivator?.cultivator_cni,
+          cni_image_url: cultivator?.cultivator_cni_photo,
           // Association specific fields
           cultivator_assoc_name: cultivator?.cultivator_assoc_name,
           cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,

@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
+import { toast } from "sonner";
 
 export default function EditTransfers({
   from_ct = "",
@@ -56,17 +57,34 @@ export default function EditTransfers({
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const payload = {
+      from_ct: fromCt,
+      to_depulpeur_name: toDepulpeur,
+      society: soc,
+      localite: { province, commune },
+      qte_tranferer: { ca: caValue, cb: cbValue },
+      photo_fiche: photoFicheUrl,
+    };
+
+    const promise = new Promise((resolve) => {
+      setTimeout(() => {
+        console.log("Submitting cultivator update", payload);
+        resolve({ code: "Transfert" });
+      }, 1000);
+    });
+
+    toast.promise(promise, {
+      loading: "Modification...",
+      success: (data) => {
+        setTimeout(() => setOpen(false), 500);
+        return `${data.code} a été modifié avec succès `;
+      },
+      error: "Donnée non modifiée",
+    });
+
     try {
-      const payload = {
-        from_ct: fromCt,
-        to_depulpeur_name: toDepulpeur,
-        society: soc,
-        localite: { province, commune },
-        qte_tranferer: { ca: caValue, cb: cbValue },
-        photo_fiche: photoFicheUrl,
-      };
-      console.log("Submitting cultivator update", payload);
-      setOpen(false);
+      // await promise;
     } catch (error) {
       console.error(error);
     } finally {

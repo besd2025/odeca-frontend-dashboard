@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
+import { toast } from "sonner";
 
 export default function EditAchats({
   cultivator = {},
@@ -78,26 +79,40 @@ export default function EditAchats({
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const payload = {
+      cultivator_code: code,
+      first_name: firstName,
+      last_name: lastName,
+      sdl_ct: sdl,
+      society: soc,
+      localite: { province, commune },
+      num_fiche: ficheNumber,
+      num_recu: recuNumber,
+      ca: caValue,
+      cb: cbValue,
+      date: purchaseDate,
+      photo_fiche: photoFicheUrl,
+    };
+
+    const promise = new Promise((resolve) => {
+      setTimeout(() => {
+        console.log("Submitting cultivator update", payload);
+        resolve({ code });
+      }, 1000);
+    });
+
+    toast.promise(promise, {
+      loading: "Modification...",
+      success: (data) => {
+        setTimeout(() => setOpen(false), 500);
+        return `${data.code} a été modifié avec succès `;
+      },
+      error: "Donnée non modifiée",
+    });
+
     try {
-      // TODO: call API / lift state to parent. For now just log values.
-      const payload = {
-        cultivator_code: code,
-        first_name: firstName,
-        last_name: lastName,
-        sdl_ct: sdl,
-        society: soc,
-        localite: { province, commune },
-        num_fiche: ficheNumber,
-        num_recu: recuNumber,
-        ca: caValue,
-        cb: cbValue,
-        date: purchaseDate,
-        photo_fiche: photoFicheUrl,
-      };
-      // For now output to console; caller can replace with API call
-      // eslint-disable-next-line no-console
-      console.log("Submitting cultivator update", payload);
-      setOpen(false);
+      // await promise;
     } catch (error) {
       console.error(error);
     } finally {

@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SquarePen } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
+import { toast } from "sonner";
 
 export default function EditReceipts({
   from_sdl = "",
@@ -27,7 +28,7 @@ export default function EditReceipts({
   const [open, setOpen] = React.useState(false);
   const [fromSdl, setFromSdl] = React.useState(from_sdl || "");
   const [toDepulpeur, setToDepulpeur] = React.useState(
-    to_sdl_destination_name || ""
+    to_sdl_destination_name || "",
   );
   const [soc, setSoc] = React.useState(society || "");
   const [province, setProvince] = React.useState(localite?.province || "");
@@ -64,8 +65,22 @@ export default function EditReceipts({
       qte_tranferer: { ca: caValue, cb: cbValue },
       photo_fiche: photoFicheUrl,
     };
-    console.log("Submitting cultivator update", payload);
-    setOpen(false);
+
+    const promise = new Promise((resolve) => {
+      setTimeout(() => {
+        console.log("Submitting cultivator update", payload);
+        resolve({ code: "Reçu" });
+      }, 1000);
+    });
+
+    toast.promise(promise, {
+      loading: "Modification...",
+      success: (data) => {
+        setTimeout(() => setOpen(false), 500);
+        return `${data.code} a été modifié avec succès `;
+      },
+      error: "Donnée non modifiée",
+    });
   };
 
   return (

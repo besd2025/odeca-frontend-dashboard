@@ -22,6 +22,8 @@ import {
   ChevronLeft,
   ChevronRight,
   User,
+  ShieldUser,
+  IdCard,
 } from "lucide-react";
 import Link from "next/link";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
@@ -71,7 +73,7 @@ function ProfileCard({ cult_id }) {
         " relative lg:sticky lg:top-5 transition-all duration-300 ease-in-out border-r shadow-sm bg-card rounded-xl h-max",
         isExpanded
           ? "w-full lg:w-[300px] p-6 space-y-4 "
-          : "w-[80px] p-4 flex flex-col items-center"
+          : "w-[80px] p-4 flex flex-col items-center",
       )}
     >
       <Tooltip>
@@ -135,11 +137,12 @@ function ProfileCard({ cult_id }) {
                   <AvatarImage
                     src={data?.cultivator_photo || null}
                     alt={data?.cultivator_first_name}
-                    className="object-cover "
+                    className="object-cover hidden"
                   />
                   <ViewImageDialog
                     imageUrl={data?.cultivator_photo}
                     className="size-full object-cover"
+                    // fallbackUrl=""
                   />
                 </>
               ) : (
@@ -157,12 +160,13 @@ function ProfileCard({ cult_id }) {
               )}
 
               {/* <AvatarFallback>
-            {data?.cultivator_first_name
-              .split(" ")
-              .map((part) => part[0])
-              .join("")
-              .slice(0, 2)}
-          </AvatarFallback> */}
+                {[data?.cultivator_first_name, data?.cultivator_last_name]
+                  .filter(Boolean)
+                  .map((name) => name[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2)}
+              </AvatarFallback> */}
             </Avatar>
             <div className="space-y-1 flex flex-col items-center gap-y-2">
               {loading ? (
@@ -268,13 +272,26 @@ function ProfileCard({ cult_id }) {
                   </div>
                   <div className="flex items-center justify-between text-sm flex-col gap-y-1">
                     <span className="text-muted-foreground">CNI</span>
-                    <span className="font-medium">
-                      {loading ? (
-                        <Skeleton className="h-5 w-24 mx-auto" />
-                      ) : (
-                        data?.cultivator_cni
-                      )}
-                    </span>
+
+                    <div className="flex items-center gap-3">
+                      <ViewImageDialog
+                        imageUrl={data?.cultivator_cni_photo || null}
+                        alt="CNI"
+                        profile={false}
+                      />
+                      <div>
+                        <span className="">
+                          <span className="flex justify-center items-center font-medium">
+                            <IdCard size={18} /> :{" "}
+                            {loading ? (
+                              <Skeleton className="h-5 w-24 mx-auto" />
+                            ) : (
+                              data?.cultivator_cni
+                            )}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <Separator className="my-2" />
                 </div>

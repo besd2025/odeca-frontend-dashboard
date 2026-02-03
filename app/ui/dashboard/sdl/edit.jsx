@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import { toast } from "sonner";
 export default function Edit({ id }) {
   // local state initialized from props
   const [open, setOpen] = React.useState(false);
@@ -47,10 +48,10 @@ export default function Edit({ id }) {
         setTelephone(response?.sdl_responsable?.user?.phone || "");
         setProvince(
           response?.sdl_adress?.zone_code?.commune_code?.province_code
-            ?.province_name || ""
+            ?.province_name || "",
         );
         setCommune(
-          response?.sdl_adress?.zone_code?.commune_code?.commune_name || ""
+          response?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
         );
       } catch (error) {
         console.error("Error fetching station data:", error);
@@ -67,21 +68,42 @@ export default function Edit({ id }) {
       sdl_nom: sdlName,
     };
 
-    try {
-      const results = await fetchData("patch", `/cafe/stationslavage/${id}/`, {
-        params: {},
-        additionalHeaders: {},
-        body: formData,
-      });
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const results = await fetchData(
+          "patch",
+          `/cafe/stationslavage/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: formData,
+          },
+        );
 
-      if (results.status == 200) {
-        window.location.reload();
-      } else {
-        console.log("error");
+        if (results.status == 200) {
+          resolve({ code });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
       }
+    });
+
+    toast.promise(promise, {
+      loading: "Modification...",
+      success: (data) => {
+        setTimeout(() => window.location.reload(), 1000);
+        return `${data.code} a été modifié avec succès `;
+      },
+      error: "Donnée non modifiée",
+    });
+
+    try {
+      await promise;
     } catch (error) {
-      setError(error);
       console.error(error);
+      setError(error);
     } finally {
       setLoading(false);
     }
