@@ -30,7 +30,7 @@ export function StockSummaryCard() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         const rendement = await fetchData(
           "get",
@@ -39,7 +39,7 @@ export function StockSummaryCard() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         setData(response);
         rendement.forEach((item) => {
@@ -237,7 +237,7 @@ export function StockSummaryCard() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 justify-between p-3 border/5 rounded-lg mt-2">
+        <div className="flex items-center gap-2 justify-between p-0 md:p-3 border/5 rounded-lg mt-2">
           <div className="flex items-center gap-2">
             <div className="bg-green-100 p-1.5 rounded-full dark:bg-green-900">
               <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />

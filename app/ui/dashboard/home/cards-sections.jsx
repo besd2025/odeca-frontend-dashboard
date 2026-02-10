@@ -108,7 +108,7 @@ export function SectionCards() {
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-7">
-      <Card className="@container/card col-span-3 relative">
+      <Card className="@container/card col-span-4 @5xl/main:col-span-3 relative">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-primary p-2 rounded-md">
@@ -243,149 +243,151 @@ export function SectionCards() {
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card col-span-2 h-max">
-        <CardHeader>
-          <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-chart-2 p-2 rounded-md">
-              <ChartColumnBig className="text-white" />
+
+      <Card className="@container/card col-span-4">
+        <CardContent>
+          <div>
+            <div className="flex flex-row gap-x-2 items-center ml-2">
+              <div className="bg-chart-2 p-1 rounded-md">
+                <ChartColumnBig className="text-white" />
+              </div>
+              <CardTitle className="text-2xl @[250px]/card:text-2xl font-semibold tracking-tight tabular-nums">
+                {rendement?.total_cerise >= 1000 ? (
+                  <>
+                    {(rendement?.total_cerise / 1000).toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    <span className="text-sm"> T</span>
+                  </>
+                ) : (
+                  <>
+                    {rendement?.total_cerise?.toLocaleString("fr-FR") || 0}
+                    <span className="text-sm"> Kg</span>
+                  </>
+                )}
+              </CardTitle>
             </div>
-            <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {rendement?.total_cerise >= 1000 ? (
-                <>
-                  {(rendement?.total_cerise / 1000).toLocaleString("fr-FR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                  <span className="text-sm"> T</span>
-                </>
-              ) : (
-                <>
-                  {rendement?.total_cerise?.toLocaleString("fr-FR") || 0}
-                  <span className="text-sm"> Kg</span>
-                </>
-              )}
+            <CardTitle className="text-md font-medium tabular-nums ml-2">
+              Réndement cerise
             </CardTitle>
-          </div>
-          <CardTitle className="text-lg font-semibold tabular-nums  ">
-            Rendement cerise
-          </CardTitle>
-          {/* <CardAction>
+            {/* <CardAction>
             <Badge variant="secondary">
               <IconTrendingUp />
               +12.5%
             </Badge>
           </CardAction> */}
-        </CardHeader>
-        <CardFooter className="flex flex-row ">
-          <div className="flex flex-wrap justify-between text-xs font-medium w-full">
-            <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
-              <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-primary size-5" />
-                <CardTitle className="text-md font-semibold text-primary">
-                  CA :
-                </CardTitle>
+            <div className="flex flex-wrap justify-between text-xs font-medium w-full mt-2">
+              <div className="flex flex-col @5xl/main:flex-row gap-x-2 @5xl/main:items-center bg-background/70 py-1 px-2 rounded-lg w-max">
+                <div className="flex flex-row gap-x-2 items-center bg-sec/ondary/10 py-1 px-2 rounded-lg">
+                  <div className="flex flex-row gap-x-1 items-center">
+                    <Grape className="text-primary size-5" />
+                    <CardTitle className="text-md font-semibold text-primary">
+                      CA :
+                    </CardTitle>
+                  </div>
+                  <CardDescription className="font-semibold text-accent-foreground text-lg">
+                    {rendement?.quantite_cerise_a_grade >= 1000 ? (
+                      <>
+                        {(
+                          rendement?.quantite_cerise_a_grade / 1000
+                        ).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                        <span className="text-sm"> T</span>
+                      </>
+                    ) : (
+                      <>
+                        {rendement?.quantite_cerise_a_grade?.toLocaleString(
+                          "fr-FR",
+                        ) || 0}
+                        <span className="text-sm"> Kg</span>
+                      </>
+                    )}
+                  </CardDescription>
+                </div>
+                <span className="w-0.5 h-8 bg-black/20 hidden @5xl/main:block"></span>
+                <div className="flex flex-row gap-x-2 items-center bg-sec/ondary/10 py-1 px-2 rounded-lg">
+                  <div className="flex flex-row gap-x-1 items-center">
+                    <Grape className="text-secondary size-5" />
+                    <CardTitle className="text-md font-semibold text-secondary">
+                      CB :
+                    </CardTitle>
+                  </div>
+                  <CardDescription className="font-semibold text-accent-foreground text-lg">
+                    {rendement?.quantite_cerise_b_grade >= 1000 ? (
+                      <>
+                        {(
+                          rendement?.quantite_cerise_b_grade / 1000
+                        ).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                        <span className="text-sm"> T</span>
+                      </>
+                    ) : (
+                      <>
+                        {rendement?.quantite_cerise_b_grade?.toLocaleString(
+                          "fr-FR",
+                        ) || 0}
+                        <span className="text-sm"> Kg</span>
+                      </>
+                    )}
+                  </CardDescription>
+                </div>
               </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {rendement?.quantite_cerise_a_grade >= 1000 ? (
+            </div>
+          </div>
+        </CardContent>
+        <CardContent>
+          <div>
+            <div className="flex flex-row gap-x-2 items-center ml-2">
+              <div className="bg-secondary p-1 rounded-md">
+                <Grape className="text-white" />
+              </div>
+              <CardTitle className="text-2xl @[250px]/card:text-2xl font-semibold tracking-tight tabular-nums">
+                {cafe_vert_produit?.total_cafe_vert >= 1000 ? (
                   <>
-                    {(rendement?.quantite_cerise_a_grade / 1000).toLocaleString(
+                    {(cafe_vert_produit?.total_cafe_vert / 1000).toLocaleString(
                       "fr-FR",
                       {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       },
                     )}
-                    <span className="text-sm"> T</span>
+                    <span className="text-sm">T</span>
                   </>
                 ) : (
                   <>
-                    {rendement?.quantite_cerise_a_grade?.toLocaleString(
+                    {cafe_vert_produit?.total_cafe_vert?.toLocaleString(
                       "fr-FR",
-                    ) || 0}
-                    <span className="text-sm"> Kg</span>
+                    ) || 0}{" "}
+                    <span className="text-sm">Kg</span>
                   </>
                 )}
-              </CardDescription>
-            </div>
-            <span className="w-0.5 h-8 bg-black/20"></span>
-            <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
-              <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-secondary size-5" />
-                <CardTitle className="text-md font-semibold text-secondary">
-                  CB :
-                </CardTitle>
-              </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {rendement?.quantite_cerise_b_grade >= 1000 ? (
-                  <>
-                    {(rendement?.quantite_cerise_b_grade / 1000).toLocaleString(
-                      "fr-FR",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      },
-                    )}
-                    <span className="text-sm"> T</span>
-                  </>
-                ) : (
-                  <>
-                    {rendement?.quantite_cerise_b_grade?.toLocaleString(
-                      "fr-FR",
-                    ) || 0}
-                    <span className="text-sm"> Kg</span>
-                  </>
-                )}
-              </CardDescription>
-            </div>
-          </div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card col-span-2 h-max">
-        <CardHeader>
-          <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-secondary p-2 rounded-md">
-              <Grape className="text-white" />
-            </div>
-            <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {cafe_vert_produit?.total_cafe_vert >= 1000 ? (
-                <>
-                  {(cafe_vert_produit?.total_cafe_vert / 1000).toLocaleString(
-                    "fr-FR",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    },
-                  )}
-                  <span className="text-sm">T</span>
-                </>
-              ) : (
-                <>
-                  {cafe_vert_produit?.total_cafe_vert?.toLocaleString(
-                    "fr-FR",
-                  ) || 0}{" "}
-                  <span className="text-sm">Kg</span>
-                </>
-              )}
-            </CardTitle>
-          </div>
-          <CardTitle className="text-lg font-semibold tabular-nums  ">
-            Cafe vert
-          </CardTitle>
-          <div className="hidden flex-col gap-y-1">
-            <div className="flex flex-row gap-x-2 items-center">
-              <div className="rounded-md">
-                <CircleDollarSign className="text-yellow-500" />
-              </div>
-              <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
-                Montant
               </CardTitle>
             </div>
-            <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-              0 <span className="text-base">FBU</span>
+            <CardTitle className="text-md font-medium tabular-nums ml-2">
+              Cafe vert
             </CardTitle>
-            <div className="text-muted-foreground">≈ 194 559 456 $</div>
+            <div className="hidden flex-col gap-y-1">
+              <div className="flex flex-row gap-x-2 items-center">
+                <div className="rounded-md">
+                  <CircleDollarSign className="text-yellow-500" />
+                </div>
+                <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
+                  Montant
+                </CardTitle>
+              </div>
+              <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+                0 <span className="text-base">FBU</span>
+              </CardTitle>
+              <div className="text-muted-foreground">≈ 194 559 456 $</div>
+            </div>
           </div>
-        </CardHeader>
+        </CardContent>
+        <CardFooter className="flex flex-row "></CardFooter>
       </Card>
     </div>
   );
