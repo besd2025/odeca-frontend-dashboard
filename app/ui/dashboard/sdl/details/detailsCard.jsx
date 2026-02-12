@@ -28,9 +28,13 @@ function DetailsCard({ id }) {
   const [loading, setLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
   useEffect(() => {
-    setTimeout(() => {
-      setIsExpanded(false);
+    const timer = setTimeout(() => {
+      if (window.innerWidth >= 1024) {
+        setIsExpanded(false);
+      }
     }, 2500);
+
+    return () => clearTimeout(timer);
   }, []);
   const toggleSidebar = () => setIsExpanded(!isExpanded);
   useEffect(() => {
@@ -59,7 +63,7 @@ function DetailsCard({ id }) {
         "relative lg:sticky lg:top-5 transition-all duration-300 ease-in-out border-r shadow-sm bg-card rounded-xl h-max",
         isExpanded
           ? "w-full lg:w-[300px] p-6 space-y-4"
-          : "w-[80px] p-4 flex flex-col items-center"
+          : "w-[80px] p-4 flex flex-col items-center",
       )}
     >
       <Tooltip>

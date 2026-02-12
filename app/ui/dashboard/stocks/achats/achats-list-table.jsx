@@ -389,7 +389,7 @@ function DataTable({ data, isCultivatorsPage, exportType }) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Pas de resultats
                 </TableCell>
               </TableRow>
             )}

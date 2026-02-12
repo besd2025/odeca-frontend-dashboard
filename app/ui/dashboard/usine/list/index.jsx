@@ -307,7 +307,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
                             ? null
                             : flexRender(
                                 header.column.columnDef.header,
-                                header.getContext()
+                                header.getContext(),
                               )}
                         </TableHead>
                       );
@@ -326,7 +326,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
                         <TableCell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       ))}
@@ -338,7 +338,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      Pas de resultats
                     </TableCell>
                   </TableRow>
                 )}
@@ -347,8 +347,8 @@ export default function UsineListTable({ isLoading: externalLoading }) {
           </div>
           <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
+              {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected. */}
             </div>
             <PaginationControls
               page={table.getState().pagination.pageIndex + 1}
