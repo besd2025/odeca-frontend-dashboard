@@ -379,7 +379,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      Pas de resultats
                     </TableCell>
                   </TableRow>
                 )}
@@ -388,8 +388,8 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
           </div>
           <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
+              {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected. */}
             </div>
             {/* <PaginationControls
               page={table.getState().pagination.pageIndex + 1}

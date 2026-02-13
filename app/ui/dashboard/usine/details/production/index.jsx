@@ -70,7 +70,7 @@ export default function Production({ data = [] }) {
         quantite: 300,
       },
     ],
-    []
+    [],
   );
 
   const tableData = data.length > 0 ? data : defaultData;
@@ -103,7 +103,7 @@ export default function Production({ data = [] }) {
         ),
       },
     ],
-    []
+    [],
   );
 
   const table = useReactTable({
@@ -126,7 +126,7 @@ export default function Production({ data = [] }) {
   // Aggregations (using full dataset)
   const totalProduction = tableData.reduce(
     (acc, curr) => acc + curr.quantite,
-    0
+    0,
   );
 
   const byGrade = tableData.reduce((acc, curr) => {
@@ -232,7 +232,7 @@ export default function Production({ data = [] }) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   ))}
@@ -250,7 +250,7 @@ export default function Production({ data = [] }) {
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}
@@ -262,7 +262,7 @@ export default function Production({ data = [] }) {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    Pas de resultats
                   </TableCell>
                 </TableRow>
               )}

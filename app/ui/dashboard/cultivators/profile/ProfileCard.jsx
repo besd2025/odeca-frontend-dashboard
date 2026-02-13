@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,10 +41,15 @@ function ProfileCard({ cult_id }) {
   const [data, setData] = React.useState({});
   const [loading, setLoading] = React.useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
+
   useEffect(() => {
-    setTimeout(() => {
-      setIsExpanded(false);
+    const timer = setTimeout(() => {
+      if (window.innerWidth >= 1024) {
+        setIsExpanded(false);
+      }
     }, 2500);
+
+    return () => clearTimeout(timer);
   }, []);
   useEffect(() => {
     const getCultivators = async () => {

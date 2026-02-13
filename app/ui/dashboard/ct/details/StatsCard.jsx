@@ -74,7 +74,7 @@ function StatsCard({ id }) {
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
               {data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b}
-              <span className="text-base">Kg</span>
+              <span className="text-base"> Kg</span>
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
@@ -126,14 +126,13 @@ function StatsCard({ id }) {
             )
               .toString()
               .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-            FBU
             <span className="text-base">FBU</span>
           </CardTitle>
           <div className="mt-3">
-            <div className="flex flex-row gap-x-2 items-center">
+            <div className="flex flex-row gap-x-1 items-center">
               <Banknote className="text-secondary" />
 
-              <CardTitle className="text-muted-foreground font-medium tabular-nums  ">
+              <CardTitle className="text-muted-foreground font-normal text-sm tabular-nums  ">
                 Tranche 1
               </CardTitle>
             </div>
@@ -149,34 +148,36 @@ function StatsCard({ id }) {
             <div className="bg-secondary p-2 rounded-full">
               <Users className="text-white" />
             </div>
-            <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
-              Cafeiculteurs
+            <CardTitle className="font-normal flex flex-col gap- tabular-nums  ">
+              <span className="text-muted-foreground text-sm">
+                Cafeiculteurs
+              </span>
+              <span className="text-lg font-semibold tracking-tight tabular-nums">
+                {(data?.nombre_cultivateurs?.hommes ?? 0) +
+                  (data?.nombre_cultivateurs?.femmes ?? 0)}
+              </span>
             </CardTitle>
           </div>
-          <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-            {(data?.nombre_cultivateurs?.hommes ?? 0) +
-              (data?.nombre_cultivateurs?.femmes ?? 0)}
-          </CardTitle>
-          <div className="flex flex-row gap-x-4 mt-4">
-            <div className="flex flex-col ">
-              <div className="text-muted-foreground font-medium tabular-nums flex gap-x-1 ">
-                <span>
+          <div className="flex flex-col gap-y-2 mt-4 rounded-md border border-muted-foreground/50 p-2">
+            <div className="flex flex-row ">
+              <div className="text-muted-foreground tabular-nums flex gap-x-1 ">
+                <span className="bg-background p-1 rounded">
                   <Mars />
                 </span>
-                Homme
+                Homme :
               </div>
-              <div className="text-lg font-semibold tracking-tight tabular-nums ml-4">
+              <div className="font-medium tabular-nums ml-4">
                 {data?.nombre_cultivateurs?.hommes}
               </div>
             </div>
-            <div className="flex flex-col ">
-              <div className="text-muted-foreground font-medium tabular-nums flex gap-x-1 ">
-                <span>
+            <div className="flex flex-row ">
+              <div className="text-muted-foreground tabular-nums flex gap-x-1">
+                <span className="bg-background p-1 rounded">
                   <Venus />
                 </span>
-                Femme
+                Femme :
               </div>
-              <div className="text-lg font-semibold tracking-tight tabular-nums ml-4">
+              <div className="font-medium tabular-nums ml-4">
                 {data?.nombre_cultivateurs?.femmes || 0}
               </div>
             </div>

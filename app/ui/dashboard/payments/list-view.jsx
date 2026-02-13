@@ -85,7 +85,7 @@ export default function ListView({ data = RHData }) {
               <DropdownMenuItem
                 onClick={() =>
                   navigator.clipboard.writeText(
-                    cultivator.cultivator.cultivator_code
+                    cultivator.cultivator.cultivator_code,
                   )
                 }
               >
@@ -256,7 +256,7 @@ export default function ListView({ data = RHData }) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -275,7 +275,7 @@ export default function ListView({ data = RHData }) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -287,7 +287,7 @@ export default function ListView({ data = RHData }) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Pas de resultats
                 </TableCell>
               </TableRow>
             )}

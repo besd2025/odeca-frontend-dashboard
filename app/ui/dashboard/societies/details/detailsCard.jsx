@@ -30,11 +30,12 @@ function DetailsCard({ id }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   useEffect(() => {
-    // Auto collapse after delay if similar to SDL behavior is desired
-    // For now keeping it simple or matching SDL behavior
     const timer = setTimeout(() => {
-      setIsExpanded(false);
+      if (window.innerWidth >= 1024) {
+        setIsExpanded(false);
+      }
     }, 2500);
+
     return () => clearTimeout(timer);
   }, []);
 

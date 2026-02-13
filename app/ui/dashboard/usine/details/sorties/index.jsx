@@ -62,7 +62,7 @@ export default function Sorties({ data = [] }) {
         destination: "", // Missing destination
       },
     ],
-    []
+    [],
   );
 
   const tableData = data.length > 0 ? data : defaultData;
@@ -105,7 +105,7 @@ export default function Sorties({ data = [] }) {
         ),
       },
     ],
-    []
+    [],
   );
 
   const table = useReactTable({
@@ -253,7 +253,7 @@ export default function Sorties({ data = [] }) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   ))}
@@ -271,7 +271,7 @@ export default function Sorties({ data = [] }) {
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}
@@ -283,7 +283,7 @@ export default function Sorties({ data = [] }) {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    Pas de resultats
                   </TableCell>
                 </TableRow>
               )}

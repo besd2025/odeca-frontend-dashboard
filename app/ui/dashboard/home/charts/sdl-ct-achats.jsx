@@ -41,14 +41,14 @@ export function ChartLineAchats() {
           period === "jour"
             ? "day"
             : period === "semaine"
-            ? "week"
-            : period === "annee"
-            ? "year"
-            : "month";
+              ? "week"
+              : period === "annee"
+                ? "year"
+                : "month";
         const results = await fetchData(
           "get",
           `/cafe/stationslavage/get_recent_total_7_cultivators_per_days_or_weeks_or_months_for_line_chart?period=${periodParam}`,
-          { params: {}, additionalHeaders: {}, body: {} }
+          { params: {}, additionalHeaders: {}, body: {} },
         );
         console.log("Fetching data for period:", results);
         if (!Array.isArray(results)) return;
@@ -121,10 +121,10 @@ export function ChartLineAchats() {
                 period === "jour"
                   ? "time"
                   : period === "semaine"
-                  ? "day"
-                  : period === "mois"
-                  ? "month"
-                  : "year"
+                    ? "day"
+                    : period === "mois"
+                      ? "month"
+                      : "year"
               }
               tickLine={false}
               axisLine={false}
