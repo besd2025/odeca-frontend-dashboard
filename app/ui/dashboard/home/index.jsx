@@ -4,6 +4,7 @@ import { ChartPieSdlCtActive } from "./charts/sdl-ct-active";
 import { ChartLineAchats } from "./charts/sdl-ct-achats";
 import { StockSummaryCard } from "./stock-card";
 import { KPIGrid } from "./kpi-stats";
+import { StockSummaryCardUDP } from "./stock-card-udp";
 
 function DashboardContainer() {
   return (
@@ -21,6 +22,7 @@ function DashboardContainer() {
               <ChartPieSdlCtActive />
             </div>
           </div>
+
           <div className="px-4 lg:px-6 grid grid-cols-5 gap-4">
             {/* New KPI Grid Section */}
             <div className="col-span-5 lg:col-span-1">
@@ -28,6 +30,12 @@ function DashboardContainer() {
             </div>
             <div className="col-span-5 lg:col-span-4">
               <ChartLineAchats />
+            </div>
+          </div>
+          <div className="px-4 lg:px-6 grid grid-cols-5 gap-4">
+            {/* Existing Charts + Stock Card */}
+            <div className="col-span-5 flex flex-col gap-4">
+              <StockSummaryCardUDP />
             </div>
           </div>
         </div>

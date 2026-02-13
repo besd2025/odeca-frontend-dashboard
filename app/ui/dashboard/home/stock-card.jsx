@@ -76,9 +76,13 @@ export function StockSummaryCard() {
           <div className="bg-destructive p-2 rounded-md">
             <Package className="text-white" />
           </div>
-          <CardTitle className="text-lg font-semibold">Stock Actuel</CardTitle>
+          <CardTitle className="text-lg font-semibold">
+            Stock Actuel SDLs
+          </CardTitle>
         </div>
-        <CardDescription>État des stocks en temps réel</CardDescription>
+        <CardDescription>
+          État des stocks en temps réel des (SDLs)
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="grid">
@@ -102,10 +106,11 @@ export function StockSummaryCard() {
                 </>
               )}
             </span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm font-medium">
               {(data?.total_montant_cerise_a_achat ?? 0)
                 .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+              FBU (Estimé)
             </span>
           </div>
           <div className="flex flex-col gap-1 p-3 bg-secondary/10 rounded-lg">
@@ -127,10 +132,11 @@ export function StockSummaryCard() {
                 </>
               )}
             </span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm font-medium">
               {(data?.total_montant_cerise_b_achat ?? 0)
                 .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+              FBU (Estimé)
             </span>
           </div>
         </div>
