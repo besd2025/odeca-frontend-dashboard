@@ -42,8 +42,15 @@ import EditAchats from "./edit-achats";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TableSkeleton } from "@/components/ui/skeletons";
-
-function DataTable({ data, isCultivatorsPage, exportType }) {
+import PaginationContent from "@/components/ui/pagination-content";
+function DataTable({
+  data,
+  isCultivatorsPage,
+  exportType,
+  datapagination,
+  limit,
+  totalCount,
+}) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -294,7 +301,16 @@ function DataTable({ data, isCultivatorsPage, exportType }) {
       ),
     },
   ];
-
+  const datapaginationlimit = (limitdata) => {
+    if (limitdata <= datapagination.totalCount) {
+      setPagination((prev) => ({ ...prev, pageSize: limitdata }));
+    } else {
+      setPagination((prev) => ({
+        ...prev,
+        pageSize: datapagination.totalCount,
+      }));
+    }
+  };
   const table = useReactTable({
     data,
     columns,
@@ -401,7 +417,7 @@ function DataTable({ data, isCultivatorsPage, exportType }) {
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <PaginationControls
+        {/* <PaginationControls
           page={table.getState().pagination.pageIndex + 1}
           pageSize={table.getState().pagination.pageSize}
           totalItems={table.getFilteredRowModel().rows.length}
@@ -410,6 +426,15 @@ function DataTable({ data, isCultivatorsPage, exportType }) {
           onPageSizeChange={(size) => table.setPageSize(size)}
           hasNextPage={table.getCanNextPage()}
           hasPreviousPage={table.getCanPreviousPage()}
+        /> */}
+        <PaginationContent
+          datapaginationlimit={datapaginationlimit}
+          currentPage={datapagination.currentPage}
+          totalPages={datapagination.totalPages}
+          onPageChange={datapagination.onPageChange}
+          pointer={datapagination.pointer}
+          totalCount={datapagination.totalCount}
+          onLimitChange={datapagination.onLimitChange}
         />
       </div>
     </div>
@@ -423,6 +448,9 @@ export default function AchatsListTable({
   isCultivatorsPage,
   isLoading,
   fetchCultivatorsByType,
+  datapagination,
+  limit,
+  totalCount,
 }) {
   console.log("AchatsListTable individualData:", individualData);
   console.log("AchatsListTable associationData:", associationData);
@@ -457,6 +485,9 @@ export default function AchatsListTable({
           <TableSkeleton rows={10} columns={6} />
         ) : (
           <DataTable
+            datapagination={datapagination}
+            limit={limit}
+            totalCount={totalCount}
             data={individualData}
             isCultivatorsPage={isCultivatorsPage}
             exportType="achats_individual"
@@ -468,6 +499,9 @@ export default function AchatsListTable({
           <TableSkeleton rows={10} columns={6} />
         ) : (
           <DataTable
+            datapagination={datapagination}
+            limit={limit}
+            totalCount={totalCount}
             data={associationData}
             isCultivatorsPage={isCultivatorsPage}
             exportType="achats_association"

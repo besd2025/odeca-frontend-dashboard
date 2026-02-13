@@ -62,6 +62,11 @@ function DetailsContent({ id }) {
     React.useState([]);
   const [associationCultivatorsData, setAssociationCultivatorsData] =
     React.useState([]);
+
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [totalCount, setTotalCount] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
   React.useEffect(() => {
     const getAchatsSDls = async () => {
       try {
@@ -233,7 +238,26 @@ function DetailsContent({ id }) {
     getTransfers();
     getCultivatorsAssociations();
   }, [id]);
-
+  const totalPages = Math.ceil(totalCount / limit);
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    //localStorage.setItem("table_limit", String(newLimit));
+    setPointer(0);
+    setCurrentPage(1);
+  };
+  const datapagination = {
+    totalCount: totalCount,
+    currentPage: currentPage,
+    onPageChange: onPageChange,
+    totalPages: totalPages,
+    pointer: pointer,
+    onLimitChange: onLimitChange,
+    limit: limit,
+  };
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [transfertbtnLoading, setTransfertbtnLoading] = useState(false);
@@ -326,6 +350,9 @@ function DetailsContent({ id }) {
             isCultivatorsPage={false}
             handleFilter={handleFilter}
             fetchCultivatorsByType={fethTransfertbtnLoading}
+            datapagination={datapagination}
+            limit={limit}
+            totalCount={totalCount}
           />
         </TabsContent>
         <TabsContent value="achats">

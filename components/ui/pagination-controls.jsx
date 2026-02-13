@@ -51,7 +51,7 @@ const createPageSequence = (totalPages, currentPage, siblingCount) => {
       ELLIPSIS,
       ...Array.from(
         { length: rightRange },
-        (_, index) => totalPages - rightRange + index + 1
+        (_, index) => totalPages - rightRange + index + 1,
       ),
     ];
   }
@@ -61,7 +61,7 @@ const createPageSequence = (totalPages, currentPage, siblingCount) => {
     ELLIPSIS,
     ...Array.from(
       { length: rightSiblingIndex - leftSiblingIndex + 1 },
-      (_, index) => leftSiblingIndex + index
+      (_, index) => leftSiblingIndex + index,
     ),
     ELLIPSIS,
     totalPages,
@@ -69,8 +69,8 @@ const createPageSequence = (totalPages, currentPage, siblingCount) => {
 };
 
 export default function PaginationControls({
-  page = 1,
-  pageSize = 10,
+  page,
+  pageSize,
   totalItems,
   totalPages,
   onPageChange,
@@ -83,10 +83,39 @@ export default function PaginationControls({
   hasNextPage,
   hasPreviousPage,
   showPageSizeSelect = true,
+  PaginatedDateFunction,
 }) {
+  const PaginatedData = {
+    page,
+    pageSize,
+    totalItems,
+    totalPages,
+    onPageChange,
+    // onPageSizeChange,
+    pageSizeOptions,
+    siblingCount,
+    showSummary,
+    summaryFormatter,
+    className,
+    hasNextPage,
+    hasPreviousPage,
+    showPageSizeSelect,
+  };
+  const [currentPageSize, setCurrentPageSize] = React.useState(pageSize);
+  const handlePageSizeChange = (newPageSize) => {
+    PaginatedDateFunction({
+      ...PaginatedData,
+      pageSize: newPageSize,
+    });
+    setCurrentPageSize(newPageSize);
+  };
+  // React.useEffect(() => {
+  //   PaginatedDateFunction(PaginatedData);
+  // }, []);
   const resolvedTotalPages = React.useMemo(() => {
     if (typeof totalPages === "number" && totalPages > 0) {
       return Math.max(totalPages, 1);
+      //  return Math.max(totalPages, 1);
     }
 
     if (typeof totalItems === "number" && pageSize > 0) {
@@ -110,9 +139,22 @@ export default function PaginationControls({
 
   const pageSequence = React.useMemo(
     () => createPageSequence(resolvedTotalPages, currentPage, siblingCount),
-    [resolvedTotalPages, currentPage, siblingCount]
+    [resolvedTotalPages, currentPage, siblingCount],
   );
 
+  React.useEffect(() => {
+    setCurrentPageSize(pageSize);
+  }, [pageSize]);
+
+  // Sync initial + changes
+  React.useEffect(() => {
+    if (typeof PaginatedDateFunction === "function") {
+      PaginatedDateFunction({
+        page: currentPage,
+        pageSize: currentPageSize,
+      });
+    }
+  }, [currentPage, currentPageSize]);
   const handlePageChange = React.useCallback(
     (nextPage) => {
       if (
@@ -126,7 +168,7 @@ export default function PaginationControls({
 
       onPageChange(nextPage);
     },
-    [currentPage, onPageChange, resolvedTotalPages]
+    [currentPage, onPageChange, resolvedTotalPages],
   );
 
   const summaryText = React.useMemo(() => {
@@ -165,33 +207,33 @@ export default function PaginationControls({
       pageSizeOptions
         .map((option) => Number(option))
         .filter((size) => !Number.isNaN(size) && size > 0),
-    [pageSizeOptions]
+    [pageSizeOptions],
   );
 
   const showPagination = resolvedTotalPages > 1;
-
+  console.log("PaginatedData dddd:", showPagination);
   return (
     <div
       className={cn(
         "flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between",
-        className
+        className,
       )}
     >
       <div className="flex-1 text-sm text-muted-foreground">
         {summaryText ?? ""}
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-        {showPageSizeSelect && onPageSizeChange && (
+        {currentPageSize > 0 && (
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground whitespace-nowrap">
               Par page
             </span>
             <Select
-              value={String(pageSize)}
-              onValueChange={(value) => onPageSizeChange(Number(value))}
+              value={String(currentPageSize)}
+              onValueChange={(value) => handlePageSizeChange(Number(value))}
             >
               <SelectTrigger className="w-[90px]">
-                <SelectValue placeholder={pageSize} />
+                <SelectValue placeholder={currentPageSize} />
               </SelectTrigger>
               <SelectContent>
                 {formattedPageSizeOptions.map((option) => (
@@ -212,7 +254,7 @@ export default function PaginationControls({
                   href="#"
                   aria-disabled={!canGoToPrevious}
                   className={cn(
-                    !canGoToPrevious && "pointer-events-none opacity-50"
+                    !canGoToPrevious && "pointer-events-none opacity-50",
                   )}
                   onClick={(event) => {
                     event.preventDefault();
@@ -245,7 +287,7 @@ export default function PaginationControls({
                   href="#"
                   aria-disabled={!canGoToNext}
                   className={cn(
-                    !canGoToNext && "pointer-events-none opacity-50"
+                    !canGoToNext && "pointer-events-none opacity-50",
                   )}
                   onClick={(event) => {
                     event.preventDefault();

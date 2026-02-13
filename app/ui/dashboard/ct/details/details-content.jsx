@@ -45,17 +45,22 @@ function DetailsContent({ id }) {
     [],
   );
   const [transfertbtnLoading, setTransfertbtnLoading] = useState(false);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [totalCount, setTotalCount] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
   const getAchatsHangars = async () => {
     try {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_achats/`,
-        (params = {
-          params: { limit: 1000, offset: 0 },
+        {
+          params: { limit: limit, offset: pointer },
           additionalHeaders: {},
           body: {},
-        }),
+        },
       );
+
       const results = response?.results;
       const formatData = (achats) => ({
         id: achats?.id,
@@ -98,7 +103,11 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_cultivators/`,
-        { params: { limit: 1000, offset: 0 }, additionalHeaders: {}, body: {} },
+        {
+          params: { limit: limit, offset: pointer },
+          additionalHeaders: {},
+          body: {},
+        },
       );
       const results = response?.results;
       const cultivatorsData = results?.map((cultivator) => ({
@@ -123,6 +132,7 @@ function DetailsContent({ id }) {
         champs: cultivator?.nombre_champs,
       }));
       setIndividualCultivatorsData(cultivatorsData);
+      setTotalCount(response?.count);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     }
@@ -132,7 +142,11 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_cultivators_association/`,
-        { params: { limit: 1000, offset: 0 }, additionalHeaders: {}, body: {} },
+        {
+          params: { limit: limit, offset: pointer },
+          additionalHeaders: {},
+          body: {},
+        },
       );
       const results = response?.results;
       const cultivatorsData = results?.map((cultivator) => ({
@@ -166,7 +180,11 @@ function DetailsContent({ id }) {
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_transferts/`,
-        { params: { limit: 1000, offset: 0 }, additionalHeaders: {}, body: {} },
+        {
+          params: { limit: limit, offset: pointer },
+          additionalHeaders: {},
+          body: {},
+        },
       );
       const results = response?.results;
       const transfersData = results?.map((transfer) => ({
@@ -216,18 +234,34 @@ function DetailsContent({ id }) {
       } else if (cultivateur_type === "cultivator_association") {
         getCultivatorsAssociation();
       }
-      console.log(
-        "Fetching transfers data due to loading state...",
-        transfertbtnLoading,
-      );
       if (transfertbtnLoading) {
         getTransfers();
       }
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     }
-  }, [cultivateur_type]);
+  }, [cultivateur_type, limit, pointer]);
 
+  const totalPages = Math.ceil(totalCount / limit);
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    //localStorage.setItem("table_limit", String(newLimit));
+    setPointer(0);
+    setCurrentPage(1);
+  };
+  const datapagination = {
+    totalCount: totalCount,
+    currentPage: currentPage,
+    onPageChange: onPageChange,
+    totalPages: totalPages,
+    pointer: pointer,
+    onLimitChange: onLimitChange,
+    limit: limit,
+  };
   const exportCultivatorsToExcel = async () => {
     try {
       const initResponse = await fetchData(
@@ -519,6 +553,9 @@ function DetailsContent({ id }) {
             onClickTyepeExport={onClickTyepeExport}
             handleFilter={handleFilter}
             fetchCultivatorsByType={fetchCultivatorsByType}
+            datapagination={datapagination}
+            limit={limit}
+            totalCount={totalCount}
           />
         </TabsContent>
         <TabsContent value="achats">
