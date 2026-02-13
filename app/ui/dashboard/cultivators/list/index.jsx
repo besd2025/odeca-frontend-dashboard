@@ -44,11 +44,14 @@ import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Edit from "../edit";
 import Link from "next/link";
 import PaginationControls from "@/components/ui/pagination-controls";
-
+import PaginationContent from "@/components/ui/pagination-content";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TableSkeleton } from "@/components/ui/skeletons";
 
 function DataTable({
+  limit,
+  datapagination,
+  totalCount,
   data,
   isCultivatorsPage,
   typeExport,
@@ -62,13 +65,9 @@ function DataTable({
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [typeExportState, setTypeExportState] = React.useState("");
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
   const [filterData, setFilterData] = React.useState(null);
   const isAssociation = exportType === "cultivator_association";
-
+  const [limitState, setLimit] = React.useState(limit);
   React.useEffect(() => {
     setTypeExportState(exportType);
   }, [exportType]);
@@ -294,6 +293,20 @@ function DataTable({
     },
   ];
 
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
+  const datapaginationlimit = (limitdata) => {
+    if (limitdata <= datapagination.totalCount) {
+      setPagination((prev) => ({ ...prev, pageSize: limitdata }));
+    } else {
+      setPagination((prev) => ({
+        ...prev,
+        pageSize: datapagination.totalCount,
+      }));
+    }
+  };
   const table = useReactTable({
     data,
     columns,
@@ -314,6 +327,7 @@ function DataTable({
       pagination,
     },
   });
+
   const handleFilter = (filterData) => {
     setFilterData(filterData);
   };
@@ -409,18 +423,32 @@ function DataTable({
       </div>
       <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {/* {table.getFilteredSelectedRowModel().rows.length} of {totalCount}{" "}
+          row(s) selected. */}
         </div>
-        <PaginationControls
+        {/* <PaginationControls
+          PaginatedDateFunction={PaginatedDateFunction}
           page={table.getState().pagination.pageIndex + 1}
           pageSize={table.getState().pagination.pageSize}
-          totalItems={table.getFilteredRowModel().rows.length}
-          totalPages={table.getPageCount()}
+          // totalItems={table.getFilteredRowModel().rows.length}
+          totalItems={totalCount}
+          // totalPages={table.getPageCount()}
+          totalPages={
+            Math.ceil(totalCount / table.getState().pagination.pageSize) + 1
+          }
           onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
           onPageSizeChange={(size) => table.setPageSize(size)}
           hasNextPage={table.getCanNextPage()}
           hasPreviousPage={table.getCanPreviousPage()}
+        /> */}
+        <PaginationContent
+          datapaginationlimit={datapaginationlimit}
+          currentPage={datapagination.currentPage}
+          totalPages={datapagination.totalPages}
+          onPageChange={datapagination.onPageChange}
+          pointer={datapagination.pointer}
+          totalCount={datapagination.totalCount}
+          onLimitChange={datapagination.onLimitChange}
         />
       </div>
     </div>
@@ -430,7 +458,7 @@ function DataTable({
 export default function CultivatorsListTable({
   individualData,
   associationData,
-
+  totalCount,
   isCultivatorsPage,
   onExportToExcel,
   onExportAssociationToExcel,
@@ -439,6 +467,8 @@ export default function CultivatorsListTable({
   isLoading,
   handleFilter,
   fetchCultivatorsByType,
+  datapagination,
+  limit,
 }) {
   const [tabValue, setTabValue] = useState("individual");
   const [filterData, setFilterData] = React.useState(null);
@@ -446,8 +476,6 @@ export default function CultivatorsListTable({
     //onClickTyepeExport(value);
     setTabValue(value);
   };
-
-  const [pageSize, setPageSize] = React.useState(10);
   const handleFilterData = (filterData) => {
     setFilterData(filterData);
   };
@@ -457,6 +485,11 @@ export default function CultivatorsListTable({
   const handleTabClick = (value) => {
     fetchCultivatorsByType(value);
   };
+
+  // const paginationData = (PaginationData) => {
+  //   paginationDataCultivator(PaginationData); // Log the received pagination data
+  // };
+
   return (
     <Tabs
       value={tabValue}
@@ -488,6 +521,9 @@ export default function CultivatorsListTable({
           <TableSkeleton columns={6} rows={10} />
         ) : (
           <DataTable
+            datapagination={datapagination}
+            limit={limit}
+            totalCount={totalCount}
             data={individualData}
             isCultivatorsPage={isCultivatorsPage}
             onExportToExcel={onExportToExcel}
@@ -501,6 +537,9 @@ export default function CultivatorsListTable({
           <TableSkeleton columns={6} rows={10} />
         ) : (
           <DataTable
+            datapagination={datapagination}
+            limit={limit}
+            totalCount={totalCount}
             data={associationData}
             isCultivatorsPage={isCultivatorsPage}
             onExportToExcel={onExportToExcel}

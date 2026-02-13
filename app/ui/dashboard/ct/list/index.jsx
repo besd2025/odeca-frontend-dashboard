@@ -37,7 +37,8 @@ import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { fetchData } from "@/app/_utils/api";
 import { TableSkeleton } from "@/components/ui/skeletons";
-
+import PaginationContent from "@/components/ui/pagination-content";
+import { useState } from "react";
 export default function CtsListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -53,12 +54,16 @@ export default function CtsListTable({ isLoading: externalLoading }) {
 
   const isActuallyLoading = externalLoading ?? loading;
 
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   React.useEffect(() => {
     const getSdls = async () => {
       setLoading(true);
       try {
         const response = await fetchData("get", "cafe/centres_transite/", {
-          params: {},
+          params: { limit: limit, offset: pointer },
           additionalHeaders: {},
           body: {},
         });
@@ -85,6 +90,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
         }));
 
         setData(ctData);
+        setTotalCount(response?.count);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -94,6 +100,26 @@ export default function CtsListTable({ isLoading: externalLoading }) {
 
     getSdls();
   }, []);
+  const totalPages = Math.ceil(totalCount / limit);
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    //localStorage.setItem("table_limit", String(newLimit));
+    setPointer(0);
+    setCurrentPage(1);
+  };
+  const datapagination = {
+    totalCount: totalCount,
+    currentPage: currentPage,
+    onPageChange: onPageChange,
+    totalPages: totalPages,
+    pointer: pointer,
+    onLimitChange: onLimitChange,
+    limit: limit,
+  };
   const handleFilter = (filteredData) => {
     setFilterData(filteredData);
     console.log("Filtered Data:", filteredData);
@@ -243,7 +269,9 @@ export default function CtsListTable({ isLoading: externalLoading }) {
       },
     },
   ];
-
+  const datapaginationlimit = (limitdata) => {
+    setLimit(limitdata);
+  };
   const table = useReactTable({
     data,
     columns,
@@ -311,7 +339,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
                             ? null
                             : flexRender(
                                 header.column.columnDef.header,
-                                header.getContext()
+                                header.getContext(),
                               )}
                         </TableHead>
                       );
@@ -330,7 +358,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
                         <TableCell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       ))}
@@ -354,7 +382,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
               {table.getFilteredSelectedRowModel().rows.length} of{" "}
               {table.getFilteredRowModel().rows.length} row(s) selected.
             </div>
-            <PaginationControls
+            {/* <PaginationControls
               page={table.getState().pagination.pageIndex + 1}
               pageSize={table.getState().pagination.pageSize}
               totalItems={table.getFilteredRowModel().rows.length}
@@ -363,6 +391,17 @@ export default function CtsListTable({ isLoading: externalLoading }) {
               onPageSizeChange={(size) => table.setPageSize(size)}
               hasNextPage={table.getCanNextPage()}
               hasPreviousPage={table.getCanPreviousPage()}
+            />
+             */}
+
+            <PaginationContent
+              datapaginationlimit={datapaginationlimit}
+              currentPage={datapagination.currentPage}
+              totalPages={datapagination.totalPages}
+              onPageChange={datapagination.onPageChange}
+              pointer={datapagination.pointer}
+              totalCount={datapagination.totalCount}
+              onLimitChange={datapagination.onLimitChange}
             />
           </div>
         </>

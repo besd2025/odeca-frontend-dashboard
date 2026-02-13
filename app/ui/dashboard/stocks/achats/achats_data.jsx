@@ -10,13 +10,17 @@ function AchatsData() {
   const [individualAchats, setIndividualAchats] = useState([]);
   const [associationAchats, setAssociationAchats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     const getAchats = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await fetchData("get", "cafe/achat_cafe/", {
-          params: { limit: 2000, offset: 0 },
+          params: { limit: limit, offset: pointer },
           additionalHeaders: {},
           body: {},
         });
@@ -24,7 +28,7 @@ function AchatsData() {
           "get",
           "cafe/achat_cafe/get_achat_associations/",
           {
-            params: { limit: 2000, offset: 0 },
+            params: { limit: limit, offset: pointer },
             additionalHeaders: {},
             body: {},
           },
@@ -103,6 +107,7 @@ function AchatsData() {
         }));
         setIndividualAchats(dataAchat);
         setAssociationAchats(data_associate);
+        setTotalCount(response?.count);
       } catch (error) {
         console.error("Error fetching achats data:", error);
       } finally {
@@ -111,7 +116,28 @@ function AchatsData() {
     };
 
     getAchats();
-  }, []);
+  }, [limit, pointer]);
+  const totalPages = Math.ceil(totalCount / limit);
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    //localStorage.setItem("table_limit", String(newLimit));
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
+  const datapagination = {
+    totalCount: totalCount,
+    currentPage: currentPage,
+    onPageChange: onPageChange,
+    totalPages: totalPages,
+    pointer: pointer,
+    onLimitChange: onLimitChange,
+    limit: limit,
+  };
   const fetchCultivatorsByType = (type) => {
     console.log("Fetch cultivators of typeffff:", type);
   };
@@ -136,6 +162,9 @@ function AchatsData() {
             isCultivatorsPage={true}
             isLoading={loading}
             fetchCultivatorsByType={fetchCultivatorsByType}
+            datapagination={datapagination}
+            limit={limit}
+            totalCount={totalCount}
           />
         </TabsContent>
         <TabsContent value="details">

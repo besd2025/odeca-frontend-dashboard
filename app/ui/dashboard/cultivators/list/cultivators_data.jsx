@@ -23,21 +23,32 @@ function CultivatorData() {
     React.useState([]);
   const [associationCultivatorsData, setAssociationCultivatorsData] =
     React.useState([]);
+  const [paginationData, setPaginationData] = useState({});
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
+  const paginationDataCultivator = (PaginationData) => {
+    setPaginationData(PaginationData);
+  };
+
   const getCultivators = async () => {
-    setLoading(true);
-    setTypeExport("individuel");
+    //setLoading(true);
+    //setTypeExport("individuel");
     try {
-      // Fetch Individuals
       const responseIndividuals = await fetchData(
         "get",
         "cultivators/get_cafe_cultivators/?cafeiculteur_type=personne",
         {
-          params: { limit: 1000, offset: 0 },
+          params: {
+            limit: limit,
+            offset: pointer,
+          },
           additionalHeaders: {},
           body: {},
         },
       );
-      // Format Individual Data
       const data = responseIndividuals.results.map((cultivator) => ({
         id: cultivator.id,
         cultivator: {
@@ -48,33 +59,25 @@ function CultivatorData() {
           telephone: cultivator?.cultivator_telephone,
           cni: cultivator?.cultivator_cni,
           cni_image_url: cultivator?.cultivator_cni_photo,
-          // Association specific fields
-          cultivator_assoc_name: cultivator?.cultivator_assoc_name,
-          cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,
-          cultivator_assoc_nif: cultivator?.cultivator_assoc_nif,
-          cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
-          cultivator_assoc_numero_fiche:
-            cultivator?.cultivator_assoc_numero_fiche,
         },
         sdl_ct: cultivator?.ct_sdl_name,
         society: cultivator?.societe_name,
-        localite: {
-          province:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.province_code?.province_name,
-          commune:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.commune_name,
-        },
         champs: cultivator?.nombre_champs,
       }));
       setIndividualCultivatorsData(data);
+      setTotalCount(responseIndividuals.count);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  // ... le reste de votre code (getCultivatorsAssociation, etc.)
+
+  // React.useEffect(() => {
+  //   getCultivators();
+  // }, [pointer, limit]);
   const getCultivatorsAssociation = async () => {
     setLoading(true);
     try {
@@ -83,7 +86,7 @@ function CultivatorData() {
         "get",
         "cultivators/get_cafe_cultivators/?cafeiculteur_type=association",
         {
-          params: { limit: 1000, offset: 0 },
+          params: { limit: limit, offset: pointer },
           additionalHeaders: {},
           body: {},
         },
@@ -122,6 +125,7 @@ function CultivatorData() {
       }));
 
       setAssociationCultivatorsData(data);
+      setTotalCount(responseAssociations?.count);
       setTypeExport("association");
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
@@ -130,18 +134,35 @@ function CultivatorData() {
     }
   };
   useEffect(() => {
-    try {
-      if (cultivateur_type === "cultivator_individual") {
-        setTypeExport("individuel");
-        getCultivators();
-      } else if (cultivateur_type === "cultivator_association") {
-        getCultivatorsAssociation();
-      }
-    } catch (error) {
-      console.error("Error fetching cultivators data:", error);
+    if (cultivateur_type === "cultivator_individual") {
+      setTypeExport("individuel");
+      getCultivators();
+    } else if (cultivateur_type === "cultivator_association") {
+      getCultivatorsAssociation();
     }
-  }, [cultivateur_type]);
+  }, [cultivateur_type, pointer, limit]);
 
+  const totalPages = Math.ceil(totalCount / limit);
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    //localStorage.setItem("table_limit", String(newLimit));
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
+  const datapagination = {
+    totalCount: totalCount,
+    currentPage: currentPage,
+    onPageChange: onPageChange,
+    totalPages: totalPages,
+    pointer: pointer,
+    onLimitChange: onLimitChange,
+    limit: limit,
+  };
   const exportCultivatorsToExcel = async () => {
     try {
       const initResponse = await fetchData(
@@ -363,6 +384,7 @@ function CultivatorData() {
   const fetchCultivatorsByType = (type) => {
     setCultivateur_type(type);
   };
+
   return (
     <div className="p-4">
       <Tabs defaultValue="list" className="w-full">
@@ -392,6 +414,9 @@ function CultivatorData() {
             isLoading={loading}
             handleFilter={handleFilter}
             fetchCultivatorsByType={fetchCultivatorsByType}
+            datapagination={datapagination}
+            limit={limit}
+            totalCount={totalCount}
           />
           {/* )} */}
         </TabsContent>
