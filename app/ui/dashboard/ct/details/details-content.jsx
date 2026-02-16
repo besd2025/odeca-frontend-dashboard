@@ -38,6 +38,9 @@ function DetailsContent({ id }) {
   const [cultivateur_type, setCultivateur_type] = useState(
     "cultivator_individual",
   );
+  const [achatCultivateur_type, setAchatCultivateur_type] = useState(
+    "achat_cultivator_individual",
+  );
   const [individualCultivatorsData, setIndividualCultivatorsData] = useState(
     [],
   );
@@ -49,55 +52,78 @@ function DetailsContent({ id }) {
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCountAchat, setTotalCountAchat] = useState(0);
+
+  const [pointerAchat, setPointerAchat] = useState(0);
+  const [limitAchat, setLimitAchat] = useState(5);
+  const [currentPageAchat, setCurrentPageAchat] = useState(1);
+
   const getAchatsHangars = async () => {
     try {
+      const type =
+        achatCultivateur_type === "achat_cultivator_individual"
+          ? "personne"
+          : "association";
+
       const response = await fetchData(
         "get",
         `cafe/centres_transite/${id}/get_achats/`,
         {
-          params: { limit: limit, offset: pointer },
-          additionalHeaders: {},
-          body: {},
+          params: {
+            cafeiculteur_type: type,
+            limit: limitAchat,
+            offset: pointerAchat,
+          },
         },
       );
+      const mappedData =
+        response?.results?.map((achats) => ({
+          id: achats?.id,
+          cultivator: {
+            cultivator_code: achats?.cafeiculteur?.cultivator_code,
+            first_name: achats?.cafeiculteur?.cultivator_first_name,
+            last_name: achats?.cafeiculteur?.cultivator_last_name,
+            image_url: achats?.cafeiculteur?.cultivator_photo,
+            cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
+            cultivator_assoc_rep_name:
+              achats?.cafeiculteur?.cultivator_assoc_rep_name,
+          },
+          localite: {
+            province:
+              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name,
+            commune:
+              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name,
+          },
+          num_fiche: 784,
+          num_recu: achats?.numero_recu,
+          photo_fiche: achats?.photo_fiche,
+          ca: achats?.quantite_cerise_a,
+          cb: achats?.quantite_cerise_b,
+          date: achats?.date_achat,
+          isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
+        })) || [];
 
-      const results = response?.results;
-      const formatData = (achats) => ({
-        id: achats?.id,
-        cultivator: {
-          cultivator_code: achats?.cafeiculteur?.cultivator_code,
-          first_name: achats?.cafeiculteur?.cultivator_first_name,
-          last_name: achats?.cafeiculteur?.cultivator_last_name,
-          image_url: achats?.cafeiculteur?.cultivator_photo,
-          // Association fields
-          cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
-          cultivator_assoc_rep_name:
-            achats?.cafeiculteur?.cultivator_assoc_rep_name,
-        },
-        localite: {
-          province:
-            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-              ?.province_code?.province_name,
-          commune:
-            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-              ?.commune_name,
-        },
-        num_fiche: 784,
-        num_recu: achats?.numero_recu,
-        photo_fiche: achats?.photo_fiche,
-        ca: achats?.quantite_cerise_a,
-        cb: achats?.quantite_cerise_b,
-        date: achats?.date_achat,
-        isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
-      });
+      setTotalCountAchat(response?.count || 0);
 
-      const formattedResults = results?.map(formatData) || [];
-      setIndividualAchatsData(formattedResults.filter((a) => a.isAssociation));
-      setAssociationAchatsData(formattedResults.filter((a) => a.isAssociation));
+      if (type == "personne") {
+        setIndividualAchatsData(mappedData);
+        setAssociationAchatsData([]);
+      } else {
+        setAssociationAchatsData(mappedData);
+        setIndividualAchatsData([]);
+      }
     } catch (error) {
-      console.error("Error fetching cultivators data:", error);
+      console.error("Error fetching achats data:", error);
     }
   };
+
+  useEffect(() => {
+    if (tab == "achats") {
+      getAchatsHangars();
+    }
+  }, [achatCultivateur_type, limitAchat, pointerAchat, tab]);
   const getCultivatorsIndividual = async () => {
     try {
       const response = await fetchData(
@@ -171,6 +197,7 @@ function DetailsContent({ id }) {
         champs: cultivator?.nombre_champs,
       }));
       setAssociationCultivatorsData(cultivatorsData);
+      setTotalCount(response?.count);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     }
@@ -220,18 +247,18 @@ function DetailsContent({ id }) {
   };
   const [typeExport, setTypeExport] = useState("individual");
   useEffect(() => {
-    if (achatCultivateur_type === "achat_cultivator_individual") {
-      getAchatsHangars();
-    } else if (achatCultivateur_type === "achat_cultivator_association") {
-      getAchatsHangars();
-    }
+    // if (achatCultivateur_type === "achat_cultivator_individual") {
+    // getAchatsHangars();
+    // } else if (achatCultivateur_type === "achat_cultivator_association") {
+
+    //}
 
     try {
-      if (cultivateur_type === "cultivator_individual") {
+      if (cultivateur_type == "cultivator_individual") {
         setTypeExport("individuel");
 
         getCultivatorsIndividual();
-      } else if (cultivateur_type === "cultivator_association") {
+      } else if (cultivateur_type == "cultivator_association") {
         getCultivatorsAssociation();
       }
       if (transfertbtnLoading) {
@@ -253,6 +280,18 @@ function DetailsContent({ id }) {
     setPointer(0);
     setCurrentPage(1);
   };
+
+  const totalPagesAchat = Math.ceil(totalCountAchat / limitAchat);
+  const onPageChangeAchat = (pageNumber) => {
+    setCurrentPageAchat(pageNumber);
+    setPointerAchat((pageNumber - 1) * limitAchat);
+  };
+  const onLimitChangeAchat = (newLimit) => {
+    setLimitAchat(newLimit);
+    //localStorage.setItem("table_limit", String(newLimit));
+    setPointerAchat(0);
+    setCurrentPageAchat(1);
+  };
   const datapagination = {
     totalCount: totalCount,
     currentPage: currentPage,
@@ -262,6 +301,17 @@ function DetailsContent({ id }) {
     onLimitChange: onLimitChange,
     limit: limit,
   };
+
+  const dataAchatpagination = {
+    totalCount: totalCountAchat,
+    currentPage: currentPageAchat,
+    onPageChange: onPageChangeAchat,
+    totalPages: totalPagesAchat,
+    pointer: pointerAchat,
+    onLimitChange: onLimitChangeAchat,
+    limit: limitAchat,
+  };
+
   const exportCultivatorsToExcel = async () => {
     try {
       const initResponse = await fetchData(
@@ -483,22 +533,47 @@ function DetailsContent({ id }) {
   };
   const fetchCultivatorsByType = (type) => {
     setCultivateur_type(type);
+    if (type === "cultivator_individual") {
+      getCultivatorsIndividual();
+    } else if (type === "cultivator_association") {
+      getCultivatorsAssociation();
+    }
   };
-  const [achatCultivateur_type, setAchatCultivateur_type] = useState(
-    "achat_cultivator_individual",
-  );
 
   const fetchAchatCultivatorsByType = (type) => {
-    console.log("Fetch achat cultivators of type:", type);
     setAchatCultivateur_type(type);
   };
 
   const fethTransfertbtnLoading = (loading) => {
     setTransfertbtnLoading(loading);
   };
+  useEffect(() => {
+    // Réinitialiser la pagination lorsque le type de cultivateur change
+    setCurrentPage(1);
+    setPointer(0);
+  }, [cultivateur_type]);
+
+  const handleTabChange = (tab) => {
+    setTab(tab);
+    console.log("Selected tab:", tab);
+    if (tab === "cultivators") {
+      fetchCultivatorsByType(cultivateur_type);
+    } else if (tab === "achats") {
+      fetchAchatCultivatorsByType(achatCultivateur_type);
+    } else if (tab === "transferCt") {
+      fethTransfertbtnLoading(true);
+    } else if (tab === "maps") {
+      //fetchMapData();
+    }
+  };
+
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
-      <Tabs value={tab} className="space-y-6 w-full" onValueChange={setTab}>
+      <Tabs
+        value={tab}
+        className="space-y-6 w-full"
+        onValueChange={(value) => handleTabChange(value)}
+      >
         <TabsList className="overflow-x-auto w-full ">
           <TabsTrigger value="cultivators" className="shrink-0">
             <Users /> Cafeiculteurs
@@ -565,6 +640,9 @@ function DetailsContent({ id }) {
             associationData={associationAchatsData}
             isCultivatorsPage={false}
             fetchCultivatorsByType={fetchAchatCultivatorsByType}
+            datapagination={dataAchatpagination}
+            limit={limit}
+            totalCount={totalCountAchat}
           />
         </TabsContent>
 

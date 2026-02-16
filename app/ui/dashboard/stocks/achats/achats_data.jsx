@@ -14,6 +14,7 @@ function AchatsData() {
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
+  const [achat_type, setAchat_type] = useState("achat_cultivator_individual");
 
   useEffect(() => {
     const getAchats = async () => {
@@ -105,9 +106,15 @@ function AchatsData() {
           date: achat?.date_achat || "N/A",
           // Type identification
         }));
-        setIndividualAchats(dataAchat);
-        setAssociationAchats(data_associate);
-        setTotalCount(response?.count);
+        if (achat_type === "achat_cultivator_individual") {
+          setIndividualAchats(dataAchat);
+          setTotalCount(response?.count);
+          setAssociationAchats([]);
+        } else if (achat_type === "achat_cultivator_association") {
+          setAssociationAchats(data_associate);
+          setTotalCount(response_associate?.count);
+          setIndividualAchats([]);
+        }
       } catch (error) {
         console.error("Error fetching achats data:", error);
       } finally {
@@ -116,7 +123,7 @@ function AchatsData() {
     };
 
     getAchats();
-  }, [limit, pointer]);
+  }, [limit, pointer, achat_type]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -139,8 +146,15 @@ function AchatsData() {
     limit: limit,
   };
   const fetchCultivatorsByType = (type) => {
-    console.log("Fetch cultivators of typeffff:", type);
+    setAchat_type(type);
   };
+
+  useEffect(() => {
+    // Réinitialiser la pagination lorsque le type de cultivateur change
+    setCurrentPage(1);
+    setPointer(0);
+  }, [achat_type]);
+
   return (
     <div className="p-4">
       <Tabs defaultValue="list" className="w-full">

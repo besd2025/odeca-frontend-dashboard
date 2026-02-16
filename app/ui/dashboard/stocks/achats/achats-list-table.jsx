@@ -55,10 +55,6 @@ function DataTable({
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
   const columns = [
     {
       id: "actions",
@@ -301,6 +297,10 @@ function DataTable({
       ),
     },
   ];
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
   const datapaginationlimit = (limitdata) => {
     if (limitdata <= datapagination.totalCount) {
       setPagination((prev) => ({ ...prev, pageSize: limitdata }));
@@ -452,12 +452,14 @@ export default function AchatsListTable({
   limit,
   totalCount,
 }) {
-  console.log("AchatsListTable individualData:", individualData);
-  console.log("AchatsListTable associationData:", associationData);
-  const individuals = individualData ?? data ?? [];
-  const associations = associationData ?? [];
+  console.log("individualData", individualData);
+  console.log("associationData", associationData);
   const handleTabClick = (value) => {
-    fetchCultivatorsByType(value);
+    if (value == "") {
+      fetchCultivatorsByType("achat_cultivator_individual");
+    } else {
+      fetchCultivatorsByType(value);
+    }
   };
   return (
     <Tabs defaultValue="individual" className="w-full mt-4">

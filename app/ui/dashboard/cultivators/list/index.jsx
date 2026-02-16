@@ -67,7 +67,6 @@ function DataTable({
   const [typeExportState, setTypeExportState] = React.useState("");
   const [filterData, setFilterData] = React.useState(null);
   const isAssociation = exportType === "cultivator_association";
-  const [limitState, setLimit] = React.useState(limit);
   React.useEffect(() => {
     setTypeExportState(exportType);
   }, [exportType]);
@@ -414,7 +413,7 @@ function DataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Pas de resultats
+                  No results.
                 </TableCell>
               </TableRow>
             )}
