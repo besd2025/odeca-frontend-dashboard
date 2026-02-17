@@ -297,14 +297,7 @@ function DataTable({
     pageSize: 5,
   });
   const datapaginationlimit = (limitdata) => {
-    if (limitdata <= datapagination.totalCount) {
-      setPagination((prev) => ({ ...prev, pageSize: limitdata }));
-    } else {
-      setPagination((prev) => ({
-        ...prev,
-        pageSize: datapagination.totalCount,
-      }));
-    }
+    setPagination((prev) => ({ ...prev, pageSize: limitdata }));
   };
   const table = useReactTable({
     data,

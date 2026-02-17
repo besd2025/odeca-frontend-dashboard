@@ -43,6 +43,7 @@ import PaginationControls from "@/components/ui/pagination-controls";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TableSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
+import Filter from "./filter";
 function DataTable({
   data,
   isCultivatorsPage,
@@ -50,6 +51,7 @@ function DataTable({
   datapagination,
   limit,
   totalCount,
+  handleFilter,
 }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -302,14 +304,7 @@ function DataTable({
     pageSize: 5,
   });
   const datapaginationlimit = (limitdata) => {
-    if (limitdata <= datapagination.totalCount) {
-      setPagination((prev) => ({ ...prev, pageSize: limitdata }));
-    } else {
-      setPagination((prev) => ({
-        ...prev,
-        pageSize: datapagination.totalCount,
-      }));
-    }
+    setPagination((prev) => ({ ...prev, pageSize: limitdata }));
   };
   const table = useReactTable({
     data,
@@ -348,6 +343,9 @@ function DataTable({
         </div>
 
         <div className="flex flex-row justify-between gap-x-3">
+          <div className="flex items-center gap-3">
+            <Filter handleFilter={handleFilter} />
+          </div>
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
               exportType={exportType}
@@ -451,9 +449,8 @@ export default function AchatsListTable({
   datapagination,
   limit,
   totalCount,
+  handleFilter,
 }) {
-  console.log("individualData", individualData);
-  console.log("associationData", associationData);
   const handleTabClick = (value) => {
     if (value == "") {
       fetchCultivatorsByType("achat_cultivator_individual");
@@ -493,6 +490,7 @@ export default function AchatsListTable({
             data={individualData}
             isCultivatorsPage={isCultivatorsPage}
             exportType="achats_individual"
+            handleFilter={handleFilter}
           />
         )}
       </TabsContent>
@@ -507,6 +505,7 @@ export default function AchatsListTable({
             data={associationData}
             isCultivatorsPage={isCultivatorsPage}
             exportType="achats_association"
+            handleFilter={handleFilter}
           />
         )}
       </TabsContent>

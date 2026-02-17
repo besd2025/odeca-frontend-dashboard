@@ -35,6 +35,12 @@ function DetailsContent({ id }) {
   const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
   const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
   const [dataTransfert, setDataTransfert] = React.useState([]);
+
+  // Transfert Pagination State
+  const [pointerTransfer, setPointerTransfer] = useState(0);
+  const [limitTransfer, setLimitTransfer] = useState(5);
+  const [totalCountTransfer, setTotalCountTransfer] = useState(0);
+  const [currentPageTransfer, setCurrentPageTransfer] = useState(1);
   const [cultivateur_type, setCultivateur_type] = useState(
     "cultivator_individual",
   );
@@ -57,8 +63,12 @@ function DetailsContent({ id }) {
   const [pointerAchat, setPointerAchat] = useState(0);
   const [limitAchat, setLimitAchat] = useState(5);
   const [currentPageAchat, setCurrentPageAchat] = useState(1);
+  const [filterAchatData, setFilterAchatData] = useState({});
+  const [isCultivatorsLoading, setIsCultivatorsLoading] = useState(false);
+  const [isAchatsLoading, setIsAchatsLoading] = useState(false);
 
   const getAchatsHangars = async () => {
+    console.log("Fetching achats with filter data:", filterAchatData);
     try {
       const type =
         achatCultivateur_type === "achat_cultivator_individual"
@@ -70,6 +80,7 @@ function DetailsContent({ id }) {
         `cafe/centres_transite/${id}/get_achats/`,
         {
           params: {
+            ...filterAchatData,
             cafeiculteur_type: type,
             limit: limitAchat,
             offset: pointerAchat,
@@ -87,6 +98,8 @@ function DetailsContent({ id }) {
             cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
             cultivator_assoc_rep_name:
               achats?.cafeiculteur?.cultivator_assoc_rep_name,
+            cultivator_type:
+              type === "association" ? "association" : "individual",
           },
           localite: {
             province:
@@ -123,7 +136,7 @@ function DetailsContent({ id }) {
     if (tab == "achats") {
       getAchatsHangars();
     }
-  }, [achatCultivateur_type, limitAchat, pointerAchat, tab]);
+  }, [achatCultivateur_type, limitAchat, pointerAchat, tab, filterAchatData]);
   const getCultivatorsIndividual = async () => {
     try {
       const response = await fetchData(
@@ -183,6 +196,8 @@ function DetailsContent({ id }) {
           last_name: cultivator?.cultivator_last_name,
           image_url: cultivator?.cultivator_photo,
           telephone: cultivator?.cultivator_telephone,
+          cultivator_assoc_name: cultivator?.cultivator_assoc_name,
+          cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,
         },
         sdl_ct: "NGome",
         society: "ODECA",
@@ -208,11 +223,12 @@ function DetailsContent({ id }) {
         "get",
         `cafe/centres_transite/${id}/get_transferts/`,
         {
-          params: { limit: limit, offset: pointer },
+          params: { limit: limitTransfer, offset: pointerTransfer },
           additionalHeaders: {},
           body: {},
         },
       );
+      setTotalCountTransfer(response?.count || 0);
       const results = response?.results;
       const transfersData = results?.map((transfer) => ({
         id: transfer?.id,
@@ -256,7 +272,6 @@ function DetailsContent({ id }) {
     try {
       if (cultivateur_type == "cultivator_individual") {
         setTypeExport("individuel");
-
         getCultivatorsIndividual();
       } else if (cultivateur_type == "cultivator_association") {
         getCultivatorsAssociation();
@@ -267,7 +282,14 @@ function DetailsContent({ id }) {
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     }
-  }, [cultivateur_type, limit, pointer]);
+  }, [
+    cultivateur_type,
+    limit,
+    pointer,
+    limitTransfer,
+    pointerTransfer,
+    transfertbtnLoading,
+  ]);
 
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
@@ -292,6 +314,17 @@ function DetailsContent({ id }) {
     setPointerAchat(0);
     setCurrentPageAchat(1);
   };
+  const totalPagesTransfer = Math.ceil(totalCountTransfer / limitTransfer);
+  const onPageChangeTransfer = (pageNumber) => {
+    setCurrentPageTransfer(pageNumber);
+    setPointerTransfer((pageNumber - 1) * limitTransfer);
+  };
+  const onLimitChangeTransfer = (newLimit) => {
+    setLimitTransfer(newLimit);
+    setPointerTransfer(0);
+    setCurrentPageTransfer(1);
+  };
+
   const datapagination = {
     totalCount: totalCount,
     currentPage: currentPage,
@@ -300,6 +333,16 @@ function DetailsContent({ id }) {
     pointer: pointer,
     onLimitChange: onLimitChange,
     limit: limit,
+  };
+
+  const dataTransferPagination = {
+    totalCount: totalCountTransfer,
+    currentPage: currentPageTransfer,
+    onPageChange: onPageChangeTransfer,
+    totalPages: totalPagesTransfer,
+    pointer: pointerTransfer,
+    onLimitChange: onLimitChangeTransfer,
+    limit: limitTransfer,
   };
 
   const dataAchatpagination = {
@@ -533,25 +576,38 @@ function DetailsContent({ id }) {
   };
   const fetchCultivatorsByType = (type) => {
     setCultivateur_type(type);
+    setPointer(0);
+    setCurrentPage(1);
+    setTotalCount(0); // Reset count to avoid stale data
+    // Clear data to indicate loading/change
     if (type === "cultivator_individual") {
-      getCultivatorsIndividual();
-    } else if (type === "cultivator_association") {
-      getCultivatorsAssociation();
+      setAssociationCultivatorsData([]);
+    } else {
+      setIndividualCultivatorsData([]);
     }
   };
 
   const fetchAchatCultivatorsByType = (type) => {
     setAchatCultivateur_type(type);
+    setCurrentPageAchat(1);
+    setPointerAchat(0);
+    setTotalCountAchat(0);
+    // Clear data
+    if (type === "achat_cultivator_individual") {
+      setAssociationAchatsData([]);
+    } else {
+      setIndividualAchatsData([]);
+    }
   };
 
   const fethTransfertbtnLoading = (loading) => {
     setTransfertbtnLoading(loading);
   };
-  useEffect(() => {
-    // Réinitialiser la pagination lorsque le type de cultivateur change
-    setCurrentPage(1);
-    setPointer(0);
-  }, [cultivateur_type]);
+  // useEffect(() => {
+  //   // Réinitialiser la pagination lorsque le type de cultivateur change
+  //   setCurrentPage(1);
+  //   setPointer(0);
+  // }, [cultivateur_type]);
 
   const handleTabChange = (tab) => {
     setTab(tab);
@@ -566,7 +622,24 @@ function DetailsContent({ id }) {
       //fetchMapData();
     }
   };
+  const handleAchatFilter = (filterData) => {
+    const formattedFilterData = {
+      date_achat_min: filterData.dateAchatFrom,
+      date_achat_max: filterData.dateAchatTo,
+      enregistrement_min: filterData.dateDebutEnregistre,
+      enregistrement_max: filterData.dateFinEnregistre,
+      quantite_a_min: filterData.qteMinCA,
+      quantite_a_max: filterData.qteMaxCA,
+      quantite_b_min: filterData.qteMinCB,
+      quantite_b_max: filterData.qteMaxCB,
+      province: filterData.province,
+      commune: filterData.commune,
+      zone: filterData.zone,
+      colline: filterData.colline,
+    };
 
+    setFilterAchatData(formattedFilterData);
+  };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
       <Tabs
@@ -629,8 +702,6 @@ function DetailsContent({ id }) {
             handleFilter={handleFilter}
             fetchCultivatorsByType={fetchCultivatorsByType}
             datapagination={datapagination}
-            limit={limit}
-            totalCount={totalCount}
           />
         </TabsContent>
         <TabsContent value="achats">
@@ -643,6 +714,7 @@ function DetailsContent({ id }) {
             datapagination={dataAchatpagination}
             limit={limit}
             totalCount={totalCountAchat}
+            handleFilter={handleAchatFilter}
           />
         </TabsContent>
 
@@ -726,6 +798,7 @@ function DetailsContent({ id }) {
           <TransferCtDep
             data={dataTransfert}
             fethTransfertbtnLoading={fethTransfertbtnLoading}
+            datapagination={dataTransferPagination}
           />
         </TabsContent>
       </Tabs>

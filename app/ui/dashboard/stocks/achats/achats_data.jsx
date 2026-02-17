@@ -15,13 +15,12 @@ function AchatsData() {
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
   const [achat_type, setAchat_type] = useState("achat_cultivator_individual");
-
+  const [filterData, setFilterData] = useState({});
   useEffect(() => {
     const getAchats = async () => {
       try {
-        // setLoading(true);
         const response = await fetchData("get", "cafe/achat_cafe/", {
-          params: { limit: limit, offset: pointer },
+          params: { limit: limit, offset: pointer, ...filterData },
           additionalHeaders: {},
           body: {},
         });
@@ -29,7 +28,7 @@ function AchatsData() {
           "get",
           "cafe/achat_cafe/get_achat_associations/",
           {
-            params: { limit: limit, offset: pointer },
+            params: { limit: limit, offset: pointer, ...filterData },
             additionalHeaders: {},
             body: {},
           },
@@ -123,7 +122,7 @@ function AchatsData() {
     };
 
     getAchats();
-  }, [limit, pointer, achat_type]);
+  }, [limit, pointer, achat_type, filterData]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -148,7 +147,24 @@ function AchatsData() {
   const fetchCultivatorsByType = (type) => {
     setAchat_type(type);
   };
+  const handleFilter = (filterData) => {
+    const formattedFilterData = {
+      date_achat_min: filterData.dateAchatFrom,
+      date_achat_max: filterData.dateAchatTo,
+      enregistrement_min: filterData.dateDebutEnregistre,
+      enregistrement_max: filterData.dateFinEnregistre,
+      quantite_a_min: filterData.qteMinCA,
+      quantite_a_max: filterData.qteMaxCA,
+      quantite_b_min: filterData.qteMinCB,
+      quantite_b_max: filterData.qteMaxCB,
+      province: filterData.province,
+      commune: filterData.commune,
+      zone: filterData.zone,
+      colline: filterData.colline,
+    };
 
+    setFilterData(formattedFilterData);
+  };
   useEffect(() => {
     // Réinitialiser la pagination lorsque le type de cultivateur change
     setCurrentPage(1);
@@ -179,6 +195,7 @@ function AchatsData() {
             datapagination={datapagination}
             limit={limit}
             totalCount={totalCount}
+            handleFilter={handleFilter}
           />
         </TabsContent>
         <TabsContent value="details">
