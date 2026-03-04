@@ -16,19 +16,26 @@ function AchatsData() {
   const [totalCount, setTotalCount] = useState(0);
   const [achat_type, setAchat_type] = useState("achat_cultivator_individual");
   const [filterData, setFilterData] = useState({});
+const [serch, setSerch] = useState("");
   useEffect(() => {
     const getAchats = async () => {
       try {
         const response = await fetchData("get", "cafe/achat_cafe/", {
-          params: { limit: limit, offset: pointer, ...filterData },
+          params: { limit: limit, offset: pointer, ...filterData,search:serch },
           additionalHeaders: {},
           body: {},
         });
+
         const response_associate = await fetchData(
           "get",
           "cafe/achat_cafe/get_achat_associations/",
           {
-            params: { limit: limit, offset: pointer, ...filterData },
+            params: {
+              limit: limit,
+              offset: pointer,
+              ...filterData,
+              search: serch,
+            },
             additionalHeaders: {},
             body: {},
           },
@@ -122,7 +129,7 @@ function AchatsData() {
     };
 
     getAchats();
-  }, [limit, pointer, achat_type, filterData]);
+  }, [limit, pointer, achat_type, filterData,serch]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -165,6 +172,10 @@ function AchatsData() {
 
     setFilterData(formattedFilterData);
   };
+
+  const hendlesecherchData=(value)=>{
+setSerch(value)
+  }
   useEffect(() => {
     // Réinitialiser la pagination lorsque le type de cultivateur change
     setCurrentPage(1);
@@ -196,6 +207,7 @@ function AchatsData() {
             limit={limit}
             totalCount={totalCount}
             handleFilter={handleFilter}
+            hendlesecherchData={hendlesecherchData}
           />
         </TabsContent>
         <TabsContent value="details">

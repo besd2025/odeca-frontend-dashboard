@@ -45,6 +45,8 @@ export default function EditSociety({ id }) {
         setCommune(
           response?.adresse?.zone_code?.commune_code?.commune_name || "",
         );
+
+        console.log("data: ",response)
       } catch (error) {
         console.error("Error fetching society data:", error);
       }
@@ -69,8 +71,9 @@ export default function EditSociety({ id }) {
           body: formData,
         });
 
-        if (results.status === 200) {
-          resolve({ code });
+        if (results.status === 200||results.status==201) {
+      resolve({ code });
+
         } else {
           reject(new Error("Erreur"));
         }
@@ -208,7 +211,7 @@ export default function EditSociety({ id }) {
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" onClick={handleSubmit}  disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enregistrer
             </Button>

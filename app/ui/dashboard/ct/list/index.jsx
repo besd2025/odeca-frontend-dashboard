@@ -58,12 +58,12 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [search,setSearch]=useState("")
   React.useEffect(() => {
     const getSdls = async () => {
-      setLoading(true);
       try {
         const response = await fetchData("get", "cafe/centres_transite/", {
-          params: { limit: limit, offset: pointer },
+          params: { limit: limit, offset: pointer, ...filterData,search:search },
           additionalHeaders: {},
           body: {},
         });
@@ -99,7 +99,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
     };
 
     getSdls();
-  }, []);
+  }, [pointer,limit,filterData,search]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -122,8 +122,10 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   };
   const handleFilter = (filteredData) => {
     setFilterData(filteredData);
-    console.log("Filtered Data:", filteredData);
   };
+  const handleSearch=(e)=>{
+    setSearch(e.target.value)
+  }
   const handleExportCTs = () => {
     // Logic to export CT data
     console.log("Exporting CT Data...");
@@ -302,12 +304,18 @@ export default function CtsListTable({ isLoading: externalLoading }) {
           <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
             <div className="relative ">
               <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
-              <input
+              {/* <input
                 placeholder="Rechercher..."
                 value={table.getColumn("ct")?.getFilterValue() ?? ""}
                 onChange={(event) =>
                   table.getColumn("ct")?.setFilterValue(event.target.value)
                 }
+                className="pl-10 h-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
+              /> */}
+              <input
+                placeholder="Rechercher..."
+                value={search}
+                onChange={handleSearch}
                 className="pl-10 h-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
               />
             </div>

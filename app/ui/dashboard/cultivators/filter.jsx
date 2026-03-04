@@ -15,28 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { fetchData } from "@/app/_utils/api";
 function Filter({ handleFilter }) {
-  // Example options for the selects
-  const provinceOptions = [
-    { value: "buja", label: "Buja" },
-    { value: "kigali", label: "Kigali" },
-    { value: "rwanda_north", label: "Rwanda North" },
-  ];
-
-  const communeOptions = [
-    { value: "ntahangwa", label: "Ntahangwa" },
-    { value: "gasabo", label: "Gasabo" },
-    { value: "gicumbi", label: "Gicumbi" },
-  ];
-
-  const zoneOptions = [
-    { value: "zone_a", label: "Zone A" },
-    { value: "zone_b", label: "Zone B" },
-  ];
-
-  const collineOptions = [
-    { value: "colline_1", label: "Colline 1" },
-    { value: "colline_2", label: "Colline 2" },
-  ];
 
   const [province, setProvince] = React.useState([]);
   const [commune, setCommune] = React.useState([]);
@@ -145,34 +123,17 @@ function Filter({ handleFilter }) {
     e.preventDefault();
     setLoadingSearch(true);
     const filterData = {
-      province: selectedProvince,
-      commune: selectedCommune,
-      zone: selectedZone,
-      colline: selectedColline,
-      ageMin: ageMin,
-      ageMax: ageMax,
-      societe: selectedColline,
-      sdl_ct: selectedColline,
-      dateTo: dateTo,
-      dateFrom: dateFrom,
+      province_name: selectedProvince,
+      commune_name: selectedCommune,
+      zone_name: selectedZone,
+      colline_name: selectedColline,
+      age_min: ageMin,
+      age_max: ageMax,
+      created_at_min: dateTo,
+      created_at_max: dateFrom,
     };
     handleFilter(filterData);
   };
-
-  // Local state and handlers for the example selects/inputs
-  // const [selectedProvince, setSelectedProvince] = React.useState("");
-  // const [selectedCommune, setSelectedCommune] = React.useState("");
-  // const [selectedZone, setSelectedZone] = React.useState("");
-  // const [selectedColline, setSelectedColline] = React.useState("");
-  // const [ageMin, setAgeMin] = React.useState("");
-  // const [ageMax, setAgeMax] = React.useState("");
-  // const [dateFrom, setDateFrom] = React.useState("");
-  // const [dateTo, setDateTo] = React.useState("");
-
-  // const handleSelectProvinceChange = (e) => setSelectedProvince(e.target.value);
-  // const handleSelectCommuneChange = (e) => setSelectedCommune(e.target.value);
-  // const handleSelectZoneChange = (e) => setSelectedZone(e.target.value);
-  // const handleSelectCollineChange = (e) => setSelectedColline(e.target.value);
 
   return (
     <Dialog>
@@ -297,44 +258,6 @@ function Filter({ handleFilter }) {
                       >
                         <option value="">Selectionner Colline</option>
                         {colline.map((c) => (
-                          <option key={c.value} value={c.value}>
-                            {c.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-span-2 lg:col-span-1">
-                  <div className="space-y-2">
-                    <Label>Societe</Label>
-                    <div className="relative">
-                      <select
-                        value={selectedColline}
-                        onChange={handleSelectCollineChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
-                      >
-                        <option value="">Selectionner societe</option>
-                        {collineOptions.map((c) => (
-                          <option key={c.value} value={c.value}>
-                            {c.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-span-2 lg:col-span-1">
-                  <div className="space-y-2">
-                    <Label>SDL ou CT</Label>
-                    <div className="relative">
-                      <select
-                        value={selectedColline}
-                        onChange={handleSelectCollineChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
-                      >
-                        <option value="">Selectionner Colline</option>
-                        {collineOptions.map((c) => (
                           <option key={c.value} value={c.value}>
                             {c.label}
                           </option>

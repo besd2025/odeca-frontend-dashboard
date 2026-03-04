@@ -133,16 +133,13 @@ function Filter({ handleFilter }) {
   const handleFilters = (e) => {
     e.preventDefault();
     const filterData = {
-      province: selectedProvince,
-      commune: selectedCommune,
-      zone: selectedZone,
-      colline: selectedColline,
-      qteMin: QteMin,
-      qteMax: QteMax,
-      societe: selectedColline,
-      sdl_ct: selectedColline,
-      dateTo: dateTo,
-      dateFrom: dateFrom,
+      province_name: selectedProvince,
+      commune_name: selectedCommune,
+      zone_name: selectedZone,
+      colline_name: selectedColline,
+      societe_nom: selectedSociete,
+      created_after: dateTo,
+      created_before: dateFrom,
     };
     handleFilter(filterData);
   };
@@ -282,64 +279,17 @@ function Filter({ handleFilter }) {
                     <Label>Societe</Label>
                     <div className="relative">
                       <select
-                        value={selectedColline}
-                        onChange={handleSelectCollineChange}
+                        value={selectedSociete}
+                        onChange={(e) => setSelectedSociete(e.target.value)}
                         className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner societe</option>
                         {societes.map((c) => (
-                          <option key={c.value} value={c.value}>
+                          <option key={c.value} value={c.label}>
                             {c.label}
                           </option>
                         ))}
                       </select>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-span-2 lg:col-span-1">
-                  <div className="space-y-2">
-                    <Label>CT</Label>
-                    <div className="relative">
-                      <select
-                        value={selectedColline}
-                        onChange={handleSelectCollineChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
-                      >
-                        <option value="">Selectionner la SDL</option>
-                        {collines.map((c) => (
-                          <option key={c.value} value={c.value}>
-                            {c.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-span-2 lg:col-span-1">
-                  <div className="space-y-2">
-                    <Label>Quantité MIN</Label>
-                    <div className="relative">
-                      <Input
-                        type="number"
-                        placeholder="Entrer la quantité minimum"
-                        value={QteMin}
-                        onChange={(e) => setQteMin(e.target.value)}
-                        className="dark:bg-dark-900"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-span-2 lg:col-span-1">
-                  <div className="space-y-2">
-                    <Label>Quantité MAX</Label>
-                    <div className="relative">
-                      <Input
-                        type="number"
-                        placeholder="Entrer la quantité maximum"
-                        value={QteMax}
-                        onChange={(e) => setQteMax(e.target.value)}
-                        className="dark:bg-dark-900"
-                      />
                     </div>
                   </div>
                 </div>

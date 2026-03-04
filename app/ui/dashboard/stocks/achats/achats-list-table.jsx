@@ -52,6 +52,7 @@ function DataTable({
   limit,
   totalCount,
   handleFilter,
+  hendlesecherchData 
 }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -64,7 +65,6 @@ function DataTable({
       header: "Actions",
       cell: ({ row }) => {
         const cultivator = row.original;
-
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -94,6 +94,7 @@ function DataTable({
               </Link>
               <div>
                 <EditAchats
+                  id={cultivator?.id}
                   cultivator={cultivator.cultivator}
                   sdl_ct={cultivator.sdl_ct}
                   society={cultivator.society}
@@ -306,6 +307,12 @@ function DataTable({
   const datapaginationlimit = (limitdata) => {
     setPagination((prev) => ({ ...prev, pageSize: limitdata }));
   };
+const [serchValue,setserchValue]=React.useState("")
+  const handleSerch =(e)=>{
+    const input =e.target.value
+     setserchValue(input);
+    hendlesecherchData(input)
+  }
   const table = useReactTable({
     data,
     columns,
@@ -332,12 +339,18 @@ function DataTable({
       <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
         <div className="relative ">
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
-          <Input
+          {/* <Input
             placeholder="Rechercher..."
             value={table.getColumn("cultivator")?.getFilterValue() ?? ""}
             onChange={(event) =>
               table.getColumn("cultivator")?.setFilterValue(event.target.value)
             }
+            className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+          /> */}
+          <Input
+            placeholder="Rechercher..."
+            value={serchValue}
+            onChange={handleSerch}
             className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
           />
         </div>
@@ -411,10 +424,10 @@ function DataTable({
         </Table>
       </div>
       <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+        {/* <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
+        </div> */}
         {/* <PaginationControls
           page={table.getState().pagination.pageIndex + 1}
           pageSize={table.getState().pagination.pageSize}
@@ -450,6 +463,7 @@ export default function AchatsListTable({
   limit,
   totalCount,
   handleFilter,
+  hendlesecherchData,
 }) {
   const handleTabClick = (value) => {
     if (value == "") {
@@ -491,6 +505,7 @@ export default function AchatsListTable({
             isCultivatorsPage={isCultivatorsPage}
             exportType="achats_individual"
             handleFilter={handleFilter}
+            hendlesecherchData={hendlesecherchData}
           />
         )}
       </TabsContent>
@@ -506,6 +521,7 @@ export default function AchatsListTable({
             isCultivatorsPage={isCultivatorsPage}
             exportType="achats_association"
             handleFilter={handleFilter}
+            hendlesecherchData={hendlesecherchData}
           />
         )}
       </TabsContent>

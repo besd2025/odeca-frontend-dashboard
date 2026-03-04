@@ -446,8 +446,12 @@ function Filter({ handleFilter }) {
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <DialogClose asChild>
-              <Button type="submit" onClick={handleFilters}>
+            <DialogClose asChild >
+              <Button
+                type="submit"
+                onClick={handleFilters}
+               
+              >
                 Filtrer
               </Button>
             </DialogClose>

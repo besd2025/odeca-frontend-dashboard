@@ -16,8 +16,9 @@ import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import { toast } from "sonner";
-
+import { fetchData } from "@/app/_utils/api";
 export default function EditAchats({
+  id,
   cultivator = {},
   sdl_ct = "",
   society = "",
@@ -76,30 +77,72 @@ export default function EditAchats({
     photoRecu,
   ]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const payload = {
-      cultivator_code: code,
-      first_name: firstName,
-      last_name: lastName,
-      sdl_ct: sdl,
-      society: soc,
-      localite: { province, commune },
-      num_fiche: ficheNumber,
-      num_recu: recuNumber,
-      ca: caValue,
-      cb: cbValue,
-      date: purchaseDate,
-      photo_fiche: photoFicheUrl,
-    };
+    let bodyToSend;
+    let additionalHeaders = {};
+    // Si une nouvelle image a été sélectionnée, on utilise FormData
+    if (photoFicheUrl instanceof File) {
+      bodyToSend = new FormData();
+      bodyToSend.append("cultivator_code", code);
+      bodyToSend.append("first_name", firstName);
+      bodyToSend.append("last_name", lastName);
+      bodyToSend.append("sdl_ct", sdl);
+      bodyToSend.append("society", soc);
+      bodyToSend.append("localite", JSON.stringify({ province, commune }));
+      bodyToSend.append("num_fiche", ficheNumber);
+      bodyToSend.append("num_recu", recuNumber);
+      bodyToSend.append("ca", caValue);
+      bodyToSend.append("cb", cbValue);
+      bodyToSend.append("date", purchaseDate);
+      // Ajoute photo_fiche seulement si c'est un fichier
+      if (photoFicheUrl instanceof File) {
+        bodyToSend.append("photo_fiche", photoFicheUrl);
+      }
+      // Pas de Content-Type, laissé à fetchData/axios
+    } else {
+      // N'inclus photo_fiche que si ce n'est pas vide et que ce n'est pas une URL
+      const payload = {
+        cultivator_code: code,
+        first_name: firstName,
+        last_name: lastName,
+        sdl_ct: sdl,
+        society: soc,
+        localite: { province, commune },
+        num_fiche: ficheNumber,
+        numero_recu: recuNumber,
+        quantite_cerise_a: caValue,
+        quantite_cerise_b: cbValue,
+        date_achat: purchaseDate,
+      };
+      // Si photoFicheUrl est une chaîne non vide et ne commence pas par http, on l'ajoute
+      if (photoFicheUrl && typeof photoFicheUrl === "string" && !photoFicheUrl.startsWith("http")) {
+        payload.photo_fiche = photoFicheUrl;
+      }
+      bodyToSend = payload;
+    }
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const results = await fetchData(
+          "patch",
+          `/cafe/achat_cafe/${id}/`,
+          {
+            params: {},
+            additionalHeaders,
+            body: bodyToSend,
+          },
+        );
 
-    const promise = new Promise((resolve) => {
-      setTimeout(() => {
-        console.log("Submitting cultivator update", payload);
-        resolve({ code });
-      }, 1000);
+        if (results.status === 200 || results.status === 201) {
+          resolve({ code });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
+      }
     });
 
     toast.promise(promise, {
@@ -112,7 +155,7 @@ export default function EditAchats({
     });
 
     try {
-      // await promise;
+      await promise;
     } catch (error) {
       console.error(error);
     } finally {
@@ -262,7 +305,7 @@ export default function EditAchats({
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" onClick={handleSubmit} disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enregistrer
             </Button>

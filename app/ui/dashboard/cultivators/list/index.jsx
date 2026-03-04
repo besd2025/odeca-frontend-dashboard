@@ -59,6 +59,7 @@ function DataTable({
   onExportAssociationToExcel,
   exportType,
   handleFilterData,
+  hendlesecherchData,
 }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -326,17 +327,31 @@ function DataTable({
   React.useEffect(() => {
     handleFilterData(filterData);
   }, [filterData]);
+
+          const [serchValue, setserchValue] = React.useState("");
+          const handleSerch = (e) => {
+            const input = e.target.value;
+            setserchValue(input);
+            hendlesecherchData(input);
+          };
   return (
     <div className="w-full bg-sidebar p-2 rounded-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
         <div className="relative ">
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
-          <Input
+          {/* <Input
             placeholder="Rechercher..."
             value={table.getColumn("cultivator")?.getFilterValue() ?? ""}
             onChange={(event) =>
               table.getColumn("cultivator")?.setFilterValue(event.target.value)
             }
+            className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+          /> */}
+
+          <Input
+            placeholder="Rechercher..."
+            value={serchValue}
+            onChange={handleSerch}
             className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
           />
         </div>
@@ -461,6 +476,7 @@ export default function CultivatorsListTable({
   fetchCultivatorsByType,
   datapagination,
   limit,
+  hendlesecherchData,
 }) {
   const [tabValue, setTabValue] = useState("individual");
   const [filterData, setFilterData] = React.useState(null);
@@ -521,6 +537,7 @@ export default function CultivatorsListTable({
             onExportToExcel={onExportToExcel}
             exportType="cultivator_individual"
             handleFilterData={handleFilterData}
+            hendlesecherchData={hendlesecherchData}
           />
         )}
       </TabsContent>
@@ -539,6 +556,7 @@ export default function CultivatorsListTable({
             typeExport={tabValue}
             exportType="cultivator_association"
             handleFilterData={handleFilterData}
+            hendlesecherchData={hendlesecherchData}
           />
         )}
       </TabsContent>

@@ -6,16 +6,11 @@ import CultivatorsListTable from "@/app/ui/dashboard/cultivators/list";
 import ProfilePage from "@/app/ui/dashboard/cultivators/profile/ProfilePage";
 import { fetchData } from "@/app/_utils/api";
 import CultivatorAnalytics from "../analytics";
-import { TableSkeleton } from "@/components/ui/skeletons";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 function CultivatorData() {
-  const [individualData, setIndividualData] = useState([]);
-  const [associationData, setAssociationData] = useState([]);
   const [typeExport, setTypeExport] = useState("individuel");
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
-  const [data_association, setDataAssociation] = useState([]);
   const [cultivateur_type, setCultivateur_type] = useState(
     "cultivator_individual",
   );
@@ -29,10 +24,14 @@ function CultivatorData() {
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
+    const [filterData, setFilterData] = useState({});
+    const [serch, setSerch] = useState("");
   const paginationDataCultivator = (PaginationData) => {
     setPaginationData(PaginationData);
   };
-
+  const hendlesecherchData = (value) => {
+    setSerch(value);
+  };
   const getCultivators = async () => {
     //setLoading(true);
     //setTypeExport("individuel");
@@ -44,6 +43,8 @@ function CultivatorData() {
           params: {
             limit: limit,
             offset: pointer,
+            ...filterData,
+            search:serch
           },
           additionalHeaders: {},
           body: {},
@@ -62,6 +63,14 @@ function CultivatorData() {
         },
         sdl_ct: cultivator?.ct_sdl_name,
         society: cultivator?.societe_name,
+        localite: {
+          province:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
+        },
         champs: cultivator?.nombre_champs,
       }));
       setIndividualCultivatorsData(data);
@@ -73,20 +82,21 @@ function CultivatorData() {
     }
   };
 
-  // ... le reste de votre code (getCultivatorsAssociation, etc.)
 
-  // React.useEffect(() => {
-  //   getCultivators();
-  // }, [pointer, limit]);
   const getCultivatorsAssociation = async () => {
-    setLoading(true);
+    // setLoading(true);
     try {
       // Fetch Associations
       const responseAssociations = await fetchData(
         "get",
         "cultivators/get_cafe_cultivators/?cafeiculteur_type=association",
         {
-          params: { limit: limit, offset: pointer },
+          params: {
+            limit: limit,
+            offset: pointer,
+            ...filterData,
+            search: serch,
+          },
           additionalHeaders: {},
           body: {},
         },
@@ -140,7 +150,7 @@ function CultivatorData() {
     } else if (cultivateur_type === "cultivator_association") {
       getCultivatorsAssociation();
     }
-  }, [cultivateur_type, pointer, limit]);
+  }, [cultivateur_type, pointer, limit, filterData, serch]);
 
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
@@ -197,10 +207,6 @@ function CultivatorData() {
           Prénom: item.cultivator_last_name || "",
           Genre: item.cultivator_gender || "",
           CNI: item.cultivator_cni || "",
-          // association: item.cultivator_assoc_name || "",
-          // Représentant_de_lassociation: item.cultivator_assoc_rep_name || "",
-          // numero_fiche: item.cultivator_assoc_numero_fiche || "",
-          // NIF_de_lassociation: item.cultivator_assoc_nif || "",
           Province:
             item.cultivator_adress?.zone_code?.commune_code?.province_code
               ?.province_name || "",
@@ -227,13 +233,6 @@ function CultivatorData() {
           formattedItem.mode_payement = item?.cultivator_payment_type
             .replaceAll("_", " ")
             .toUpperCase();
-          // const phone = item.cultivator_mobile_payment.toString();
-          // if (phone.startsWith("6") || phone.startsWith("3")) {
-          //   formattedItem.nom_service =
-          //     item.cultivator_mobile_payment_service || "L";
-          // } else if (phone.startsWith("7")) {
-          //   formattedItem.nom_service = "ECOCASH";
-          // }
           formattedItem.nom_service = item.cultivator_mobile_payment_name || "";
           formattedItem.Numero_de_telephone_de_payement =
             item.cultivator_mobile_payment_account || "";
@@ -376,9 +375,8 @@ function CultivatorData() {
     setCultivateur_type(type);
   };
   const handleFilter = (filterData) => {
-    // Implement filtering logic here based on filterData
-    console.log("Received filter data ffffhhh:", filterData);
-    // You can use filterData to fetch filtered cultivators from the API
+setFilterData(filterData)
+  
   };
 
   const fetchCultivatorsByType = (type) => {
@@ -417,6 +415,7 @@ function CultivatorData() {
             datapagination={datapagination}
             limit={limit}
             totalCount={totalCount}
+            hendlesecherchData={hendlesecherchData}
           />
           {/* )} */}
         </TabsContent>
