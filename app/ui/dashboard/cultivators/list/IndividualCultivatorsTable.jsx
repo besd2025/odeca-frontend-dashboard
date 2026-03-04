@@ -1,0 +1,489 @@
+"use client";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import {
+  ArrowUpDownIcon,
+  IdCard,
+  MoreHorizontal,
+  Search,
+  User,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import ExportButton from "@/components/ui/export_button";
+import Filter from "../filter";
+import ViewImageDialog from "@/components/ui/view-image-dialog";
+import Edit from "../edit";
+import Link from "next/link";
+import PaginationContent from "@/components/ui/pagination-content";
+import { TableSkeleton } from "@/components/ui/skeletons";
+import { fetchData } from "@/app/_utils/api";
+const XLSX = require("xlsx");
+import { saveAs } from "file-saver";
+
+export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(5);
+  const [pointer, setPointer] = useState(0);
+  const [filterData, setFilterData] = useState(null);
+
+  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [columnVisibility, setColumnVisibility] = React.useState({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
+
+  const getCultivators = async () => {
+    setLoading(true);
+    try {
+      const response = await fetchData(
+        "get",
+        "cultivators/get_cafe_cultivators/?cafeiculteur_type=personne",
+        {
+          params: {
+            limit: limit,
+            offset: pointer,
+            // Add filterData as params if the API supports it
+            ...filterData,
+          },
+        },
+      );
+
+      const formattedData = response.results.map((cultivator) => ({
+        id: cultivator.id,
+        cultivator: {
+          cultivator_code: cultivator?.cultivator_code,
+          first_name: cultivator?.cultivator_first_name,
+          last_name: cultivator?.cultivator_last_name,
+          image_url: cultivator?.cultivator_photo,
+          telephone: cultivator?.cultivator_telephone,
+          cni: cultivator?.cultivator_cni,
+          cni_image_url: cultivator?.cultivator_cni_photo,
+        },
+        sdl_ct: cultivator?.ct_sdl_name,
+        society: cultivator?.societe_name,
+        localite: {
+          province:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
+        },
+        champs: cultivator?.nombre_champs,
+      }));
+
+      setData(formattedData);
+      setTotalCount(response.count);
+    } catch (error) {
+      console.error("Error fetching individual cultivators:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getCultivators();
+  }, [pointer, limit, filterData]);
+
+  const onExportToExcel = async () => {
+    try {
+      const initResponse = await fetchData(
+        "get",
+        `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
+        { params: { limit: 1 } },
+      );
+      const total = initResponse?.count || 0;
+      if (total === 0) return;
+
+      const response = await fetchData(
+        "get",
+        `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
+        { params: { limit: total } },
+      );
+
+      const allData = response.results || [];
+      const formattedData = allData.map((item) => ({
+        code_cultivateur: item.cultivator_code || "",
+        Type: item.cultivator_entity_type || "",
+        Nom: item.cultivator_first_name || "",
+        Prénom: item.cultivator_last_name || "",
+        Genre: item.cultivator_gender || "",
+        CNI: item.cultivator_cni || "",
+        Province:
+          item.cultivator_adress?.zone_code?.commune_code?.province_code
+            ?.province_name || "",
+        Commune:
+          item.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+        Zone: item.cultivator_adress?.zone_code?.zone_name || "",
+        Colline: item.cultivator_adress?.colline_name || "",
+        Societe: item?.collector?.hangar?.hangar_name || "",
+        Nombre_de_champs: item.nombre_champs || 0,
+        Superficie_totale_des_champs: item.superficie_totale_champs || 0,
+        Telephone: item.cultivator_telephone || "",
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Cultivateurs");
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      });
+      saveAs(
+        blob,
+        `cultivateurs_physiques_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+    } catch (error) {
+      console.error("Erreur exportation Excel :", error);
+    }
+  };
+
+  const columns = useMemo(
+    () => [
+      {
+        id: "actions",
+        enableHiding: false,
+        header: "Actions",
+        cell: ({ row }) => {
+          const result = row.original;
+          const cultivator = result.cultivator;
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuLabel className="text-muted-foreground font-normal">
+                  Actions
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() =>
+                    navigator.clipboard.writeText(cultivator?.cultivator_code)
+                  }
+                >
+                  Copier code
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <Link
+                  href={`/odeca-dashboard/cultivators/profile/?id=${result?.id}`}
+                >
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                </Link>
+                <div>
+                  <Edit
+                    cultivator={result?.id}
+                    sdl_ct={result?.sdl_ct}
+                    society={result?.society}
+                    localite={result?.localite}
+                    champs={result?.champs}
+                  />
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      },
+      {
+        accessorKey: "cultivator",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Cafeiculteur
+            <ArrowUpDownIcon />
+          </Button>
+        ),
+        filterFn: (row, columnId, filterValue) => {
+          const cultivator = row.original.cultivator;
+          if (!filterValue) return true;
+          const search = filterValue.toLowerCase();
+          return (
+            (cultivator?.first_name || "").toLowerCase().includes(search) ||
+            (cultivator?.last_name || "").toLowerCase().includes(search) ||
+            (cultivator?.cultivator_code || "").toLowerCase().includes(search)
+          );
+        },
+        cell: ({ row }) => {
+          const cultivators = row.original.cultivator;
+          return (
+            <div className="flex items-center gap-3">
+              <ViewImageDialog
+                imageUrl={cultivators?.image_url || null}
+                alt={`${cultivators?.last_name} ${cultivators?.first_name}`}
+              />
+              <div>
+                <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
+                  {`${cultivators?.last_name} ${cultivators?.first_name}`}
+                </span>
+                <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                  {cultivators?.cultivator_code}
+                </span>
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "CNI",
+        header: "CNI",
+        cell: ({ row }) => {
+          const cultivators = row.original.cultivator;
+          return (
+            <div className="flex items-center gap-3">
+              <ViewImageDialog
+                imageUrl={cultivators?.cni_image_url || null}
+                alt="CNI"
+                profile={false}
+              />
+              <div>
+                <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                  <span className="flex justify-center items-center">
+                    <IdCard size={18} /> : {cultivators?.cni}
+                  </span>
+                </span>
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        id: "Telephone",
+        header: "Téléphone",
+        cell: ({ row }) => (
+          <div className="text-center font-semibold">
+            {row.original.cultivator?.telephone}
+          </div>
+        ),
+      },
+      ...(isCultivatorsPage
+        ? [
+            {
+              accessorKey: "sdl_ct",
+              header: ({ column }) => (
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                  }
+                >
+                  SDL/CT
+                  <ArrowUpDownIcon />
+                </Button>
+              ),
+              cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
+            },
+            {
+              accessorKey: "society",
+              header: ({ column }) => (
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                  }
+                >
+                  Société
+                  <ArrowUpDownIcon />
+                </Button>
+              ),
+              cell: ({ row }) => (
+                <div className="font-medium">{row.getValue("society")}</div>
+              ),
+            },
+          ]
+        : []),
+      {
+        id: "localite",
+        header: "Localité",
+        cell: ({ row }) => {
+          const localite = row.original.localite;
+          return (
+            <div className="text-sm">
+              {localite?.commune}, {localite?.province}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "champs",
+        header: "Champs",
+        cell: ({ row }) => (
+          <div className="text-center font-semibold">
+            {row.getValue("champs")}
+          </div>
+        ),
+      },
+    ],
+    [isCultivatorsPage],
+  );
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      pagination,
+    },
+  });
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
+  if (loading && data.length === 0) {
+    return <TableSkeleton columns={6} rows={10} />;
+  }
+
+  return (
+    <div className="w-full bg-sidebar p-2 rounded-lg">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
+        <div className="relative ">
+          <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
+          <Input
+            placeholder="Rechercher..."
+            value={table.getColumn("cultivator")?.getFilterValue() ?? ""}
+            onChange={(event) =>
+              table.getColumn("cultivator")?.setFilterValue(event.target.value)
+            }
+            className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+          />
+        </div>
+
+        <div className="flex flex-row justify-between gap-x-3">
+          <div className="flex items-center gap-3">
+            <Filter handleFilter={setFilterData} />
+          </div>
+          <div className="flex items-center gap-3 text-gray-700">
+            <ExportButton
+              exportType="cultivator_individual"
+              onExportToExcel={onExportToExcel}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow
+                key={headerGroup.id}
+                className="sticky top-0 bg-background z-10 hover:bg-background"
+              >
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  Pas de resultats
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
+        <div className="flex-1 text-sm text-muted-foreground"></div>
+        <PaginationContent
+          datapaginationlimit={(l) => {
+            if (l <= totalCount)
+              setPagination((prev) => ({ ...prev, pageSize: l }));
+            else setPagination((prev) => ({ ...prev, pageSize: totalCount }));
+          }}
+          currentPage={currentPage}
+          totalPages={Math.ceil(totalCount / limit)}
+          onPageChange={onPageChange}
+          pointer={pointer}
+          totalCount={totalCount}
+          onLimitChange={onLimitChange}
+        />
+      </div>
+    </div>
+  );
+}

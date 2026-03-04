@@ -15,7 +15,7 @@ const workspaces = [
   {
     id: 1,
     name: "Campagne",
-    interval: "2025",
+    interval: "2026",
   },
   // {
   //   id: 2,
