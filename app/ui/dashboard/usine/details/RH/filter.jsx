@@ -13,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-function Filter() {
+function Filter({ handleFilter }) {
+  const [open, setOpen] = React.useState(false);
   // Example options for the selects
   const provinceOptions = [
     { value: "buja", label: "Buja" },
@@ -51,9 +52,25 @@ function Filter() {
   const handleSelectCommuneChange = (e) => setSelectedCommune(e.target.value);
   const handleSelectZoneChange = (e) => setSelectedZone(e.target.value);
   const handleSelectCollineChange = (e) => setSelectedColline(e.target.value);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (handleFilter) {
+      handleFilter({
+        selectedProvince,
+        selectedCommune,
+        selectedZone,
+        selectedColline,
+        ageMin,
+        ageMax,
+        dateFrom,
+        dateTo,
+      });
+    }
+    setOpen(false);
+  };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <form>
         <DialogTrigger asChild>
           <Button
@@ -295,7 +312,9 @@ function Filter() {
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit">Filtrer</Button>
+            <Button type="submit" onClick={handleSubmit}>
+              Filtrer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

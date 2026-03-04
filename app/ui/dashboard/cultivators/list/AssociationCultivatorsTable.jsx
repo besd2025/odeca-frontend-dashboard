@@ -34,7 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import ExportButton from "@/components/ui/export_button";
-import Filter from "../filter";
+import AssociationFilter from "../AssociationFilter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Edit from "../edit";
 import Link from "next/link";
@@ -390,7 +390,7 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
 
         <div className="flex flex-row justify-between gap-x-3">
           <div className="flex items-center gap-3">
-            <Filter handleFilter={setFilterData} />
+            <AssociationFilter handleFilter={setFilterData} />
           </div>
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton

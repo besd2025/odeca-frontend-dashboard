@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { fetchData } from "@/app/_utils/api";
 
 function SocietiesFilter({ handleFilter }) {
+  const [open, setOpen] = React.useState(false);
   const [selectedProvince, setSelectedProvince] = React.useState("");
   const [selectedCommune, setSelectedCommune] = React.useState("");
   const [selectedZone, setSelectedZone] = React.useState("");
@@ -106,10 +107,11 @@ function SocietiesFilter({ handleFilter }) {
       dateFrom: dateFrom,
     };
     handleFilter(filterData);
+    setOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <form>
         <DialogTrigger asChild>
           <Button
