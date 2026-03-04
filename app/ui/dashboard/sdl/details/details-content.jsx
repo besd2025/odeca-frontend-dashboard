@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Card } from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -58,186 +58,179 @@ function DetailsContent({ id }) {
   const [data, setData] = React.useState([]);
   const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
   const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
-  const [individualCultivatorsData, setIndividualCultivatorsData] =
-    React.useState([]);
-  const [associationCultivatorsData, setAssociationCultivatorsData] =
-    React.useState([]);
+  const [individualCultivatorsData, setIndividualCultivatorsData] = React.useState([]);
+  const [associationCultivatorsData, setAssociationCultivatorsData] = React.useState([]);
 
+  // Cultivators Pagination
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
-  const [totalCount, setTotalCount] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  React.useEffect(() => {
-    const getAchatsSDls = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/stationslavage/${id}/get_achats/`,
-          {
-            params: { limit: 1000, offset: 0 },
-            additionalHeaders: {},
-            body: {},
-          },
-        );
-        const results = response?.results;
-        const formatData = (achats) => ({
-          id: achats?.id,
-          cultivator: {
-            cultivator_code: achats?.cafeiculteur?.cultivator_code,
-            first_name: achats?.cafeiculteur?.cultivator_first_name,
-            last_name: achats?.cafeiculteur?.cultivator_last_name,
-            image_url: achats?.cafeiculteur?.cultivator_photo,
-            // Association fields
-            cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
-            cultivator_assoc_rep_name:
-              achats?.cafeiculteur?.cultivator_assoc_rep_name,
-          },
-          localite: {
-            province:
-              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
-            commune:
-              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
-          },
-          num_fiche: 784,
-          num_recu: achats?.numero_recu,
-          photo_fiche: achats?.photo_fiche,
-          ca: achats?.quantite_cerise_a,
-          cb: achats?.quantite_cerise_b,
-          date: achats?.date_achat,
-          isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
-        });
+  const [cultivateur_type, setCultivateur_type] = useState("cultivator_individual");
 
-        const formattedResults = results?.map(formatData) || [];
-        setIndividualAchatsData(
-          formattedResults.filter((a) => !a.isAssociation),
-        );
-        setAssociationAchatsData(
-          formattedResults.filter((a) => a.isAssociation),
-        );
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-    const getCultivators = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/stationslavage/${id}/get_cultivators/`,
-          {
-            params: { limit: 1000, offset: 0 },
-            additionalHeaders: {},
-            body: {},
+  // Achats Pagination
+  const [pointerAchat, setPointerAchat] = useState(0);
+  const [limitAchat, setLimitAchat] = useState(5);
+  const [totalCountAchat, setTotalCountAchat] = useState(0);
+  const [currentPageAchat, setCurrentPageAchat] = useState(1);
+  const [achatCultivateur_type, setAchatCultivateur_type] = useState("achat_cultivator_individual");
+  const getAchatsSDls = async () => {
+    try {
+      const type = achatCultivateur_type === "achat_cultivator_individual" ? "personne" : "association";
+      const response = await fetchData(
+        "get",
+        `cafe/stationslavage/${id}/get_achats/`,
+        {
+          params: {
+            cafeiculteur_type: type,
+            limit: limitAchat,
+            offset: pointerAchat,
           },
-        );
-        const results = response?.results;
-        const cultivatorsData = results?.map((cultivator) => ({
-          id: cultivator?.id,
-          cultivator: {
-            cultivator_code: cultivator?.cultivator_code,
-            first_name: cultivator?.cultivator_first_name,
-            last_name: cultivator?.cultivator_last_name,
-            image_url: cultivator?.cultivator_photo,
-            cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
-            cultivator_assoc_numero_fiche:
-              cultivator?.cultivator_assoc_numero_fiche,
-          },
-          sdl_ct: "NGome",
-          society: "ODECA",
-          localite: {
-            province:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
-            commune:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
-          },
-          champs: cultivator?.nombre_champs,
-        }));
-        setIndividualCultivatorsData(cultivatorsData);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-    const getCultivatorsAssociations = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/stationslavage/${id}/get_cultivators_association/`,
-          {
-            params: { limit: 1000, offset: 0 },
-            additionalHeaders: {},
-            body: {},
-          },
-        );
-        const results = response?.results;
-        const cultivatorsData = results?.map((cultivator) => ({
-          id: cultivator?.id,
-          cultivator: {
-            cultivator_code: cultivator?.cultivator_code,
-            first_name: cultivator?.cultivator_assoc_name,
-            last_name: cultivator?.cultivator_last_name,
-            image_url: cultivator?.cultivator_photo,
-            cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
-            cultivator_assoc_numero_fiche:
-              cultivator?.cultivator_assoc_numero_fiche,
-          },
-          sdl_ct: "NGome",
-          society: "fffffff",
-          localite: {
-            province:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
-            commune:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
-          },
-          champs: cultivator?.nombre_champs,
-        }));
-        setAssociationCultivatorsData(cultivatorsData);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-    const getTransfers = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/stationslavage/${id}/get_transferts/`,
-          {
-            params: { limit: 1000, offset: 0 },
-            additionalHeaders: {},
-            body: {},
-          },
-        );
-        const results = response?.results;
-        const transfersData = results?.map((transfer) => ({
-          id: transfer?.id,
+        },
+      );
+      const results = response?.results;
+      const formatData = (achats) => ({
+        id: achats?.id,
+        cultivator: {
+          cultivator_code: achats?.cafeiculteur?.cultivator_code,
+          first_name: achats?.cafeiculteur?.cultivator_first_name,
+          last_name: achats?.cafeiculteur?.cultivator_last_name,
+          image_url: achats?.cafeiculteur?.cultivator_photo,
+          cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
+          cultivator_assoc_rep_name: achats?.cafeiculteur?.cultivator_assoc_rep_name,
+          cultivator_type: type === "association" ? "association" : "individual",
+        },
+        localite: {
+          province: achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
+          commune: achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+        },
+        num_fiche: 784,
+        num_recu: achats?.numero_recu,
+        photo_fiche: achats?.photo_fiche,
+        ca: achats?.quantite_cerise_a,
+        cb: achats?.quantite_cerise_b,
+        date: achats?.date_achat,
+        isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
+      });
 
-          from_sdl: "Ngome",
-          to_depulpeur_name: "NGANE",
-          society: "ODECA",
-          qte_tranferer: {
-            ca: 78452,
-            cb: 741,
-          },
-          photo_fiche: "/images/logo_1.jpg",
-          localite: {
-            province: "Buja",
-            commune: "Ntahangwa",
-          },
-        }));
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
+      const formattedResults = results?.map(formatData) || [];
+      setTotalCountAchat(response?.count || 0);
 
-    getAchatsSDls();
-    getCultivators();
-    getTransfers();
-    getCultivatorsAssociations();
-  }, [id]);
+      if (type === "personne") {
+        setIndividualAchatsData(formattedResults);
+        setAssociationAchatsData([]);
+      } else {
+        setAssociationAchatsData(formattedResults);
+        setIndividualAchatsData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching achats data:", error);
+    }
+  };
+
+  const getCultivatorsIndividual = async () => {
+    try {
+      const response = await fetchData(
+        "get",
+        `cafe/stationslavage/${id}/get_cultivators/`,
+        {
+           params: { limit: limit, offset: pointer },
+        },
+      );
+      const results = response?.results;
+      const cultivatorsData = results?.map((cultivator) => ({
+        id: cultivator?.id,
+        cultivator: {
+          cultivator_code: cultivator?.cultivator_code,
+          first_name: cultivator?.cultivator_first_name,
+          last_name: cultivator?.cultivator_last_name,
+          image_url: cultivator?.cultivator_photo,
+          cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
+          cultivator_assoc_numero_fiche: cultivator?.cultivator_assoc_numero_fiche,
+        },
+        sdl_ct: "NGome",
+        society: "ODECA",
+        localite: {
+          province: cultivator?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
+          commune: cultivator?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+        },
+        champs: cultivator?.nombre_champs,
+      }));
+      setIndividualCultivatorsData(cultivatorsData);
+      setTotalCount(response?.count);
+    } catch (error) {
+      console.error("Error fetching cultivators data:", error);
+    }
+  };
+
+  const getCultivatorsAssociation = async () => {
+    try {
+      const response = await fetchData(
+        "get",
+        `cafe/stationslavage/${id}/get_cultivators_association/`,
+        {
+          params: { limit: limit, offset: pointer },
+        },
+      );
+      const results = response?.results;
+      const cultivatorsData = results?.map((cultivator) => ({
+        id: cultivator?.id,
+        cultivator: {
+          cultivator_code: cultivator?.cultivator_code,
+          first_name: cultivator?.cultivator_assoc_name,
+          last_name: cultivator?.cultivator_last_name,
+          image_url: cultivator?.cultivator_photo,
+          cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
+          cultivator_assoc_numero_fiche: cultivator?.cultivator_assoc_numero_fiche,
+          cultivator_assoc_name: cultivator?.cultivator_assoc_name,
+          cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,
+        },
+        sdl_ct: "NGome",
+        society: "fffffff",
+        localite: {
+          province: cultivator?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
+          commune: cultivator?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+        },
+        champs: cultivator?.nombre_champs,
+      }));
+      setAssociationCultivatorsData(cultivatorsData);
+      setTotalCount(response?.count);
+    } catch (error) {
+      console.error("Error fetching cultivators data:", error);
+    }
+  };
+
+  const getTransfers = async () => {
+    try {
+      const response = await fetchData(
+        "get",
+        `cafe/stationslavage/${id}/get_transferts/`,
+        {
+          params: { limit: 1000, offset: 0 },
+        },
+      );
+      // Transfer logic placeholder
+    } catch (error) {
+      console.error("Error fetching transfers data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (tab === "achats") {
+      getAchatsSDls();
+    }
+  }, [achatCultivateur_type, limitAchat, pointerAchat, tab]);
+
+  useEffect(() => {
+    if (cultivateur_type === "cultivator_individual") {
+      getCultivatorsIndividual();
+    } else if (cultivateur_type === "cultivator_association") {
+      getCultivatorsAssociation();
+    }
+    if (tab === "transferSdl") {
+      getTransfers();
+    }
+  }, [cultivateur_type, limit, pointer, tab]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -245,10 +238,21 @@ function DetailsContent({ id }) {
   };
   const onLimitChange = (newLimit) => {
     setLimit(newLimit);
-    //localStorage.setItem("table_limit", String(newLimit));
     setPointer(0);
     setCurrentPage(1);
   };
+
+  const totalPagesAchat = Math.ceil(totalCountAchat / limitAchat);
+  const onPageChangeAchat = (pageNumber) => {
+    setCurrentPageAchat(pageNumber);
+    setPointerAchat((pageNumber - 1) * limitAchat);
+  };
+  const onLimitChangeAchat = (newLimit) => {
+    setLimitAchat(newLimit);
+    setPointerAchat(0);
+    setCurrentPageAchat(1);
+  };
+
   const datapagination = {
     totalCount: totalCount,
     currentPage: currentPage,
@@ -257,6 +261,49 @@ function DetailsContent({ id }) {
     pointer: pointer,
     onLimitChange: onLimitChange,
     limit: limit,
+  };
+
+  const dataAchatpagination = {
+    totalCount: totalCountAchat,
+    currentPage: currentPageAchat,
+    onPageChange: onPageChangeAchat,
+    totalPages: totalPagesAchat,
+    pointer: pointerAchat,
+    onLimitChange: onLimitChangeAchat,
+    limit: limitAchat,
+  };
+
+  const fetchCultivatorsByType = (type) => {
+    setCultivateur_type(type);
+    setPointer(0);
+    setCurrentPage(1);
+    setTotalCount(0);
+    if (type === "cultivator_individual") {
+      setAssociationCultivatorsData([]);
+    } else {
+      setIndividualCultivatorsData([]);
+    }
+  };
+
+  const fetchAchatCultivatorsByType = (type) => {
+    setAchatCultivateur_type(type);
+    setCurrentPageAchat(1);
+    setPointerAchat(0);
+    setTotalCountAchat(0); 
+    if (type === "achat_cultivator_individual") {
+       setAssociationAchatsData([]);
+    } else {
+       setIndividualAchatsData([]);
+    }
+  };
+
+  const handleTabChange = (tab) => {
+    setTab(tab);
+    if (tab === "cultivators") {
+      fetchCultivatorsByType(cultivateur_type);
+    } else if (tab === "achats") {
+      fetchAchatCultivatorsByType(achatCultivateur_type);
+    }
   };
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -275,7 +322,7 @@ function DetailsContent({ id }) {
   };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
-      <Tabs value={tab} className="space-y-6 w-full" onValueChange={setTab}>
+      <Tabs value={tab} className="space-y-6 w-full" onValueChange={handleTabChange}>
         {/* TABS LIST */}
         <TabsList className="overflow-x-auto flex-nowrap gap-2 w-full">
           <TabsTrigger value="cultivators" className="shrink-0">
@@ -349,7 +396,7 @@ function DetailsContent({ id }) {
             associationData={associationCultivatorsData}
             isCultivatorsPage={false}
             handleFilter={handleFilter}
-            fetchCultivatorsByType={fethTransfertbtnLoading}
+            fetchCultivatorsByType={fetchCultivatorsByType}
             datapagination={datapagination}
             limit={limit}
             totalCount={totalCount}
@@ -361,6 +408,10 @@ function DetailsContent({ id }) {
             individualData={individualAchatsData}
             associationData={associationAchatsData}
             isCultivatorsPage={false}
+            fetchCultivatorsByType={fetchAchatCultivatorsByType}
+            datapagination={dataAchatpagination}
+            limit={limit}
+            totalCount={totalCountAchat}
           />
         </TabsContent>
 

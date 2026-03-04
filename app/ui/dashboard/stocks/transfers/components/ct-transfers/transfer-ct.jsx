@@ -33,10 +33,15 @@ import ExportButton from "@/components/ui/export_button";
 import Link from "next/link";
 import EditTransfers from "./edit-tranfers";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
-import PaginationControls from "@/components/ui/pagination-controls";
+// import PaginationControls from "@/components/ui/pagination-controls";
+import PaginationContent from "@/components/ui/pagination-content";
 import DetailsTransfer from "./details-transfer";
 
-export default function TransferCtDep({ data, fethTransfertbtnLoading }) {
+export default function TransferCtDep({
+  data,
+  fethTransfertbtnLoading,
+  datapagination,
+}) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -240,6 +245,8 @@ export default function TransferCtDep({ data, fethTransfertbtnLoading }) {
       rowSelection,
       pagination,
     },
+    manualPagination: true,
+    rowCount: datapagination.totalCount,
   });
 
   return (
@@ -326,17 +333,17 @@ export default function TransferCtDep({ data, fethTransfertbtnLoading }) {
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <PaginationControls
-          page={table.getState().pagination.pageIndex + 1}
-          pageSize={table.getState().pagination.pageSize}
-          totalItems={table.getFilteredRowModel().rows.length}
-          totalPages={table.getPageCount()}
-          onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
-          onPageSizeChange={(size) => table.setPageSize(size)}
-          hasNextPage={table.getCanNextPage()}
-          hasPreviousPage={table.getCanPreviousPage()}
+   
+        <PaginationContent
+          datapaginationlimit={datapagination.onLimitChange}
+          currentPage={datapagination.currentPage}
+          totalPages={datapagination.totalPages}
+          onPageChange={datapagination.onPageChange}
+          pointer={datapagination.pointer}
+          totalCount={datapagination.totalCount}
+          onLimitChange={datapagination.onLimitChange}
         />
       </div>
-    </div>
+      </div>
   );
 }

@@ -14,13 +14,13 @@ function AchatsData() {
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
-
+  const [achat_type, setAchat_type] = useState("achat_cultivator_individual");
+  const [filterData, setFilterData] = useState({});
   useEffect(() => {
     const getAchats = async () => {
       try {
-        // setLoading(true);
         const response = await fetchData("get", "cafe/achat_cafe/", {
-          params: { limit: limit, offset: pointer },
+          params: { limit: limit, offset: pointer, ...filterData },
           additionalHeaders: {},
           body: {},
         });
@@ -28,7 +28,7 @@ function AchatsData() {
           "get",
           "cafe/achat_cafe/get_achat_associations/",
           {
-            params: { limit: limit, offset: pointer },
+            params: { limit: limit, offset: pointer, ...filterData },
             additionalHeaders: {},
             body: {},
           },
@@ -105,9 +105,15 @@ function AchatsData() {
           date: achat?.date_achat || "N/A",
           // Type identification
         }));
-        setIndividualAchats(dataAchat);
-        setAssociationAchats(data_associate);
-        setTotalCount(response?.count);
+        if (achat_type === "achat_cultivator_individual") {
+          setIndividualAchats(dataAchat);
+          setTotalCount(response?.count);
+          setAssociationAchats([]);
+        } else if (achat_type === "achat_cultivator_association") {
+          setAssociationAchats(data_associate);
+          setTotalCount(response_associate?.count);
+          setIndividualAchats([]);
+        }
       } catch (error) {
         console.error("Error fetching achats data:", error);
       } finally {
@@ -116,7 +122,7 @@ function AchatsData() {
     };
 
     getAchats();
-  }, [limit, pointer]);
+  }, [limit, pointer, achat_type, filterData]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -139,8 +145,32 @@ function AchatsData() {
     limit: limit,
   };
   const fetchCultivatorsByType = (type) => {
-    console.log("Fetch cultivators of typeffff:", type);
+    setAchat_type(type);
   };
+  const handleFilter = (filterData) => {
+    const formattedFilterData = {
+      date_achat_min: filterData.dateAchatFrom,
+      date_achat_max: filterData.dateAchatTo,
+      enregistrement_min: filterData.dateDebutEnregistre,
+      enregistrement_max: filterData.dateFinEnregistre,
+      quantite_a_min: filterData.qteMinCA,
+      quantite_a_max: filterData.qteMaxCA,
+      quantite_b_min: filterData.qteMinCB,
+      quantite_b_max: filterData.qteMaxCB,
+      province: filterData.province,
+      commune: filterData.commune,
+      zone: filterData.zone,
+      colline: filterData.colline,
+    };
+
+    setFilterData(formattedFilterData);
+  };
+  useEffect(() => {
+    // Réinitialiser la pagination lorsque le type de cultivateur change
+    setCurrentPage(1);
+    setPointer(0);
+  }, [achat_type]);
+
   return (
     <div className="p-4">
       <Tabs defaultValue="list" className="w-full">
@@ -165,6 +195,7 @@ function AchatsData() {
             datapagination={datapagination}
             limit={limit}
             totalCount={totalCount}
+            handleFilter={handleFilter}
           />
         </TabsContent>
         <TabsContent value="details">
