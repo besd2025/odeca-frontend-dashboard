@@ -6,7 +6,7 @@ import CultivatorsListTable from "@/app/ui/dashboard/cultivators/list";
 import ProfilePage from "@/app/ui/dashboard/cultivators/profile/ProfilePage";
 import { fetchData } from "@/app/_utils/api";
 import CultivatorAnalytics from "../analytics";
-const XLSX = require("xlsx");
+import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 function CultivatorData() {
   const [typeExport, setTypeExport] = useState("individuel");
