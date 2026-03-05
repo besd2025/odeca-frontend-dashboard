@@ -129,9 +129,9 @@ const exportCultivatorsToExcel = async () => {
         "post",
         "/cafe/achat_cafe/export_achat_quantites/",
         {
-          params: { cafeiculteur_type: "personne", export_type: "RESUME" },
+          params: {},
           additionalHeaders: {},
-          body: {},
+          body: { cafeiculteur_type: "personne", export_type: "RESUME" },
         },
       );
       console.log("export data ", initial_export);
