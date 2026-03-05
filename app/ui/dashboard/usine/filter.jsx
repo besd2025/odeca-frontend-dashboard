@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { fetchData } from "@/app/_utils/api";
 
 function Filter({ handleFilter }) {
+  const [open, setOpen] = React.useState(false);
   const [selectedProvince, setSelectedProvince] = React.useState("");
   const [selectedCommune, setSelectedCommune] = React.useState("");
   const [selectedZone, setSelectedZone] = React.useState("");
@@ -38,7 +39,7 @@ function Filter({ handleFilter }) {
         params: { province: value },
         additionalHeaders: {},
         body: {},
-      }
+      },
     );
     const options = communes?.map((item) => ({
       value: item.commune_name,
@@ -140,9 +141,10 @@ function Filter({ handleFilter }) {
       societe: selectedSociete,
     };
     handleFilter(filterData);
+    setOpen(false);
   };
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <form>
         <DialogTrigger asChild>
           <Button
