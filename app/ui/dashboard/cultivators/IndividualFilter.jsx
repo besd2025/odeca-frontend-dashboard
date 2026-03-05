@@ -130,18 +130,20 @@ function IndividualFilter({ handleFilter }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const filterData = {
-      province: selectedProvince,
-      commune: selectedCommune,
-      zone: selectedZone,
-      colline: selectedColline,
-      ageMin,
-      ageMax,
-      dateFrom,
-      dateTo,
+      province_name: selectedProvince,
+      commune_name: selectedCommune,
+      zone_name: selectedZone,
+      colline_name: selectedColline,
+      age_min: ageMin,
+      age_max: ageMax,
+      created_at_min: dateTo,
+      created_at_max: dateFrom,
     };
     handleFilter(filterData);
     setOpen(false); // Close the dialog
   };
+
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

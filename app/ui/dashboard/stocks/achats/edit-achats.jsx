@@ -83,8 +83,6 @@ export default function EditAchats({
 
     let bodyToSend;
     let additionalHeaders = {};
-    // Si une nouvelle image a été sélectionnée, on utilise FormData
-    if (photoFicheUrl instanceof File) {
       bodyToSend = new FormData();
       bodyToSend.append("cultivator_code", code);
       bodyToSend.append("first_name", firstName);
@@ -101,28 +99,6 @@ export default function EditAchats({
       if (photoFicheUrl instanceof File) {
         bodyToSend.append("photo_fiche", photoFicheUrl);
       }
-      // Pas de Content-Type, laissé à fetchData/axios
-    } else {
-      // N'inclus photo_fiche que si ce n'est pas vide et que ce n'est pas une URL
-      const payload = {
-        cultivator_code: code,
-        first_name: firstName,
-        last_name: lastName,
-        sdl_ct: sdl,
-        society: soc,
-        localite: { province, commune },
-        num_fiche: ficheNumber,
-        numero_recu: recuNumber,
-        quantite_cerise_a: caValue,
-        quantite_cerise_b: cbValue,
-        date_achat: purchaseDate,
-      };
-      // Si photoFicheUrl est une chaîne non vide et ne commence pas par http, on l'ajoute
-      if (photoFicheUrl && typeof photoFicheUrl === "string" && !photoFicheUrl.startsWith("http")) {
-        payload.photo_fiche = photoFicheUrl;
-      }
-      bodyToSend = payload;
-    }
     const promise = new Promise(async (resolve, reject) => {
       try {
         const results = await fetchData(
@@ -198,6 +174,7 @@ export default function EditAchats({
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Nom</Label>
                   <Input
+                    readOnly
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
@@ -206,6 +183,7 @@ export default function EditAchats({
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Prénom</Label>
                   <Input
+                    readOnly
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}

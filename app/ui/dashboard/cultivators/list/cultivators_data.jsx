@@ -4,6 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartColumn, List } from "lucide-react";
 import CultivatorsListTable from "@/app/ui/dashboard/cultivators/list";
 import CultivatorAnalytics from "../analytics";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 function CultivatorData() {
   return (

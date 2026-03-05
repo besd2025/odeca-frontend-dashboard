@@ -53,7 +53,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
   const [limit, setLimit] = useState(5);
   const [pointer, setPointer] = useState(0);
   const [filterData, setFilterData] = useState(null);
-
+  const [searchvalue, setSearchValue] = useState("");
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -62,7 +62,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 5,
   });
-
+  useEffect(() => {
   const getCultivators = async () => {
     setLoading(true);
     try {
@@ -75,6 +75,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
             offset: pointer,
             // Add filterData as params if the API supports it
             ...filterData,
+            search:searchvalue
           },
         },
       );
@@ -112,63 +113,159 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     }
   };
 
-  useEffect(() => {
+
     getCultivators();
-  }, [pointer, limit, filterData]);
+  }, [pointer, limit, filterData,searchvalue]);
 
-  const onExportToExcel = async () => {
+  // const onExportToExcel = async () => {
+  //   try {
+  //     const initResponse = await fetchData(
+  //       "get",
+  //       `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
+  //       { params: { limit: 1 } },
+  //     );
+  //     const total = initResponse?.count || 0;
+  //     if (total === 0) return;
+
+  //     const response = await fetchData(
+  //       "get",
+  //       `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
+  //       { params: { limit: total } },
+  //     );
+
+  //     const allData = response.results || [];
+  //     const formattedData = allData.map((item) => ({
+  //       code_cultivateur: item.cultivator_code || "",
+  //       Type: item.cultivator_entity_type || "",
+  //       Nom: item.cultivator_first_name || "",
+  //       Prénom: item.cultivator_last_name || "",
+  //       Genre: item.cultivator_gender || "",
+  //       CNI: item.cultivator_cni || "",
+  //       Province:
+  //         item.cultivator_adress?.zone_code?.commune_code?.province_code
+  //           ?.province_name || "",
+  //       Commune:
+  //         item.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+  //       Zone: item.cultivator_adress?.zone_code?.zone_name || "",
+  //       Colline: item.cultivator_adress?.colline_name || "",
+  //       Societe: item?.collector?.hangar?.hangar_name || "",
+  //       Nombre_de_champs: item.nombre_champs || 0,
+  //       Superficie_totale_des_champs: item.superficie_totale_champs || 0,
+  //       Telephone: item.cultivator_telephone || "",
+  //     }));
+
+  //     const worksheet = XLSX.utils.json_to_sheet(formattedData);
+  //     const workbook = XLSX.utils.book_new();
+  //     XLSX.utils.book_append_sheet(workbook, worksheet, "Cultivateurs");
+  //     const excelBuffer = XLSX.write(workbook, {
+  //       bookType: "xlsx",
+  //       type: "array",
+  //     });
+  //     const blob = new Blob([excelBuffer], {
+  //       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+  //     });
+  //     saveAs(
+  //       blob,
+  //       `cultivateurs_physiques_${new Date().toISOString().split("T")[0]}.xlsx`,
+  //     );
+  //   } catch (error) {
+  //     console.error("Erreur exportation Excel :", error);
+  //   }
+  // };
+
+const [reportId, setReportId]=useState("")
+    const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+    const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+const exportCultivatorsToExcel = async () => {
+    setLoadingEportBtn(true);
     try {
-      const initResponse = await fetchData(
-        "get",
-        `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
-        { params: { limit: 1 } },
+      // Étape 1 : Récupérer le nombre total d'enregistrements
+      const initial_export = await fetchData(
+        "post",
+        "/cafe/achat_cafe/export_achat_quantites/",
+        {
+          params: { cafeiculteur_type: "personne", export_type: "RESUME" },
+          additionalHeaders: {},
+          body: {},
+        },
       );
-      const total = initResponse?.count || 0;
-      if (total === 0) return;
+      console.log("export data ", initial_export);
+      if (initial_export.data?.status == "PENDING") {
+        setLoadingEportBtn(true);
+        const task_id = initial_export?.data?.report_id;
+        const intervalId = setInterval(async () => {
+          const export_excel = await fetchData(
+            "get",
+            "cafe/achat_cafe/export_achat_status/",
+            {
+              params: { report_id: task_id },
+            },
+          );
+          if (export_excel.status === "SUCCESS") {
+            clearInterval(intervalId); // Arrêtez l'intervalle
+            // setLoadingEportBtn(false);
+            DownloadCultivatorsToExcel(); 
+            setReportId(task_id);
+          }
+        }, 2000);
+      }
 
-      const response = await fetchData(
-        "get",
-        `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
-        { params: { limit: total } },
-      );
-
-      const allData = response.results || [];
-      const formattedData = allData.map((item) => ({
-        code_cultivateur: item.cultivator_code || "",
-        Type: item.cultivator_entity_type || "",
-        Nom: item.cultivator_first_name || "",
-        Prénom: item.cultivator_last_name || "",
-        Genre: item.cultivator_gender || "",
-        CNI: item.cultivator_cni || "",
-        Province:
-          item.cultivator_adress?.zone_code?.commune_code?.province_code
-            ?.province_name || "",
-        Commune:
-          item.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
-        Zone: item.cultivator_adress?.zone_code?.zone_name || "",
-        Colline: item.cultivator_adress?.colline_name || "",
-        Societe: item?.collector?.hangar?.hangar_name || "",
-        Nombre_de_champs: item.nombre_champs || 0,
-        Superficie_totale_des_champs: item.superficie_totale_champs || 0,
-        Telephone: item.cultivator_telephone || "",
-      }));
-
-      const worksheet = XLSX.utils.json_to_sheet(formattedData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Cultivateurs");
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-      const blob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
-      });
-      saveAs(
-        blob,
-        `cultivateurs_physiques_${new Date().toISOString().split("T")[0]}.xlsx`,
-      );
+      // Vérifier toutes les 6 secondes
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
+    } finally {
+      //setLoadingEportBtn(false);
+    }
+  };
+  const DownloadCultivatorsToExcel = async () => {
+    try {
+      const response = await fetchData("get", "/cafe/achat_cafe/download/", {
+        params: { report_id: reportId },
+        isBlob: true,
+      });
+      console.log("downloard", response);
+      // Créer le blob avec le bon type MIME
+      const blob = new Blob([response.data], {
+        type:
+          response.headers["content-type"] ||
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+
+      const timestamp = `${day}_${month}_${year}_${hours}_${minutes}_${seconds}`;
+      // Nom du fichier par défaut
+      let filename = `cultivator_list_${timestamp}.xlsx`;
+
+      const contentDisposition = response.headers["content-disposition"];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match && match[1]) filename = match[1];
+      }
+
+      // Création du <a> temporaire
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+
+      // Nettoyage
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      setActivedownloadBtn(false);
+    } catch (error) {
+      console.error("Erreur lors de l'exportation Excel :", error);
+    } finally {
+      setLoadingEportBtn(false);
     }
   };
 
@@ -379,7 +476,6 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     setCurrentPage(pageNumber);
     setPointer((pageNumber - 1) * limit);
   };
-
   const onLimitChange = (newLimit) => {
     setLimit(newLimit);
     setPointer(0);
@@ -397,10 +493,8 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
           <Input
             placeholder="Rechercher..."
-            value={table.getColumn("cultivator")?.getFilterValue() ?? ""}
-            onChange={(event) =>
-              table.getColumn("cultivator")?.setFilterValue(event.target.value)
-            }
+            value={searchvalue}
+            onChange={(e) => setSearchValue(e.target.value)}
             className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
           />
         </div>
@@ -412,7 +506,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
               exportType="cultivator_individual"
-              onExportToExcel={onExportToExcel}
+              onExportToExcel={exportCultivatorsToExcel}
             />
           </div>
         </div>
