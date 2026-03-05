@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo,useContext } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,13 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDownIcon,
-  IdCard,
-  MoreHorizontal,
-  Search,
-  User,
-} from "lucide-react";
+import { ArrowUpDownIcon, MoreHorizontal, Search, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,85 +29,90 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import ExportButton from "@/components/ui/export_button";
-import IndividualFilter from "../IndividualFilter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
-import Edit from "../edit";
 import Link from "next/link";
+import EditIndividualAchats from "./EditIndividualAchats";
 import PaginationContent from "@/components/ui/pagination-content";
 import { TableSkeleton } from "@/components/ui/skeletons";
 import { fetchData } from "@/app/_utils/api";
-import { UserContext } from "@/app/ui/context/User_Context";
-export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
+import IndividualAchatsFilter from "./IndividualAchatsFilter";
+
+export default function IndividualAchatsTable({ isCultivatorsPage }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(5);
   const [pointer, setPointer] = useState(0);
-  const [filterData, setFilterData] = useState(null);
+  const [filterData, setFilterData] = useState({});
   const [searchvalue, setSearchValue] = useState("");
+
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 5,
+    pageSize: limit,
   });
-    const user=useContext(UserContext)
+
   useEffect(() => {
-    const getCultivators = async () => {
+    const getAchats = async () => {
       setLoading(true);
       try {
-        const response = await fetchData(
-          "get",
-          "cultivators/get_cafe_cultivators/?cafeiculteur_type=personne",
-          {
-            params: {
-              limit: limit,
-              offset: pointer,
-              // Add filterData as params if the API supports it
-              ...filterData,
-              search: searchvalue,
-            },
+        const response = await fetchData("get", "cafe/achat_cafe/", {
+          params: {
+            limit: limit,
+            offset: pointer,
+            ...filterData,
+            search: searchvalue,
           },
-        );
+        });
 
-        const formattedData = response.results.map((cultivator) => ({
-          id: cultivator.id,
+        const formattedData = response?.results?.map((achat) => ({
+          id: achat?.id,
           cultivator: {
-            cultivator_code: cultivator?.cultivator_code,
-            first_name: cultivator?.cultivator_first_name,
-            last_name: cultivator?.cultivator_last_name,
-            image_url: cultivator?.cultivator_photo,
-            telephone: cultivator?.cultivator_telephone,
-            cni: cultivator?.cultivator_cni,
-            cni_image_url: cultivator?.cultivator_cni_photo,
+            cultivator_id: achat?.cafeiculteur?.id,
+            cultivator_code: achat?.cafeiculteur?.cultivator_code,
+            first_name: achat?.cafeiculteur?.cultivator_first_name,
+            last_name: achat?.cafeiculteur?.cultivator_last_name,
+            image_url: achat?.cafeiculteur?.cultivator_photo,
+            cultivator_type: "personel",
           },
-          sdl_ct: cultivator?.ct_sdl_name,
-          society: cultivator?.societe_name,
+          sdl_ct: achat?.responsable?.sdl_ct?.sdl?.sdl_nom
+            ? "SDL " + achat.responsable.sdl_ct.sdl.sdl_nom
+            : "CT " + achat?.responsable?.sdl_ct?.ct?.ct_nom,
+
+          society:
+            achat?.responsable?.sdl_ct?.sdl?.societe?.nom_societe ||
+            achat?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
           localite: {
             province:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
+              achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name || "N/A",
             commune:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
+              achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name || "N/A",
           },
-          champs: cultivator?.nombre_champs,
+          num_fiche: achat?.numero_fiche || "0",
+          num_recu: achat?.numero_recu || "N/A",
+          photo_fiche: achat?.photo_fiche,
+          ca: achat?.quantite_cerise_a || 0,
+          cb: achat?.quantite_cerise_b || 0,
+          date: achat?.date_achat || "N/A",
         }));
 
-        setData(formattedData);
-        setTotalCount(response.count);
+        setData(formattedData || []);
+        setTotalCount(response?.count || 0);
       } catch (error) {
-        console.error("Error fetching individual cultivators:", error);
+        console.error("Error fetching individual achats:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    getCultivators();
-  }, [pointer, limit, filterData, searchvalue]);
+    getAchats();
+  }, [limit, pointer, filterData, searchvalue]);
 
   const [reportId, setReportId] = useState("");
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
@@ -128,9 +127,10 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
         {
           params: {},
           additionalHeaders: {},
-          body: { cafeiculteur_type: "personne", export_type: "RESUME" },
+          body: { cafeiculteur_type: "personne", export_type: "DETAIL" },
         },
       );
+      console.log("export data ", initial_export);
       if (initial_export.data?.status == "PENDING") {
         setLoadingEportBtn(true);
         const task_id = initial_export?.data?.report_id;
@@ -217,8 +217,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
         enableHiding: false,
         header: "Actions",
         cell: ({ row }) => {
-          const result = row.original;
-          const cultivator = result.cultivator;
+          const cultivator = row.original;
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -233,27 +232,31 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
                 </DropdownMenuLabel>
                 <DropdownMenuItem
                   onClick={() =>
-                    navigator.clipboard.writeText(cultivator?.cultivator_code)
+                    navigator.clipboard.writeText(
+                      cultivator.cultivator.cultivator_code,
+                    )
                   }
                 >
                   Copier code
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <Link
-                  href={`/odeca-dashboard/cultivators/profile/?id=${result?.id}`}
+                  href={`/odeca-dashboard/cultivators/profile?id=${cultivator.cultivator.cultivator_id}`}
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                   {user?.session?.category==="Admin"?( 
-                    <div>
-                  <Edit
-                    cultivator={result?.id}
-                    sdl_ct={result?.sdl_ct}
-                    society={result?.society}
-                    localite={result?.localite}
-                    champs={result?.champs}
+                <div>
+                  <EditIndividualAchats
+                    id={cultivator?.id}
+                    cultivator={cultivator.cultivator}
+                    num_fiche={cultivator.num_fiche}
+                    num_recu={cultivator.num_recu}
+                    ca={cultivator.ca}
+                    cb={cultivator.cb}
+                    date={cultivator.date}
+                    photo_fiche={cultivator.photo_fiche}
                   />
-                </div>):" "}
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           );
@@ -261,23 +264,17 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
       },
       {
         accessorKey: "cultivator",
-        header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Cafeiculteur
-            <ArrowUpDownIcon />
-          </Button>
-        ),
-        filterFn: (row, columnId, filterValue) => {
-          const cultivator = row.original.cultivator;
-          if (!filterValue) return true;
-          const search = filterValue.toLowerCase();
+        header: ({ column }) => {
           return (
-            (cultivator?.first_name || "").toLowerCase().includes(search) ||
-            (cultivator?.last_name || "").toLowerCase().includes(search) ||
-            (cultivator?.cultivator_code || "").toLowerCase().includes(search)
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Cafeiculteur
+              <ArrowUpDownIcon />
+            </Button>
           );
         },
         cell: ({ row }) => {
@@ -285,12 +282,12 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
           return (
             <div className="flex items-center gap-3">
               <ViewImageDialog
-                imageUrl={cultivators?.image_url || null}
-                alt={`${cultivators?.last_name} ${cultivators?.first_name}`}
+                imageUrl={cultivators?.image_url}
+                alt={`${cultivators?.last_name ?? ""} ${cultivators?.first_name ?? ""}`}
               />
               <div>
                 <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                  {`${cultivators?.last_name} ${cultivators?.first_name}`}
+                  {`${cultivators?.last_name ?? ""} ${cultivators?.first_name ?? ""}`}
                 </span>
                 <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                   {cultivators?.cultivator_code}
@@ -300,68 +297,40 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
           );
         },
       },
-      {
-        accessorKey: "CNI",
-        header: "CNI",
-        cell: ({ row }) => {
-          const cultivators = row.original.cultivator;
-          return (
-            <div className="flex items-center gap-3">
-              <ViewImageDialog
-                imageUrl={cultivators?.cni_image_url || null}
-                alt="CNI"
-                profile={false}
-              />
-              <div>
-                <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                  <span className="flex justify-center items-center">
-                    <IdCard size={18} /> : {cultivators?.cni}
-                  </span>
-                </span>
-              </div>
-            </div>
-          );
-        },
-      },
-      {
-        id: "Telephone",
-        header: "Téléphone",
-        cell: ({ row }) => (
-          <div className="text-center font-semibold">
-            {row.original.cultivator?.telephone}
-          </div>
-        ),
-      },
       ...(isCultivatorsPage
         ? [
             {
               accessorKey: "sdl_ct",
-              header: ({ column }) => (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  SDL/CT
-                  <ArrowUpDownIcon />
-                </Button>
-              ),
+              header: ({ column }) => {
+                return (
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      column.toggleSorting(column.getIsSorted() === "asc")
+                    }
+                  >
+                    SDL/CT
+                    <ArrowUpDownIcon />
+                  </Button>
+                );
+              },
               cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
             },
             {
               accessorKey: "society",
-              header: ({ column }) => (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  Société
-                  <ArrowUpDownIcon />
-                </Button>
-              ),
+              header: ({ column }) => {
+                return (
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      column.toggleSorting(column.getIsSorted() === "asc")
+                    }
+                  >
+                    Société
+                    <ArrowUpDownIcon />
+                  </Button>
+                );
+              },
               cell: ({ row }) => (
                 <div className="font-medium">{row.getValue("society")}</div>
               ),
@@ -381,11 +350,80 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
         },
       },
       {
-        accessorKey: "champs",
-        header: "Champs",
+        accessorKey: "num_fiche",
+        header: "No Fiche",
         cell: ({ row }) => (
           <div className="text-center font-semibold">
-            {row.getValue("champs")}
+            {row.getValue("num_fiche")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "num_recu",
+        header: "No Recus",
+        cell: ({ row }) => (
+          <div className="text-center font-semibold">
+            {row.getValue("num_recu")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "ca",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              CA
+              <ArrowUpDownIcon />
+            </Button>
+          );
+        },
+        cell: ({ row }) => (
+          <div className="text-center font-semibold">{row.getValue("ca")}</div>
+        ),
+      },
+      {
+        accessorKey: "cb",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              CB
+              <ArrowUpDownIcon />
+            </Button>
+          );
+        },
+        cell: ({ row }) => (
+          <div className="text-center font-semibold">{row.getValue("cb")}</div>
+        ),
+      },
+      {
+        accessorKey: "photo_fiche",
+        header: "Fiche",
+        cell: ({ row }) => (
+          <div className="text-center font-semibold">
+            <ViewImageDialog
+              imageUrl={row.getValue("photo_fiche")}
+              alt={`photo_fiche`}
+              profile={false}
+            />
+          </div>
+        ),
+      },
+      {
+        accessorKey: "date",
+        header: "Date",
+        cell: ({ row }) => (
+          <div className="text-center font-semibold">
+            {row.getValue("date")}
           </div>
         ),
       },
@@ -424,15 +462,35 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     setCurrentPage(1);
   };
 
-  if (loading && data.length === 0) {
-    return <TableSkeleton columns={6} rows={10} />;
+  const handleFilter = (filters) => {
+    const formattedFilterData = {
+      date_achat_min: filters.dateAchatFrom,
+      date_achat_max: filters.dateAchatTo,
+      enregistrement_min: filters.dateDebutEnregistre,
+      enregistrement_max: filters.dateFinEnregistre,
+      quantite_a_min: filters.qteMinCA,
+      quantite_a_max: filters.qteMaxCA,
+      quantite_b_min: filters.qteMinCB,
+      quantite_b_max: filters.qteMaxCB,
+      province: filters.province,
+      commune: filters.commune,
+      zone: filters.zone,
+      colline: filters.colline,
+    };
+    setFilterData(formattedFilterData);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
+  if (loading) {
+    return <TableSkeleton rows={limit} columns={6} />;
   }
 
   return (
-    <div className="w-full bg-sidebar p-2 rounded-lg">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
-        <div className="relative ">
-          <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
+    <div className="w-full bg-sidebar rounded-lg p-2">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4">
+        <div className="relative">
+          <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5" />
           <Input
             placeholder="Rechercher..."
             value={searchvalue}
@@ -443,12 +501,12 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
 
         <div className="flex flex-row justify-between gap-x-3">
           <div className="flex items-center gap-3">
-            <IndividualFilter handleFilter={setFilterData} />
+            <IndividualAchatsFilter handleFilter={handleFilter} />
           </div>
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
-              exportType="cultivator_individual"
-              onExportToExcel={exportCultivatorsToExcel}
+              exportType="achats_individual"
+              handlerExportAchat={exportCultivatorsToExcel}
               loading={LoadingEportBtn}
               activedownloadBtn={ActivedownloadBtn}
               onClickDownloadButton={DownloadCultivatorsToExcel}
@@ -456,7 +514,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
           </div>
         </div>
       </div>
-      <div className="grid w-full [&>div]:border [&>div]:rounded-md">
+      <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -508,12 +566,11 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
         </Table>
       </div>
       <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
-        <div className="flex-1 text-sm text-muted-foreground"></div>
         <PaginationContent
           datapaginationlimit={(l) => {
-            if (l <= totalCount)
-              setPagination((prev) => ({ ...prev, pageSize: l }));
-            else setPagination((prev) => ({ ...prev, pageSize: totalCount }));
+            setLimit(l);
+            setPointer(0);
+            setCurrentPage(1);
           }}
           currentPage={currentPage}
           totalPages={Math.ceil(totalCount / limit)}

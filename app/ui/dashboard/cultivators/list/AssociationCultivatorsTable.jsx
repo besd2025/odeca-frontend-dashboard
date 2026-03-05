@@ -121,6 +121,7 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
     const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
     const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
 const exportCultivatorsToExcel = async () => {
+
     setLoadingEportBtn(true);
     try {
       // Étape 1 : Récupérer le nombre total d'enregistrements
@@ -147,8 +148,8 @@ const exportCultivatorsToExcel = async () => {
           );
           if (export_excel.status === "SUCCESS") {
             clearInterval(intervalId); // Arrêtez l'intervalle
-            // setLoadingEportBtn(false);
-            DownloadCultivatorsToExcel(); 
+            setLoadingEportBtn(false);
+            setActivedownloadBtn(true);
             setReportId(task_id);
           }
         }, 2000);
@@ -433,11 +434,14 @@ const exportCultivatorsToExcel = async () => {
             <ExportButton
               exportType="cultivator_association"
               onExportAssociationToExcel={exportCultivatorsToExcel}
+              loading={LoadingEportBtn}
+              activedownloadBtn={ActivedownloadBtn}
+              onClickDownloadButton={DownloadCultivatorsToExcel}
             />
           </div>
         </div>
       </div>
-      <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+      <div className="grid w-full [&>div]:border [&>div]:rounded-md">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

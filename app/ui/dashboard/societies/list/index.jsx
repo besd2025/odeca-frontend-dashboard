@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDownIcon, MoreHorizontal, Phone, Search } from "lucide-react";
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
 import { TableSkeleton } from "@/components/ui/skeletons";
@@ -38,8 +38,12 @@ import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
+<<<<<<< HEAD
 import { UserContext } from "@/app/ui/context/User_Context";
 import { useState, useContext } from "react";
+=======
+import { Input } from "@/components/ui/input";
+>>>>>>> a679289c842e8dff7ea03ea634bf0f51d342a21d
 export default function SocietiesListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -52,13 +56,33 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
     pageSize: 10,
   });
   const [filterData, setFilterData] = React.useState([]);
+  const [search, setSearch] = useState("");
+  const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+  const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+  const [exportBlob, setExportBlob] = useState(null);
+
   const isActuallyLoading = externalLoading ?? loading;
+<<<<<<< HEAD
   const user=useContext(UserContext)
+=======
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+
+>>>>>>> a679289c842e8dff7ea03ea634bf0f51d342a21d
   useEffect(() => {
     const getSocieties = async () => {
       setLoading(true);
       try {
+<<<<<<< HEAD
         const response = await fetchData("get", "cafe/societes/", {});
+=======
+        const response = await fetchData("get", "cafe/societes/", {
+          params: { search: search },
+        });
+        console.log(response);
+>>>>>>> a679289c842e8dff7ea03ea634bf0f51d342a21d
         const results = response?.results || [];
         const societiesData = results.map((society) => ({
           id: society?.id,
@@ -88,19 +112,23 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
     };
 
     getSocieties();
-  }, []);
+  }, [search]);
 
   const handleFilter = (filteredData) => {
     setFilterData(filteredData);
     console.log("Filtered Data:", filteredData);
   };
-  const handleExportSocieties = async() => {
+  const handleExportSocieties = async () => {
+    setLoadingEportBtn(true);
     try {
       const initResponse = await fetchData("get", `cafe/societes/`, {
         params: { limit: 1 },
       });
       const total = initResponse?.count || 0;
-      if (total === 0) return;
+      if (total === 0) {
+        setLoadingEportBtn(false);
+        return;
+      }
 
       const response = await fetchData("get", `cafe/societes/`, {
         params: { limit: total },
@@ -132,19 +160,30 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
       const blob = new Blob([excelBuffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
       });
-      const now = new Date();
-      const date = now.toISOString().split("T")[0];
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const seconds = String(now.getSeconds()).padStart(2, "0");
-      const time = `${hours}_${minutes}_${seconds}`;
-      saveAs(
-        blob,
-        `liste_societes_et_les_responsables_${date}_${time}.xlsx`,
-      );
+
+      setExportBlob(blob);
+      setActivedownloadBtn(true);
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
+    } finally {
+      setLoadingEportBtn(false);
     }
+  };
+
+  const DownloadSocietiesToExcel = () => {
+    if (!exportBlob) return;
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const time = `${hours}_${minutes}_${seconds}`;
+    saveAs(
+      exportBlob,
+      `liste_societes_et_les_responsables_${date}_${time}.xlsx`,
+    );
+    setActivedownloadBtn(false);
+    setExportBlob(null);
   };
   const columns = [
     {
@@ -294,12 +333,10 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
           <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
             <div className="relative ">
               <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
-              <input
+              <Input
                 placeholder="Rechercher Société..."
-                value={table.getColumn("name")?.getFilterValue() ?? ""}
-                onChange={(event) =>
-                  table.getColumn("name")?.setFilterValue(event.target.value)
-                }
+                value={search}
+                onChange={handleSearch}
                 className="pl-10 h-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
               />
             </div>
@@ -312,11 +349,14 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
                 <ExportButton
                   handleExportSocieties={handleExportSocieties}
                   exportType="society_data"
+                  loading={LoadingEportBtn}
+                  activedownloadBtn={ActivedownloadBtn}
+                  onClickDownloadButton={DownloadSocietiesToExcel}
                 />
               </div>
             </div>
           </div>
-          <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+          <div className="grid w-full [&>div]:border [&>div]:rounded-md">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (

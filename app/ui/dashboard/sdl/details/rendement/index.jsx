@@ -62,7 +62,7 @@ export default function RedementC() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md overflow-hidden">
+        <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>

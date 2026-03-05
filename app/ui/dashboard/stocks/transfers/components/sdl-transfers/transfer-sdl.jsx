@@ -210,7 +210,7 @@ export default function MouvementMagasinTable() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="overflow-x-auto grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+        <div className="overflow-x-auto grid w-full [&>div]:border [&>div]:rounded-md">
           <Table className="min-w-[1500px]">
             {/* Header principal */}
             <TableHeader className="bg-muted/30">

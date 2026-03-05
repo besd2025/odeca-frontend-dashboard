@@ -235,7 +235,7 @@ export default function RG() {
           <CardTitle className="text-xl font-bold">Rapport G</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto  grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+          <div className="overflow-x-auto  grid w-full [&>div]:border [&>div]:rounded-md">
             <Table>
               <TableHeader className="bg-muted/40">
                 <TableRow>

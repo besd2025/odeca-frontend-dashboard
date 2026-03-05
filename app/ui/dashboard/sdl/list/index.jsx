@@ -64,16 +64,21 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [reportId, setReportId] = useState("");
+  const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+  const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+  const [exportBlob, setExportBlob] = useState(null);
+
   useEffect(() => {
     const getSdls = async () => {
-      //setLoading(true);
+      setLoading(true);
       try {
         const response = await fetchData("get", "cafe/stationslavage/", {
           params: {
             limit: limit,
             offset: pointer,
             ...filterData,
-            search:search
+            search: search,
           },
           additionalHeaders: {},
           body: {},
@@ -111,7 +116,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
     };
 
     getSdls();
-  }, [limit, pointer,filterData,search]);
+  }, [limit, pointer, filterData, search]);
 
   const datapaginationlimit = (limitdata) => {
     setLimit(limitdata);
@@ -142,13 +147,17 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };
-  const handleExportSDLs = async() => {
+  const handleExportSDLs = async () => {
+    setLoadingEportBtn(true);
     try {
       const initResponse = await fetchData("get", `cafe/stationslavage/`, {
         params: { limit: 1 },
       });
       const total = initResponse?.count || 0;
-      if (total === 0) return;
+      if (total === 0) {
+        setLoadingEportBtn(false);
+        return;
+      }
 
       const response = await fetchData("get", `cafe/stationslavage/`, {
         params: { limit: total },
@@ -181,20 +190,27 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
       const blob = new Blob([excelBuffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
       });
-      const now = new Date();
-      const date = now.toISOString().split("T")[0];
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const seconds = String(now.getSeconds()).padStart(2, "0");
-      const time = `${hours}_${minutes}_${seconds}`;
-      saveAs(
-        blob,
-        `liste_sdls_et_les_responsables_${date}_${time}.xlsx`,
-      );
+
+      setExportBlob(blob);
+      setActivedownloadBtn(true);
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
+    } finally {
+      setLoadingEportBtn(false);
     }
+  };
 
+  const DownloadSDLsToExcel = () => {
+    if (!exportBlob) return;
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const time = `${hours}_${minutes}_${seconds}`;
+    saveAs(exportBlob, `liste_sdls_et_les_responsables_${date}_${time}.xlsx`);
+    setActivedownloadBtn(false);
+    setExportBlob(null);
   };
   const columns = [
     {
@@ -386,11 +402,14 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                 <ExportButton
                   handleExportSDLs={handleExportSDLs}
                   exportType="sdl_data"
+                  loading={LoadingEportBtn}
+                  activedownloadBtn={ActivedownloadBtn}
+                  onClickDownloadButton={DownloadSDLsToExcel}
                 />
               </div>
             </div>
           </div>
-          <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+          <div className="grid w-full [&>div]:border [&>div]:rounded-md">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
