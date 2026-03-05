@@ -88,7 +88,7 @@ export function LoginForm({ className, ...props }) {
       const user = DecodeToJwt(data.access);
       if (
         user?.category === "Admin" ||
-        //user?.category === "Anagessa" ||
+        user?.category === "General" ||
         user?.category === "Cafe_ODECA"
       ) {
         document.cookie = `accessToken=${data.access}; path=/; max-age=3600; secure`;
