@@ -37,7 +37,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { TableSkeleton } from "@/components/ui/skeletons";
-
+import { UserContext } from "@/app/ui/context/User_Context";
+import { useState, useContext } from "react";
 export default function UsineListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -52,7 +53,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
   });
 
   const isActuallyLoading = externalLoading ?? loading;
-
+  const user=useContext(UserContext)
   useEffect(() => {
     const getUsines = async () => {
       setLoading(true);
@@ -94,7 +95,6 @@ export default function UsineListTable({ isLoading: externalLoading }) {
 
   const handleFilter = (filteredData) => {
     setFilterData(filteredData);
-    console.log("Filtered Data:", filteredData);
   };
   const handleExportUsines = () => {
     // Logic to export usine data
@@ -129,9 +129,9 @@ export default function UsineListTable({ isLoading: externalLoading }) {
               <Link href={`/odeca-dashboard/usine/details/?id=${sdl?.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-              <div>
+             {user?.session?.category==="Admin"?( <div>
                 <Edit id={sdl.id} />
-              </div>
+            </div>):""}
             </DropdownMenuContent>
           </DropdownMenu>
         );

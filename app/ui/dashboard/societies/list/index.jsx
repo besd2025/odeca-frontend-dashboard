@@ -38,6 +38,8 @@ import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
+import { UserContext } from "@/app/ui/context/User_Context";
+import { useState, useContext } from "react";
 export default function SocietiesListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -51,13 +53,12 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
   });
   const [filterData, setFilterData] = React.useState([]);
   const isActuallyLoading = externalLoading ?? loading;
-
+  const user=useContext(UserContext)
   useEffect(() => {
     const getSocieties = async () => {
       setLoading(true);
       try {
         const response = await fetchData("get", "cafe/societes/", {});
-        console.log(response);
         const results = response?.results || [];
         const societiesData = results.map((society) => ({
           id: society?.id,
@@ -176,9 +177,13 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
               >
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-              <div>
-                <EditSociety id={society.id} />
-              </div>
+              {user?.session?.category === "Admin" ? (
+                <div>
+                  <EditSociety id={society.id} />
+                </div>
+              ) : (
+                ""
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );

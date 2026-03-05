@@ -43,6 +43,8 @@ import PaginationControls from "@/components/ui/pagination-controls";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TableSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
+import { UserContext } from "@/app/ui/context/User_Context";
+import { useState, useContext } from "react";
 import Filter from "./filter";
 function DataTable({
   data,
@@ -59,6 +61,7 @@ function DataTable({
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+    const user=useContext(UserContext)
   const columns = [
     {
       id: "actions",
@@ -93,7 +96,7 @@ function DataTable({
               >
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
-              <div>
+                  {user?.session?.category === "Admin" ? (<div>
                 <EditAchats
                   id={cultivator?.id}
                   cultivator={cultivator.cultivator}
@@ -107,7 +110,7 @@ function DataTable({
                   date={cultivator.date}
                   photo_fiche={cultivator.photo_fiche}
                 />
-              </div>
+              </div>):""}
             </DropdownMenuContent>
           </DropdownMenu>
         );
