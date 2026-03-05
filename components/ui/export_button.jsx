@@ -21,6 +21,7 @@ function ExportButton({
   onExportAchat_IndividuelToExcel,
   onExportAchat_AssociationToExcel,
   exportType,
+  handleExportSocieties,
 }) {
   const value = typeExport || "individuel";
   const [exportTypeState, setExportTypeState] = React.useState("");
@@ -52,6 +53,9 @@ function ExportButton({
                 } else if (exportTypeState === "ct_data") {
                   handleExportCTs();
                 }
+               else if (exportTypeState === "society_data") {
+                 handleExportSocieties();
+               }
               }}
               loading={loading}
               loadingType="spinner"
