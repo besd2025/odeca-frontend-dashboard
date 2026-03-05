@@ -40,7 +40,7 @@ import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Edit from "../edit";
 import Link from "next/link";
 import PaginationContent from "@/components/ui/pagination-content";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import { fetchData } from "@/app/_utils/api";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
@@ -418,13 +418,16 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     setPointer((pageNumber - 1) * limit);
+    setPagination((prev) => ({ ...prev, pageIndex: pageNumber - 1 }));
   };
   const onLimitChange = (newLimit) => {
     setLimit(newLimit);
     setPointer(0);
     setCurrentPage(1);
+    setPagination((prev) => ({ ...prev, pageSize: newLimit, pageIndex: 0 }));
   };
 
+  // On affiche le skeleton complet seulement au premier chargement (data vide)
   if (loading && data.length === 0) {
     return <TableSkeleton columns={6} rows={10} />;
   }
@@ -479,7 +482,9 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {loading ? (
+              <TableRowsSkeleton columns={columns.length} rows={limit} />
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -512,9 +517,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
         <div className="flex-1 text-sm text-muted-foreground"></div>
         <PaginationContent
           datapaginationlimit={(l) => {
-            if (l <= totalCount)
-              setPagination((prev) => ({ ...prev, pageSize: l }));
-            else setPagination((prev) => ({ ...prev, pageSize: totalCount }));
+            // This is already handled by onLimitChange and the internal limit state
           }}
           currentPage={currentPage}
           totalPages={Math.ceil(totalCount / limit)}

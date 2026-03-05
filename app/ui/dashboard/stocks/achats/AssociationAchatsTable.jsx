@@ -33,7 +33,7 @@ import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Link from "next/link";
 import EditAssociationAchats from "./EditAssociationAchats";
 import PaginationContent from "@/components/ui/pagination-content";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import { fetchData } from "@/app/_utils/api";
 import AssociationAchatsFilter from "./AssociationAchatsFilter";
 
@@ -460,11 +460,13 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     setPointer((pageNumber - 1) * limit);
+    setPagination((prev) => ({ ...prev, pageIndex: pageNumber - 1 }));
   };
   const onLimitChange = (newLimit) => {
     setLimit(newLimit);
     setPointer(0);
     setCurrentPage(1);
+    setPagination((prev) => ({ ...prev, pageSize: newLimit, pageIndex: 0 }));
   };
 
   const handleFilter = (filters) => {
@@ -487,8 +489,9 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
     setCurrentPage(1);
   };
 
-  if (loading) {
-    return <TableSkeleton rows={limit} columns={6} />;
+  // On affiche le skeleton complet seulement au premier chargement (data vide)
+  if (loading && data.length === 0) {
+    return <TableSkeleton columns={10} rows={limit} />;
   }
 
   return (
@@ -541,7 +544,9 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {loading ? (
+              <TableRowsSkeleton columns={columns.length} rows={limit} />
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

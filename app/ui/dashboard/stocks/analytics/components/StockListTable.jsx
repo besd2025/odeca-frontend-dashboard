@@ -20,7 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 
 export function StockListTable({ isLoading: externalLoading }) {
   const [data, setData] = React.useState([]);
@@ -38,7 +38,7 @@ export function StockListTable({ isLoading: externalLoading }) {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         const gradeData = response?.map((item) => ({
           id: item?.rendement__numero_lot,
@@ -48,9 +48,9 @@ export function StockListTable({ isLoading: externalLoading }) {
             item?.grade__grade_name === "A3"
               ? "Cerise A"
               : item?.grade__grade_name === "B1" ||
-                item?.grade__grade_name === "B2"
-              ? "Cerise B"
-              : "Inconnu",
+                  item?.grade__grade_name === "B2"
+                ? "Cerise B"
+                : "Inconnu",
           grade: item?.grade__grade_name,
           quantity: item?.total_cerise + " Kg",
           entryDate: item?.date_entre,
@@ -67,7 +67,7 @@ export function StockListTable({ isLoading: externalLoading }) {
     getDatas();
   }, []);
 
-  if (isActuallyLoading)
+  if (isActuallyLoading && data.length === 0)
     return (
       <div className="col-span-1 lg:col-span-3">
         <TableSkeleton rows={5} columns={6} />
@@ -100,18 +100,22 @@ export function StockListTable({ isLoading: externalLoading }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((lot, idd = 1) => (
-              <TableRow key={idd + 1}>
-                <TableCell className="font-medium">{lot.id}</TableCell>
-                <TableCell>{lot.type}</TableCell>
-                <TableCell>{lot.grade}</TableCell>
-                <TableCell>{lot.quantity}</TableCell>
-                <TableCell>{lot.entryDate}</TableCell>
-                <TableCell>
-                  <Badge variant="outline">{lot.status}</Badge>
-                </TableCell>
-              </TableRow>
-            ))}
+            {isActuallyLoading ? (
+              <TableRowsSkeleton columns={6} rows={5} />
+            ) : (
+              data.map((lot, idd = 1) => (
+                <TableRow key={idd + 1}>
+                  <TableCell className="font-medium">{lot.id}</TableCell>
+                  <TableCell>{lot.type}</TableCell>
+                  <TableCell>{lot.grade}</TableCell>
+                  <TableCell>{lot.quantity}</TableCell>
+                  <TableCell>{lot.entryDate}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{lot.status}</Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>

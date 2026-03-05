@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { fetchData } from "@/app/_utils/api";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 const movements = [
   {
     date: "2024-06-15",
@@ -73,7 +73,7 @@ export function RecentMovementsTable({ isLoading: externalLoading }) {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         const gradeData = response?.map((item) => ({
           date: item?.date_entre,
@@ -94,7 +94,8 @@ export function RecentMovementsTable({ isLoading: externalLoading }) {
     getDatas();
   }, []);
 
-  if (isActuallyLoading) return <TableSkeleton rows={5} columns={6} />;
+  if (isActuallyLoading && data.length === 0)
+    return <TableSkeleton rows={5} columns={6} />;
 
   return (
     <Card className="col-span-1 lg:col-span-4">
@@ -115,24 +116,28 @@ export function RecentMovementsTable({ isLoading: externalLoading }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((movement, index) => (
-              <TableRow key={index}>
-                <TableCell>{movement.date}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      movement.type === "Entrée" ? "default" : "destructive"
-                    }
-                  >
-                    {movement.type}
-                  </Badge>
-                </TableCell>
-                <TableCell className="font-medium">{movement.lot}</TableCell>
-                <TableCell>{movement.quantity}</TableCell>
-                <TableCell>{movement.origin}</TableCell>
-                <TableCell>{movement.destination}</TableCell>
-              </TableRow>
-            ))}
+            {isActuallyLoading ? (
+              <TableRowsSkeleton columns={6} rows={5} />
+            ) : (
+              data.map((movement, index) => (
+                <TableRow key={index}>
+                  <TableCell>{movement.date}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        movement.type === "Entrée" ? "default" : "destructive"
+                      }
+                    >
+                      {movement.type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="font-medium">{movement.lot}</TableCell>
+                  <TableCell>{movement.quantity}</TableCell>
+                  <TableCell>{movement.origin}</TableCell>
+                  <TableCell>{movement.destination}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>

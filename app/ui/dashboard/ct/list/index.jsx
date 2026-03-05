@@ -36,7 +36,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { fetchData } from "@/app/_utils/api";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
 import { useState } from "react";
 const XLSX = require("xlsx");
@@ -372,7 +372,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
 
   return (
     <div className="w-full bg-sidebar p-4 rounded-lg">
-      {isActuallyLoading ? (
+      {isActuallyLoading && data.length === 0 ? (
         <TableSkeleton rows={10} columns={5} />
       ) : (
         <>
@@ -434,7 +434,9 @@ export default function CtsListTable({ isLoading: externalLoading }) {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {isActuallyLoading ? (
+                  <TableRowsSkeleton columns={columns.length} rows={limit} />
+                ) : table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}

@@ -36,7 +36,7 @@ import Edit from "../edit";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import { saveAs } from "file-saver";
 const XLSX = require("xlsx");
 export default function UsineListTable({ isLoading: externalLoading }) {
@@ -335,7 +335,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
 
   return (
     <div className="w-full bg-sidebar p-4 rounded-lg">
-      {isActuallyLoading ? (
+      {isActuallyLoading && data.length === 0 ? (
         <TableSkeleton rows={10} columns={5} />
       ) : (
         <>
@@ -389,7 +389,9 @@ export default function UsineListTable({ isLoading: externalLoading }) {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {isActuallyLoading ? (
+                  <TableRowsSkeleton columns={columns.length} rows={10} />
+                ) : table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
@@ -419,10 +421,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
             </Table>
           </div>
           <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected. */}
-            </div>
+            <div className="flex-1 text-sm text-muted-foreground"></div>
             <PaginationControls
               page={table.getState().pagination.pageIndex + 1}
               pageSize={table.getState().pagination.pageSize}

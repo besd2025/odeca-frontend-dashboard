@@ -13,7 +13,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -309,7 +309,7 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
 
   return (
     <div className="w-full bg-sidebar p-4 rounded-lg">
-      {isActuallyLoading ? (
+      {isActuallyLoading && data.length === 0 ? (
         <TableSkeleton rows={10} columns={4} />
       ) : (
         <>
@@ -363,7 +363,9 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {isActuallyLoading ? (
+                  <TableRowsSkeleton columns={columns.length} rows={10} />
+                ) : table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}

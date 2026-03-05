@@ -110,7 +110,7 @@ export function StockSummaryCard() {
               {(data?.total_montant_cerise_a_achat ?? 0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-              FBU (Estimé)
+              FBU
             </span>
           </div>
           <div className="flex flex-col gap-1 p-3 bg-secondary/10 rounded-lg">
@@ -136,7 +136,7 @@ export function StockSummaryCard() {
               {(data?.total_montant_cerise_b_achat ?? 0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-              FBU (Estimé)
+              FBU
             </span>
           </div>
         </div>

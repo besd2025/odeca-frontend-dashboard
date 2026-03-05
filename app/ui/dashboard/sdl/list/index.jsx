@@ -14,7 +14,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { fetchData } from "@/app/_utils/api";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -377,7 +377,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
 
   return (
     <div className="w-full bg-sidebar p-4 rounded-lg">
-      {isActuallyLoading ? (
+      {isActuallyLoading && data.length === 0 ? (
         <TableSkeleton rows={10} columns={5} />
       ) : (
         <>
@@ -431,7 +431,9 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {isActuallyLoading ? (
+                  <TableRowsSkeleton columns={columns.length} rows={limit} />
+                ) : table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}

@@ -156,3 +156,19 @@ export function DashboardHomeSkeleton() {
     </div>
   );
 }
+
+export function TableRowsSkeleton({ rows = 5, columns = 5 }) {
+  return (
+    <>
+      {Array.from({ length: rows }).map((_, i) => (
+        <tr key={i} className="border-b transition-colors hover:bg-muted/50">
+          {Array.from({ length: columns }).map((_, j) => (
+            <td key={j} className="p-4 align-middle whitespace-nowrap">
+              <Skeleton className="h-4 w-full" />
+            </td>
+          ))}
+        </tr>
+      ))}
+    </>
+  );
+}

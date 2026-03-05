@@ -13,7 +13,7 @@ import {
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { useSearchParams } from "next/navigation";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 const products = [
   {
     id: 101,
@@ -70,7 +70,7 @@ export default function Ventes({ cult_id }) {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         const AchatsData = valuesdata?.results?.map((item) => ({
           id: item?.id,
@@ -98,7 +98,8 @@ export default function Ventes({ cult_id }) {
     getCultivators();
   }, [cult_id]);
 
-  if (loading) return <TableSkeleton rows={5} columns={9} />;
+  if (loading && data?.length === 0)
+    return <TableSkeleton rows={5} columns={9} />;
 
   return (
     <div className="w-full">
@@ -118,29 +119,33 @@ export default function Ventes({ cult_id }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((product) => (
-              <TableRow key={product.id} className="odd:bg-muted/50">
-                <TableCell className="pl-4">{product.id}</TableCell>
-                <TableCell className="font-medium">{product.date}</TableCell>
-                <TableCell>{product.sdl_ct}</TableCell>
-                <TableCell>{product.No_fiche}</TableCell>
-                <TableCell>{product.No_recus}</TableCell>
-                <TableCell>{product.ca}</TableCell>
-                <TableCell>{product.cb}</TableCell>
-                <TableCell>
-                  <ViewImageDialog
-                    imageUrl={product.fiche_photo}
-                    profile={false}
-                  />
-                </TableCell>
-                <TableCell>
-                  {(product.ca * 2800 + product.cb * 1400 ?? 0)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-                  Fbu
-                </TableCell>
-              </TableRow>
-            ))}
+            {loading ? (
+              <TableRowsSkeleton columns={9} rows={5} />
+            ) : (
+              data.map((product) => (
+                <TableRow key={product.id} className="odd:bg-muted/50">
+                  <TableCell className="pl-4">{product.id}</TableCell>
+                  <TableCell className="font-medium">{product.date}</TableCell>
+                  <TableCell>{product.sdl_ct}</TableCell>
+                  <TableCell>{product.No_fiche}</TableCell>
+                  <TableCell>{product.No_recus}</TableCell>
+                  <TableCell>{product.ca}</TableCell>
+                  <TableCell>{product.cb}</TableCell>
+                  <TableCell>
+                    <ViewImageDialog
+                      imageUrl={product.fiche_photo}
+                      profile={false}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {(product.ca * 2800 + product.cb * 1400 ?? 0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+                    Fbu
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

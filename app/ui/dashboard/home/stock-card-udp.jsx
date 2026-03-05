@@ -122,7 +122,7 @@ export function StockSummaryCardUDP() {
               {data.total_value
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-              FBU (Estimé)
+              FBU
             </span>
           </div>
         </div>
