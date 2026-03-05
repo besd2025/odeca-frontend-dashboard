@@ -3,6 +3,7 @@
 import { User, Users } from "lucide-react";
 import * as React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import IndividualAchatsTable from "./IndividualAchatsTable";
 import AssociationAchatsTable from "./AssociationAchatsTable";
 

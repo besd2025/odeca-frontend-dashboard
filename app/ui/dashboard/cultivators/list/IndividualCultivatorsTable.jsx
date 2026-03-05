@@ -116,61 +116,6 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     getCultivators();
   }, [pointer, limit, filterData, searchvalue]);
 
-  // const onExportToExcel = async () => {
-  //   try {
-  //     const initResponse = await fetchData(
-  //       "get",
-  //       `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
-  //       { params: { limit: 1 } },
-  //     );
-  //     const total = initResponse?.count || 0;
-  //     if (total === 0) return;
-
-  //     const response = await fetchData(
-  //       "get",
-  //       `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
-  //       { params: { limit: total } },
-  //     );
-
-  //     const allData = response.results || [];
-  //     const formattedData = allData.map((item) => ({
-  //       code_cultivateur: item.cultivator_code || "",
-  //       Type: item.cultivator_entity_type || "",
-  //       Nom: item.cultivator_first_name || "",
-  //       Prénom: item.cultivator_last_name || "",
-  //       Genre: item.cultivator_gender || "",
-  //       CNI: item.cultivator_cni || "",
-  //       Province:
-  //         item.cultivator_adress?.zone_code?.commune_code?.province_code
-  //           ?.province_name || "",
-  //       Commune:
-  //         item.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
-  //       Zone: item.cultivator_adress?.zone_code?.zone_name || "",
-  //       Colline: item.cultivator_adress?.colline_name || "",
-  //       Societe: item?.collector?.hangar?.hangar_name || "",
-  //       Nombre_de_champs: item.nombre_champs || 0,
-  //       Superficie_totale_des_champs: item.superficie_totale_champs || 0,
-  //       Telephone: item.cultivator_telephone || "",
-  //     }));
-
-  //     const worksheet = XLSX.utils.json_to_sheet(formattedData);
-  //     const workbook = XLSX.utils.book_new();
-  //     XLSX.utils.book_append_sheet(workbook, worksheet, "Cultivateurs");
-  //     const excelBuffer = XLSX.write(workbook, {
-  //       bookType: "xlsx",
-  //       type: "array",
-  //     });
-  //     const blob = new Blob([excelBuffer], {
-  //       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
-  //     });
-  //     saveAs(
-  //       blob,
-  //       `cultivateurs_physiques_${new Date().toISOString().split("T")[0]}.xlsx`,
-  //     );
-  //   } catch (error) {
-  //     console.error("Erreur exportation Excel :", error);
-  //   }
-  // };
 
   const [reportId, setReportId] = useState("");
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
@@ -183,9 +128,9 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
         "post",
         "/cafe/achat_cafe/export_achat_quantites/",
         {
-          params: { cafeiculteur_type: "personne", export_type: "RESUME" },
+          params: {},
           additionalHeaders: {},
-          body: {},
+          body: { cafeiculteur_type: "personne", export_type: "RESUME" },
         },
       );
       console.log("export data ", initial_export);

@@ -39,6 +39,8 @@ import { fetchData } from "@/app/_utils/api";
 import { TableSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
 import { useState } from "react";
+const XLSX = require("xlsx");
+import { saveAs } from "file-saver";
 export default function CtsListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -126,9 +128,60 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   const handleSearch=(e)=>{
     setSearch(e.target.value)
   }
-  const handleExportCTs = () => {
-    // Logic to export CT data
-    console.log("Exporting CT Data...");
+  const handleExportCTs = async() => {
+try {
+      const initResponse = await fetchData("get", `cafe/centres_transite/`, {
+        params: { limit: 1 },
+      });
+      const total = initResponse?.count || 0;
+      if (total === 0) return;
+
+      const response = await fetchData("get", `cafe/centres_transite/`, {
+        params: { limit: total },
+      });
+
+      const allData = response.results || [];
+      const formattedData = allData.map((item) => ({
+        Province:
+          item.ct_adress?.zone_code?.commune_code?.province_code
+            ?.province_name || "",
+        Commune: item.ct_adress?.zone_code?.commune_code?.commune_name || "",
+        Zone: item.ct_adress?.zone_code?.zone_name || "",
+        Colline: item.ct_adress?.colline_name || "",
+        CODE_CT: item?.ct_code || "",
+        NON_CT: item.ct_nom || "",
+        SDL_DESTINATION: item?.sdl?.sdl_nom,
+        SOCIETE: item?.sdl?.societe?.nom_societe || "",
+        NOM_RESPONSABLE: item?.ct_responsable?.user?.last_name || "",
+        PRENOM_RESPONSABLE: item?.ct_responsable?.user?.first_name || "",
+        TELEPHONE_RESPONSABLE: item?.ct_responsable?.user?.phone || "",
+        DATE_CREATION: item?.created_at,
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "CT");
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      });
+      const now = new Date();
+      const date = now.toISOString().split("T")[0];
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+      const time = `${hours}_${minutes}_${seconds}`;
+      saveAs(
+        blob,
+        `liste_CTs_et_les_responsables_${date}_${time}.xlsx`,
+      );
+    } catch (error) {
+      console.error("Erreur exportation Excel :", error);
+    }
+
   };
   const columns = [
     {

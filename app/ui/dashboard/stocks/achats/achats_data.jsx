@@ -9,6 +9,7 @@ function AchatsData() {
       <Tabs defaultValue="list" className="w-full">
         <TabsContent value="list">
           <h1 className="text-2xl font-semibold m-2">Liste des achats</h1>
+
           <AchatsListTable isCultivatorsPage={true} />
         </TabsContent>
         <TabsContent value="details">
