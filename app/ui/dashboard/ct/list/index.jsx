@@ -34,11 +34,11 @@ import Filter from "../filter";
 import Edit from "../edit";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import PaginationControls from "@/components/ui/pagination-controls";
 import { fetchData } from "@/app/_utils/api";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
-import { useState } from "react";
+import { UserContext } from "@/app/ui/context/User_Context";
+import { useState,useContext} from "react";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 export default function CtsListTable({ isLoading: externalLoading }) {
@@ -55,7 +55,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   });
 
   const isActuallyLoading = externalLoading ?? loading;
-
+  const user=useContext(UserContext)
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
@@ -120,7 +120,6 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   };
   const onLimitChange = (newLimit) => {
     setLimit(newLimit);
-    //localStorage.setItem("table_limit", String(newLimit));
     setPointer(0);
     setCurrentPage(1);
   };
@@ -233,9 +232,10 @@ export default function CtsListTable({ isLoading: externalLoading }) {
               <Link href={`/odeca-dashboard/ct/details/?id=${ct.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-              <div>
+              {user?.session?.category==="Admin"?(
+                 <div>
                 <Edit id={ct.id} />
-              </div>
+              </div>):" "}
             </DropdownMenuContent>
           </DropdownMenu>
         );

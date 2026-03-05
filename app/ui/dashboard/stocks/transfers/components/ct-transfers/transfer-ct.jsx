@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDownIcon, MoreHorizontal, Search } from "lucide-react";
 import * as React from "react";
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -50,7 +50,11 @@ export default function TransferCtDep({
     pageIndex: 0,
     pageSize: 10,
   });
-
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
   React.useEffect(() => {
     fethTransfertbtnLoading(true);
   }, [fethTransfertbtnLoading]);
@@ -246,7 +250,7 @@ export default function TransferCtDep({
       pagination,
     },
     manualPagination: true,
-    rowCount: datapagination.totalCount,
+    // rowCount: datapagination.totalCount,
   });
 
   return (
@@ -334,7 +338,9 @@ export default function TransferCtDep({
           {table.getFilteredRowModel().rows.length} row(s) selected. */}
         </div>
 
+
         <PaginationContent
+
           datapaginationlimit={datapagination.onLimitChange}
           currentPage={datapagination.currentPage}
           totalPages={datapagination.totalPages}
@@ -342,7 +348,7 @@ export default function TransferCtDep({
           pointer={datapagination.pointer}
           totalCount={datapagination.totalCount}
           onLimitChange={datapagination.onLimitChange}
-        />
+        /> 
       </div>
     </div>
   );

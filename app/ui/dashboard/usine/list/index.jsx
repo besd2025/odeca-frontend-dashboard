@@ -37,8 +37,12 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
+
+import { UserContext } from "@/app/ui/context/User_Context";
+import { useContext } from "react";
 import { saveAs } from "file-saver";
 const XLSX = require("xlsx");
+
 export default function UsineListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -58,6 +62,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
   const [exportBlob, setExportBlob] = useState(null);
 
   const isActuallyLoading = externalLoading ?? loading;
+  const user = useContext(UserContext);
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -106,7 +111,6 @@ export default function UsineListTable({ isLoading: externalLoading }) {
 
   const handleFilter = (filteredData) => {
     setFilterData(filteredData);
-    console.log("Filtered Data:", filteredData);
   };
   const handleExportUsines = async () => {
     setLoadingEportBtn(true);
@@ -201,9 +205,13 @@ export default function UsineListTable({ isLoading: externalLoading }) {
               <Link href={`/odeca-dashboard/usine/details/?id=${sdl?.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-              <div>
-                <Edit id={sdl.id} />
-              </div>
+              {user?.session?.category === "Admin" ? (
+                <div>
+                  <Edit id={sdl.id} />
+                </div>
+              ) : (
+                ""
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );

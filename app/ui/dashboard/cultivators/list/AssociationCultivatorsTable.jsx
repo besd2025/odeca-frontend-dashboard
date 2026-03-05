@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo,useContext } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -41,9 +41,7 @@ import Link from "next/link";
 import PaginationContent from "@/components/ui/pagination-content";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import { fetchData } from "@/app/_utils/api";
-const XLSX = require("xlsx");
-import { saveAs } from "file-saver";
-
+import { UserContext } from "@/app/ui/context/User_Context";
 export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +60,7 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 5,
   });
+  const user=useContext(UserContext)
   useEffect(() => {
     const getCultivatorsAssociation = async () => {
       setLoading(true);
@@ -118,67 +117,11 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
 
     getCultivatorsAssociation();
   }, [pointer, limit, filterData, searchvalue]);
+    const [reportId, setReportId]=useState("")
+    const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+    const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+const exportCultivatorsToExcel = async () => {
 
-  // const onExportAssociationToExcel = async () => {
-  //   try {
-  //     const initResponse = await fetchData(
-  //       "get",
-  //       `cultivators/get_cafe_cultivators?cafeiculteur_type=association`,
-  //       { params: { limit: 1 } },
-  //     );
-  //     const total = initResponse?.count || 0;
-  //     if (total === 0) return;
-
-  //     const response = await fetchData(
-  //       "get",
-  //       `cultivators/get_cafe_cultivators?cafeiculteur_type=association`,
-  //       { params: { limit: total } },
-  //     );
-
-  //     const allData = response.results || [];
-  //     const formattedData = allData.map((item) => ({
-  //       code_cultivateur: item.cultivator_code || "",
-  //       Type: item.cultivator_entity_type || "",
-  //       association: item.cultivator_assoc_name || "",
-  //       Représentant_de_lassociation: item.cultivator_assoc_rep_name || "",
-  //       telephone_du_représentant: item.cultivator_assoc_rep_phone || "",
-  //       numero_fiche: item.cultivator_assoc_numero_fiche || "",
-  //       NIF_de_lassociation: item.cultivator_assoc_nif || "",
-  //       Province:
-  //         item.cultivator_adress?.zone_code?.commune_code?.province_code
-  //           ?.province_name || "",
-  //       Commune:
-  //         item.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
-  //       Zone: item.cultivator_adress?.zone_code?.zone_name || "",
-  //       Colline: item.cultivator_adress?.colline_name || "",
-  //       Societe: item?.collector?.hangar?.hangar_name || "",
-  //       Nombre_de_champs: item.nombre_champs || 0,
-  //       Superficie_totale_des_champs: item.superficie_totale_champs || 0,
-  //     }));
-
-  //     const worksheet = XLSX.utils.json_to_sheet(formattedData);
-  //     const workbook = XLSX.utils.book_new();
-  //     XLSX.utils.book_append_sheet(workbook, worksheet, "Associations");
-  //     const excelBuffer = XLSX.write(workbook, {
-  //       bookType: "xlsx",
-  //       type: "array",
-  //     });
-  //     const blob = new Blob([excelBuffer], {
-  //       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
-  //     });
-  //     saveAs(
-  //       blob,
-  //       `associations_${new Date().toISOString().split("T")[0]}.xlsx`,
-  //     );
-  //   } catch (error) {
-  //     console.error("Erreur exportation Excel :", error);
-  //   }
-
-  //Export Function
-  const [reportId, setReportId] = useState("");
-  const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
-  const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
-  const exportCultivatorsToExcel = async () => {
     setLoadingEportBtn(true);
     try {
       // Étape 1 : Récupérer le nombre total d'enregistrements
@@ -225,7 +168,6 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
         params: { report_id: reportId },
         isBlob: true,
       });
-      console.log("downloard", response);
       // Créer le blob avec le bon type MIME
       const blob = new Blob([response.data], {
         type:
@@ -305,7 +247,8 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                <div>
+                 {user?.session?.category==="Admin"?(
+                  <div>
                   <Edit
                     cultivator={result?.id}
                     sdl_ct={result?.sdl_ct}
@@ -313,7 +256,7 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
                     localite={result?.localite}
                     champs={result?.champs}
                   />
-                </div>
+                </div>):" "}
               </DropdownMenuContent>
             </DropdownMenu>
           );

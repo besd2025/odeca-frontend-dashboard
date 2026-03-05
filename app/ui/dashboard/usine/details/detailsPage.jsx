@@ -1,18 +1,21 @@
 "use client";
-import React from "react";
+import React,{useContext} from "react";
 import StatsCard from "./StatsCard";
 import Edit from "../edit";
 import DetailsCard from "./detailsCard";
 import DetailsContent from "./details-content";
 import { useSearchParams } from "next/navigation";
+import { UserContext } from "@/app/ui/context/User_Context";
 function DetailsPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+       const user=useContext(UserContext)
   return (
     <div className=" space-y-6">
-      <div className="flex justify-end gap-2">
+                   {user?.session?.category==="Admin"?(
+             <div className="flex justify-end gap-2">
         <Edit id={id} />
-      </div>
+      </div>):""}
       <div className="flex flex-col lg:flex-row gap-4">
         <DetailsCard id={id} />
 

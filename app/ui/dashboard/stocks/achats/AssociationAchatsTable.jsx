@@ -58,7 +58,6 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
 
   useEffect(() => {
     const getAchatsAssociation = async () => {
-      setLoading(true);
       try {
         const response = await fetchData(
           "get",

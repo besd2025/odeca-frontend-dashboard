@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo,useContext } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -42,9 +42,7 @@ import Link from "next/link";
 import PaginationContent from "@/components/ui/pagination-content";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import { fetchData } from "@/app/_utils/api";
-const XLSX = require("xlsx");
-import { saveAs } from "file-saver";
-
+import { UserContext } from "@/app/ui/context/User_Context";
 export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +60,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 5,
   });
+    const user=useContext(UserContext)
   useEffect(() => {
     const getCultivators = async () => {
       setLoading(true);
@@ -132,7 +131,6 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
           body: { cafeiculteur_type: "personne", export_type: "RESUME" },
         },
       );
-      console.log("export data ", initial_export);
       if (initial_export.data?.status == "PENDING") {
         setLoadingEportBtn(true);
         const task_id = initial_export?.data?.report_id;
@@ -246,7 +244,8 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                <div>
+                   {user?.session?.category==="Admin"?( 
+                    <div>
                   <Edit
                     cultivator={result?.id}
                     sdl_ct={result?.sdl_ct}
@@ -254,7 +253,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
                     localite={result?.localite}
                     champs={result?.champs}
                   />
-                </div>
+                </div>):" "}
               </DropdownMenuContent>
             </DropdownMenu>
           );
