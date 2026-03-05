@@ -32,7 +32,7 @@ function ExportButton({
 
   React.useEffect(() => {
     setExportTypeState(exportType);
-    console.log(exportType)
+    console.log(exportType);
   }, [exportType]);
 
   return (
@@ -59,7 +59,7 @@ function ExportButton({
                 } else if (exportTypeState === "achats_individual") {
                   handlerExportAchat();
                 } else if (exportTypeState === "achats_association") {
-                  handlerExportAchat();
+                  handleExportSocieties();
                 } else if (exportTypeState === "usine_data") {
                   handleExportUsines();
                 } else if (exportTypeState === "sdl_data") {

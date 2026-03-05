@@ -60,12 +60,23 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [search,setSearch]=useState("")
+  const [search, setSearch] = useState("");
+  const [reportId, setReportId] = useState("");
+  const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+  const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+  const [exportBlob, setExportBlob] = useState(null);
+
   React.useEffect(() => {
     const getSdls = async () => {
+      setLoading(true);
       try {
         const response = await fetchData("get", "cafe/centres_transite/", {
-          params: { limit: limit, offset: pointer, ...filterData,search:search },
+          params: {
+            limit: limit,
+            offset: pointer,
+            ...filterData,
+            search: search,
+          },
           additionalHeaders: {},
           body: {},
         });
@@ -101,7 +112,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
     };
 
     getSdls();
-  }, [pointer,limit,filterData,search]);
+  }, [pointer, limit, filterData, search]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -125,16 +136,20 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   const handleFilter = (filteredData) => {
     setFilterData(filteredData);
   };
-  const handleSearch=(e)=>{
-    setSearch(e.target.value)
-  }
-  const handleExportCTs = async() => {
-try {
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+  const handleExportCTs = async () => {
+    setLoadingEportBtn(true);
+    try {
       const initResponse = await fetchData("get", `cafe/centres_transite/`, {
         params: { limit: 1 },
       });
       const total = initResponse?.count || 0;
-      if (total === 0) return;
+      if (total === 0) {
+        setLoadingEportBtn(false);
+        return;
+      }
 
       const response = await fetchData("get", `cafe/centres_transite/`, {
         params: { limit: total },
@@ -168,20 +183,27 @@ try {
       const blob = new Blob([excelBuffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
       });
-      const now = new Date();
-      const date = now.toISOString().split("T")[0];
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const seconds = String(now.getSeconds()).padStart(2, "0");
-      const time = `${hours}_${minutes}_${seconds}`;
-      saveAs(
-        blob,
-        `liste_CTs_et_les_responsables_${date}_${time}.xlsx`,
-      );
+
+      setExportBlob(blob);
+      setActivedownloadBtn(true);
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
+    } finally {
+      setLoadingEportBtn(false);
     }
+  };
 
+  const DownloadCTsToExcel = () => {
+    if (!exportBlob) return;
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const time = `${hours}_${minutes}_${seconds}`;
+    saveAs(exportBlob, `liste_CTs_et_les_responsables_${date}_${time}.xlsx`);
+    setActivedownloadBtn(false);
+    setExportBlob(null);
   };
   const columns = [
     {
@@ -381,11 +403,14 @@ try {
                 <ExportButton
                   exportType="ct_data"
                   handleExportCTs={handleExportCTs}
+                  loading={LoadingEportBtn}
+                  activedownloadBtn={ActivedownloadBtn}
+                  onClickDownloadButton={DownloadCTsToExcel}
                 />
               </div>
             </div>
           </div>
-          <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+          <div className="grid w-full [&>div]:border [&>div]:rounded-md">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (

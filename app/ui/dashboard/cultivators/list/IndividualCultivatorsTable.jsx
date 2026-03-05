@@ -116,7 +116,6 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     getCultivators();
   }, [pointer, limit, filterData, searchvalue]);
 
-
   const [reportId, setReportId] = useState("");
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
   const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
@@ -458,7 +457,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
           </div>
         </div>
       </div>
-      <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+      <div className="grid w-full [&>div]:border [&>div]:rounded-md">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

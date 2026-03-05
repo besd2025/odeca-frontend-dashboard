@@ -498,7 +498,7 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
           </div>
         </div>
       </div>
-      <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+      <div className="grid w-full [&>div]:border [&>div]:rounded-md">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

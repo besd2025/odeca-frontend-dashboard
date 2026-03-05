@@ -118,6 +118,102 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
     getAchatsAssociation();
   }, [limit, pointer, filterData, searchvalue]);
 
+  const [reportId, setReportId] = useState("");
+  const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+  const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+  const exportCultivatorsToExcel = async () => {
+    setLoadingEportBtn(true);
+    try {
+      // Étape 1 : Récupérer le nombre total d'enregistrements
+      const initial_export = await fetchData(
+        "post",
+        "/cafe/achat_cafe/export_achat_quantites/",
+        {
+          params: {},
+          additionalHeaders: {},
+          body: { cafeiculteur_type: "association", export_type: "DETAIL" },
+        },
+      );
+      console.log("export data ", initial_export);
+      if (initial_export.data?.status == "PENDING") {
+        setLoadingEportBtn(true);
+        const task_id = initial_export?.data?.report_id;
+        const intervalId = setInterval(async () => {
+          const export_excel = await fetchData(
+            "get",
+            "cafe/achat_cafe/export_achat_status/",
+            {
+              params: { report_id: task_id },
+            },
+          );
+          if (export_excel.status === "SUCCESS") {
+            clearInterval(intervalId); // Arrêtez l'intervalle
+            setLoadingEportBtn(false);
+            setActivedownloadBtn(true);
+            setReportId(task_id);
+          }
+        }, 2000);
+      }
+
+      // Vérifier toutes les 6 secondes
+    } catch (error) {
+      console.error("Erreur exportation Excel :", error);
+    } finally {
+      //setLoadingEportBtn(false);
+    }
+  };
+  const DownloadCultivatorsToExcel = async () => {
+    try {
+      const response = await fetchData("get", "/cafe/achat_cafe/download/", {
+        params: { report_id: reportId },
+        isBlob: true,
+      });
+      console.log("downloard", response);
+      // Créer le blob avec le bon type MIME
+      const blob = new Blob([response.data], {
+        type:
+          response.headers["content-type"] ||
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+
+      const timestamp = `${day}_${month}_${year}_${hours}_${minutes}_${seconds}`;
+      // Nom du fichier par défaut
+      let filename = `cultivator_list_${timestamp}.xlsx`;
+
+      const contentDisposition = response.headers["content-disposition"];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match && match[1]) filename = match[1];
+      }
+
+      // Création du <a> temporaire
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+
+      // Nettoyage
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      setActivedownloadBtn(false);
+    } catch (error) {
+      console.error("Erreur lors de l'exportation Excel :", error);
+    } finally {
+      setLoadingEportBtn(false);
+    }
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -413,7 +509,13 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
             <AssociationAchatsFilter handleFilter={handleFilter} />
           </div>
           <div className="flex items-center gap-3 text-gray-700">
-            <ExportButton exportType="achats_association" />
+            <ExportButton
+              exportType="achats_association"
+              handleExportSocieties={exportCultivatorsToExcel}
+              loading={LoadingEportBtn}
+              activedownloadBtn={ActivedownloadBtn}
+              onClickDownloadButton={DownloadCultivatorsToExcel}
+            />
           </div>
         </div>
       </div>

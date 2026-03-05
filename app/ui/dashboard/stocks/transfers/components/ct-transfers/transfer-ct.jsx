@@ -275,7 +275,7 @@ export default function TransferCtDep({
           </div>
         </div>
       </div>
-      <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+      <div className="grid w-full [&>div]:border [&>div]:rounded-md">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -330,10 +330,10 @@ export default function TransferCtDep({
       </div>
       <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected. */}
         </div>
-   
+
         <PaginationContent
           datapaginationlimit={datapagination.onLimitChange}
           currentPage={datapagination.currentPage}
@@ -344,6 +344,6 @@ export default function TransferCtDep({
           onLimitChange={datapagination.onLimitChange}
         />
       </div>
-      </div>
+    </div>
   );
 }

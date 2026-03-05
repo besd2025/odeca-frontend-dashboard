@@ -133,7 +133,7 @@ export default function RA() {
     if (!currentData) return 0;
     return currentData.personnel.reduce(
       (acc, day) => acc + (day.values[colIndex] || 0),
-      0
+      0,
     );
   };
 
@@ -292,7 +292,7 @@ export default function RA() {
         </CardHeader>
 
         <CardContent>
-          <div className="overflow-x-auto grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+          <div className="overflow-x-auto grid w-full [&>div]:border [&>div]:rounded-md">
             <Table>
               {/* Header */}
               <TableHeader className="bg-muted/40">

@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -37,7 +37,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { TableSkeleton } from "@/components/ui/skeletons";
-
+import { saveAs } from "file-saver";
+const XLSX = require("xlsx");
 export default function UsineListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -46,18 +47,29 @@ export default function UsineListTable({ isLoading: externalLoading }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [filterData, setFilterData] = React.useState([]);
+
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [search, setSearch] = useState("");
+  const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+  const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+  const [exportBlob, setExportBlob] = useState(null);
 
   const isActuallyLoading = externalLoading ?? loading;
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
 
   useEffect(() => {
     const getUsines = async () => {
       setLoading(true);
       try {
-        const response = await fetchData("get", "cafe/usine_deparchage/", {});
+        const response = await fetchData("get", "cafe/usine_deparchage/", {
+          params: { search: search },
+        });
         const results = response?.results || [];
         const sdlData = results.map((usine) => ({
           id: usine?.id,
@@ -90,15 +102,75 @@ export default function UsineListTable({ isLoading: externalLoading }) {
     };
 
     getUsines();
-  }, []);
+  }, [search]);
 
   const handleFilter = (filteredData) => {
     setFilterData(filteredData);
     console.log("Filtered Data:", filteredData);
   };
-  const handleExportUsines = () => {
-    // Logic to export usine data
-    console.log("Exporting Usine Data...");
+  const handleExportUsines = async () => {
+    setLoadingEportBtn(true);
+    try {
+      const initResponse = await fetchData("get", "cafe/usine_deparchage/", {
+        params: { limit: 1 },
+      });
+      const total = initResponse?.count || 0;
+      if (total === 0) {
+        setLoadingEportBtn(false);
+        return;
+      }
+
+      const response = await fetchData("get", "cafe/usine_deparchage/", {
+        params: { limit: total },
+      });
+
+      const allData = response.results || [];
+      const formattedData = allData.map((item) => ({
+        Province:
+          item.usine_adress?.zone_code?.commune_code?.province_code
+            ?.province_name || "",
+        Commune: item.usine_adress?.zone_code?.commune_code?.commune_name || "",
+        Zone: item.usine_adress?.zone_code?.zone_name || "",
+        Colline: item.usine_adress?.colline_name || "",
+        CODE_USINE: item?.usine_code || "",
+        NOM_USINE: item?.usine_name || "",
+        NOM_RESPONSABLE: item?.usine_responsable?.user?.last_name || "",
+        PRENOM_RESPONSABLE: item?.usine_responsable?.user?.first_name || "",
+        TELEPHONE_RESPONSABLE: item?.usine_responsable?.user?.phone || "",
+        DATE_CREATION: item?.created_at,
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "USINE");
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      });
+
+      setExportBlob(blob);
+      setActivedownloadBtn(true);
+    } catch (error) {
+      console.error("Erreur exportation Excel :", error);
+    } finally {
+      setLoadingEportBtn(false);
+    }
+  };
+
+  const DownloadUsinesToExcel = () => {
+    if (!exportBlob) return;
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const time = `${hours}_${minutes}_${seconds}`;
+    saveAs(exportBlob, `liste_usines_et_les_responsables_${date}_${time}.xlsx`);
+    setActivedownloadBtn(false);
+    setExportBlob(null);
   };
   const columns = [
     {
@@ -270,12 +342,10 @@ export default function UsineListTable({ isLoading: externalLoading }) {
           <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
             <div className="relative ">
               <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
-              <input
+              <Input
                 placeholder="Rechercher Usine..."
-                value={table.getColumn("sdl")?.getFilterValue() ?? ""}
-                onChange={(event) =>
-                  table.getColumn("sdl")?.setFilterValue(event.target.value)
-                }
+                value={search}
+                onChange={handleSearch}
                 className="pl-10 h-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
               />
             </div>
@@ -288,11 +358,14 @@ export default function UsineListTable({ isLoading: externalLoading }) {
                 <ExportButton
                   handleExportUsines={handleExportUsines}
                   exportType="usine_data"
+                  loading={LoadingEportBtn}
+                  activedownloadBtn={ActivedownloadBtn}
+                  onClickDownloadButton={DownloadUsinesToExcel}
                 />
               </div>
             </div>
           </div>
-          <div className="grid w-full [&>div]:max-h-max [&>div]:border [&>div]:rounded-md">
+          <div className="grid w-full [&>div]:border [&>div]:rounded-md">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
