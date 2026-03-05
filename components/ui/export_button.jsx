@@ -22,12 +22,14 @@ function ExportButton({
   onExportAchat_AssociationToExcel,
   exportType,
   handleExportSocieties,
+  handlerExportAchat,
 }) {
   const value = typeExport || "individuel";
   const [exportTypeState, setExportTypeState] = React.useState("");
 
   React.useEffect(() => {
     setExportTypeState(exportType);
+    console.log(exportType)
   }, [exportType]);
 
   return (
@@ -42,20 +44,19 @@ function ExportButton({
                   onExportToExcel();
                 } else if (exportTypeState === "cultivator_association") {
                   onExportAssociationToExcel();
-                } else if (exportTypeState === "achat_individuel") {
-                  onExportAchat_IndividuelToExcel();
-                } else if (exportTypeState === "achat_association") {
-                  onExportAchat_AssociationToExcel();
+                } else if (exportTypeState === "achats_individual") {
+                  handlerExportAchat();
+                } else if (exportTypeState === "achats_association") {
+                  handlerExportAchat();
                 } else if (exportTypeState === "usine_data") {
                   handleExportUsines();
                 } else if (exportTypeState === "sdl_data") {
                   handleExportSDLs();
                 } else if (exportTypeState === "ct_data") {
                   handleExportCTs();
+                } else if (exportTypeState === "society_data") {
+                  handleExportSocieties();
                 }
-               else if (exportTypeState === "society_data") {
-                 handleExportSocieties();
-               }
               }}
               loading={loading}
               loadingType="spinner"

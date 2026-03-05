@@ -52,7 +52,8 @@ function DataTable({
   limit,
   totalCount,
   handleFilter,
-  hendlesecherchData 
+  hendlesecherchData ,
+  handlerExportAchat
 }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -362,6 +363,7 @@ const [serchValue,setserchValue]=React.useState("")
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
               exportType={exportType}
+              handlerExportAchat={handlerExportAchat}
               //   onClickExportButton={exportCultivatorsToExcel}
               //   onClickDownloadButton={DownloadCultivatorsToExcel}
               //   loading={loadingEportBtn}
@@ -464,6 +466,7 @@ export default function AchatsListTable({
   totalCount,
   handleFilter,
   hendlesecherchData,
+  handlerExportAchat,
 }) {
   const handleTabClick = (value) => {
     if (value == "") {
@@ -506,6 +509,7 @@ export default function AchatsListTable({
             exportType="achats_individual"
             handleFilter={handleFilter}
             hendlesecherchData={hendlesecherchData}
+            handlerExportAchat={handlerExportAchat}
           />
         )}
       </TabsContent>
@@ -522,6 +526,7 @@ export default function AchatsListTable({
             exportType="achats_association"
             handleFilter={handleFilter}
             hendlesecherchData={hendlesecherchData}
+            handlerExportAchat={handlerExportAchat}
           />
         )}
       </TabsContent>
