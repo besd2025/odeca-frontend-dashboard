@@ -173,12 +173,12 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
   //   } catch (error) {
   //     console.error("Erreur exportation Excel :", error);
   //   }
-    
-    //Export Function
-    const [reportId, setReportId]=useState("")
-    const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
-    const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
-const exportCultivatorsToExcel = async () => {
+
+  //Export Function
+  const [reportId, setReportId] = useState("");
+  const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+  const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+  const exportCultivatorsToExcel = async () => {
     setLoadingEportBtn(true);
     try {
       // Étape 1 : Récupérer le nombre total d'enregistrements
@@ -205,8 +205,8 @@ const exportCultivatorsToExcel = async () => {
           );
           if (export_excel.status === "SUCCESS") {
             clearInterval(intervalId); // Arrêtez l'intervalle
-            // setLoadingEportBtn(false);
-            DownloadCultivatorsToExcel(); 
+            setLoadingEportBtn(false);
+            setActivedownloadBtn(true);
             setReportId(task_id);
           }
         }, 2000);
@@ -270,12 +270,6 @@ const exportCultivatorsToExcel = async () => {
       setLoadingEportBtn(false);
     }
   };
-
-
-
-
-
-
 
   const columns = useMemo(
     () => [
@@ -497,6 +491,9 @@ const exportCultivatorsToExcel = async () => {
             <ExportButton
               exportType="cultivator_association"
               onExportAssociationToExcel={exportCultivatorsToExcel}
+              loading={LoadingEportBtn}
+              activedownloadBtn={ActivedownloadBtn}
+              onClickDownloadButton={DownloadCultivatorsToExcel}
             />
           </div>
         </div>

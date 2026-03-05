@@ -63,59 +63,58 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     pageSize: 5,
   });
   useEffect(() => {
-  const getCultivators = async () => {
-    setLoading(true);
-    try {
-      const response = await fetchData(
-        "get",
-        "cultivators/get_cafe_cultivators/?cafeiculteur_type=personne",
-        {
-          params: {
-            limit: limit,
-            offset: pointer,
-            // Add filterData as params if the API supports it
-            ...filterData,
-            search:searchvalue
+    const getCultivators = async () => {
+      setLoading(true);
+      try {
+        const response = await fetchData(
+          "get",
+          "cultivators/get_cafe_cultivators/?cafeiculteur_type=personne",
+          {
+            params: {
+              limit: limit,
+              offset: pointer,
+              // Add filterData as params if the API supports it
+              ...filterData,
+              search: searchvalue,
+            },
           },
-        },
-      );
+        );
 
-      const formattedData = response.results.map((cultivator) => ({
-        id: cultivator.id,
-        cultivator: {
-          cultivator_code: cultivator?.cultivator_code,
-          first_name: cultivator?.cultivator_first_name,
-          last_name: cultivator?.cultivator_last_name,
-          image_url: cultivator?.cultivator_photo,
-          telephone: cultivator?.cultivator_telephone,
-          cni: cultivator?.cultivator_cni,
-          cni_image_url: cultivator?.cultivator_cni_photo,
-        },
-        sdl_ct: cultivator?.ct_sdl_name,
-        society: cultivator?.societe_name,
-        localite: {
-          province:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.province_code?.province_name,
-          commune:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.commune_name,
-        },
-        champs: cultivator?.nombre_champs,
-      }));
+        const formattedData = response.results.map((cultivator) => ({
+          id: cultivator.id,
+          cultivator: {
+            cultivator_code: cultivator?.cultivator_code,
+            first_name: cultivator?.cultivator_first_name,
+            last_name: cultivator?.cultivator_last_name,
+            image_url: cultivator?.cultivator_photo,
+            telephone: cultivator?.cultivator_telephone,
+            cni: cultivator?.cultivator_cni,
+            cni_image_url: cultivator?.cultivator_cni_photo,
+          },
+          sdl_ct: cultivator?.ct_sdl_name,
+          society: cultivator?.societe_name,
+          localite: {
+            province:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name,
+            commune:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name,
+          },
+          champs: cultivator?.nombre_champs,
+        }));
 
-      setData(formattedData);
-      setTotalCount(response.count);
-    } catch (error) {
-      console.error("Error fetching individual cultivators:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+        setData(formattedData);
+        setTotalCount(response.count);
+      } catch (error) {
+        console.error("Error fetching individual cultivators:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     getCultivators();
-  }, [pointer, limit, filterData,searchvalue]);
+  }, [pointer, limit, filterData, searchvalue]);
 
   // const onExportToExcel = async () => {
   //   try {
@@ -173,10 +172,10 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
   //   }
   // };
 
-const [reportId, setReportId]=useState("")
-    const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
-    const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
-const exportCultivatorsToExcel = async () => {
+  const [reportId, setReportId] = useState("");
+  const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+  const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+  const exportCultivatorsToExcel = async () => {
     setLoadingEportBtn(true);
     try {
       // Étape 1 : Récupérer le nombre total d'enregistrements
@@ -203,8 +202,8 @@ const exportCultivatorsToExcel = async () => {
           );
           if (export_excel.status === "SUCCESS") {
             clearInterval(intervalId); // Arrêtez l'intervalle
-            // setLoadingEportBtn(false);
-            DownloadCultivatorsToExcel(); 
+            setLoadingEportBtn(false);
+            setActivedownloadBtn(true);
             setReportId(task_id);
           }
         }, 2000);
@@ -507,6 +506,9 @@ const exportCultivatorsToExcel = async () => {
             <ExportButton
               exportType="cultivator_individual"
               onExportToExcel={exportCultivatorsToExcel}
+              loading={LoadingEportBtn}
+              activedownloadBtn={ActivedownloadBtn}
+              onClickDownloadButton={DownloadCultivatorsToExcel}
             />
           </div>
         </div>

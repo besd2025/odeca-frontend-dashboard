@@ -14,7 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { fetchData } from "@/app/_utils/api";
-function Filter({ handleFilter }) {
+
+function IndividualAchatsFilter({ handleFilter }) {
   const [province, setProvince] = React.useState([]);
   const [commune, setCommune] = React.useState([]);
   const [zones, setZones] = React.useState([]);
@@ -33,11 +34,8 @@ function Filter({ handleFilter }) {
   const [dateFrom, setDateFrom] = React.useState("");
   const [dateTo, setDateTo] = React.useState("");
 
-  const [loadingSearch, setLoadingSearch] = React.useState(false);
-
   const handleSelectProvinceChange = async (e) => {
     const value = e.target.value;
-    //console.log("Selected value:", value);
     if (!value) {
       setCommune([]);
       return;
@@ -47,8 +45,6 @@ function Filter({ handleFilter }) {
       `adress/commune/get_communes_by_province`,
       {
         params: { province: value },
-        additionalHeaders: {},
-        body: {},
       },
     );
 
@@ -59,16 +55,15 @@ function Filter({ handleFilter }) {
     setCommune(options);
     setSelectedProvince(value);
   };
+
   const handleSelectCommuneChange = async (e) => {
     const value = e.target.value;
     if (!value) {
-      setCommune([]);
+      setZones([]);
       return;
     }
     const zones = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
       params: { commune: value },
-      additionalHeaders: {},
-      body: {},
     });
     const options = zones?.map((item) => ({
       value: item.zone_name,
@@ -77,13 +72,12 @@ function Filter({ handleFilter }) {
     setZones(options);
     setSelectedCommune(value);
   };
+
   React.useEffect(() => {
     async function getData() {
       try {
         const provinces = await fetchData("get", `adress/province/`, {
-          params: { offset: 0, limit: 5 },
-          additionalHeaders: {},
-          body: {},
+          params: { offset: 0, limit: 100 },
         });
 
         const options = provinces?.results?.map((item) => ({
@@ -91,7 +85,6 @@ function Filter({ handleFilter }) {
           label: item.province_name,
         }));
         setProvince(options);
-        //setZones(zones);
       } catch (error) {
         setError(error);
         console.error(error);
@@ -99,17 +92,16 @@ function Filter({ handleFilter }) {
     }
     getData();
   }, []);
+
   const handleSelectZoneChange = async (e) => {
     const value = e.target.value;
     if (!value) {
-      setCommune([]);
+      setColline([]);
       return;
     }
 
     const collines = await fetchData("get", `adress/colline/`, {
       params: { zone: value },
-      additionalHeaders: {},
-      body: {},
     });
     const options = collines?.results?.map((item) => ({
       value: item.colline_name,
@@ -118,9 +110,11 @@ function Filter({ handleFilter }) {
     setColline(options);
     setSelectedZone(value);
   };
+
   const handleSelectCollineChange = (e) => {
     setSelectedColline(e.target.value);
   };
+
   const handleFilters = (e) => {
     e.preventDefault();
     const filterData = {
@@ -139,14 +133,14 @@ function Filter({ handleFilter }) {
     };
     handleFilter(filterData);
   };
+
   return (
     <Dialog>
       <form>
         <DialogTrigger asChild>
           <Button
             variant="outline"
-            //   onClick={() => openModalFilter()}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200"
           >
             <svg
               className="stroke-current fill-white dark:fill-gray-800"
@@ -200,7 +194,7 @@ function Filter({ handleFilter }) {
                       <select
                         value={selectedProvince}
                         onChange={handleSelectProvinceChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm flex items-center bg-background"
                       >
                         <option value="">Selectionner province</option>
                         {province.map((p) => (
@@ -220,7 +214,7 @@ function Filter({ handleFilter }) {
                       <select
                         value={selectedCommune}
                         onChange={handleSelectCommuneChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm flex items-center bg-background"
                       >
                         <option value="">Selectionner Commune</option>
                         {commune.map((c) => (
@@ -239,7 +233,7 @@ function Filter({ handleFilter }) {
                       <select
                         value={selectedZone}
                         onChange={handleSelectZoneChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm flex items-center bg-background"
                       >
                         <option value="">Selectionner zone</option>
                         {zones.map((z) => (
@@ -258,7 +252,7 @@ function Filter({ handleFilter }) {
                       <select
                         value={selectedColline}
                         onChange={handleSelectCollineChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm flex items-center bg-background"
                       >
                         <option value="">Selectionner Colline</option>
                         {colline.map((c) => (
@@ -270,47 +264,10 @@ function Filter({ handleFilter }) {
                     </div>
                   </div>
                 </div>
-                {/* <div className="col-span-2 lg:col-span-1">
-                  <div className="space-y-2">
-                    <Label>Societe</Label>
-                    <div className="relative">
-                      <select
-                        value={selectedColline}
-                        onChange={handleSelectCollineChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
-                      >
-                        <option value="">Selectionner societe</option>
-                        {collineOptions.map((c) => (
-                          <option key={c.value} value={c.value}>
-                            {c.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
+
                 <div className="col-span-2 lg:col-span-1">
                   <div className="space-y-2">
-                    <Label>SDL ou CT</Label>
-                    <div className="relative">
-                      <select
-                        value={selectedColline}
-                        onChange={handleSelectCollineChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
-                      >
-                        <option value="">Selectionner Colline</option>
-                        {collineOptions.map((c) => (
-                          <option key={c.value} value={c.value}>
-                            {c.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div> */}
-                <div className="col-span-2 lg:col-span-1">
-                  <div className="space-y-2">
-                    <Label>Quantité MIN CELISE A </Label>
+                    <Label>Quantité MIN CERISE A </Label>
                     <div className="relative">
                       <Input
                         type="number"
@@ -324,7 +281,7 @@ function Filter({ handleFilter }) {
                 </div>
                 <div className="col-span-2 lg:col-span-1">
                   <div className="space-y-2">
-                    <Label>Quantité MAX CELISE A </Label>
+                    <Label>Quantité MAX CERISE A </Label>
                     <div className="relative">
                       <Input
                         type="number"
@@ -339,7 +296,7 @@ function Filter({ handleFilter }) {
 
                 <div className="col-span-2 lg:col-span-1">
                   <div className="space-y-2">
-                    <Label>Quantité MIN CELISE B </Label>
+                    <Label>Quantité MIN CERISE B </Label>
                     <div className="relative">
                       <Input
                         type="number"
@@ -353,7 +310,7 @@ function Filter({ handleFilter }) {
                 </div>
                 <div className="col-span-2 lg:col-span-1">
                   <div className="space-y-2">
-                    <Label>Quantité MAX CELISE B </Label>
+                    <Label>Quantité MAX CERISE B </Label>
                     <div className="relative">
                       <Input
                         type="number"
@@ -373,7 +330,6 @@ function Filter({ handleFilter }) {
                       </label>
                       <div className="relative">
                         <input
-                          id="event-start-date"
                           type="date"
                           value={dateDebutEnregistre || ""}
                           onChange={(e) => setEnregistreDepuis(e.target.value)}
@@ -391,7 +347,6 @@ function Filter({ handleFilter }) {
                       </label>
                       <div className="relative">
                         <input
-                          id="event-start-date"
                           type="date"
                           value={dateFinEnregistre || ""}
                           onChange={(e) => setEnregistreJusquA(e.target.value)}
@@ -409,7 +364,6 @@ function Filter({ handleFilter }) {
                       </label>
                       <div className="relative">
                         <input
-                          id="event-start-date"
                           type="date"
                           value={dateFrom || ""}
                           onChange={(e) => setDateFrom(e.target.value)}
@@ -428,7 +382,6 @@ function Filter({ handleFilter }) {
                       </label>
                       <div className="relative">
                         <input
-                          id="event-start-date"
                           type="date"
                           value={dateTo || ""}
                           onChange={(e) => setDateTo(e.target.value)}
@@ -446,12 +399,8 @@ function Filter({ handleFilter }) {
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <DialogClose asChild >
-              <Button
-                type="submit"
-                onClick={handleFilters}
-               
-              >
+            <DialogClose asChild>
+              <Button type="submit" onClick={handleFilters}>
                 Filtrer
               </Button>
             </DialogClose>
@@ -462,4 +411,4 @@ function Filter({ handleFilter }) {
   );
 }
 
-export default Filter;
+export default IndividualAchatsFilter;
