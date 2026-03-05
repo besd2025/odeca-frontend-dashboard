@@ -128,12 +128,12 @@ function AssociationFilter({ handleFilter }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const filterData = {
-      province: selectedProvince,
-      commune: selectedCommune,
-      zone: selectedZone,
-      colline: selectedColline,
-      dateFrom,
-      dateTo,
+      province_name: selectedProvince,
+      commune_name: selectedCommune,
+      zone_name: selectedZone,
+      colline_name: selectedColline,
+      created_at_min: dateTo,
+      created_at_max: dateFrom,
     };
     handleFilter(filterData);
     setOpen(false); // Close the dialog
