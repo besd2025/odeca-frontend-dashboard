@@ -65,7 +65,7 @@ export default function PaymentsPage() {
   const [isStoragePanelOpen, setIsStoragePanelOpen] = useState(false);
 
   return (
-    <div className="bg-sidebar flex h-screen">
+    <div className="bg-sidebar flex rounded-lg ">
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}

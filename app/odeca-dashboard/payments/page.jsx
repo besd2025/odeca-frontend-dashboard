@@ -2,5 +2,9 @@ import PaymentsPage from "@/app/ui/dashboard/payments";
 import React from "react";
 
 export default function page() {
-  return <PaymentsPage />;
+  return (
+    <div className="p-4">
+      <PaymentsPage />
+    </div>
+  );
 }
