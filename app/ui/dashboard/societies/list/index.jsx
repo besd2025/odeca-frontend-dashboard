@@ -38,12 +38,10 @@ import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
-<<<<<<< HEAD
+
 import { UserContext } from "@/app/ui/context/User_Context";
-import { useState, useContext } from "react";
-=======
+import { useContext } from "react";
 import { Input } from "@/components/ui/input";
->>>>>>> a679289c842e8dff7ea03ea634bf0f51d342a21d
 export default function SocietiesListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -62,27 +60,22 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
   const [exportBlob, setExportBlob] = useState(null);
 
   const isActuallyLoading = externalLoading ?? loading;
-<<<<<<< HEAD
+
   const user=useContext(UserContext)
-=======
+
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };
 
->>>>>>> a679289c842e8dff7ea03ea634bf0f51d342a21d
   useEffect(() => {
     const getSocieties = async () => {
       setLoading(true);
       try {
-<<<<<<< HEAD
-        const response = await fetchData("get", "cafe/societes/", {});
-=======
+
         const response = await fetchData("get", "cafe/societes/", {
           params: { search: search },
         });
-        console.log(response);
->>>>>>> a679289c842e8dff7ea03ea634bf0f51d342a21d
         const results = response?.results || [];
         const societiesData = results.map((society) => ({
           id: society?.id,

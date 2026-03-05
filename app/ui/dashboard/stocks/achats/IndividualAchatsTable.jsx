@@ -58,7 +58,6 @@ export default function IndividualAchatsTable({ isCultivatorsPage }) {
 
   useEffect(() => {
     const getAchats = async () => {
-      setLoading(true);
       try {
         const response = await fetchData("get", "cafe/achat_cafe/", {
           params: {
@@ -130,7 +129,6 @@ export default function IndividualAchatsTable({ isCultivatorsPage }) {
           body: { cafeiculteur_type: "personne", export_type: "DETAIL" },
         },
       );
-      console.log("export data ", initial_export);
       if (initial_export.data?.status == "PENDING") {
         setLoadingEportBtn(true);
         const task_id = initial_export?.data?.report_id;
