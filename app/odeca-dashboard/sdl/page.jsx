@@ -3,9 +3,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartColumn, List } from "lucide-react";
 import SdlsListTable from "@/app/ui/dashboard/sdl/list";
 import SdlAnalytics from "@/app/ui/dashboard/sdl/analytics";
-
+import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
+import { ROLES } from "@/lib/permissions";
 function page() {
   return (
+    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL]}>
     <div className="p-4">
       <Tabs defaultValue="list" className="w-full">
         <TabsList className="w-full h-10 lg:w-[50%]">
@@ -29,6 +31,7 @@ function page() {
         </TabsContent>
       </Tabs>
     </div>
+    </ProtectedRoute>
   );
 }
 

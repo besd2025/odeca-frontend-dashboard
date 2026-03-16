@@ -1,5 +1,5 @@
 "use client";
-
+import { UserContext } from "@/app/ui/context/User_Context";
 import * as React from "react";
 import {
   DropdownMenu,
@@ -40,7 +40,6 @@ import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import CampaigneAnnee from "./home/campaigne-annee";
-
 // This is sample data.
 const menuItems = {
   navMain: [
@@ -177,6 +176,7 @@ const menuItems = {
         </svg>
       ),
       keyword: "collectors",
+      roles: ["Admin"],
     },
     {
       title: "Stocks",
@@ -327,6 +327,11 @@ export function AppSidebar({ ...props }) {
   const { isMobile, state } = useSidebar();
   const [isHovered, setIsHovered] = React.useState(false);
   const isCollapsed = !isMobile && state === "collapsed" && !isHovered;
+  const user = React.useContext(UserContext);
+  const filteredMenuItems = menuItems.navMain.filter((item) => {
+    if (!item.roles) return true;
+    return item.roles.includes(user?.session?.category);
+  });
 
   return (
     <Sidebar
@@ -350,7 +355,7 @@ export function AppSidebar({ ...props }) {
               <div className=" lg:hidden w-full flex justify-center items-center">
                 <CampaigneAnnee />
               </div>
-              {menuItems.navMain.map((item) => {
+              {filteredMenuItems?.map((item) => {
                 const active = isActive(item.keyword);
 
                 if (item.items && item.items.length > 0) {
@@ -403,81 +408,6 @@ export function AppSidebar({ ...props }) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      {/* <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground z-99999"
-                >
-                  <Avatar className="h-8 w-8 rounded-lg grayscale">
-                    <AvatarImage
-                      src={menuItems.user.avatar}
-                      alt={menuItems.user.name}
-                    />
-                    <AvatarFallback className="rounded-lg text-primary">
-                      AD
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">
-                      {menuItems.user.name}
-                    </span>
-                    <span className="text-muted/50 truncate text-xs">
-                      {menuItems.user.email}
-                    </span>
-                  </div>
-                  <IconDotsVertical className="ml-auto size-4" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg "
-                side={isMobile ? "bottom" : "right"}
-                align="end"
-                sideOffset={4}
-              >
-                <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage
-                        src={menuItems.user.avatar}
-                        alt={menuItems.user.name}
-                      />
-                      <AvatarFallback className="rounded-lg">AD</AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">
-                        {menuItems.user.name}
-                      </span>
-                      <span className="text-muted-foreground truncate text-xs">
-                        {menuItems.user.email}
-                      </span>
-                    </div>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <IconUserCircle />
-                    Account
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <IconNotification />
-                    Notifications
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <IconLogout />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter> */}
       <SidebarRail />
     </Sidebar>
   );

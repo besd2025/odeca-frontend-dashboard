@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo,useContext } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -60,7 +60,7 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 5,
   });
-  const user=useContext(UserContext)
+  const user = useContext(UserContext)
   useEffect(() => {
     const getCultivatorsAssociation = async () => {
       setLoading(true);
@@ -117,10 +117,10 @@ export default function AssociationCultivatorsTable({ isCultivatorsPage }) {
 
     getCultivatorsAssociation();
   }, [pointer, limit, filterData, searchvalue]);
-    const [reportId, setReportId]=useState("")
-    const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
-    const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
-const exportCultivatorsToExcel = async () => {
+  const [reportId, setReportId] = useState("")
+  const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
+  const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+  const exportCultivatorsToExcel = async () => {
 
     setLoadingEportBtn(true);
     try {
@@ -134,7 +134,6 @@ const exportCultivatorsToExcel = async () => {
           body: { cafeiculteur_type: "association", export_type: "RESUME" },
         },
       );
-      console.log("export data ", initial_export);
       if (initial_export.data?.status == "PENDING") {
         setLoadingEportBtn(true);
         const task_id = initial_export?.data?.report_id;
@@ -247,16 +246,16 @@ const exportCultivatorsToExcel = async () => {
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                 {user?.session?.category==="Admin"?(
+                {user?.session?.category === "Admin" ? (
                   <div>
-                  <Edit
-                    cultivator={result?.id}
-                    sdl_ct={result?.sdl_ct}
-                    society={result?.society}
-                    localite={result?.localite}
-                    champs={result?.champs}
-                  />
-                </div>):" "}
+                    <Edit
+                      cultivator={result?.id}
+                      sdl_ct={result?.sdl_ct}
+                      society={result?.society}
+                      localite={result?.localite}
+                      champs={result?.champs}
+                    />
+                  </div>) : " "}
               </DropdownMenuContent>
             </DropdownMenu>
           );
@@ -318,39 +317,39 @@ const exportCultivatorsToExcel = async () => {
       },
       ...(isCultivatorsPage
         ? [
-            {
-              accessorKey: "sdl_ct",
-              header: ({ column }) => (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  SDL/CT
-                  <ArrowUpDownIcon />
-                </Button>
-              ),
-              cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
-            },
-            {
-              accessorKey: "society",
-              header: ({ column }) => (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  Société
-                  <ArrowUpDownIcon />
-                </Button>
-              ),
-              cell: ({ row }) => (
-                <div className="font-medium">{row.getValue("society")}</div>
-              ),
-            },
-          ]
+          {
+            accessorKey: "sdl_ct",
+            header: ({ column }) => (
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+              >
+                SDL/CT
+                <ArrowUpDownIcon />
+              </Button>
+            ),
+            cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
+          },
+          {
+            accessorKey: "society",
+            header: ({ column }) => (
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+              >
+                Société
+                <ArrowUpDownIcon />
+              </Button>
+            ),
+            cell: ({ row }) => (
+              <div className="font-medium">{row.getValue("society")}</div>
+            ),
+          },
+        ]
         : []),
       {
         id: "localite",
@@ -456,9 +455,9 @@ const exportCultivatorsToExcel = async () => {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 ))}
               </TableRow>

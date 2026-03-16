@@ -1,5 +1,5 @@
 "use client";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -58,25 +58,34 @@ function DetailsContent({ id }) {
   const [data, setData] = React.useState([]);
   const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
   const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
-  const [individualCultivatorsData, setIndividualCultivatorsData] = React.useState([]);
-  const [associationCultivatorsData, setAssociationCultivatorsData] = React.useState([]);
+  const [individualCultivatorsData, setIndividualCultivatorsData] =
+    React.useState([]);
+  const [associationCultivatorsData, setAssociationCultivatorsData] =
+    React.useState([]);
 
   // Cultivators Pagination
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [cultivateur_type, setCultivateur_type] = useState("cultivator_individual");
+  const [cultivateur_type, setCultivateur_type] = useState(
+    "cultivator_individual",
+  );
 
   // Achats Pagination
   const [pointerAchat, setPointerAchat] = useState(0);
   const [limitAchat, setLimitAchat] = useState(5);
   const [totalCountAchat, setTotalCountAchat] = useState(0);
   const [currentPageAchat, setCurrentPageAchat] = useState(1);
-  const [achatCultivateur_type, setAchatCultivateur_type] = useState("achat_cultivator_individual");
+  const [achatCultivateur_type, setAchatCultivateur_type] = useState(
+    "achat_cultivator_individual",
+  );
   const getAchatsSDls = async () => {
     try {
-      const type = achatCultivateur_type === "achat_cultivator_individual" ? "personne" : "association";
+      const type =
+        achatCultivateur_type === "achat_cultivator_individual"
+          ? "personne"
+          : "association";
       const response = await fetchData(
         "get",
         `cafe/stationslavage/${id}/get_achats/`,
@@ -97,12 +106,18 @@ function DetailsContent({ id }) {
           last_name: achats?.cafeiculteur?.cultivator_last_name,
           image_url: achats?.cafeiculteur?.cultivator_photo,
           cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
-          cultivator_assoc_rep_name: achats?.cafeiculteur?.cultivator_assoc_rep_name,
-          cultivator_type: type === "association" ? "association" : "individual",
+          cultivator_assoc_rep_name:
+            achats?.cafeiculteur?.cultivator_assoc_rep_name,
+          cultivator_type:
+            type === "association" ? "association" : "individual",
         },
         localite: {
-          province: achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
-          commune: achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+          province:
+            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
         },
         num_fiche: 784,
         num_recu: achats?.numero_recu,
@@ -134,7 +149,7 @@ function DetailsContent({ id }) {
         "get",
         `cafe/stationslavage/${id}/get_cultivators/`,
         {
-           params: { limit: limit, offset: pointer },
+          params: { limit: limit, offset: pointer },
         },
       );
       const results = response?.results;
@@ -146,16 +161,22 @@ function DetailsContent({ id }) {
           last_name: cultivator?.cultivator_last_name,
           image_url: cultivator?.cultivator_photo,
           cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
-          cultivator_assoc_numero_fiche: cultivator?.cultivator_assoc_numero_fiche,
+          cultivator_assoc_numero_fiche:
+            cultivator?.cultivator_assoc_numero_fiche,
         },
         sdl_ct: "NGome",
         society: "ODECA",
         localite: {
-          province: cultivator?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
-          commune: cultivator?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+          province:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
         },
         champs: cultivator?.nombre_champs,
       }));
+      console.log(cultivatorsData);
       setIndividualCultivatorsData(cultivatorsData);
       setTotalCount(response?.count);
     } catch (error) {
@@ -181,15 +202,20 @@ function DetailsContent({ id }) {
           last_name: cultivator?.cultivator_last_name,
           image_url: cultivator?.cultivator_photo,
           cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
-          cultivator_assoc_numero_fiche: cultivator?.cultivator_assoc_numero_fiche,
+          cultivator_assoc_numero_fiche:
+            cultivator?.cultivator_assoc_numero_fiche,
           cultivator_assoc_name: cultivator?.cultivator_assoc_name,
           cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,
         },
         sdl_ct: "NGome",
         society: "fffffff",
         localite: {
-          province: cultivator?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
-          commune: cultivator?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+          province:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
         },
         champs: cultivator?.nombre_champs,
       }));
@@ -289,11 +315,11 @@ function DetailsContent({ id }) {
     setAchatCultivateur_type(type);
     setCurrentPageAchat(1);
     setPointerAchat(0);
-    setTotalCountAchat(0); 
+    setTotalCountAchat(0);
     if (type === "achat_cultivator_individual") {
-       setAssociationAchatsData([]);
+      setAssociationAchatsData([]);
     } else {
-       setIndividualAchatsData([]);
+      setIndividualAchatsData([]);
     }
   };
 
@@ -322,7 +348,11 @@ function DetailsContent({ id }) {
   };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
-      <Tabs value={tab} className="space-y-6 w-full" onValueChange={handleTabChange}>
+      <Tabs
+        value={tab}
+        className="space-y-6 w-full"
+        onValueChange={handleTabChange}
+      >
         {/* TABS LIST */}
         <TabsList className="overflow-x-auto flex-nowrap gap-2 w-full">
           <TabsTrigger value="cultivators" className="shrink-0">
