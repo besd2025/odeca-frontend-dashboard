@@ -19,8 +19,8 @@ const outfit = Outfit({
 });
 
 export const metadata = {
-  title: "Odeca Agricole Burundi",
-  description: "Agricole Burundi management platform",
+  title: "KAWA y'u Burundi",
+  description: "KAWA y'u Burundi management platform",
 };
 
 export default function RootLayout({ children }) {

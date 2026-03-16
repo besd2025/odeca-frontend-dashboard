@@ -113,7 +113,10 @@ export default function Edit({ id }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <form onSubmit={handleSubmit}>
         <DialogTrigger asChild>
-          <Button variant="secondary">
+          <Button
+            variant="secondary"
+            className="w-full justify-start font-normal text-sm"
+          >
             <SquarePen />
             Modifier
           </Button>
