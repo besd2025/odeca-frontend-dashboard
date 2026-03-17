@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     }
 
     if (!allowedRoles.includes(user?.session?.category)) {
-        router.push("/unauthorized");
+        router.push("/odeca-dashboard/unauthorized");
         return null;
     }
 

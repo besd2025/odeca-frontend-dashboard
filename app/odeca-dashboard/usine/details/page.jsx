@@ -7,7 +7,7 @@ export default function page() {
   return (
     <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA]}>
       <div className="p-4 relative">
-        <h1 className="text-xl lg:text-2xl font-semibold m-2 absolute top-0">
+        <h1 className="text-xl lg:text-2xl font-semibold mx-2 mb-4">
           Usine de Déparchage
         </h1>
         <DetailsPage />

@@ -359,8 +359,8 @@ function DetailsContent({ id }) {
     try {
       const initResponse = await fetchData(
         "get",
-        `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
-        { params: { limit: 1000, offset: 0 }, additionalHeaders: {}, body: {} },
+        `cafe/centres_transite/${id}/get_cultivators/`,
+        { params: { limit: 1 } },
       );
 
       const totalCount = initResponse?.count || 0;
@@ -368,14 +368,8 @@ function DetailsContent({ id }) {
 
       const response = await fetchData(
         "get",
-        `cultivators/get_cafe_cultivators/?cafeiculteur_type=personne`,
-        {
-          params: {
-            params: { limit: 1000, offset: 0 },
-            additionalHeaders: {},
-            body: {},
-          },
-        },
+        `cafe/centres_transite/${id}/get_cultivators/`,
+        { params: { limit: totalCount, offset: 0 } },
       );
 
       const allData = response.results || [];
@@ -466,7 +460,7 @@ function DetailsContent({ id }) {
     try {
       const initResponse = await fetchData(
         "get",
-        `cultivators/get_cafe_cultivators?cafeiculteur_type=association`,
+        `cafe/centres_transite/${id}/get_cultivators_association/`,
         { params: { limit: 1 } },
       );
 
@@ -475,7 +469,7 @@ function DetailsContent({ id }) {
 
       const response = await fetchData(
         "get",
-        `cultivators/get_cafe_cultivators?cafeiculteur_type=association`,
+        `cafe/centres_transite/${id}/get_cultivators_association/`,
         {
           params: {
             limit: totalCount,
@@ -570,9 +564,62 @@ function DetailsContent({ id }) {
     setCultivateur_type(type);
   };
   const handleFilter = (filterData) => {
-    // Implement filtering logic here based on filterData
     console.log("Received filter data ffffhhh:", filterData);
-    // You can use filterData to fetch filtered cultivators from the API
+  };
+
+  // ── Helper Excel ────────────────────────────────────────────
+  const buildXlsx = (rows, sheetName, filename) => {
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(
+      new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
+      filename,
+    );
+  };
+
+  // ── Exports achats CT filtrés ───────────────────────────────────
+  const exportIndividualAchatsToExcel = async () => {
+    try {
+      const init = await fetchData("get", `cafe/centres_transite/${id}/get_achats/`, { params: { limit: 1, cafeiculteur_type: "personne" } });
+      const total = init?.count || 0;
+      if (total === 0) return;
+      const res = await fetchData("get", `cafe/centres_transite/${id}/get_achats/`, { params: { limit: total, offset: 0, cafeiculteur_type: "personne" } });
+      const rows = (res?.results || []).map((a) => ({
+        Code_cultivateur: a?.cafeiculteur?.cultivator_code || "",
+        Nom: a?.cafeiculteur?.cultivator_last_name || "",
+        Prénom: a?.cafeiculteur?.cultivator_first_name || "",
+        Num_recu: a?.numero_recu || "",
+        CA: a?.quantite_cerise_a || 0,
+        CB: a?.quantite_cerise_b || 0,
+        Date: a?.date_achat || "",
+        Province: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
+        Commune: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+      }));
+      buildXlsx(rows, "Achats", `achats_ind_ct_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
+    } catch (e) { console.error("Export achats CT individuel erreur:", e); }
+  };
+
+  const exportAssociationAchatsToExcel = async () => {
+    try {
+      const init = await fetchData("get", `cafe/centres_transite/${id}/get_achats/`, { params: { limit: 1, cafeiculteur_type: "association" } });
+      const total = init?.count || 0;
+      if (total === 0) return;
+      const res = await fetchData("get", `cafe/centres_transite/${id}/get_achats/`, { params: { limit: total, offset: 0, cafeiculteur_type: "association" } });
+      const rows = (res?.results || []).map((a) => ({
+        Code_cultivateur: a?.cafeiculteur?.cultivator_code || "",
+        Association: a?.cafeiculteur?.cultivator_assoc_name || "",
+        Représentant: a?.cafeiculteur?.cultivator_assoc_rep_name || "",
+        Num_recu: a?.numero_recu || "",
+        CA: a?.quantite_cerise_a || 0,
+        CB: a?.quantite_cerise_b || 0,
+        Date: a?.date_achat || "",
+        Province: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
+        Commune: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+      }));
+      buildXlsx(rows, "Achats", `achats_assoc_ct_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
+    } catch (e) { console.error("Export achats CT association erreur:", e); }
   };
   const fetchCultivatorsByType = (type) => {
     setCultivateur_type(type);
@@ -695,7 +742,7 @@ function DetailsContent({ id }) {
             associationData={associationCultivatorsData}
             data={data}
             isCultivatorsPage={false}
-            onExportToExcel={exportCultivatorsToExcel}
+            onExportIndividualToExcel={exportCultivatorsToExcel}
             onExportAssociationToExcel={exportAssociationToExcel}
             typeExport={typeExport}
             onClickTyepeExport={onClickTyepeExport}
@@ -715,6 +762,8 @@ function DetailsContent({ id }) {
             limit={limit}
             totalCount={totalCountAchat}
             handleFilter={handleAchatFilter}
+            onExportIndividualToExcel={exportIndividualAchatsToExcel}
+            onExportAssociationToExcel={exportAssociationAchatsToExcel}
           />
         </TabsContent>
 

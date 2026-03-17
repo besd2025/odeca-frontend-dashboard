@@ -31,8 +31,11 @@ export default function Edit({
   const [imageUrl, setImageUrl] = React.useState("");
   const [sdl, setSdl] = React.useState("");
   const [soc, setSoc] = React.useState("");
+  const [numFiche, setNumFiche] = React.useState("");
   const [province, setProvince] = React.useState("");
   const [commune, setCommune] = React.useState("");
+  const [zone, setZone] = React.useState("");
+  const [colline, setColline] = React.useState("");
   const [nbChamps, setNbChamps] = React.useState(0);
   const [date_naissance, setDateNaissance] = React.useState("");
   const [phone, setPhone] = React.useState("");
@@ -67,6 +70,7 @@ export default function Edit({
         setCni(response?.cultivator_cni || "");
         setSdl(sdl_ct || "");
         setSoc(society || "");
+        setNumFiche(response?.cultivator_assoc_numero_fiche || "");
         setProvince(localite?.province || "");
         setCommune(localite?.commune || "");
         setNbChamps(champs || 0);
@@ -77,7 +81,6 @@ export default function Edit({
         setProprietaire(response?.cultivator_account_owner || "");
         setCollectorCode(response?.collector?.unique_code || "");
         setAdressCode(response?.cultivator_adress?.colline_code);
-        setNumeroFiche(response?.cultivator_assoc_numero_fiche)
       } catch (error) {
         console.error("Error in Edit useEffect:", error);
       }
@@ -92,6 +95,7 @@ export default function Edit({
       cultivator_first_name: firstName,
       cultivator_last_name: lastName,
       cultivator_cni: cni,
+      cultivator_assoc_numero_fiche: numFiche,
       date_naissance: date_naissance,
       cultivator_payment_type: payment_mode,
       cultivator_bank_name: bank_name,
@@ -236,14 +240,6 @@ export default function Edit({
                     type="text"
                     value={soc}
                     onChange={(e) => setSoc(e.target.value)}
-                  />
-                </div>
-                <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Numero de la Fiche</Label>
-                  <Input
-                    type="text"
-                    value={numero_fiche}
-                    onChange={(e) => setNumeroFiche(e.target.value)}
                   />
                 </div>
               </div>
