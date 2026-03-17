@@ -42,7 +42,7 @@ import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
-import { useState,useContext } from "react";
+import { useState, useContext } from "react";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 export default function SdlsListTable({ isLoading: externalLoading }) {
@@ -56,7 +56,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
     pageIndex: 0,
     pageSize: 10,
   });
-  const user=useContext(UserContext)
+  const user = useContext(UserContext)
   const [filterData, setFilterData] = React.useState([]);
   const isActuallyLoading = externalLoading ?? loading;
   const [pointer, setPointer] = useState(0);
@@ -177,7 +177,17 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
         NOM_RESPONSABLE: item?.sdl_responsable?.user?.last_name || "",
         PRENOM_RESPONSABLE: item?.sdl_responsable?.user?.first_name || "",
         TELEPHONE_RESPONSABLE: item?.sdl_responsable?.user?.phone || "",
-        DATE_CREATION: item?.created_at,
+        DATE_CREATION: item?.sdl_responsable?.created_at
+          ? new Date(item.sdl_responsable.created_at).toLocaleString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          })
+          : null
+
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
@@ -241,9 +251,9 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
               <Link href={`/odeca-dashboard/sdl/details/?id=${sdl?.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-             {user?.session?.category==="Admin"?( <div>
+              {user?.session?.category === "Admin" ? (<div>
                 <Edit id={sdl.id} />
-              </div>):""}
+              </div>) : ""}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -423,9 +433,9 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                         </TableHead>
                       );
                     })}

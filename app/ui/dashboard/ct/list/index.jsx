@@ -38,7 +38,7 @@ import { fetchData } from "@/app/_utils/api";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
-import { useState,useContext} from "react";
+import { useState, useContext } from "react";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 export default function CtsListTable({ isLoading: externalLoading }) {
@@ -55,7 +55,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   });
 
   const isActuallyLoading = externalLoading ?? loading;
-  const user=useContext(UserContext)
+  const user = useContext(UserContext)
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
@@ -81,6 +81,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
           body: {},
         });
         const results = response?.results;
+        console.log("result: ", results)
         const ctData = results.map((ct) => ({
           id: ct?.id,
           ct: {
@@ -169,7 +170,16 @@ export default function CtsListTable({ isLoading: externalLoading }) {
         NOM_RESPONSABLE: item?.ct_responsable?.user?.last_name || "",
         PRENOM_RESPONSABLE: item?.ct_responsable?.user?.first_name || "",
         TELEPHONE_RESPONSABLE: item?.ct_responsable?.user?.phone || "",
-        DATE_CREATION: item?.created_at,
+        DATE_CREATION: item?.ct_responsable?.created_at
+          ? new Date(item.ct_responsable.created_at).toLocaleString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          })
+          : null
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
@@ -232,10 +242,10 @@ export default function CtsListTable({ isLoading: externalLoading }) {
               <Link href={`/odeca-dashboard/ct/details/?id=${ct.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-              {user?.session?.category==="Admin"?(
-                 <div>
-                <Edit id={ct.id} />
-              </div>):" "}
+              {user?.session?.category === "Admin" ? (
+                <div>
+                  <Edit id={ct.id} />
+                </div>) : " "}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -424,9 +434,9 @@ export default function CtsListTable({ isLoading: externalLoading }) {
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                         </TableHead>
                       );
                     })}

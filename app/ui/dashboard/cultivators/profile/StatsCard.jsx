@@ -39,6 +39,7 @@ function StatsCard({ cult_id }) {
         );
         setData(response);
         setValues(valuesdata);
+        console.log("dataVALUE: ", response)
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -220,7 +221,7 @@ function StatsCard({ cult_id }) {
           ) : (
             <>
               <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-                {data?.cultivator_bank_name}
+                {data?.cultivator_bank_name} {data?.cultivator_bank_opened}
               </CardTitle>
               <div className="flex flex-col gap-y-2">
                 <div className="flex flex-col ">
