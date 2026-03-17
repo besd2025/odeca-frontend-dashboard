@@ -25,14 +25,14 @@ export function LoginForm({ className, ...props }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("Access_Token");
     if (accessToken) {
       const user = DecodeToJwt(accessToken);
       const now = new Date();
       if (now < new Date(user?.exp * 1000)) {
         router.push("/odeca-dashboard/home");
       } else {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("Access_Token");
         router.push("/");
       }
     } else {
@@ -91,8 +91,8 @@ export function LoginForm({ className, ...props }) {
         user?.category === "General" ||
         user?.category === "Cafe_ODECA"
       ) {
-        document.cookie = `accessToken=${data.access}; path=/; max-age=3600; secure`;
-        localStorage.setItem("accessToken", data.access);
+        document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
+        localStorage.setItem("Access_Token", data.access);
         router.push("/odeca-dashboard/home");
         // } else if (user?.category === "Communal") {
         //   router.push("/municipal/cultivators");

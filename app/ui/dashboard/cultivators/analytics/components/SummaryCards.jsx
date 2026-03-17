@@ -15,6 +15,7 @@ import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 export function SummaryCards() {
   const [data, setData] = React.useState({});
   const [loading, setLoading] = React.useState(true);
+  const [resultsData, setResultsData] = React.useState({});
   React.useEffect(() => {
     const getCultivators = async () => {
       try {
@@ -27,7 +28,17 @@ export function SummaryCards() {
             body: {},
           },
         );
+        const response2 = await fetchData(
+          "get",
+          `/cultivators/get_cafe_cafeiculteurs_par_entite_type/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          },
+        );
         setData(response);
+        setResultsData(response2);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -103,9 +114,9 @@ export function SummaryCards() {
           <User className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data?.hommes}</div>
+          <div className="text-2xl font-bold">{resultsData?.personne}</div>
           <p className="text-xs text-muted-foreground">
-            {((data?.hommes / data?.total_cultivators) * 100).toFixed(1)}% du
+            {((resultsData?.personne / data?.total_cultivators) * 100).toFixed(1)}% du
             total
           </p>
         </CardContent>
@@ -118,9 +129,9 @@ export function SummaryCards() {
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data?.femmes}</div>
+          <div className="text-2xl font-bold">{resultsData?.association}</div>
           <p className="text-xs text-muted-foreground">
-            {((data?.femmes / data?.total_cultivators) * 100).toFixed(1)}% du
+            {((resultsData?.association / data?.total_cultivators) * 100).toFixed(1)}% du
             total
           </p>
         </CardContent>

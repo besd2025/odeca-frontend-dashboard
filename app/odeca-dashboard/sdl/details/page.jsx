@@ -5,7 +5,7 @@ import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
 import { ROLES } from "@/lib/permissions";
 export default function page() {
   return (
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL]}>
+    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE]}>
       <div className="p-4 relative">
         <h1 className="text-xl lg:text-2xl font-semibold mx-2 mb-4">
           Station de Lavage(SDL)

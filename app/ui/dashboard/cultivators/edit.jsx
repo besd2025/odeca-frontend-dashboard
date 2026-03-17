@@ -47,7 +47,6 @@ export default function Edit({
   const [proprietaire, setProprietaire] = React.useState("");
   const [collector_code, setCollectorCode] = React.useState("");
   const [address_code, setAdressCode] = React.useState("");
-  const [numero_fiche, setNumeroFiche] = React.useState("");
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   React.useEffect(() => {
@@ -60,7 +59,6 @@ export default function Edit({
           additionalHeaders: {},
           body: {},
         });
-        console.log(" data Edit cultivator: ", response)
         setCode(response.cultivator_code || "");
         setFirstName(response?.cultivator_first_name || "");
         setLastName(response?.cultivator_last_name || "");
@@ -100,7 +98,7 @@ export default function Edit({
       cultivator_payment_type: payment_mode,
       cultivator_bank_name: bank_name,
       cultivator_bank_account: bank_account,
-      cultivator_assoc_numero_fiche: numero_fiche,
+      cultivator_assoc_numero_fiche: numFiche,
       cultivator_mobile_payment_account: payment_phone,
       cultivator_account_owner: proprietaire,
       cultivator_bank_name: bank_name,
@@ -240,6 +238,14 @@ export default function Edit({
                     type="text"
                     value={soc}
                     onChange={(e) => setSoc(e.target.value)}
+                  />
+                </div>
+                <div className="col-span-2 lg:col-span-1 space-y-2">
+                  <Label>Numero de la Fiche</Label>
+                  <Input
+                    type="text"
+                    value={numFiche}
+                    onChange={(e) => setNumFiche(e.target.value)}
                   />
                 </div>
               </div>
