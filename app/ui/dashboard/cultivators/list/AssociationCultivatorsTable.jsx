@@ -67,9 +67,11 @@ export default function AssociationCultivatorsTable({
     pageIndex: 0,
     pageSize: 5,
   });
+
   const user = useContext(UserContext);
 
   // Mode contrôlé (SDL detail) : utiliser les données externes du parent
+
   useEffect(() => {
     if (!isCultivatorsPage && externalData !== undefined) {
       setData(externalData || []);
@@ -140,6 +142,7 @@ export default function AssociationCultivatorsTable({
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
   const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
   const exportCultivatorsToExcel = async () => {
+
     setLoadingEportBtn(true);
     try {
       // Étape 1 : Récupérer le nombre total d'enregistrements
@@ -152,7 +155,6 @@ export default function AssociationCultivatorsTable({
           body: { cafeiculteur_type: "association", export_type: "RESUME" },
         },
       );
-      console.log("export data ", initial_export);
       if (initial_export.data?.status == "PENDING") {
         setLoadingEportBtn(true);
         const task_id = initial_export?.data?.report_id;
@@ -274,10 +276,12 @@ export default function AssociationCultivatorsTable({
                       localite={result?.localite}
                       champs={result?.champs}
                     />
+
                   </div>
                 ) : (
                   " "
                 )}
+
               </DropdownMenuContent>
             </DropdownMenu>
           );
@@ -339,39 +343,39 @@ export default function AssociationCultivatorsTable({
       },
       ...(isCultivatorsPage
         ? [
-            {
-              accessorKey: "sdl_ct",
-              header: ({ column }) => (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  SDL/CT
-                  <ArrowUpDownIcon />
-                </Button>
-              ),
-              cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
-            },
-            {
-              accessorKey: "society",
-              header: ({ column }) => (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  Société
-                  <ArrowUpDownIcon />
-                </Button>
-              ),
-              cell: ({ row }) => (
-                <div className="font-medium">{row.getValue("society")}</div>
-              ),
-            },
-          ]
+          {
+            accessorKey: "sdl_ct",
+            header: ({ column }) => (
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+              >
+                SDL/CT
+                <ArrowUpDownIcon />
+              </Button>
+            ),
+            cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
+          },
+          {
+            accessorKey: "society",
+            header: ({ column }) => (
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+              >
+                Société
+                <ArrowUpDownIcon />
+              </Button>
+            ),
+            cell: ({ row }) => (
+              <div className="font-medium">{row.getValue("society")}</div>
+            ),
+          },
+        ]
         : []),
       {
         id: "localite",
@@ -489,9 +493,9 @@ export default function AssociationCultivatorsTable({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -534,7 +538,7 @@ export default function AssociationCultivatorsTable({
         {/* Mode SDL : utiliser la pagination du parent. Mode autonome : pagination interne */}
         {!isCultivatorsPage && datapagination ? (
           <PaginationContent
-            datapaginationlimit={() => {}}
+            datapaginationlimit={() => { }}
             currentPage={datapagination.currentPage}
             totalPages={datapagination.totalPages}
             onPageChange={datapagination.onPageChange}
@@ -544,7 +548,7 @@ export default function AssociationCultivatorsTable({
           />
         ) : (
           <PaginationContent
-            datapaginationlimit={(l) => {}}
+            datapaginationlimit={(l) => { }}
             currentPage={currentPage}
             totalPages={Math.ceil(totalCount / limit)}
             onPageChange={onPageChange}

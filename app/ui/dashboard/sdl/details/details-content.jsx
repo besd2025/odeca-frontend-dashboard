@@ -176,6 +176,7 @@ function DetailsContent({ id }) {
         },
         champs: cultivator?.nombre_champs,
       }));
+      console.log(cultivatorsData);
       setIndividualCultivatorsData(cultivatorsData);
       console.log("individualCultivatorsData", cultivatorsData);
       setTotalCount(response?.count);
