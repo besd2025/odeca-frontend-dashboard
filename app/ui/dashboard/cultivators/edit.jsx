@@ -59,7 +59,6 @@ export default function Edit({
           additionalHeaders: {},
           body: {},
         });
-
         setCode(response.cultivator_code || "");
         setFirstName(response?.cultivator_first_name || "");
         setLastName(response?.cultivator_last_name || "");
@@ -80,7 +79,6 @@ export default function Edit({
         setProprietaire(response?.cultivator_account_owner || "");
         setCollectorCode(response?.collector?.unique_code || "");
         setAdressCode(response?.cultivator_adress?.colline_code);
-        console.log(response);
       } catch (error) {
         console.error("Error in Edit useEffect:", error);
       }
@@ -100,6 +98,7 @@ export default function Edit({
       cultivator_payment_type: payment_mode,
       cultivator_bank_name: bank_name,
       cultivator_bank_account: bank_account,
+      cultivator_assoc_numero_fiche: numFiche,
       cultivator_mobile_payment_account: payment_phone,
       cultivator_account_owner: proprietaire,
       cultivator_bank_name: bank_name,
@@ -242,7 +241,7 @@ export default function Edit({
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Numero du fiche</Label>
+                  <Label>Numero de la Fiche</Label>
                   <Input
                     type="text"
                     value={numFiche}

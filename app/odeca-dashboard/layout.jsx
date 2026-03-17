@@ -24,14 +24,14 @@ export default function Layout({ children }) {
     }
   }
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("Access_Token");
     const now = new Date();
     if (!token) {
       router.replace("/");
     } else {
       const user = DecodeToJwt(token);
       if (now > new Date(user?.exp * 1000)) {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("Access_Token");
         router.replace("/");
       } else {
         setIsAuthChecked(true);

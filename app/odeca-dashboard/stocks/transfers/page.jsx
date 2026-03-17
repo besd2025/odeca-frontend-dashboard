@@ -86,7 +86,7 @@ export default function TransfersPage() {
   }, []);
 
   return (
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL]}>
+       <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL,ROLES.ODECA,ROLES.SOCIETE]}>
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Gestion des Transferts</h1>

@@ -7,7 +7,7 @@ const server = process.env.NEXT_PUBLIC_API_URL;
 /* ------------------------------------------------------------------ */
 const getAccessToken = () => {
   if (typeof window !== "undefined") {
-    return localStorage.getItem("accessToken") || null;
+    return localStorage.getItem("Access_Token") || null;
   }
   return null;
 };

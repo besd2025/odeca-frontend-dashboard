@@ -23,10 +23,10 @@ function UserProvider(props) {
     }
 
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("accessToken");
+      const token = localStorage.getItem("Access_Token");
       decodeJWT(token);
     }
-  }, [typeof window !== "undefined" && localStorage.getItem("accessToken")]);
+  }, [typeof window !== "undefined" && localStorage.getItem("Access_Token")]);
 
   return (
     <UserContext.Provider

@@ -81,6 +81,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
           body: {},
         });
         const results = response?.results;
+        console.log("result: ", results)
         const ctData = results.map((ct) => ({
           id: ct?.id,
           ct: {
@@ -169,7 +170,16 @@ export default function CtsListTable({ isLoading: externalLoading }) {
         NOM_RESPONSABLE: item?.ct_responsable?.user?.last_name || "",
         PRENOM_RESPONSABLE: item?.ct_responsable?.user?.first_name || "",
         TELEPHONE_RESPONSABLE: item?.ct_responsable?.user?.phone || "",
-        DATE_CREATION: item?.created_at,
+        DATE_CREATION: item?.ct_responsable?.created_at
+          ? new Date(item.ct_responsable.created_at).toLocaleString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          })
+          : null
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
