@@ -194,7 +194,7 @@ function AssociationFilter({ handleFilter }) {
               <select
                 value={selectedProvince}
                 onChange={handleProvinceChange}
-                className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
               >
                 <option value="">Sélectionner province</option>
                 {province.map((p) => (
@@ -209,7 +209,7 @@ function AssociationFilter({ handleFilter }) {
               <select
                 value={selectedCommune}
                 onChange={handleCommuneChange}
-                className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
               >
                 <option value="">Sélectionner commune</option>
                 {commune.map((c) => (
@@ -224,7 +224,7 @@ function AssociationFilter({ handleFilter }) {
               <select
                 value={selectedZone}
                 onChange={handleZoneChange}
-                className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
               >
                 <option value="">Sélectionner zone</option>
                 {zones.map((z) => (
@@ -239,7 +239,7 @@ function AssociationFilter({ handleFilter }) {
               <select
                 value={selectedColline}
                 onChange={(e) => setSelectedColline(e.target.value)}
-                className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
               >
                 <option value="">Sélectionner colline</option>
                 {colline.map((c) => (

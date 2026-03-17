@@ -29,6 +29,7 @@ import { fetchData } from "@/app/_utils/api";
 import SharedGeoLocalisation from "@/components/ui/geo-localisation";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
+import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
 function DetailsContent({ id }) {
   const [tab, setTab] = useState("cultivators");
   const [data, setData] = React.useState([]);
@@ -158,8 +159,8 @@ function DetailsContent({ id }) {
           image_url: cultivator?.cultivator_photo,
           telephone: cultivator?.cultivator_telephone,
         },
-        sdl_ct: "NGome",
-        society: "ODECA",
+        cni: cultivator?.cultivator_cni,
+        cni_image_url: cultivator?.cultivator_cni_photo,
         localite: {
           province:
             cultivator?.cultivator_adress?.zone_code?.commune_code
@@ -768,79 +769,82 @@ function DetailsContent({ id }) {
         </TabsContent>
 
         <TabsContent value="maps">
-          <SharedGeoLocalisation
-            selectedPlace={selectedPlace}
-            onSelectPlace={handleSelectPlace}
-            onCloseDetails={() => setSelectedPlace(null)}
-            flyToPosition={selectedPosition}
-            mainMap={false}
-            data={[
-              {
-                name: "CT",
-                icon: (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="size-10 text-secondary drop-shadow-xl"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                ),
-                mapIcon: (
-                  <div className="relative size-16 flex items-center justify-center">
-                    {/* PIN */}
+          <div className="w-full h-full relative overflow-hidden">
+            <SharedGeoLocalisation
+              selectedPlace={selectedPlace}
+              onSelectPlace={handleSelectPlace}
+              onCloseDetails={() => setSelectedPlace(null)}
+              flyToPosition={selectedPosition}
+              mainMap={false}
+              data={[
+                {
+                  name: "CT",
+                  icon: (
                     <svg
+                      xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
                       fill="currentColor"
-                      className="absolute inset-0 size-full text-secondary/50 drop-shadow-xl z-0"
+                      className="size-10 text-secondary drop-shadow-xl"
                     >
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                      <path
+                        fillRule="evenodd"
+                        d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z"
+                        clipRule="evenodd"
+                      />
                     </svg>
-                    {/* ICON CENTER */}
-                    <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
+                  ),
+                  mapIcon: (
+                    <div className="relative size-16 flex items-center justify-center">
+                      {/* PIN */}
                       <svg
-                        xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
                         fill="currentColor"
-                        className="size-6 text-white drop-shadow-md"
+                        className="absolute inset-0 size-full text-secondary/50 drop-shadow-xl z-0"
                       >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z"
-                          clipRule="evenodd"
-                        />
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
                       </svg>
+                      {/* ICON CENTER */}
+                      <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className="size-6 text-white drop-shadow-md"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
                     </div>
-                  </div>
-                ),
-                places: [
-                  {
-                    name: "CT KAREHE",
-                    coordinates: [-3.3896077, 29.9255809],
-                    type: "CT",
-                    address: "Zone Karehe, Commune Buyenzi",
-                    stockCA: 12500,
-                    stockCB: 4500,
-                    farmersCount: 342,
-                  },
-                  {
-                    name: "CT KIGUSU",
-                    coordinates: [-3.3896077, 29.9255809],
-                    type: "CT",
-                    address: "Zone Kigusu, Commune Buyenzi",
-                    stockCA: 8900,
-                    stockCB: 2100,
-                    farmersCount: 156,
-                  },
-                ],
-              },
-            ]}
-          />
+                  ),
+                  places: [
+                    {
+                      name: "CT KAREHE",
+                      coordinates: [-3.3896077, 29.9255809],
+                      type: "CT",
+                      address: "Zone Karehe, Commune Buyenzi",
+                      stockCA: 12500,
+                      stockCB: 4500,
+                      farmersCount: 342,
+                    },
+                    {
+                      name: "CT KIGUSU",
+                      coordinates: [-3.3896077, 29.9255809],
+                      type: "CT",
+                      address: "Zone Kigusu, Commune Buyenzi",
+                      stockCA: 8900,
+                      stockCB: 2100,
+                      farmersCount: 156,
+                    },
+                  ],
+                },
+              ]}
+            />
+            <ComingSoonOverlay transparent={true} />
+          </div>
         </TabsContent>
         <TabsContent value="transferCt">
           <h1 className="text-xl font-semibold m-2">Transfers effectues</h1>

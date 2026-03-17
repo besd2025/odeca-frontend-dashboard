@@ -59,10 +59,14 @@ function StatsCard({ cult_id }) {
     );
   }
 
+  const total_cerise = values?.cerise_a + values?.cerise_b;
+  const percentageA = total_cerise > 0 ? (values?.cerise_a / total_cerise) * 100 : 0;
+  const percentageB = total_cerise > 0 ? (values?.cerise_b / total_cerise) * 100 : 0;
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <Card className="@container/card">
-        <CardHeader>
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <Card className="@container/card col-span-1 lg:col-span-2 relative">
+        <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-primary p-2 rounded-md">
               <Archive className="text-white" />
@@ -92,66 +96,90 @@ function StatsCard({ cult_id }) {
           <CardTitle className="text-lg font-semibold tabular-nums  ">
             Qte Vendue (CA+CB)
           </CardTitle>
-          {/* <CardAction>
-            <Badge variant="secondary">
-              <IconTrendingUp />
-              +12.5%
-            </Badge>
-          </CardAction> */}
-        </CardHeader>
-        <CardFooter className="flex flex-row items-center justify-between text-sm ">
-          {/* <div className="text-muted-foreground">Qte totale (CA+CB)</div> */}
-          <div className="ml-2 flex flex-col gap-y-1">
-            <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
-              <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-primary size-5" />
-                <CardTitle className="text-md font-semibold text-primary">
-                  Cerise A :
-                </CardTitle>
-              </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {values?.cerise_a >= 1000 ? (
-                  <>
-                    {(values?.cerise_a / 1000).toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    <span className="text-sm">T</span>
-                  </>
-                ) : (
-                  <>
-                    {values?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
-                    <span className="text-sm">Kg</span>
-                  </>
-                )}{" "}
-              </CardDescription>
+
+          <div className="mt-2 space-y-3 w-full">
+            <div className="flex justify-between items-end">
+              <span className="text-xs text-muted-foreground ">
+                Rapport Cerise A / B
+              </span>
+              {/* <span className="text-[10px] font-mono text-muted-foreground">
+                Ratio: 65%
+              </span> */}
             </div>
-            <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
-              <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-secondary size-5" />
-                <CardTitle className="text-md font-semibold text-secondary">
-                  Cerise B :
-                </CardTitle>
+            {/* Barre de progression professionnelle */}
+            <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="bg-primary/90"
+                style={{ width: `${percentageA}%` }}
+              />
+              <div
+                className="bg-secondary/90"
+                style={{ width: `${percentageB}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-y-2 justify-between text-xs font-medium">
+              <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
+                <span className="text-primary flex items-center gap-1">●</span>
+                <div className="flex flex-row gap-x-1 items-center">
+                  <Grape className="text-primary size-5" />
+                  <CardTitle className="text-md font-semibold text-primary">
+                    CA :
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-semibold text-accent-foreground text-lg">
+                  {values?.cerise_a >= 1000 ? (
+                    <>
+                      {(values?.cerise_a / 1000).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      <span className="text-sm">T</span>
+                    </>
+                  ) : (
+                    <>
+                      {values?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
+                    </>
+                  )}{" "}
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({percentageA.toFixed(1)}%)
+                  </span>
+                </CardDescription>
               </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {values?.cerise_b >= 1000 ? (
-                  <>
-                    {(values?.cerise_b / 1000).toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    <span className="text-sm">T</span>
-                  </>
-                ) : (
-                  <>
-                    {values?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
-                    <span className="text-sm">Kg</span>
-                  </>
-                )}{" "}
-              </CardDescription>
+              <span className="w-0.5 h-8 bg-black/20 hidden lg:block"></span>
+              <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
+                <span className="text-secondary flex items-center gap-1">
+                  ●
+                </span>
+                <div className="flex flex-row gap-x-1 items-center">
+                  <Grape className="text-secondary size-5" />
+                  <CardTitle className="text-md font-semibold text-secondary">
+                    CB :
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-semibold text-accent-foreground text-lg">
+                  {values?.cerise_b >= 1000 ? (
+                    <>
+                      {(values?.cerise_b / 1000).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      <span className="text-sm">T</span>
+                    </>
+                  ) : (
+                    <>
+                      {values?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
+                    </>
+                  )}{" "}
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({percentageB.toFixed(1)}%)
+                  </span>
+                </CardDescription>
+              </div>
             </div>
           </div>
-        </CardFooter>
+        </CardHeader>
       </Card>
       <Card className="@container/card">
         <CardHeader>
@@ -160,10 +188,10 @@ function StatsCard({ cult_id }) {
               <CircleDollarSign className="text-white" />
             </div>
             <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
-              Montant
+              Montant total
             </CardTitle>
           </div>
-          <CardTitle className="text-3xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
+          <CardTitle className="text-3xl @[250px]/card:text-2xl font-semibold tracking-tight tabular-nums">
             {(values?.montant_cerise_a + values?.montant_cerise_b ?? 0)
               .toString()
               .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
@@ -173,7 +201,7 @@ function StatsCard({ cult_id }) {
             <div className="flex flex-row gap-x-2 items-center">
               <Banknote className="text-secondary" />
 
-              <CardTitle className="text-muted-foreground font-medium tabular-nums  ">
+              <CardTitle className="text-muted-foreground font-normal    ">
                 Tranche 1
               </CardTitle>
             </div>
@@ -189,8 +217,11 @@ function StatsCard({ cult_id }) {
             <div className="bg-yellow-500 p-2 rounded-md">
               <Landmark className="text-white" />
             </div>
-            <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
-              {data?.cultivator_payment_type}
+            <CardTitle className="text-lg font-medium tabular-nums">
+              <div className="text-muted-foreground  font-normal text-sm  ">
+                Mode de paiment
+              </div>
+              {data?.cultivator_payment_type === "momo" ? "Mobile Money" : "Banque"}
             </CardTitle>
           </div>
           {data?.cultivator_payment_type === "momo" ? (

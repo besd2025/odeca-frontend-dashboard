@@ -231,9 +231,9 @@ export default function Production({ data = [] }) {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -262,7 +262,7 @@ export default function Production({ data = [] }) {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    Pas de resultats
+                    Pas de donneés
                   </TableCell>
                 </TableRow>
               )}

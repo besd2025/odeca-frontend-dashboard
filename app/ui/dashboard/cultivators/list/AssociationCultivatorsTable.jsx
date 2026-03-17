@@ -156,9 +156,9 @@ export default function AssociationCultivatorsTable({
         },
       );
       if (initial_export.data?.status == "PENDING") {
-        setLoadingEportBtn(true);
         const task_id = initial_export?.data?.report_id;
-        const intervalId = setInterval(async () => {
+        let isDone = false;
+        while (!isDone) {
           const export_excel = await fetchData(
             "get",
             "cafe/achat_cafe/export_achat_status/",
@@ -167,19 +167,19 @@ export default function AssociationCultivatorsTable({
             },
           );
           if (export_excel.status === "SUCCESS") {
-            clearInterval(intervalId); // Arrêtez l'intervalle
-            setLoadingEportBtn(false);
             setActivedownloadBtn(true);
             setReportId(task_id);
+            isDone = true;
+          } else {
+            // Attendre 2 secondes avant la prochaine vérification
+            await new Promise((resolve) => setTimeout(resolve, 2000));
           }
-        }, 2000);
+        }
       }
-
-      // Vérifier toutes les 6 secondes
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
     } finally {
-      //setLoadingEportBtn(false);
+      setLoadingEportBtn(false);
     }
   };
   const DownloadCultivatorsToExcel = async () => {
@@ -526,7 +526,7 @@ export default function AssociationCultivatorsTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Pas de resultats
+                  Pas de donneés
                 </TableCell>
               </TableRow>
             )}

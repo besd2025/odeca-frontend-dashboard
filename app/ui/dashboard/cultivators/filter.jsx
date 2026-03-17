@@ -196,7 +196,7 @@ function Filter({ handleFilter }) {
                       <select
                         value={selectedProvince}
                         onChange={handleSelectProvinceChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                        className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner province</option>
                         {province.map((p) => (
@@ -216,7 +216,7 @@ function Filter({ handleFilter }) {
                       <select
                         value={selectedCommune}
                         onChange={handleSelectCommuneChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                        className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Commune</option>
                         {commune.map((c) => (
@@ -235,7 +235,7 @@ function Filter({ handleFilter }) {
                       <select
                         value={selectedZone}
                         onChange={handleSelectZoneChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                        className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner zone</option>
                         {zones.map((z) => (
@@ -254,7 +254,7 @@ function Filter({ handleFilter }) {
                       <select
                         value={selectedColline}
                         onChange={handleSelectCollineChange}
-                        className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                        className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Colline</option>
                         {colline.map((c) => (

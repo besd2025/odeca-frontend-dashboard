@@ -35,7 +35,7 @@ import Filter from "../filter";
 import EditSociety from "../edit";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import PaginationControls from "@/components/ui/pagination-controls";
+import PaginationContent from "@/components/ui/pagination-content";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 
@@ -59,13 +59,21 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
   const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
   const [exportBlob, setExportBlob] = useState(null);
 
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(5);
+  const [pointer, setPointer] = useState(0);
+
   const isActuallyLoading = externalLoading ?? loading;
 
-  const user=useContext(UserContext)
+  const user = useContext(UserContext)
 
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
+    setPointer(0);
+    setCurrentPage(1);
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   useEffect(() => {
@@ -74,9 +82,10 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
       try {
 
         const response = await fetchData("get", "cafe/societes/", {
-          params: { search: search },
+          params: { search: search, limit: limit, offset: pointer },
         });
         const results = response?.results || [];
+        setTotalCount(response?.count || 0);
         const societiesData = results.map((society) => ({
           id: society?.id,
           code: society?.code_societe,
@@ -105,7 +114,7 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
     };
 
     getSocieties();
-  }, [search]);
+  }, [search, limit, pointer]);
 
   const handleFilter = (filteredData) => {
     setFilterData(filteredData);
@@ -270,30 +279,30 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
                 </span>
               </div>
 
-              <Badge className="size-max ml-2 text-xs">SOCIETE</Badge>
+              {/* <Badge className="size-max ml-2 text-xs">SOCIETE</Badge> */}
             </div>
           </div>
         );
       },
     },
-    {
-      accessorKey: "responsable",
-      header: "Responsable",
-      cell: ({ row }) => {
-        const responsable = row.original.responsable;
-        return (
-          <div className="text-sm flex flex-col gap-y-1">
-            <span>
-              {responsable?.first_name} {responsable?.last_name}
-            </span>
-            <span className="flex flex-row gap-x-2 text-accent-foreground/70">
-              <Phone size={18} />
-              {responsable?.telephone}
-            </span>
-          </div>
-        );
-      },
-    },
+    // {
+    //   accessorKey: "responsable",
+    //   header: "Responsable",
+    //   cell: ({ row }) => {
+    //     const responsable = row.original.responsable;
+    //     return (
+    //       <div className="text-sm flex flex-col gap-y-1">
+    //         <span>
+    //           {responsable?.first_name} {responsable?.last_name}
+    //         </span>
+    //         <span className="flex flex-row gap-x-2 text-accent-foreground/70">
+    //           <Phone size={18} />
+    //           {responsable?.telephone}
+    //         </span>
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   const table = useReactTable({
@@ -317,10 +326,23 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
     },
   });
 
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+    setPagination((prev) => ({ ...prev, pageIndex: pageNumber - 1 }));
+  };
+
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+    setPagination((prev) => ({ ...prev, pageSize: newLimit, pageIndex: 0 }));
+  };
+
   return (
     <div className="w-full bg-sidebar p-4 rounded-lg">
       {isActuallyLoading && data.length === 0 ? (
-        <TableSkeleton rows={10} columns={4} />
+        <TableSkeleton rows={limit} columns={4} />
       ) : (
         <>
           <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
@@ -363,9 +385,9 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                         </TableHead>
                       );
                     })}
@@ -374,7 +396,7 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
               </TableHeader>
               <TableBody>
                 {isActuallyLoading ? (
-                  <TableRowsSkeleton columns={columns.length} rows={10} />
+                  <TableRowsSkeleton columns={columns.length} rows={limit} />
                 ) : table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
@@ -409,15 +431,14 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
               {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
               {table.getFilteredRowModel().rows.length} row(s) selected. */}
             </div>
-            <PaginationControls
-              page={table.getState().pagination.pageIndex + 1}
-              pageSize={table.getState().pagination.pageSize}
-              totalItems={table.getFilteredRowModel().rows.length}
-              totalPages={table.getPageCount()}
-              onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
-              onPageSizeChange={(size) => table.setPageSize(size)}
-              hasNextPage={table.getCanNextPage()}
-              hasPreviousPage={table.getCanPreviousPage()}
+            <PaginationContent
+              datapaginationlimit={(l) => { }}
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalCount / limit)}
+              onPageChange={onPageChange}
+              pointer={pointer}
+              totalCount={totalCount}
+              onLimitChange={onLimitChange}
             />
           </div>
         </>

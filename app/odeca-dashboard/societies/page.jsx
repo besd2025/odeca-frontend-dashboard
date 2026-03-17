@@ -5,7 +5,9 @@ import { ROLES } from "@/lib/permissions";
 export default function page() {
   return (
     <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL]}>
-      <SocietiesList />
+      <div className="p-4">
+        <SocietiesList />
+      </div>
     </ProtectedRoute>
 
   )

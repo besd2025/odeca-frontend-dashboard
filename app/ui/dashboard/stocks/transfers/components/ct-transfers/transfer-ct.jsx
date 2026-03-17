@@ -50,7 +50,7 @@ export default function TransferCtDep({
     pageIndex: 0,
     pageSize: 10,
   });
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
@@ -293,9 +293,9 @@ export default function TransferCtDep({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                     </TableHead>
                   );
                 })}
@@ -325,7 +325,7 @@ export default function TransferCtDep({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Pas de resultats
+                  Pas de donneés
                 </TableCell>
               </TableRow>
             )}
@@ -348,7 +348,7 @@ export default function TransferCtDep({
           pointer={datapagination.pointer}
           totalCount={datapagination.totalCount}
           onLimitChange={datapagination.onLimitChange}
-        /> 
+        />
       </div>
     </div>
   );

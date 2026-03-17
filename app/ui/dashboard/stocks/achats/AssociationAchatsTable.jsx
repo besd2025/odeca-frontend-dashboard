@@ -154,7 +154,8 @@ export default function AssociationAchatsTable({
       if (initial_export.data?.status == "PENDING") {
         setLoadingEportBtn(true);
         const task_id = initial_export?.data?.report_id;
-        const intervalId = setInterval(async () => {
+        let isDone = false;
+        while (!isDone) {
           const export_excel = await fetchData(
             "get",
             "cafe/achat_cafe/export_achat_status/",
@@ -163,19 +164,19 @@ export default function AssociationAchatsTable({
             },
           );
           if (export_excel.status === "SUCCESS") {
-            clearInterval(intervalId); // Arrêtez l'intervalle
-            setLoadingEportBtn(false);
             setActivedownloadBtn(true);
             setReportId(task_id);
+            isDone = true;
+          } else {
+            // Attendre 2 secondes avant la prochaine vérification
+            await new Promise((resolve) => setTimeout(resolve, 2000));
           }
-        }, 2000);
+        }
       }
-
-      // Vérifier toutes les 6 secondes
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
     } finally {
-      //setLoadingEportBtn(false);
+      setLoadingEportBtn(false);
     }
   };
   const DownloadCultivatorsToExcel = async () => {
@@ -320,43 +321,43 @@ export default function AssociationAchatsTable({
       },
       ...(isCultivatorsPage
         ? [
-            {
-              accessorKey: "sdl_ct",
-              header: ({ column }) => {
-                return (
-                  <Button
-                    variant="ghost"
-                    onClick={() =>
-                      column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                  >
-                    SDL/CT
-                    <ArrowUpDownIcon />
-                  </Button>
-                );
-              },
-              cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
+          {
+            accessorKey: "sdl_ct",
+            header: ({ column }) => {
+              return (
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                  }
+                >
+                  SDL/CT
+                  <ArrowUpDownIcon />
+                </Button>
+              );
             },
-            {
-              accessorKey: "society",
-              header: ({ column }) => {
-                return (
-                  <Button
-                    variant="ghost"
-                    onClick={() =>
-                      column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                  >
-                    Société
-                    <ArrowUpDownIcon />
-                  </Button>
-                );
-              },
-              cell: ({ row }) => (
-                <div className="font-medium">{row.getValue("society")}</div>
-              ),
+            cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
+          },
+          {
+            accessorKey: "society",
+            header: ({ column }) => {
+              return (
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                  }
+                >
+                  Société
+                  <ArrowUpDownIcon />
+                </Button>
+              );
             },
-          ]
+            cell: ({ row }) => (
+              <div className="font-medium">{row.getValue("society")}</div>
+            ),
+          },
+        ]
         : []),
       {
         id: "localite",
@@ -563,9 +564,9 @@ export default function AssociationAchatsTable({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -596,7 +597,7 @@ export default function AssociationAchatsTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Pas de resultats
+                  Pas de donneés
                 </TableCell>
               </TableRow>
             )}
@@ -607,7 +608,7 @@ export default function AssociationAchatsTable({
         {/* Mode SDL : pagination du parent. Mode autonome : pagination interne */}
         {!isCultivatorsPage && datapagination ? (
           <PaginationContent
-            datapaginationlimit={() => {}}
+            datapaginationlimit={() => { }}
             currentPage={datapagination.currentPage}
             totalPages={datapagination.totalPages}
             onPageChange={datapagination.onPageChange}

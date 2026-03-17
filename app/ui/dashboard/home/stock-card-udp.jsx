@@ -34,12 +34,12 @@ export function StockSummaryCardUDP() {
         await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
 
         const mockData = {
-          fw: 12500, // Fully Washed
-          washed: 8400, // Washed
-          honey: 3200, // Honey
-          natural_15: 5600, // Natural 15+
-          natural_16: 4100, // Natural 16+
-          total_value: 125000000, // Estimated value in FBU
+          fw: 0, // Fully Washed
+          washed: 0, // Washed
+          honey: 0, // Honey
+          natural_15: 0, // Natural 15+
+          natural_16: 0, // Natural 16+
+          total_value: 0, // Estimated value in FBU
         };
 
         const total =

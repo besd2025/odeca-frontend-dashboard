@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import TransferSdlDep from "@/app/ui/dashboard/stocks/transfers/components/sdl-transfers/transfer-sdl";
 import SharedGeoLocalisation from "@/components/ui/geo-localisation";
 import Rapports from "./rapports";
+import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
 
 function DetailsContent({ id }) {
   const transferData = [
@@ -547,86 +548,96 @@ function DetailsContent({ id }) {
         </TabsContent>
 
         <TabsContent value="maps">
-          <SharedGeoLocalisation
-            selectedPlace={selectedPlace}
-            onSelectPlace={handleSelectPlace}
-            onCloseDetails={() => setSelectedPlace(null)}
-            flyToPosition={selectedPosition}
-            mainMap={false}
-            data={[
-              {
-                name: "SDL",
-                coordinates: [-3.3896077, 29.9755819],
-                icon: (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="size-10 text-red-500 drop-shadow-xl"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                ),
-                mapIcon: (
-                  <div className="relative size-16 flex items-center justify-center">
-                    {/* PIN */}
+          <div className="relative w-full h-full overflow-hidden">
+
+            <SharedGeoLocalisation
+              selectedPlace={selectedPlace}
+              onSelectPlace={handleSelectPlace}
+              onCloseDetails={() => setSelectedPlace(null)}
+              flyToPosition={selectedPosition}
+              mainMap={false}
+              data={[
+                {
+                  name: "SDL",
+                  coordinates: [-3.3896077, 29.9755819],
+                  icon: (
                     <svg
+                      xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
                       fill="currentColor"
-                      className="absolute inset-0 size-full text-red-500/50 drop-shadow-xl z-0"
+                      className="size-10 text-red-500 drop-shadow-xl"
                     >
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                      <path
+                        fillRule="evenodd"
+                        d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
+                        clipRule="evenodd"
+                      />
                     </svg>
-                    {/* ICON CENTER */}
-                    <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
+                  ),
+                  mapIcon: (
+                    <div className="relative size-16 flex items-center justify-center">
+                      {/* PIN */}
                       <svg
-                        xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
                         fill="currentColor"
-                        className="size-6 text-white drop-shadow-md"
+                        className="absolute inset-0 size-full text-red-500/50 drop-shadow-xl z-0"
                       >
-                        <path
-                          fillRule="evenodd"
-                          d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
-                          clipRule="evenodd"
-                        />
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
                       </svg>
+                      {/* ICON CENTER */}
+                      <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className="size-6 text-white drop-shadow-md"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
                     </div>
-                  </div>
-                ),
-                places: [
-                  {
-                    name: "SDL GATABO",
-                    coordinates: [-3.3896077, 29.9755819],
-                    type: "SDL",
-                    address: "Zone Gatabo, Commune Kayanza",
-                    stockCA: 5600,
-                    stockCB: 1200,
-                    farmersCount: 89,
-                  },
-                  {
-                    name: "SDL KIGENGE",
-                    coordinates: [-3.3896077, 29.9755819],
-                    type: "SDL",
-                    address: "Zone Kigenge, Commune Ngozi",
-                    stockCA: 7800,
-                    stockCB: 2300,
-                    farmersCount: 112,
-                  },
-                ],
-              },
-            ]}
-          />
+                  ),
+                  places: [
+                    {
+                      name: "SDL GATABO",
+                      coordinates: [-3.3896077, 29.9755819],
+                      type: "SDL",
+                      address: "Zone Gatabo, Commune Kayanza",
+                      stockCA: 5600,
+                      stockCB: 1200,
+                      farmersCount: 89,
+                    },
+                    {
+                      name: "SDL KIGENGE",
+                      coordinates: [-3.3896077, 29.9755819],
+                      type: "SDL",
+                      address: "Zone Kigenge, Commune Ngozi",
+                      stockCA: 7800,
+                      stockCB: 2300,
+                      farmersCount: 112,
+                    },
+                  ],
+                },
+              ]}
+            />
+            <ComingSoonOverlay transparent={true} />
+          </div>
         </TabsContent>
         <TabsContent value="transferSdl">
-          <TransferSdlDep data={transferData} />
+          <div className="relative w-full h-full overflow-hidden">
+            <TransferSdlDep data={transferData} />
+            <ComingSoonOverlay transparent={true} />
+          </div>
         </TabsContent>
         <TabsContent value="receptionSdl">
-          <ReceiptSdlCt data={transferData} />
+          <div className="relative w-full h-full overflow-hidden">
+            <ReceiptSdlCt data={transferData} />
+            <ComingSoonOverlay transparent={true} />
+          </div>
         </TabsContent>
 
         <TabsContent value="rh">

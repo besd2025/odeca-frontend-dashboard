@@ -6,10 +6,11 @@ import { UsineActiveChart } from "./components/UsineActiveChart";
 import { UsineLocationChart } from "./components/UsineLocationChart";
 import { UsineTypeChart } from "./components/UsineTypeChart";
 import { TopFiveCards } from "./components/UsineTopFiveCards";
+import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
 
 export default function SdlAnalytics() {
   return (
-    <div className="lg:p-4 space-y-6 bg-muted/10 min-h-screen">
+    <div className="lg:p-4 space-y-6 bg-muted/10 min-h-screen relative">
       {/* Top Cards */}
       <UsineSummaryCards />
 
@@ -27,6 +28,11 @@ export default function SdlAnalytics() {
 
       {/* Top 5 Cards */}
       <TopFiveCards />
+      <ComingSoonOverlay
+        title="Pas de données disponibles"
+        message="Les données seront disponibles prochainement"
+        transparent={true}
+      />
     </div>
   );
 }

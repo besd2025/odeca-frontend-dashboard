@@ -42,7 +42,7 @@ import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
-import { useState,useContext } from "react";
+import { useState, useContext } from "react";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 export default function SdlsListTable({ isLoading: externalLoading }) {
@@ -56,7 +56,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
     pageIndex: 0,
     pageSize: 10,
   });
-  const user=useContext(UserContext)
+  const user = useContext(UserContext)
   const [filterData, setFilterData] = React.useState([]);
   const isActuallyLoading = externalLoading ?? loading;
   const [pointer, setPointer] = useState(0);
@@ -241,9 +241,9 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
               <Link href={`/odeca-dashboard/sdl/details/?id=${sdl?.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-             {user?.session?.category==="Admin"?( <div>
+              {user?.session?.category === "Admin" ? (<div>
                 <Edit id={sdl.id} />
-              </div>):""}
+              </div>) : ""}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -423,9 +423,9 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                         </TableHead>
                       );
                     })}
@@ -457,7 +457,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      Pas de resultats
+                      Pas de donneés
                     </TableCell>
                   </TableRow>
                 )}

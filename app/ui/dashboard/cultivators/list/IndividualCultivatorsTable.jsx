@@ -105,9 +105,9 @@ export default function IndividualCultivatorsTable({
             last_name: cultivator?.cultivator_last_name,
             image_url: cultivator?.cultivator_photo,
             telephone: cultivator?.cultivator_telephone,
-            cni: cultivator?.cultivator_cni,
-            cni_image_url: cultivator?.cultivator_cni_photo,
           },
+          cni: cultivator?.cultivator_cni,
+          cni_image_url: cultivator?.cultivator_cni_photo,
           sdl_ct: cultivator?.ct_sdl_name,
           society: cultivator?.societe_name,
           localite: {
@@ -150,9 +150,10 @@ export default function IndividualCultivatorsTable({
         },
       );
       if (initial_export.data?.status == "PENDING") {
-        setLoadingEportBtn(true);
+        console.log("initial_export", initial_export);
         const task_id = initial_export?.data?.report_id;
-        const intervalId = setInterval(async () => {
+        let isDone = false;
+        while (!isDone) {
           const export_excel = await fetchData(
             "get",
             "cafe/achat_cafe/export_achat_status/",
@@ -161,19 +162,20 @@ export default function IndividualCultivatorsTable({
             },
           );
           if (export_excel.status === "SUCCESS") {
-            clearInterval(intervalId); // Arrêtez l'intervalle
-            setLoadingEportBtn(false);
+            console.log("export_excel", export_excel);
             setActivedownloadBtn(true);
             setReportId(task_id);
+            isDone = true;
+          } else {
+            // Attendre 2 secondes avant la prochaine vérification
+            await new Promise((resolve) => setTimeout(resolve, 2000));
           }
-        }, 2000);
+        }
       }
-
-      // Vérifier toutes les 6 secondes
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
     } finally {
-      //setLoadingEportBtn(false);
+      setLoadingEportBtn(false);
     }
   };
   const DownloadCultivatorsToExcel = async () => {
@@ -325,18 +327,19 @@ export default function IndividualCultivatorsTable({
         accessorKey: "CNI",
         header: "CNI",
         cell: ({ row }) => {
-          const cultivators = row.original.cultivator;
+          const cni = row.original.cni;
+          const cni_image_url = row.original.cni_image_url;
           return (
             <div className="flex items-center gap-3">
               <ViewImageDialog
-                imageUrl={cultivators?.cni_image_url || null}
+                imageUrl={cni_image_url || null}
                 alt="CNI"
                 profile={false}
               />
               <div>
                 <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                   <span className="flex justify-center items-center">
-                    <IdCard size={18} /> : {cultivators?.cni}
+                    <IdCard size={18} /> : {cni}
                   </span>
                 </span>
               </div>
@@ -355,39 +358,39 @@ export default function IndividualCultivatorsTable({
       },
       ...(isCultivatorsPage
         ? [
-            {
-              accessorKey: "sdl_ct",
-              header: ({ column }) => (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  SDL/CT
-                  <ArrowUpDownIcon />
-                </Button>
-              ),
-              cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
-            },
-            {
-              accessorKey: "society",
-              header: ({ column }) => (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  Société
-                  <ArrowUpDownIcon />
-                </Button>
-              ),
-              cell: ({ row }) => (
-                <div className="font-medium">{row.getValue("society")}</div>
-              ),
-            },
-          ]
+          {
+            accessorKey: "sdl_ct",
+            header: ({ column }) => (
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+              >
+                SDL/CT
+                <ArrowUpDownIcon />
+              </Button>
+            ),
+            cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
+          },
+          {
+            accessorKey: "society",
+            header: ({ column }) => (
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+              >
+                Société
+                <ArrowUpDownIcon />
+              </Button>
+            ),
+            cell: ({ row }) => (
+              <div className="font-medium">{row.getValue("society")}</div>
+            ),
+          },
+        ]
         : []),
       {
         id: "localite",
@@ -505,9 +508,9 @@ export default function IndividualCultivatorsTable({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -538,7 +541,7 @@ export default function IndividualCultivatorsTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Pas de resultats
+                  Pas de donneés
                 </TableCell>
               </TableRow>
             )}
@@ -550,7 +553,7 @@ export default function IndividualCultivatorsTable({
         {/* Mode SDL : utiliser la pagination du parent. Mode autonome : pagination interne */}
         {!isCultivatorsPage && datapagination ? (
           <PaginationContent
-            datapaginationlimit={() => {}}
+            datapaginationlimit={() => { }}
             currentPage={datapagination.currentPage}
             totalPages={datapagination.totalPages}
             onPageChange={datapagination.onPageChange}
@@ -560,7 +563,7 @@ export default function IndividualCultivatorsTable({
           />
         ) : (
           <PaginationContent
-            datapaginationlimit={(l) => {}}
+            datapaginationlimit={(l) => { }}
             currentPage={currentPage}
             totalPages={Math.ceil(totalCount / limit)}
             onPageChange={onPageChange}

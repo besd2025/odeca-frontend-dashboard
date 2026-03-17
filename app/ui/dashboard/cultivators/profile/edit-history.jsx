@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import PaginationControls from "@/components/ui/pagination-controls";
+import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
 
 const products = [
   {
@@ -55,7 +56,7 @@ export default function EditHistory() {
   }, [page, pageSize]);
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       <div className="w-full border rounded-md overflow-hidden">
         <Table>
           <TableHeader>
@@ -85,6 +86,7 @@ export default function EditHistory() {
             ))}
           </TableBody>
         </Table>
+
       </div>
 
       <PaginationControls
@@ -101,6 +103,7 @@ export default function EditHistory() {
         hasNextPage={page < totalPages}
         hasPreviousPage={page > 1}
       />
+      <ComingSoonOverlay transparent={true} />
     </div>
   );
 }

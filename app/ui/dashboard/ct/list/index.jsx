@@ -38,7 +38,7 @@ import { fetchData } from "@/app/_utils/api";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
-import { useState,useContext} from "react";
+import { useState, useContext } from "react";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 export default function CtsListTable({ isLoading: externalLoading }) {
@@ -55,7 +55,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   });
 
   const isActuallyLoading = externalLoading ?? loading;
-  const user=useContext(UserContext)
+  const user = useContext(UserContext)
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
@@ -232,10 +232,10 @@ export default function CtsListTable({ isLoading: externalLoading }) {
               <Link href={`/odeca-dashboard/ct/details/?id=${ct.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-              {user?.session?.category==="Admin"?(
-                 <div>
-                <Edit id={ct.id} />
-              </div>):" "}
+              {user?.session?.category === "Admin" ? (
+                <div>
+                  <Edit id={ct.id} />
+                </div>) : " "}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -424,9 +424,9 @@ export default function CtsListTable({ isLoading: externalLoading }) {
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                         </TableHead>
                       );
                     })}
@@ -458,7 +458,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      Pas de resultats
+                      Pas de donneés
                     </TableCell>
                   </TableRow>
                 )}
