@@ -37,7 +37,14 @@ import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import { fetchData } from "@/app/_utils/api";
 import AssociationAchatsFilter from "./AssociationAchatsFilter";
 
-export default function AssociationAchatsTable({ isCultivatorsPage }) {
+export default function AssociationAchatsTable({
+  isCultivatorsPage,
+  externalData,
+  datapagination,
+  externalTotalCount,
+  externalLimit,
+  externalExportFn,
+}) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
@@ -56,7 +63,18 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
     pageSize: 5,
   });
 
+  // Mode contrôlé (SDL detail) : utiliser les données externes du parent
   useEffect(() => {
+    if (!isCultivatorsPage && externalData !== undefined) {
+      setData(externalData || []);
+      setTotalCount(externalTotalCount || 0);
+      setLoading(false);
+    }
+  }, [externalData, externalTotalCount, isCultivatorsPage]);
+
+  // Mode autonome (page achats) : fetch propre
+  useEffect(() => {
+    if (!isCultivatorsPage) return;
     const getAchatsAssociation = async () => {
       try {
         const response = await fetchData(
@@ -85,7 +103,6 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
           sdl_ct: achat?.responsable?.sdl_ct?.sdl?.sdl_nom
             ? "SDL " + achat.responsable.sdl_ct.sdl.sdl_nom
             : "CT " + achat?.responsable?.sdl_ct?.ct?.ct_nom,
-
           society:
             achat?.responsable?.sdl_ct?.sdl?.societe?.nom_societe ||
             achat?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
@@ -115,7 +132,7 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
     };
 
     getAchatsAssociation();
-  }, [limit, pointer, filterData, searchvalue]);
+  }, [limit, pointer, filterData, searchvalue, isCultivatorsPage]);
 
   const [reportId, setReportId] = useState("");
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
@@ -513,10 +530,22 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
               exportType="achats_association"
-              handleExportSocieties={exportCultivatorsToExcel}
+              handleExportSocieties={async () => {
+                setLoadingEportBtn(true);
+                setActivedownloadBtn(false);
+                try {
+                  if (externalExportFn) {
+                    await externalExportFn();
+                  } else {
+                    await exportCultivatorsToExcel();
+                  }
+                } finally {
+                  setLoadingEportBtn(false);
+                }
+              }}
               loading={LoadingEportBtn}
-              activedownloadBtn={ActivedownloadBtn}
-              onClickDownloadButton={DownloadCultivatorsToExcel}
+              activedownloadBtn={externalExportFn ? false : ActivedownloadBtn}
+              onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
             />
           </div>
         </div>
@@ -575,19 +604,32 @@ export default function AssociationAchatsTable({ isCultivatorsPage }) {
         </Table>
       </div>
       <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
-        <PaginationContent
-          datapaginationlimit={(l) => {
-            setLimit(l);
-            setPointer(0);
-            setCurrentPage(1);
-          }}
-          currentPage={currentPage}
-          totalPages={Math.ceil(totalCount / limit)}
-          onPageChange={onPageChange}
-          pointer={pointer}
-          totalCount={totalCount}
-          onLimitChange={onLimitChange}
-        />
+        {/* Mode SDL : pagination du parent. Mode autonome : pagination interne */}
+        {!isCultivatorsPage && datapagination ? (
+          <PaginationContent
+            datapaginationlimit={() => {}}
+            currentPage={datapagination.currentPage}
+            totalPages={datapagination.totalPages}
+            onPageChange={datapagination.onPageChange}
+            pointer={datapagination.pointer}
+            totalCount={datapagination.totalCount}
+            onLimitChange={datapagination.onLimitChange}
+          />
+        ) : (
+          <PaginationContent
+            datapaginationlimit={(l) => {
+              setLimit(l);
+              setPointer(0);
+              setCurrentPage(1);
+            }}
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalCount / limit)}
+            onPageChange={onPageChange}
+            pointer={pointer}
+            totalCount={totalCount}
+            onLimitChange={onLimitChange}
+          />
+        )}
       </div>
     </div>
   );

@@ -7,11 +7,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import IndividualCultivatorsTable from "./IndividualCultivatorsTable";
 import AssociationCultivatorsTable from "./AssociationCultivatorsTable";
 
-export default function CultivatorsListTable({ isCultivatorsPage }) {
+export default function CultivatorsListTable({
+  isCultivatorsPage,
+  individualData,
+  associationData,
+  datapagination,
+  fetchCultivatorsByType,
+  limit,
+  totalCount,
+  onExportIndividualToExcel,
+  onExportAssociationToExcel,
+}) {
   const [tabValue, setTabValue] = useState("individual");
 
   const handleChange = (value) => {
     setTabValue(value);
+    // Si on est dans la page SDL (mode contrôlé), on notifie le parent pour fetcher le bon type
+    if (!isCultivatorsPage && fetchCultivatorsByType) {
+      fetchCultivatorsByType(
+        value === "individual" ? "cultivator_individual" : "cultivator_association"
+      );
+    }
   };
 
   return (
@@ -39,10 +55,24 @@ export default function CultivatorsListTable({ isCultivatorsPage }) {
       </TabsList>
 
       <TabsContent value="individual" className="mt-4">
-        <IndividualCultivatorsTable isCultivatorsPage={isCultivatorsPage} />
+        <IndividualCultivatorsTable
+          isCultivatorsPage={isCultivatorsPage}
+          externalData={individualData}
+          datapagination={datapagination}
+          externalTotalCount={totalCount}
+          externalLimit={limit}
+          externalExportFn={onExportIndividualToExcel}
+        />
       </TabsContent>
       <TabsContent value="association" className="mt-4">
-        <AssociationCultivatorsTable isCultivatorsPage={isCultivatorsPage} />
+        <AssociationCultivatorsTable
+          isCultivatorsPage={isCultivatorsPage}
+          externalData={associationData}
+          datapagination={datapagination}
+          externalTotalCount={totalCount}
+          externalLimit={limit}
+          externalExportFn={onExportAssociationToExcel}
+        />
       </TabsContent>
     </Tabs>
   );

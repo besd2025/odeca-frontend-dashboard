@@ -59,7 +59,7 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
       onClick={handleBackdropClick}
     >
       <div
-        className="relative max-w-full max-h-full p-4"
+        className="relative max-h-[80vh] w-auto max-w-[90vw] p-4"
         onClick={stopPropagation}
       >
         {(isLoading || !imageUrl) && !imageError && (

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo,useContext } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -43,7 +43,14 @@ import PaginationContent from "@/components/ui/pagination-content";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import { fetchData } from "@/app/_utils/api";
 import { UserContext } from "@/app/ui/context/User_Context";
-export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
+export default function IndividualCultivatorsTable({
+  isCultivatorsPage,
+  externalData,
+  datapagination,
+  externalTotalCount,
+  externalLimit,
+  externalExportFn,
+}) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
@@ -60,8 +67,20 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     pageIndex: 0,
     pageSize: 5,
   });
-    const user=useContext(UserContext)
+  const user = useContext(UserContext);
+
+  // Mode contrôlé (SDL detail) : utiliser les données externes du parent
   useEffect(() => {
+    if (!isCultivatorsPage && externalData !== undefined) {
+      setData(externalData || []);
+      setTotalCount(externalTotalCount || 0);
+      setLoading(false);
+    }
+  }, [externalData, externalTotalCount, isCultivatorsPage]);
+
+  // Mode autonome (page cultivateurs) : fetch propre
+  useEffect(() => {
+    if (!isCultivatorsPage) return; // ne pas fetcher si on est en mode SDL
     const getCultivators = async () => {
       setLoading(true);
       try {
@@ -72,7 +91,6 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
             params: {
               limit: limit,
               offset: pointer,
-              // Add filterData as params if the API supports it
               ...filterData,
               search: searchvalue,
             },
@@ -113,7 +131,7 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
     };
 
     getCultivators();
-  }, [pointer, limit, filterData, searchvalue]);
+  }, [pointer, limit, filterData, searchvalue, isCultivatorsPage]);
 
   const [reportId, setReportId] = useState("");
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
@@ -244,16 +262,19 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                   {user?.session?.category==="Admin"?( 
-                    <div>
-                  <Edit
-                    cultivator={result?.id}
-                    sdl_ct={result?.sdl_ct}
-                    society={result?.society}
-                    localite={result?.localite}
-                    champs={result?.champs}
-                  />
-                </div>):" "}
+                {user?.session?.category === "Admin" ? (
+                  <div>
+                    <Edit
+                      cultivator={result?.id}
+                      sdl_ct={result?.sdl_ct}
+                      society={result?.society}
+                      localite={result?.localite}
+                      champs={result?.champs}
+                    />
+                  </div>
+                ) : (
+                  " "
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           );
@@ -451,10 +472,22 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
           <div className="flex items-center gap-3 text-gray-700">
             <ExportButton
               exportType="cultivator_individual"
-              onExportToExcel={exportCultivatorsToExcel}
+              onExportToExcel={async () => {
+                setLoadingEportBtn(true);
+                setActivedownloadBtn(false);
+                try {
+                  if (externalExportFn) {
+                    await externalExportFn();
+                  } else {
+                    await exportCultivatorsToExcel();
+                  }
+                } finally {
+                  setLoadingEportBtn(false);
+                }
+              }}
               loading={LoadingEportBtn}
-              activedownloadBtn={ActivedownloadBtn}
-              onClickDownloadButton={DownloadCultivatorsToExcel}
+              activedownloadBtn={externalExportFn ? false : ActivedownloadBtn}
+              onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
             />
           </div>
         </div>
@@ -514,17 +547,28 @@ export default function IndividualCultivatorsTable({ isCultivatorsPage }) {
       </div>
       <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
         <div className="flex-1 text-sm text-muted-foreground"></div>
-        <PaginationContent
-          datapaginationlimit={(l) => {
-            // This is already handled by onLimitChange and the internal limit state
-          }}
-          currentPage={currentPage}
-          totalPages={Math.ceil(totalCount / limit)}
-          onPageChange={onPageChange}
-          pointer={pointer}
-          totalCount={totalCount}
-          onLimitChange={onLimitChange}
-        />
+        {/* Mode SDL : utiliser la pagination du parent. Mode autonome : pagination interne */}
+        {!isCultivatorsPage && datapagination ? (
+          <PaginationContent
+            datapaginationlimit={() => {}}
+            currentPage={datapagination.currentPage}
+            totalPages={datapagination.totalPages}
+            onPageChange={datapagination.onPageChange}
+            pointer={datapagination.pointer}
+            totalCount={datapagination.totalCount}
+            onLimitChange={datapagination.onLimitChange}
+          />
+        ) : (
+          <PaginationContent
+            datapaginationlimit={(l) => {}}
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalCount / limit)}
+            onPageChange={onPageChange}
+            pointer={pointer}
+            totalCount={totalCount}
+            onLimitChange={onLimitChange}
+          />
+        )}
       </div>
     </div>
   );

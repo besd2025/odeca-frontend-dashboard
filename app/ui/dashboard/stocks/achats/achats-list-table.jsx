@@ -7,9 +7,38 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import IndividualAchatsTable from "./IndividualAchatsTable";
 import AssociationAchatsTable from "./AssociationAchatsTable";
 
-export default function AchatsListTable({ isCultivatorsPage }) {
+export default function AchatsListTable({
+  isCultivatorsPage,
+  individualData,
+  associationData,
+  datapagination,
+  fetchCultivatorsByType,
+  limit,
+  totalCount,
+  onExportIndividualToExcel,
+  onExportAssociationToExcel,
+}) {
+  const [tabValue, setTabValue] = React.useState("individual");
+
+  const handleChange = (value) => {
+    setTabValue(value);
+    // Mode SDL : notifier le parent pour fetcher le bon type
+    if (!isCultivatorsPage && fetchCultivatorsByType) {
+      fetchCultivatorsByType(
+        value === "individual"
+          ? "achat_cultivator_individual"
+          : "achat_cultivator_association"
+      );
+    }
+  };
+
   return (
-    <Tabs defaultValue="individual" className="w-full mt-4">
+    <Tabs
+      value={tabValue}
+      onValueChange={handleChange}
+      defaultValue="individual"
+      className="w-full mt-4"
+    >
       <TabsList className="p-0 h-auto bg-background gap-1">
         <TabsTrigger
           value="individual"
@@ -28,10 +57,24 @@ export default function AchatsListTable({ isCultivatorsPage }) {
       </TabsList>
 
       <TabsContent value="individual" className="mt-4">
-        <IndividualAchatsTable isCultivatorsPage={isCultivatorsPage} />
+        <IndividualAchatsTable
+          isCultivatorsPage={isCultivatorsPage}
+          externalData={individualData}
+          datapagination={datapagination}
+          externalTotalCount={totalCount}
+          externalLimit={limit}
+          externalExportFn={onExportIndividualToExcel}
+        />
       </TabsContent>
       <TabsContent value="association" className="mt-4">
-        <AssociationAchatsTable isCultivatorsPage={isCultivatorsPage} />
+        <AssociationAchatsTable
+          isCultivatorsPage={isCultivatorsPage}
+          externalData={associationData}
+          datapagination={datapagination}
+          externalTotalCount={totalCount}
+          externalLimit={limit}
+          externalExportFn={onExportAssociationToExcel}
+        />
       </TabsContent>
     </Tabs>
   );

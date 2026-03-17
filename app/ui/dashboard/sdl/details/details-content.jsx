@@ -1,9 +1,11 @@
 "use client";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchData } from "@/app/_utils/api";
+const XLSX = require("xlsx");
+import { saveAs } from "file-saver";
 import EditHistory from "./edit-history";
 import {
   DropdownMenu,
@@ -58,25 +60,34 @@ function DetailsContent({ id }) {
   const [data, setData] = React.useState([]);
   const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
   const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
-  const [individualCultivatorsData, setIndividualCultivatorsData] = React.useState([]);
-  const [associationCultivatorsData, setAssociationCultivatorsData] = React.useState([]);
+  const [individualCultivatorsData, setIndividualCultivatorsData] =
+    React.useState([]);
+  const [associationCultivatorsData, setAssociationCultivatorsData] =
+    React.useState([]);
 
   // Cultivators Pagination
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [cultivateur_type, setCultivateur_type] = useState("cultivator_individual");
+  const [cultivateur_type, setCultivateur_type] = useState(
+    "cultivator_individual",
+  );
 
   // Achats Pagination
   const [pointerAchat, setPointerAchat] = useState(0);
   const [limitAchat, setLimitAchat] = useState(5);
   const [totalCountAchat, setTotalCountAchat] = useState(0);
   const [currentPageAchat, setCurrentPageAchat] = useState(1);
-  const [achatCultivateur_type, setAchatCultivateur_type] = useState("achat_cultivator_individual");
+  const [achatCultivateur_type, setAchatCultivateur_type] = useState(
+    "achat_cultivator_individual",
+  );
   const getAchatsSDls = async () => {
     try {
-      const type = achatCultivateur_type === "achat_cultivator_individual" ? "personne" : "association";
+      const type =
+        achatCultivateur_type === "achat_cultivator_individual"
+          ? "personne"
+          : "association";
       const response = await fetchData(
         "get",
         `cafe/stationslavage/${id}/get_achats/`,
@@ -97,12 +108,18 @@ function DetailsContent({ id }) {
           last_name: achats?.cafeiculteur?.cultivator_last_name,
           image_url: achats?.cafeiculteur?.cultivator_photo,
           cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
-          cultivator_assoc_rep_name: achats?.cafeiculteur?.cultivator_assoc_rep_name,
-          cultivator_type: type === "association" ? "association" : "individual",
+          cultivator_assoc_rep_name:
+            achats?.cafeiculteur?.cultivator_assoc_rep_name,
+          cultivator_type:
+            type === "association" ? "association" : "individual",
         },
         localite: {
-          province: achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
-          commune: achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+          province:
+            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
         },
         num_fiche: 784,
         num_recu: achats?.numero_recu,
@@ -134,7 +151,7 @@ function DetailsContent({ id }) {
         "get",
         `cafe/stationslavage/${id}/get_cultivators/`,
         {
-           params: { limit: limit, offset: pointer },
+          params: { limit: limit, offset: pointer },
         },
       );
       const results = response?.results;
@@ -146,17 +163,21 @@ function DetailsContent({ id }) {
           last_name: cultivator?.cultivator_last_name,
           image_url: cultivator?.cultivator_photo,
           cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
-          cultivator_assoc_numero_fiche: cultivator?.cultivator_assoc_numero_fiche,
+          cultivator_assoc_numero_fiche:
+            cultivator?.cultivator_assoc_numero_fiche,
         },
-        sdl_ct: "NGome",
-        society: "ODECA",
         localite: {
-          province: cultivator?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
-          commune: cultivator?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+          province:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
         },
         champs: cultivator?.nombre_champs,
       }));
       setIndividualCultivatorsData(cultivatorsData);
+      console.log("individualCultivatorsData", cultivatorsData);
       setTotalCount(response?.count);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
@@ -181,19 +202,24 @@ function DetailsContent({ id }) {
           last_name: cultivator?.cultivator_last_name,
           image_url: cultivator?.cultivator_photo,
           cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
-          cultivator_assoc_numero_fiche: cultivator?.cultivator_assoc_numero_fiche,
+          cultivator_assoc_numero_fiche:
+            cultivator?.cultivator_assoc_numero_fiche,
           cultivator_assoc_name: cultivator?.cultivator_assoc_name,
           cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,
         },
-        sdl_ct: "NGome",
-        society: "fffffff",
         localite: {
-          province: cultivator?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
-          commune: cultivator?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+          province:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
         },
         champs: cultivator?.nombre_champs,
       }));
       setAssociationCultivatorsData(cultivatorsData);
+      console.log("associationCultivatorsData", cultivatorsData);
+
       setTotalCount(response?.count);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
@@ -213,6 +239,102 @@ function DetailsContent({ id }) {
     } catch (error) {
       console.error("Error fetching transfers data:", error);
     }
+  };
+
+  // ── Export functions filtrées par SDL ──────────────────────────────────────
+  const buildXlsx = (rows, sheetName, filename) => {
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(
+      new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
+      filename,
+    );
+  };
+
+  const exportIndividualCultivatorsToExcel = async () => {
+    try {
+      const init = await fetchData("get", `cafe/stationslavage/${id}/get_cultivators/`, { params: { limit: 1 } });
+      const total = init?.count || 0;
+      if (total === 0) return;
+      const res = await fetchData("get", `cafe/stationslavage/${id}/get_cultivators/`, { params: { limit: total, offset: 0 } });
+      const rows = (res?.results || []).map((c) => ({
+        Code: c?.cultivator_code || "",
+        Nom: c?.cultivator_last_name || "",
+        Prénom: c?.cultivator_first_name || "",
+        Téléphone: c?.cultivator_telephone || "",
+        Province: c?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
+        Commune: c?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+        Zone: c?.cultivator_adress?.zone_code?.zone_name || "",
+        Colline: c?.cultivator_adress?.colline_name || "",
+        Champs: c?.nombre_champs || 0,
+      }));
+      buildXlsx(rows, "Cultivateurs", `cultivateurs_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
+    } catch (e) { console.error("Export cultivateurs erreur:", e); }
+  };
+
+  const exportAssociationCultivatorsToExcel = async () => {
+    try {
+      const init = await fetchData("get", `cafe/stationslavage/${id}/get_cultivators_association/`, { params: { limit: 1 } });
+      const total = init?.count || 0;
+      if (total === 0) return;
+      const res = await fetchData("get", `cafe/stationslavage/${id}/get_cultivators_association/`, { params: { limit: total, offset: 0 } });
+      const rows = (res?.results || []).map((c) => ({
+        Code: c?.cultivator_code || "",
+        Association: c?.cultivator_assoc_name || "",
+        Représentant: c?.cultivator_assoc_rep_name || "",
+        Téléphone_rep: c?.cultivator_assoc_rep_phone || "",
+        Num_fiche: c?.cultivator_assoc_numero_fiche || "",
+        NIF: c?.cultivator_assoc_nif || "",
+        Province: c?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
+        Commune: c?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+        Champs: c?.nombre_champs || 0,
+      }));
+      buildXlsx(rows, "Associations", `associations_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
+    } catch (e) { console.error("Export associations erreur:", e); }
+  };
+
+  const exportIndividualAchatsToExcel = async () => {
+    try {
+      const init = await fetchData("get", `cafe/stationslavage/${id}/get_achats/`, { params: { limit: 1, cafeiculteur_type: "personne" } });
+      const total = init?.count || 0;
+      if (total === 0) return;
+      const res = await fetchData("get", `cafe/stationslavage/${id}/get_achats/`, { params: { limit: total, offset: 0, cafeiculteur_type: "personne" } });
+      const rows = (res?.results || []).map((a) => ({
+        Code_cultivateur: a?.cafeiculteur?.cultivator_code || "",
+        Nom: a?.cafeiculteur?.cultivator_last_name || "",
+        Prénom: a?.cafeiculteur?.cultivator_first_name || "",
+        Num_recu: a?.numero_recu || "",
+        CA: a?.quantite_cerise_a || 0,
+        CB: a?.quantite_cerise_b || 0,
+        Date: a?.date_achat || "",
+        Province: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
+        Commune: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+      }));
+      buildXlsx(rows, "Achats", `achats_ind_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
+    } catch (e) { console.error("Export achats individuel erreur:", e); }
+  };
+
+  const exportAssociationAchatsToExcel = async () => {
+    try {
+      const init = await fetchData("get", `cafe/stationslavage/${id}/get_achats/`, { params: { limit: 1, cafeiculteur_type: "association" } });
+      const total = init?.count || 0;
+      if (total === 0) return;
+      const res = await fetchData("get", `cafe/stationslavage/${id}/get_achats/`, { params: { limit: total, offset: 0, cafeiculteur_type: "association" } });
+      const rows = (res?.results || []).map((a) => ({
+        Code_cultivateur: a?.cafeiculteur?.cultivator_code || "",
+        Association: a?.cafeiculteur?.cultivator_assoc_name || "",
+        Représentant: a?.cafeiculteur?.cultivator_assoc_rep_name || "",
+        Num_recu: a?.numero_recu || "",
+        CA: a?.quantite_cerise_a || 0,
+        CB: a?.quantite_cerise_b || 0,
+        Date: a?.date_achat || "",
+        Province: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
+        Commune: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+      }));
+      buildXlsx(rows, "Achats", `achats_assoc_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
+    } catch (e) { console.error("Export achats association erreur:", e); }
   };
 
   useEffect(() => {
@@ -289,11 +411,11 @@ function DetailsContent({ id }) {
     setAchatCultivateur_type(type);
     setCurrentPageAchat(1);
     setPointerAchat(0);
-    setTotalCountAchat(0); 
+    setTotalCountAchat(0);
     if (type === "achat_cultivator_individual") {
-       setAssociationAchatsData([]);
+      setAssociationAchatsData([]);
     } else {
-       setIndividualAchatsData([]);
+      setIndividualAchatsData([]);
     }
   };
 
@@ -322,7 +444,11 @@ function DetailsContent({ id }) {
   };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
-      <Tabs value={tab} className="space-y-6 w-full" onValueChange={handleTabChange}>
+      <Tabs
+        value={tab}
+        className="space-y-6 w-full"
+        onValueChange={handleTabChange}
+      >
         {/* TABS LIST */}
         <TabsList className="overflow-x-auto flex-nowrap gap-2 w-full">
           <TabsTrigger value="cultivators" className="shrink-0">
@@ -400,6 +526,8 @@ function DetailsContent({ id }) {
             datapagination={datapagination}
             limit={limit}
             totalCount={totalCount}
+            onExportIndividualToExcel={exportIndividualCultivatorsToExcel}
+            onExportAssociationToExcel={exportAssociationCultivatorsToExcel}
           />
         </TabsContent>
         <TabsContent value="achats">
@@ -412,6 +540,8 @@ function DetailsContent({ id }) {
             datapagination={dataAchatpagination}
             limit={limit}
             totalCount={totalCountAchat}
+            onExportIndividualToExcel={exportIndividualAchatsToExcel}
+            onExportAssociationToExcel={exportAssociationAchatsToExcel}
           />
         </TabsContent>
 
