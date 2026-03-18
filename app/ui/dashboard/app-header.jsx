@@ -82,12 +82,12 @@ export function AppHeader() {
               orientation="vertical"
               className="mx-2 data-[orientation=vertical]:h-4"
             />
-            <h1 className="text-base font-bold flex gap-x-1 items-center">
+            <h1 className="text-base font-bold flex gap-x-2 items-center">
               <Image
-                src="/images/ThreeSeeds.png"
+                src="/images/Artboard_Coffee_nb.png"
                 alt="Logo"
-                width={40}
-                height={40}
+                width={30}
+                height={30}
               />
               CAFE
             </h1>
