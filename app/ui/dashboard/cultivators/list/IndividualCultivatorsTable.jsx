@@ -78,6 +78,13 @@ export default function IndividualCultivatorsTable({
     }
   }, [externalData, externalTotalCount, isCultivatorsPage]);
 
+  // Synchronisation de l'affichage avec la limite externe (cas SDL/CT)
+  useEffect(() => {
+    if (!isCultivatorsPage && externalLimit) {
+      setPagination((prev) => ({ ...prev, pageSize: externalLimit }));
+    }
+  }, [externalLimit, isCultivatorsPage]);
+
   // Mode autonome (page cultivateurs) : fetch propre
   useEffect(() => {
     if (!isCultivatorsPage) return; // ne pas fetcher si on est en mode SDL
@@ -560,6 +567,7 @@ export default function IndividualCultivatorsTable({
             pointer={datapagination.pointer}
             totalCount={datapagination.totalCount}
             onLimitChange={datapagination.onLimitChange}
+            limit={datapagination.limit}
           />
         ) : (
           <PaginationContent
@@ -570,6 +578,7 @@ export default function IndividualCultivatorsTable({
             pointer={pointer}
             totalCount={totalCount}
             onLimitChange={onLimitChange}
+            limit={limit}
           />
         )}
       </div>

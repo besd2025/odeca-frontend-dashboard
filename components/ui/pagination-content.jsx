@@ -24,9 +24,14 @@ const PaginationContent = ({
   pointer,
   totalCount,
   onLimitChange, // Nouvelle prop pour gérer le changement de limite
+  limit: initialLimit = 5, // Prop pour la limite initiale
   className,
 }) => {
-  const [limit, setLimit] = useState(5); // Limite par défaut
+  const [limit, setLimit] = useState(initialLimit); // Limite basée sur la prop
+
+  React.useEffect(() => {
+    setLimit(initialLimit);
+  }, [initialLimit]);
 
   // Calcul des pages à afficher
   const pagesToShow = [];

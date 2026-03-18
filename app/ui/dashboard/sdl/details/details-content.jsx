@@ -540,7 +540,7 @@ function DetailsContent({ id }) {
             isCultivatorsPage={false}
             fetchCultivatorsByType={fetchAchatCultivatorsByType}
             datapagination={dataAchatpagination}
-            limit={limit}
+            limit={limitAchat}
             totalCount={totalCountAchat}
             onExportIndividualToExcel={exportIndividualAchatsToExcel}
             onExportAssociationToExcel={exportAssociationAchatsToExcel}

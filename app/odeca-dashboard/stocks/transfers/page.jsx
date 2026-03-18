@@ -9,6 +9,7 @@ import { fetchData } from "@/app/_utils/api";
 import { TableSkeleton } from "@/components/ui/skeletons";
 import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
 import { ROLES } from "@/lib/permissions";
+import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
 export default function TransfersPage() {
   const [sdlTransfers, setSdlTransfers] = useState([]);
   const [ctTransfers, setCtTransfers] = useState([]);
@@ -86,8 +87,8 @@ export default function TransfersPage() {
   }, []);
 
   return (
-       <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL,ROLES.ODECA,ROLES.SOCIETE]}>
-      <div className="p-4 space-y-4">
+    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE]}>
+      <div className="p-4 space-y-4 relative">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Gestion des Transferts</h1>
         </div>
@@ -141,6 +142,7 @@ export default function TransfersPage() {
             </div>
           </TabsContent>
         </Tabs>
+        <ComingSoonOverlay transparent={true} />
       </div>
     </ProtectedRoute>
   );

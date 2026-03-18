@@ -71,7 +71,6 @@ export default function AssociationCultivatorsTable({
   const user = useContext(UserContext);
 
   // Mode contrôlé (SDL detail) : utiliser les données externes du parent
-
   useEffect(() => {
     if (!isCultivatorsPage && externalData !== undefined) {
       setData(externalData || []);
@@ -79,6 +78,13 @@ export default function AssociationCultivatorsTable({
       setLoading(false);
     }
   }, [externalData, externalTotalCount, isCultivatorsPage]);
+
+  // Synchronisation de l'affichage avec la limite externe (cas SDL/CT)
+  useEffect(() => {
+    if (!isCultivatorsPage && externalLimit) {
+      setPagination((prev) => ({ ...prev, pageSize: externalLimit }));
+    }
+  }, [externalLimit, isCultivatorsPage]);
 
   // Mode autonome (page cultivateurs) : fetch propre
   useEffect(() => {
@@ -545,6 +551,7 @@ export default function AssociationCultivatorsTable({
             pointer={datapagination.pointer}
             totalCount={datapagination.totalCount}
             onLimitChange={datapagination.onLimitChange}
+            limit={datapagination.limit}
           />
         ) : (
           <PaginationContent
@@ -555,6 +562,7 @@ export default function AssociationCultivatorsTable({
             pointer={pointer}
             totalCount={totalCount}
             onLimitChange={onLimitChange}
+            limit={limit}
           />
         )}
       </div>

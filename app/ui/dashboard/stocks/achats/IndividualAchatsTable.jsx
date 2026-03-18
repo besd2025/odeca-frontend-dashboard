@@ -72,6 +72,13 @@ export default function IndividualAchatsTable({
     }
   }, [externalData, externalTotalCount, isCultivatorsPage]);
 
+  // Synchronisation de l'affichage avec la limite externe (cas SDL/CT)
+  useEffect(() => {
+    if (!isCultivatorsPage && externalLimit) {
+      setPagination((prev) => ({ ...prev, pageSize: externalLimit }));
+    }
+  }, [externalLimit, isCultivatorsPage]);
+
   // Mode autonome (page achats) : fetch propre
   useEffect(() => {
     if (!isCultivatorsPage) return;
@@ -609,6 +616,7 @@ export default function IndividualAchatsTable({
             pointer={datapagination.pointer}
             totalCount={datapagination.totalCount}
             onLimitChange={datapagination.onLimitChange}
+            limit={datapagination.limit}
           />
         ) : (
           <PaginationContent
@@ -623,6 +631,7 @@ export default function IndividualAchatsTable({
             pointer={pointer}
             totalCount={totalCount}
             onLimitChange={onLimitChange}
+            limit={limit}
           />
         )}
       </div>
