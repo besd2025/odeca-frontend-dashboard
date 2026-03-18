@@ -163,10 +163,10 @@ function DetailsContent({ id }) {
           first_name: cultivator?.cultivator_first_name,
           last_name: cultivator?.cultivator_last_name,
           image_url: cultivator?.cultivator_photo,
-          cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
-          cultivator_assoc_numero_fiche:
-            cultivator?.cultivator_assoc_numero_fiche,
+          telephone: cultivator?.cultivator_telephone,
         },
+        cni: cultivator?.cultivator_cni,
+        cni_image_url: cultivator?.cultivator_cni_photo,
         localite: {
           province:
             cultivator?.cultivator_adress?.zone_code?.commune_code
@@ -203,6 +203,7 @@ function DetailsContent({ id }) {
           first_name: cultivator?.cultivator_assoc_name,
           last_name: cultivator?.cultivator_last_name,
           image_url: cultivator?.cultivator_photo,
+          telephone: cultivator?.cultivator_telephone,
           cultivator_assoc_rep_phone: cultivator?.cultivator_assoc_rep_phone,
           cultivator_assoc_numero_fiche:
             cultivator?.cultivator_assoc_numero_fiche,
