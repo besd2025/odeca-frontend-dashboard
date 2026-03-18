@@ -149,7 +149,7 @@ function ProfileCard({ cult_id }) {
                   <ViewImageDialog
                     imageUrl={data?.cultivator_photo}
                     className="size-full object-cover"
-                    // fallbackUrl=""
+                  // fallbackUrl=""
                   />
                 </>
               ) : (
@@ -182,8 +182,8 @@ function ProfileCard({ cult_id }) {
                 <p className="text-xl font-semibold">
                   {data?.cultivator_entity_type === "personne"
                     ? data?.cultivator_first_name +
-                      " " +
-                      data?.cultivator_last_name
+                    " " +
+                    data?.cultivator_last_name
                     : data?.cultivator_assoc_name}
                 </p>
               )}
@@ -369,7 +369,7 @@ function ProfileCard({ cult_id }) {
               <Separator className="my-2" />
             </div>
             <div>
-              <div className="flex items-center justify-between text-sm ">
+              {/* <div className="flex items-center justify-between text-sm ">
                 <span className="text-muted-foreground flex gap-x-1">
                   <Layers size={20} /> Champs
                 </span>
@@ -445,17 +445,17 @@ function ProfileCard({ cult_id }) {
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>
-              </div>
+              </div> */}
             </div>
             <div>
-              <div className="flex items-center justify-between text-sm ">
+              {/* <div className="flex items-center justify-between text-sm ">
                 <span className="text-muted-foreground">SDL / CT</span>
                 <Link href="/odeca-dashboard/sdl/details">
                   <Button variant="link" className="p-0">
                     BUHANZA
                   </Button>
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </>

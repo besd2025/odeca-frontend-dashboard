@@ -1,10 +1,11 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { fetchData } from "@/app/_utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UserContext } from "@/app/ui/context/User_Context";
 import {
   Grape,
   MapPinHouse,
@@ -37,6 +38,7 @@ function DetailsCard({ id }) {
 
     return () => clearTimeout(timer);
   }, []);
+  const user = useContext(UserContext)
   const toggleSidebar = () => setIsExpanded(!isExpanded);
   React.useEffect(() => {
     const getSdls = async () => {
@@ -51,7 +53,6 @@ function DetailsCard({ id }) {
             body: {},
           },
         );
-
         setData(response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -220,7 +221,7 @@ function DetailsCard({ id }) {
                 </span>
               </div>
               <Separator className="my-2" />
-              <div className="flex justify-center"> <AddPrevision ct_id={id} /></div>
+              <div className="flex justify-center"> <AddPrevision sdl_id={data?.ct_responsable?.id} /></div>
             </div>
           </div>
         </>

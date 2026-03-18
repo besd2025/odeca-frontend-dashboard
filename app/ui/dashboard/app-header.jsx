@@ -63,15 +63,14 @@ const menuItems = {
   },
 };
 const deconnecter = () => {
-  localStorage.removeItem("accessToken");
+  localStorage.removeItem("Access_Token");
   window.location.href = "/";
 };
 
 export function AppHeader() {
   const user = React.useContext(UserContext);
-  const initials = `${user?.session?.first_name?.[0] || ""}${
-    user?.session?.last_name?.[0] || ""
-  }`.toUpperCase();
+  const initials = `${user?.session?.first_name?.[0] || ""}${user?.session?.last_name?.[0] || ""
+    }`.toUpperCase();
 
   return (
     <div className="">

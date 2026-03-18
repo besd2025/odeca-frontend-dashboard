@@ -48,7 +48,7 @@ function TopListCard({ title, icon, data }) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start">
-                    <Link href={`/odeca-dashboard/ct/profile/?id=${456}`}>
+                    <Link href={`/odeca-dashboard/ct/details?id=${item.id}`}>
                       <DropdownMenuItem>Profile</DropdownMenuItem>
                     </Link>
                   </DropdownMenuContent>
@@ -85,13 +85,13 @@ export function CtTopFiveCards() {
         ]);
 
         const topMembers = membersResponse.map((item) => ({
+          id: item?.collector__responsable_ct__ct__id,
           image: "/images/logo_1.jpg",
           name: item?.collector__responsable_ct__ct__ct_nom,
           value: item?.count,
           sub: "Membres",
         }));
         setDataTopMembers(topMembers);
-
         const topAchats = achatsResponse.map((item) => ({
           name: item?.responsable__responsable_ct__ct__ct_nom,
           value: item?.total_cerise,

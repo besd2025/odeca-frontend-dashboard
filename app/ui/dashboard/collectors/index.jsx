@@ -63,6 +63,7 @@ export default function CollectorsList() {
           sdl_ct: "",
           cni: item?.cni || "",
         }))
+        console.log(response)
         setAllCollectors(data)
         setTotalCount(response.count);
       } catch (error) {
@@ -97,7 +98,7 @@ export default function CollectorsList() {
             <TableRow>
               <TableHead>Collecteurs</TableHead>
               <TableHead>Téléphone</TableHead>
-              <TableHead>SDL/CT</TableHead>
+              {/*   <TableHead>SDL/CT</TableHead> */}
               <TableHead className="text-right pr-4">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -116,7 +117,7 @@ export default function CollectorsList() {
                     </div>
                   </TableCell>
                   <TableCell>{collector.phone}</TableCell>
-                  <TableCell>{collector.sdl_ct}</TableCell>
+                  {/* <TableCell>{collector.sdl_ct}</TableCell> */}
                   <TableCell className="text-right pr-4">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

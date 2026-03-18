@@ -55,8 +55,8 @@ export function Edit({ collector, children }) {
     toast.promise(promise, {
       loading: "Modification...",
       success: (data) => {
-        setTimeout(() => window.location.reload(), 1000);
-        return `${data?.identifiant} a été modifié avec succès `;
+        // setTimeout(() => window.location.reload(), 1000);
+        return `${collector?.identifiant} a été modifié avec succès `;
       },
       error: "Donnée non modifiée",
     });
