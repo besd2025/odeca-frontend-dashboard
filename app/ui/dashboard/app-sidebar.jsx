@@ -271,6 +271,7 @@ const menuItems = {
         </svg>
       ),
       keyword: "settings",
+      roles: ["Admin"],
     },
   ],
   user: {

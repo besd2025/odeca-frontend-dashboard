@@ -29,6 +29,7 @@ export function Edit({ collector, children }) {
       phone: phone || collector?.phone,
       cni: cni,
       password: password
+
     }
 
     const promise = new Promise(async (resolve, reject) => {
@@ -43,7 +44,7 @@ export function Edit({ collector, children }) {
           },
         );
         if (results.status == 200) {
-          resolve({});
+          window.location.reload();
         } else {
           reject(new Error("Erreur"));
         }

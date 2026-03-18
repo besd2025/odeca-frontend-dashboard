@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
-
+import { fetchData } from "@/app/_utils/api";
 export default function AddUserDialog() {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -45,11 +45,24 @@ export default function AddUserDialog() {
     setFormData((prev) => ({ ...prev, category: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Données de l'utilisateur :", formData);
-    setOpen(false);
-    toast.info("Soumission désactivée (UI-only)");
+    try {
+      const response = await fetchData("post", `cafe/cafe_registration/`, {
+        params: {},
+        additionalHeaders: {},
+        body: formData,
+      });
+      if (response.status === 201) {
+        setOpen(false);
+        toast.info("Utilisateur ajouté avec succès");
+        window.location.reload();
+      } else {
+        toast.error("Erreur lors de l'ajout de l'utilisateur");
+      }
+    } catch (error) {
+      console.error("Error fetching users data:", error);
+    }
   };
 
   return (
