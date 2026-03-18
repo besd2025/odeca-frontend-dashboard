@@ -404,15 +404,15 @@ export default function IndividualCultivatorsTable({
           );
         },
       },
-      {
-        accessorKey: "champs",
-        header: "Champs",
-        cell: ({ row }) => (
-          <div className="text-center font-semibold">
-            {row.getValue("champs")}
-          </div>
-        ),
-      },
+      // {
+      //   accessorKey: "champs",
+      //   header: "Champs",
+      //   cell: ({ row }) => (
+      //     <div className="text-center font-semibold">
+      //       {row.getValue("champs")}
+      //     </div>
+      //   ),
+      // },
     ],
     [isCultivatorsPage],
   );

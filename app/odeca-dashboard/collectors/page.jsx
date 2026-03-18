@@ -8,6 +8,7 @@ export default function page() {
     <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
       <div className="p-4">
         {/* <Edit /> */}
+        <h1 className="text-2xl font-semibold m-2">Liste des collecteurs</h1>
         <CollectorsList />
       </div>
     </ProtectedRoute>

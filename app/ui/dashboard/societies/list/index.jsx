@@ -86,6 +86,7 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
         });
         const results = response?.results || [];
         setTotalCount(response?.count || 0);
+        console.log(response);
         const societiesData = results.map((society) => ({
           id: society?.id,
           code: society?.code_societe,

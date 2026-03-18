@@ -22,6 +22,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { AddPrevision } from "./add-prevision-sdl";
 
 function DetailsCard({ id }) {
   const [data, setData] = useState([]);
@@ -218,6 +219,7 @@ function DetailsCard({ id }) {
                 </span>
               </div>
               <Separator className="my-2" />
+              <div className="flex justify-center"> <AddPrevision sdl_id={id} /></div>
             </div>
           </div>
         </>

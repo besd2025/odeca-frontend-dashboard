@@ -5,8 +5,8 @@ import Link from "next/link";
 
 export default function Protection() {
   return (
-    <div className="flex w-full items-center justify-center px-6">
-      <div className="mx-auto flex h-[80vh] w-[80vh]  flex-col items-center justify-center rounded-xl  bg-card px-6 pt-8 pb-10 text-center">
+    <div className="flex w-full h-screen items-center justify-center px-6 ">
+      <div className="flex h-[80vh] w-[80vh]  flex-col items-center justify-center rounded-xl  bg-card px-6 pt-8 pb-10 text-center">
         <div className="flex size-24 items-center justify-center rounded-full border border-destructive/12 bg-destructive/10">
           <ShieldX className="size-16 text-destructive" />
         </div>

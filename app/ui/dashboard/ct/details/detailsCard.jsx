@@ -22,6 +22,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { AddPrevision } from "./add-prevision-ct";
 
 function DetailsCard({ id }) {
   const [data, setData] = React.useState([]);
@@ -219,6 +220,7 @@ function DetailsCard({ id }) {
                 </span>
               </div>
               <Separator className="my-2" />
+              <div className="flex justify-center"> <AddPrevision ct_id={id} /></div>
             </div>
           </div>
         </>

@@ -229,6 +229,17 @@ const menuItems = {
     },
     {
       title: "Repartitions",
+      items: [
+        {
+          title: "Maps",
+          url: "/odeca-dashboard/maps",
+        },
+        {
+          title: "Editon",
+          url: "/odeca-dashboard/maps/edit-localisation",
+        },
+
+      ],
       url: "/odeca-dashboard/maps",
       icon: (
         <svg
