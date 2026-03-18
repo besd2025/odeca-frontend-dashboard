@@ -49,6 +49,7 @@ function DetailsCard({ id }) {
         });
 
         setData(response);
+        console.log("response: ", response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -219,7 +220,7 @@ function DetailsCard({ id }) {
                 </span>
               </div>
               <Separator className="my-2" />
-              <div className="flex justify-center"> <AddPrevision sdl_id={id} /></div>
+              <div className="flex justify-center"> <AddPrevision sdl_id={data?.sdl_responsable?.id} /></div>
             </div>
           </div>
         </>

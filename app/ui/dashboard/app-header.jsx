@@ -63,7 +63,7 @@ const menuItems = {
   },
 };
 const deconnecter = () => {
-  localStorage.removeItem("accessToken");
+  localStorage.removeItem("Access_Token");
   window.location.href = "/";
 };
 

@@ -237,8 +237,8 @@ const menuItems = {
         {
           title: "Editon",
           url: "/odeca-dashboard/maps/edit-localisation",
+          roles: ["Admin"],
         },
-
       ],
       url: "/odeca-dashboard/maps",
       icon: (
@@ -271,6 +271,7 @@ const menuItems = {
         </svg>
       ),
       keyword: "settings",
+      roles: ["Admin"],
     },
   ],
   user: {
@@ -354,10 +355,21 @@ export function AppSidebar({ ...props }) {
   const [isHovered, setIsHovered] = React.useState(false);
   const isCollapsed = !isMobile && state === "collapsed" && !isHovered;
   const user = React.useContext(UserContext);
-  const filteredMenuItems = menuItems.navMain.filter((item) => {
-    if (!item.roles) return true;
-    return item.roles.includes(user?.session?.category);
-  });
+  const filteredMenuItems = menuItems.navMain
+    .filter((item) => {
+      if (!item.roles) return true;
+      return item.roles.includes(user?.session?.category);
+    })
+    .map((item) => {
+      if (!item.items) return item;
+      return {
+        ...item,
+        items: item.items.filter((subItem) => {
+          if (!subItem.roles) return true;
+          return subItem.roles.includes(user?.session?.category);
+        }),
+      };
+    });
 
   return (
     <Sidebar

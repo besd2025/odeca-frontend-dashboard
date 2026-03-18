@@ -78,6 +78,7 @@ export function SdlTopFiveCards() {
           }
         );
         const topMembers = response.map((item) => ({
+          id: item?.collector__responsable_sdl__sdl__id,
           image: "/images/logo_1.jpg",
           name: item?.collector__responsable_sdl__sdl__sdl_nom,
           value: item?.count,

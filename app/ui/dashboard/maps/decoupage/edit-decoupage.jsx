@@ -31,8 +31,8 @@ export default function DecoupageEditionPage() {
     const [selectedCommune, setSelectedCommune] = useState("");
     const [selectedZone, setSelectedZone] = useState("");
 
-    // Collines are now objects with id (null for new ones) and name
-    const [collines, setCollines] = useState([{ id: null, name: "" }]);
+    // Collines are now objects with id (null for new ones), name, and code
+    const [collines, setCollines] = useState([{ id: null, name: "", code: "" }]);
 
     const [loadingProvinces, setLoadingProvinces] = useState(false);
     const [loadingCommunes, setLoadingCommunes] = useState(false);
@@ -61,109 +61,114 @@ export default function DecoupageEditionPage() {
             }
         };
         getProvinces();
-    }, []);
-
-    // Fetch communes when province changes
-    useEffect(() => {
-        if (!selectedProvince) {
+    }, []); const handleProvinceChange = async (value) => {
+        setSelectedProvince(value);
+        if (!value) {
             setCommunes([]);
             setSelectedCommune("");
-            return;
-        }
-
-        const getCommunes = async () => {
-            setLoadingCommunes(true);
-            try {
-                const response = await fetchData(
-                    "get",
-                    `adress/commune/get_communes_by_province`,
-                    { params: { province: selectedProvince } }
-                );
-                const options = response?.map((item) => ({
-                    value: item.commune_name,
-                    label: item.commune_name,
-                })) || [];
-                setCommunes(options);
-                setSelectedCommune("");
-                setSelectedZone("");
-                setCollines([{ id: null, name: "" }]);
-            } catch (error) {
-                console.error("Error fetching communes:", error);
-                toast.error("Erreur lors de la récupération des communes");
-            } finally {
-                setLoadingCommunes(false);
-            }
-        };
-        getCommunes();
-    }, [selectedProvince]);
-
-    // Fetch zones when commune changes
-    useEffect(() => {
-        if (!selectedCommune) {
             setZones([]);
             setSelectedZone("");
+            setCollines([{ id: null, name: "", code: "" }]);
             return;
         }
 
-        const getZones = async () => {
-            setLoadingZones(true);
-            try {
-                const response = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
-                    params: { commune: selectedCommune },
-                });
-                const options = response?.map((item) => ({
-                    value: item.zone_name,
-                    label: item.zone_name,
-                })) || [];
-                setZones(options);
-                setSelectedZone("");
-                setCollines([{ id: null, name: "" }]);
-            } catch (error) {
-                console.error("Error fetching zones:", error);
-                toast.error("Erreur lors de la récupération des zones");
-            } finally {
-                setLoadingZones(false);
-            }
-        };
-        getZones();
-    }, [selectedCommune]);
+        setLoadingCommunes(true);
+        try {
+            const response = await fetchData(
+                "get",
+                `adress/commune/get_communes_by_province`,
+                { params: { province: value } }
+            );
+            const options = response?.map((item) => ({
+                value: item.commune_name,
+                label: item.commune_name,
+            })) || [];
+            setCommunes(options);
+            setSelectedCommune("");
+            setZones([]);
+            setSelectedZone("");
+            setCollines([{ id: null, name: "", code: "" }]);
+        } catch (error) {
+            console.error("Error fetching communes:", error);
+            toast.error("Erreur lors de la récupération des communes");
+        } finally {
+            setLoadingCommunes(false);
+        }
+    };
 
-    // Fetch existing collines when zone changes
-    useEffect(() => {
-        if (!selectedZone) {
-            setCollines([{ id: null, name: "" }]);
+    const handleCommuneChange = async (value) => {
+        setSelectedCommune(value);
+        if (!value) {
+            setZones([]);
+            setSelectedZone("");
+            setCollines([{ id: null, name: "", code: "" }]);
             return;
         }
 
-        const getCollines = async () => {
-            setLoadingCollines(true);
-            try {
-                const response = await fetchData("get", "adress/colline/", {
-                    params: { zone: selectedZone, limit: 100 },
-                });
+        setLoadingZones(true);
+        try {
+            const response = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
+                params: { commune: value },
+            });
+            const options = response?.map((item) => ({
+                value: item.zone_name,
+                label: item.zone_name,
+                code: item.zone_code,
+            })) || [];
+            setZones(options);
+            setSelectedZone("");
+            setCollines([{ id: null, name: "", code: "" }]);
+        } catch (error) {
+            console.error("Error fetching zones:", error);
+            toast.error("Erreur lors de la récupération des zones");
+        } finally {
+            setLoadingZones(false);
+        }
+    };
 
-                const existingCollines = response?.results?.map(item => ({
-                    id: item.id,
-                    name: item.colline_name
-                })) || [];
+    const handleZoneChange = async (value) => {
+        const selected = zones.find((z) => z.value === value);
+        if (!selected) {
+            setSelectedZone("");
+            setCollines([{ id: null, name: "", code: "" }]);
+            return;
+        }
 
-                if (existingCollines.length > 0) {
-                    setCollines(existingCollines);
-                } else {
-                    setCollines([{ id: null, name: "" }]);
-                }
-            } catch (error) {
-                console.error("Error fetching collines:", error);
-                toast.error("Erreur lors de la récupération des collines");
-            } finally {
-                setLoadingCollines(false);
-            }
+        const newSelectedZone = {
+            name: selected.value,
+            code: selected.code,
         };
-        getCollines();
-    }, [selectedZone]);
+        setSelectedZone(newSelectedZone);
+
+        setLoadingCollines(true);
+        setCollines([{ id: null, name: "", code: "" }]);
+        try {
+            const response = await fetchData("get", "adress/colline/", {
+                params: { zone: newSelectedZone.code, limit: 100 },
+            });
+            console.log(newSelectedZone.name);
+            const existingCollines = response?.results?.map((item) => ({
+                id: item.id,
+                name: item.colline_name,
+                code: item.colline_code || "",
+            })) || [];
+
+            if (existingCollines.length > 0) {
+                setCollines(existingCollines);
+            } else {
+                setCollines([{ id: null, name: "", code: "" }]);
+            }
+        } catch (error) {
+            console.error("Error fetching collines:", error);
+            toast.error("Erreur lors de la récupération des collines");
+        } finally {
+            setLoadingCollines(false);
+        }
+    };
+
 
     const handleAddColline = () => {
-        setCollines([...collines, { id: null, name: "" }]);
+        setCollines([...collines, { id: null, name: "", code: "" }]);
     };
 
     const handleRemoveColline = async (index) => {
@@ -188,15 +193,15 @@ export default function DecoupageEditionPage() {
 
         const newCollines = collines.filter((_, i) => i !== index);
         if (newCollines.length === 0) {
-            setCollines([{ id: null, name: "" }]);
+            setCollines([{ id: null, name: "", code: "" }]);
         } else {
             setCollines(newCollines);
         }
     };
 
-    const handleCollineChange = (index, value) => {
+    const handleCollineChange = (index, field, value) => {
         const newCollines = [...collines];
-        newCollines[index].name = value;
+        newCollines[index][field] = value;
         setCollines(newCollines);
     };
 
@@ -219,14 +224,16 @@ export default function DecoupageEditionPage() {
         try {
             const promises = validCollines.map(colline => {
                 if (colline.id) {
-                    return fetchData("patch", `adress/colline/${colline.id}/`, {
-                        body: { colline_name: colline.name }
-                    });
+
+                    // return fetchData("patch", `adress/colline/${colline.id}/`, {
+                    //     body: { colline_name: colline.name }
+                    // });
                 } else {
                     return fetchData("post", "adress/colline/", {
                         body: {
                             colline_name: colline.name,
-                            zone_name: selectedZone
+                            colline_code: colline.code,
+                            zone_name: selectedZone.name
                         }
                     });
                 }
@@ -238,11 +245,12 @@ export default function DecoupageEditionPage() {
 
             // Refresh collines to get IDs for new ones
             const response = await fetchData("get", "adress/colline/", {
-                params: { zone: selectedZone, limit: 100 },
+                params: { zone: selectedZone.code, limit: 100 },
             });
             const updated = response?.results?.map(item => ({
                 id: item.id,
-                name: item.colline_name
+                name: item.colline_name,
+                code: item.colline_code || "",
             })) || [];
             setCollines(updated);
 
@@ -270,7 +278,7 @@ export default function DecoupageEditionPage() {
                                 <Label htmlFor="province">Province</Label>
                                 <Select
                                     value={selectedProvince}
-                                    onValueChange={setSelectedProvince}
+                                    onValueChange={handleProvinceChange}
                                     disabled={loadingProvinces}
                                 >
                                     <SelectTrigger id="province" className="w-full">
@@ -291,7 +299,7 @@ export default function DecoupageEditionPage() {
                                 <Label htmlFor="commune">Commune</Label>
                                 <Select
                                     value={selectedCommune}
-                                    onValueChange={setSelectedCommune}
+                                    onValueChange={handleCommuneChange}
                                     disabled={!selectedProvince || loadingCommunes}
                                 >
                                     <SelectTrigger id="commune" className="w-full">
@@ -311,8 +319,8 @@ export default function DecoupageEditionPage() {
                             <div className="space-y-2">
                                 <Label htmlFor="zone">Zone</Label>
                                 <Select
-                                    value={selectedZone}
-                                    onValueChange={setSelectedZone}
+                                    value={selectedZone?.name || ""}
+                                    onValueChange={handleZoneChange}
                                     disabled={!selectedCommune || loadingZones}
                                 >
                                     <SelectTrigger id="zone" className="w-full">
@@ -352,9 +360,15 @@ export default function DecoupageEditionPage() {
                                     <div key={index} className="flex gap-2 items-center">
                                         <Input
                                             value={colline.name}
-                                            onChange={(e) => handleCollineChange(index, e.target.value)}
-                                            placeholder={colline.id ? "Modifier le nom de la colline" : "Nom de la nouvelle colline"}
+                                            onChange={(e) => handleCollineChange(index, "name", e.target.value)}
+                                            placeholder={colline.id ? "Modifier le nom" : "Nom de la colline"}
                                             className="flex-1"
+                                        />
+                                        <Input
+                                            value={colline.code}
+                                            onChange={(e) => handleCollineChange(index, "code", e.target.value)}
+                                            placeholder="Code de la colline"
+                                            className="w-1/3"
                                         />
                                         <Button
                                             type="button"

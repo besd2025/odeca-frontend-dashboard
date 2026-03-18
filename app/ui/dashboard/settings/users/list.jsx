@@ -10,53 +10,43 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
+import { fetchData } from "@/app/_utils/api";
 
-const users = [
-    {
-        id: "1",
-        first_name: "John",
-        last_name: "Doe",
-        identifiant: "john.doe",
-        email: "[EMAIL_ADDRESS]",
-        category: "Admin",
-        phone: "+257 79 000 001",
-        status: "Actif",
-    },
-    {
-        id: "2",
-        first_name: "Jane",
-        last_name: "Smith",
-        identifiant: "jane.smith",
-        email: "[EMAIL_ADDRESS]",
-        category: "General",
-        phone: "+257 79 000 002",
-        status: "Actif",
-    },
-    {
-        id: "3",
-        first_name: "Marius",
-        last_name: "Niyomugabo",
-        identifiant: "marius.niyo",
-        email: "[EMAIL_ADDRESS]",
-        category: "Cafe_ODECA",
-        phone: "+257 79 000 003",
-        status: "Inactif",
-    },
-    {
-        id: "4",
-        first_name: "Alice",
-        last_name: "Uwimana",
-        identifiant: "alice.u",
-        email: "[EMAIL_ADDRESS]",
-        category: "Admin",
-        phone: "+257 79 000 004",
-        status: "Actif",
-    },
-]
-
-
-
+import React from "react";
 export function UserList() {
+    const [users, setUsers] = React.useState([]);
+    const [loading, setLoading] = React.useState(true);
+    React.useEffect(() => {
+        const getUsers = async () => {
+            setLoading(true);
+            try {
+                const response = await fetchData("get", `cafe/cafe_registration/`, {
+                    params: {},
+                    additionalHeaders: {},
+                    body: {},
+                });
+                const users = response.results.map((user) => {
+                    return {
+                        id: user.id,
+                        first_name: user.first_name,
+                        last_name: user.last_name,
+                        identifiant: user.identifiant,
+                        email: user.email,
+                        category: user.category,
+                        phone: user.phone,
+                        status: user.status,
+                    };
+                });
+                setUsers(users);
+
+            } catch (error) {
+                console.error("Error fetching users data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        getUsers();
+    }, []);
     return (
         <div className="rounded-md border bg-card/30 backdrop-blur-sm">
             <Table>
@@ -79,7 +69,7 @@ export function UserList() {
                                     <span className="font-bold text-gray-800 dark:text-white/90">{user.first_name} {user.last_name}</span>
                                 </div>
                             </TableCell>
-                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.identifiant}</TableCell>
                             <TableCell>{user.category}</TableCell>
                             <TableCell>{user.phone}</TableCell>
                             {/* <TableCell>
