@@ -105,7 +105,7 @@ export default function TransfersPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="sdl" className="space-y-4">
+          <TabsContent value="sdl" className="space-y-4 relative">
             <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-4">
               <div className="mb-4">
                 <h2 className="text-lg font-semibold">
@@ -122,6 +122,7 @@ export default function TransfersPage() {
                 <TransferSdlDep data={sdlTransfers} />
               )}
             </div>
+            <ComingSoonOverlay transparent={true} />
           </TabsContent>
 
           <TabsContent value="ct" className="space-y-4">
@@ -142,7 +143,7 @@ export default function TransfersPage() {
             </div>
           </TabsContent>
         </Tabs>
-        <ComingSoonOverlay transparent={true} />
+
       </div>
     </ProtectedRoute>
   );

@@ -38,7 +38,7 @@ import PaginationContent from "@/components/ui/pagination-content";
 import DetailsTransfer from "./details-transfer";
 
 export default function TransferCtDep({
-  data,
+  data = [],
   fethTransfertbtnLoading,
   datapagination,
 }) {
@@ -54,10 +54,41 @@ export default function TransferCtDep({
   const [currentPage, setCurrentPage] = useState(1);
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
-  const [totalCount, setTotalCount] = useState(0);
+  // const [totalCount, setTotalCount] = useState(0);
+
   React.useEffect(() => {
-    fethTransfertbtnLoading(true);
+    if (typeof fethTransfertbtnLoading === "function") {
+      fethTransfertbtnLoading(true);
+    }
   }, [fethTransfertbtnLoading]);
+
+  // Handle local pagination since parent might not provide datapagination
+  const totalCount = datapagination?.totalCount ?? data.length;
+  const resolvedTotalPages = datapagination?.totalPages ?? Math.ceil(totalCount / limit);
+  const resolvedCurrentPage = datapagination?.currentPage ?? currentPage;
+  const resolvedPointer = datapagination?.pointer ?? pointer;
+  const resolvedLimit = datapagination?.limit ?? limit;
+
+  const onPageChange = (page) => {
+    if (datapagination?.onPageChange) {
+      datapagination.onPageChange(page);
+    } else {
+      setCurrentPage(page);
+      setPointer((page - 1) * limit);
+    }
+  };
+
+  const onLimitChange = (newLimit) => {
+    if (datapagination?.onLimitChange) {
+      datapagination.onLimitChange(newLimit);
+    } else {
+      setLimit(newLimit);
+      setPointer(0);
+      setCurrentPage(1);
+    }
+  };
+
+  const paginatedData = datapagination ? data : data.slice(resolvedPointer, resolvedPointer + resolvedLimit);
 
   const columns = [
     {
@@ -231,7 +262,7 @@ export default function TransferCtDep({
   ];
 
   const table = useReactTable({
-    data,
+    data: paginatedData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -250,7 +281,6 @@ export default function TransferCtDep({
       pagination,
     },
     manualPagination: true,
-    // rowCount: datapagination.totalCount,
   });
 
   return (
@@ -340,14 +370,14 @@ export default function TransferCtDep({
 
 
         <PaginationContent
-
-          datapaginationlimit={datapagination.onLimitChange}
-          currentPage={datapagination.currentPage}
-          totalPages={datapagination.totalPages}
-          onPageChange={datapagination.onPageChange}
-          pointer={datapagination.pointer}
-          totalCount={datapagination.totalCount}
-          onLimitChange={datapagination.onLimitChange}
+          datapaginationlimit={onLimitChange}
+          currentPage={resolvedCurrentPage}
+          totalPages={resolvedTotalPages}
+          onPageChange={onPageChange}
+          pointer={resolvedPointer}
+          totalCount={totalCount}
+          onLimitChange={onLimitChange}
+          limit={resolvedLimit}
         />
       </div>
     </div>
