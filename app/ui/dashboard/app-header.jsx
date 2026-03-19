@@ -82,14 +82,14 @@ export function AppHeader() {
               orientation="vertical"
               className="mx-2 data-[orientation=vertical]:h-4"
             />
-            <h1 className="text-base font-bold flex gap-x-2 items-center">
+            <h1 className="text-xl font-bold flex gap-x-1 items-center">
               <Image
                 src="/images/Artboard_Coffee_nb.png"
                 alt="Logo"
                 width={30}
                 height={30}
               />
-              CAFE
+              DECA
             </h1>
             {/* <Logo className="shrink-0" /> */}
 
