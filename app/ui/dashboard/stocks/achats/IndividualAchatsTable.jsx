@@ -92,7 +92,7 @@ export default function IndividualAchatsTable({
             search: searchvalue,
           },
         });
-
+        console.log(" DATA :", response)
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
           cultivator: {
@@ -117,7 +117,7 @@ export default function IndividualAchatsTable({
               achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
                 ?.commune_name || "N/A",
           },
-          num_fiche: achat?.numero_fiche || "0",
+          num_fiche: achat?.cafeiculteur?.cultivator_assoc_numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
           photo_fiche: achat?.photo_fiche,
           ca: achat?.quantite_cerise_a || 0,

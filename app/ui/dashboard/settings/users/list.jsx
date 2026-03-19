@@ -21,7 +21,7 @@ export function UserList() {
             setLoading(true);
             try {
                 const response = await fetchData("get", `cafe/cafe_registration/`, {
-                    params: {},
+                    params: { limit: 40 },
                     additionalHeaders: {},
                     body: {},
                 });
