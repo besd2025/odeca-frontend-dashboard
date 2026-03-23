@@ -389,97 +389,95 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
 
   return (
     <div className="w-full bg-sidebar p-4 rounded-lg">
-      {isActuallyLoading && data.length === 0 ? (
-        <TableSkeleton rows={10} columns={5} />
-      ) : (
-        <>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
-            <div className="relative ">
-              <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
-              <input
-                placeholder="Rechercher..."
-                value={search}
-                onChange={handleSearch}
-                className="pl-10 h-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
+
+      <>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
+          <div className="relative ">
+            <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
+            <input
+              placeholder="Rechercher..."
+              value={search}
+              onChange={handleSearch}
+              className="pl-10 h-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
+            />
+          </div>
+
+          <div className="flex flex-row justify-between gap-x-3">
+            <div className="flex items-center gap-3">
+              <Filter handleFilter={handleFilter} />
+            </div>
+            <div className="flex items-center gap-3 text-gray-700">
+              <ExportButton
+                handleExportSDLs={handleExportSDLs}
+                exportType="sdl_data"
+                loading={LoadingEportBtn}
+                activedownloadBtn={ActivedownloadBtn}
+                onClickDownloadButton={DownloadSDLsToExcel}
               />
             </div>
-
-            <div className="flex flex-row justify-between gap-x-3">
-              <div className="flex items-center gap-3">
-                <Filter handleFilter={handleFilter} />
-              </div>
-              <div className="flex items-center gap-3 text-gray-700">
-                <ExportButton
-                  handleExportSDLs={handleExportSDLs}
-                  exportType="sdl_data"
-                  loading={LoadingEportBtn}
-                  activedownloadBtn={ActivedownloadBtn}
-                  onClickDownloadButton={DownloadSDLsToExcel}
-                />
-              </div>
-            </div>
           </div>
-          <div className="grid w-full [&>div]:border [&>div]:rounded-md">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow
-                    key={headerGroup.id}
-                    className=" sticky top-0 bg-background z-10 hover:bg-background"
-                  >
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {isActuallyLoading ? (
-                  <TableRowsSkeleton columns={columns.length} rows={limit} />
-                ) : table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
+        </div>
+        <div className="grid w-full [&>div]:border [&>div]:rounded-md">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow
+                  key={headerGroup.id}
+                  className=" sticky top-0 bg-background z-10 hover:bg-background"
+                >
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
                           )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      Pas de donneés
-                    </TableCell>
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {isActuallyLoading ? (
+                <TableRowsSkeleton columns={columns.length} rows={limit} />
+              ) : table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    Pas de donneés
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
+          <div className="flex-1 text-sm text-muted-foreground">
+            {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
               {table.getFilteredRowModel().rows.length} row(s) selected. */}
-            </div>
-            {/* <PaginationControls
+          </div>
+          {/* <PaginationControls
               page={table.getState().pagination.pageIndex + 1}
               pageSize={table.getState().pagination.pageSize}
               totalItems={table.getFilteredRowModel().rows.length}
@@ -489,18 +487,17 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
               hasNextPage={table.getCanNextPage()}
               hasPreviousPage={table.getCanPreviousPage()}
             /> */}
-            <PaginationContent
-              datapaginationlimit={datapaginationlimit}
-              currentPage={datapagination.currentPage}
-              totalPages={datapagination.totalPages}
-              onPageChange={datapagination.onPageChange}
-              pointer={datapagination.pointer}
-              totalCount={datapagination.totalCount}
-              onLimitChange={datapagination.onLimitChange}
-            />
-          </div>
-        </>
-      )}
+          <PaginationContent
+            datapaginationlimit={datapaginationlimit}
+            currentPage={datapagination.currentPage}
+            totalPages={datapagination.totalPages}
+            onPageChange={datapagination.onPageChange}
+            pointer={datapagination.pointer}
+            totalCount={datapagination.totalCount}
+            onLimitChange={datapagination.onLimitChange}
+          />
+        </div>
+      </>
     </div>
   );
 }
