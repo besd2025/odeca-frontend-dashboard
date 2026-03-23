@@ -13,7 +13,9 @@ import {
   IdCard,
   MoreHorizontal,
   Search,
+  Trash,
   User,
+  UserX,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -237,6 +240,48 @@ export default function IndividualCultivatorsTable({
     }
   };
 
+  const HandleDelete = async (id) => {
+
+    setLoading(true);
+
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const results = await fetchData(
+          "delete",
+          `/cultivators/`,
+          {
+            params: { id: id },
+            additionalHeaders: {},
+            body: {},
+          },
+        );
+        if (results.status == 200) {
+          resolve({ code });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "SUPPRIME...",
+      success: (data) => {
+        setTimeout(() => window.location.reload(), 1000);
+        return `${data.code} a été supprime avec succès `;
+      },
+      error: "Donnée non supprime",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const columns = useMemo(
     () => [
       {
@@ -280,6 +325,12 @@ export default function IndividualCultivatorsTable({
                       localite={result?.localite}
                       champs={result?.champs}
                     />
+                    <DropdownMenuItem
+                      onSelect={() => HandleDelete(result?.id)}
+                      className="text-destructive"
+                    >
+                      <UserX /> Delete
+                    </DropdownMenuItem>
                   </div>
                 ) : (
                   " "
