@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, MoreHorizontal, Search, User } from "lucide-react";
+import { ArrowUpDownIcon, MoreHorizontal, Search, User, UserX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +36,9 @@ import PaginationContent from "@/components/ui/pagination-content";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import { fetchData } from "@/app/_utils/api";
 import IndividualAchatsFilter from "./IndividualAchatsFilter";
-
+import UserContent from "@/app/ui/context/User_Context";
+import { UserContext } from "@/app/ui/context/User_Context";
+import { toast } from "sonner";
 export default function IndividualAchatsTable({
   isCultivatorsPage,
   externalData,
@@ -62,7 +64,7 @@ export default function IndividualAchatsTable({
     pageIndex: 0,
     pageSize: limit,
   });
-
+  const user = useContext(UserContext)
   // Mode contrôlé (SDL detail) : utiliser les données externes du parent
   useEffect(() => {
     if (!isCultivatorsPage && externalData !== undefined) {
@@ -92,7 +94,6 @@ export default function IndividualAchatsTable({
             search: searchvalue,
           },
         });
-        console.log(" DATA :", response)
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
           cultivator: {
@@ -124,7 +125,6 @@ export default function IndividualAchatsTable({
           cb: achat?.quantite_cerise_b || 0,
           date: achat?.date_achat || "N/A",
         }));
-
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
       } catch (error) {
@@ -232,7 +232,44 @@ export default function IndividualAchatsTable({
       setLoadingEportBtn(false);
     }
   };
+  const HandleDelete = async (id, code) => {
 
+    setLoading(true);
+
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        await fetchData(
+          "delete",
+          `/cafe/achat_cafe/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+
+          },
+        );
+        resolve({ code: code || 'Le cultivateur' });
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "SUPPRESSION...",
+      success: (data) => {
+        setTimeout(() => window.location.reload(), 1000);
+        return `${data.code} a été supprimé avec succès `;
+      },
+      error: "Donnée non supprimée",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const columns = useMemo(
     () => [
       {
@@ -268,18 +305,28 @@ export default function IndividualAchatsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                <div>
-                  <EditIndividualAchats
-                    id={cultivator?.id}
-                    cultivator={cultivator.cultivator}
-                    num_fiche={cultivator.num_fiche}
-                    num_recu={cultivator.num_recu}
-                    ca={cultivator.ca}
-                    cb={cultivator.cb}
-                    date={cultivator.date}
-                    photo_fiche={cultivator.photo_fiche}
-                  />
-                </div>
+                {user?.session?.category === "Admin" ? (
+                  <div>
+                    <EditIndividualAchats
+                      id={cultivator?.id}
+                      cultivator={cultivator.cultivator}
+                      num_fiche={cultivator.num_fiche}
+                      num_recu={cultivator.num_recu}
+                      ca={cultivator.ca}
+                      cb={cultivator.cb}
+                      date={cultivator.date}
+                      photo_fiche={cultivator.photo_fiche}
+                    />
+                    <DropdownMenuItem
+                      onSelect={() => HandleDelete(cultivator?.id, cultivator?.cultivator?.cultivator_code)}
+                      className="text-destructive"
+                    >
+                      <UserX /> Delete
+                    </DropdownMenuItem>
+                  </div>
+                ) : (
+                  " "
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           );

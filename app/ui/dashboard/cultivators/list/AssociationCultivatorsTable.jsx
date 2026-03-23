@@ -13,6 +13,7 @@ import {
   MoreHorizontal,
   Search,
   ShieldUser,
+  UserX
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
