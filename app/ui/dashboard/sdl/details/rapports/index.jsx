@@ -12,8 +12,8 @@ const RHData = [
     id: "cultivator_001",
     cultivator: {
       cultivator_code: "2530-522-7545",
-      first_name: "Brave",
-      last_name: "Eddy",
+      first_name: "CultiNom",
+      last_name: "CultiPrenom",
       image_url: "/images/logo_1.jpg",
     },
     cni: "74/565",
@@ -58,7 +58,8 @@ export default function Rapports() {
         <TabsContent value="rapportB">
           <RBSdl />
         </TabsContent> */}
-        <TabsContent value="rapportC">
+        <TabsContent value="rapportC" className="relative">
+          <ComingSoonOverlay transparent={true} />
           <RedementC />
         </TabsContent>
         {/* <TabsContent value="rapportG">
@@ -69,7 +70,6 @@ export default function Rapports() {
           <RHlist data={RHData} />
         </TabsContent>
       </Tabs>
-      <ComingSoonOverlay transparent={true} />
     </div>
   );
 }

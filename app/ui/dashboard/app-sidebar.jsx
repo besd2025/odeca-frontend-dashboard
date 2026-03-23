@@ -124,16 +124,28 @@ const menuItems = {
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
-          fill="currentColor"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-columns3-cog-icon lucide-columns-3-cog"
         >
-          <path d="M11.584 2.376a.75.75 0 0 1 .832 0l9 6a.75.75 0 1 1-.832 1.248L12 3.901 3.416 9.624a.75.75 0 0 1-.832-1.248l9-6Z" />
-          <path
-            fillRule="evenodd"
-            d="M20.25 10.332v9.918H21a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1 0-1.5h.75v-9.918a.75.75 0 0 1 .634-.74A49.109 49.109 0 0 1 12 9c2.59 0 5.134.202 7.616.592a.75.75 0 0 1 .634.74Zm-7.5 2.418a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Zm3-.75a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-1.5 0v-6.75a.75.75 0 0 1 .75-.75ZM9 12.75a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Z"
-            clipRule="evenodd"
-          />
-          <path d="M12 7.875a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" />
+          <path d="M10.5 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5.5" />
+          <path d="m14.3 19.6 1-.4" />
+          <path d="M15 3v7.5" />
+          <path d="m15.2 16.9-.9-.3" />
+          <path d="m16.6 21.7.3-.9" />
+          <path d="m16.8 15.3-.4-1" />
+          <path d="m19.1 15.2.3-.9" />
+          <path d="m19.6 21.7-.4-1" />
+          <path d="m20.7 16.8 1-.4" />
+          <path d="m21.7 19.4-.9-.3" />
+          <path d="M9 3v18" />
+          <circle cx="18" cy="18" r="3" />
         </svg>
       ),
       keyword: "usine",

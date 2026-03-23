@@ -50,8 +50,8 @@ function DetailsContent({ id }) {
       id: "cultivator_001",
       cultivator: {
         cultivator_code: "2530-522-7545",
-        first_name: "Brave",
-        last_name: "Eddy",
+        first_name: "CultiNom",
+        last_name: "CultiPrenom",
         image_url: "/images/logo_1.jpg",
       },
       sdl_ct: "NGome",

@@ -25,6 +25,7 @@ import {
 import Filter from "./filter";
 import PaymentStats from "./payment-stats";
 import Link from "next/link";
+import ComingSoonOverlay from "../../components/coming-soon-overlay";
 
 const recentFiles = [
   {
@@ -65,7 +66,8 @@ export default function PaymentsPage() {
   const [isStoragePanelOpen, setIsStoragePanelOpen] = useState(false);
 
   return (
-    <div className="bg-sidebar flex rounded-lg ">
+    <div className="bg-sidebar flex rounded-lg relative">
+      <ComingSoonOverlay transparent={true} />
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}

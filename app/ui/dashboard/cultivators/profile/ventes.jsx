@@ -72,7 +72,6 @@ export default function Ventes({ cult_id }) {
             body: {},
           },
         );
-        console.log("AchatsData", valuesdata);
         const AchatsData = valuesdata?.results?.map((item) => ({
           id: item?.id,
           date: item?.date_achat,
