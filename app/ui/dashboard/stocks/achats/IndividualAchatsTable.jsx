@@ -124,7 +124,6 @@ export default function IndividualAchatsTable({
           cb: achat?.quantite_cerise_b || 0,
           date: achat?.date_achat || "N/A",
         }));
-
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
       } catch (error) {

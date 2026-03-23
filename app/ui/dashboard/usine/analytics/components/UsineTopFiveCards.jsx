@@ -77,7 +77,7 @@ export function TopFiveCards() {
           image: "/images/logo_1.jpg",
           name: item?.collector__responsable_sdl__sdl__sdl_nom,
           value: item?.count,
-          sub: "Membres",
+          sub: "Cafeiculteurs",
         }));
         setDataTopMembers(topMembers);
       } catch (error) {
@@ -133,7 +133,7 @@ export function TopFiveCards() {
         data={datatopAchats}
       />
       {/* <TopListCard
-        title="Top 5 - Nombre de Membres"
+        title="Top 5 - Nombre de Cafeiculteurs"
         icon={<Users className="h-4 w-4" />}
         data={datatopMembers}
       /> */}
