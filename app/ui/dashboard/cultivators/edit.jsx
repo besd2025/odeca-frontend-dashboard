@@ -105,6 +105,7 @@ export default function Edit({
       cultivator_mobile_payment: payment_phone,
       cultivator_mobile_payment_user_name: proprietaire,
       cultivator_adress_code: address_code,
+      cultivator_telephone: phone,
       collector_code: collector_code,
     };
 
