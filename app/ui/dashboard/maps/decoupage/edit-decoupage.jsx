@@ -114,6 +114,7 @@ export default function DecoupageEditionPage() {
                 value: item.zone_name,
                 label: item.zone_name,
                 code: item.zone_code,
+                id: item?.id
             })) || [];
             setZones(options);
             setSelectedZone("");
@@ -133,21 +134,20 @@ export default function DecoupageEditionPage() {
             setCollines([{ id: null, name: "", code: "" }]);
             return;
         }
-
         const newSelectedZone = {
             name: selected.value,
             code: selected.code,
+            id: selected.id
         };
         setSelectedZone(newSelectedZone);
 
         setLoadingCollines(true);
         setCollines([{ id: null, name: "", code: "" }]);
         try {
-            const response = await fetchData("get", "adress/colline/", {
-                params: { zone: newSelectedZone.code, limit: 100 },
+            const response = await fetchData("get", "adress/colline/get_collines_by_zone", {
+                params: { zone: newSelectedZone.name },
             });
-            console.log(newSelectedZone.name);
-            const existingCollines = response?.results?.map((item) => ({
+            const existingCollines = response?.map((item) => ({
                 id: item.id,
                 name: item.colline_name,
                 code: item.colline_code || "",
@@ -225,15 +225,16 @@ export default function DecoupageEditionPage() {
             const promises = validCollines.map(colline => {
                 if (colline.id) {
 
-                    // return fetchData("patch", `adress/colline/${colline.id}/`, {
-                    //     body: { colline_name: colline.name }
-                    // });
+                    return fetchData("patch", `adress/colline/${colline.id}/`, {
+                        body: { colline_name: colline.name }
+                    });
                 } else {
                     return fetchData("post", "adress/colline/", {
                         body: {
                             colline_name: colline.name,
                             colline_code: colline.code,
-                            zone_name: selectedZone.name
+                            zone_name: selectedZone.name,
+                            zone_code: selectedZone.id
                         }
                     });
                 }
@@ -244,10 +245,10 @@ export default function DecoupageEditionPage() {
             toast.success("Modifications enregistrées avec succès");
 
             // Refresh collines to get IDs for new ones
-            const response = await fetchData("get", "adress/colline/", {
-                params: { zone: selectedZone.code, limit: 100 },
+            const response = await fetchData("get", "adress/colline/get_collines_by_zone/", {
+                params: { zone: selectedZone.name },
             });
-            const updated = response?.results?.map(item => ({
+            const updated = response?.map(item => ({
                 id: item.id,
                 name: item.colline_name,
                 code: item.colline_code || "",

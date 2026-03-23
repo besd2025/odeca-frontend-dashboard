@@ -104,11 +104,13 @@ function Filter({ handleFilter }) {
       return;
     }
 
-    const collines = await fetchData("get", `adress/colline/`, {
+    const collines = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
+
       params: { zone: value },
       additionalHeaders: {},
       body: {},
     });
+    console.log(collines)
     const options = collines?.results?.map((item) => ({
       value: item.colline_name,
       label: item.colline_name,

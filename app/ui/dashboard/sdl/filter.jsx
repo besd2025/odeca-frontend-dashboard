@@ -77,12 +77,12 @@ function Filter({ handleFilter }) {
       setCommune([]);
       return;
     }
-    const collines = await fetchData("get", `adress/colline/`, {
+    const collines = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
       params: { zone: value },
       additionalHeaders: {},
       body: {},
     });
-    const options = collines?.results?.map((item) => ({
+    const options = collines?.map((item) => ({
       value: item.colline_name,
       label: item.colline_name,
     }));

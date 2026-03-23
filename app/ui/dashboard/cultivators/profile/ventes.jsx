@@ -79,7 +79,7 @@ export default function Ventes({ cult_id }) {
           sdl_ct: item?.responsable?.sdl_ct?.sdl?.sdl_nom
             ? "SDL " + item.responsable.sdl_ct.sdl.sdl_nom
             : "CT " + item?.responsable?.sdl_ct?.ct?.ct_nom,
-          No_fiche: item?.cultivator_assoc_numero_fiche,
+          No_fiche: item?.cafeiculteur?.cultivator_assoc_numero_fiche,
           No_recus: item?.numero_recu,
           ca: item?.quantite_cerise_a,
           cb: item?.quantite_cerise_b,

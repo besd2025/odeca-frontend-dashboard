@@ -101,9 +101,11 @@ function DetailsContent({ id }) {
         },
       );
       const results = response?.results;
+      console.log("results", results);
       const formatData = (achats) => ({
         id: achats?.id,
         cultivator: {
+          cultivator_id: achats?.cafeiculteur?.id,
           cultivator_code: achats?.cafeiculteur?.cultivator_code,
           first_name: achats?.cafeiculteur?.cultivator_first_name,
           last_name: achats?.cafeiculteur?.cultivator_last_name,
@@ -122,7 +124,7 @@ function DetailsContent({ id }) {
             achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
               ?.commune_name,
         },
-        num_fiche: 784,
+        num_fiche: achats?.cafeiculteur?.cultivator_assoc_numero_fiche,
         num_recu: achats?.numero_recu,
         photo_fiche: achats?.photo_fiche,
         ca: achats?.quantite_cerise_a,
@@ -177,7 +179,6 @@ function DetailsContent({ id }) {
         },
         champs: cultivator?.nombre_champs,
       }));
-      console.log(cultivatorsData);
       setIndividualCultivatorsData(cultivatorsData);
       console.log("individualCultivatorsData", cultivatorsData);
       setTotalCount(response?.count);

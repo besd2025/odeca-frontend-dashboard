@@ -92,6 +92,7 @@ function DetailsContent({ id }) {
         response?.results?.map((achats) => ({
           id: achats?.id,
           cultivator: {
+            cultivator_id: achats?.cafeiculteur?.id,
             cultivator_code: achats?.cafeiculteur?.cultivator_code,
             first_name: achats?.cafeiculteur?.cultivator_first_name,
             last_name: achats?.cafeiculteur?.cultivator_last_name,

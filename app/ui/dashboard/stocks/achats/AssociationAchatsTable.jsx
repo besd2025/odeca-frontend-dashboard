@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, MoreHorizontal, Search, Users } from "lucide-react";
+import { ArrowUpDownIcon, MoreHorizontal, Search, Users, UserX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -36,7 +37,7 @@ import PaginationContent from "@/components/ui/pagination-content";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import { fetchData } from "@/app/_utils/api";
 import AssociationAchatsFilter from "./AssociationAchatsFilter";
-
+import { UserContext } from "@/app/ui/context/User_Context";
 export default function AssociationAchatsTable({
   isCultivatorsPage,
   externalData,
@@ -128,7 +129,7 @@ export default function AssociationAchatsTable({
           cb: achat?.quantite_cerise_b || 0,
           date: achat?.date_achat || "N/A",
         }));
-
+        console.log(response?.results);
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
       } catch (error) {
@@ -237,6 +238,40 @@ export default function AssociationAchatsTable({
       setLoadingEportBtn(false);
     }
   };
+  const HandleDelete = async (id, name) => {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const results = await fetchData("delete", `/cafe/achat_cafe/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+        });
+        if (results) {
+          resolve({ name });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "Suppression...",
+      success: (data) => {
+        setTimeout(() => setOpen(false), 500);
+        return `L'achat de ${data.name} a été supprimé avec succès`;
+      },
+      error: "Erreur lors de la suppression",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -245,6 +280,7 @@ export default function AssociationAchatsTable({
         enableHiding: false,
         header: "Actions",
         cell: ({ row }) => {
+          const user = useContext(UserContext)
           const cultivator = row.original;
           return (
             <DropdownMenu>
@@ -274,18 +310,28 @@ export default function AssociationAchatsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                <div>
-                  <EditAssociationAchats
-                    id={cultivator?.id}
-                    cultivator={cultivator.cultivator}
-                    num_fiche={cultivator.num_fiche}
-                    num_recu={cultivator.num_recu}
-                    ca={cultivator.ca}
-                    cb={cultivator.cb}
-                    date={cultivator.date}
-                    photo_fiche={cultivator.photo_fiche}
-                  />
-                </div>
+                {user?.session?.category === "Admin" ? (
+                  <div>
+                    <EditAssociationAchats
+                      id={cultivator?.id}
+                      cultivator={cultivator.cultivator}
+                      num_fiche={cultivator.num_fiche}
+                      num_recu={cultivator.num_recu}
+                      ca={cultivator.ca}
+                      cb={cultivator.cb}
+                      date={cultivator.date}
+                      photo_fiche={cultivator.photo_fiche}
+                    />
+                    <DropdownMenuItem
+                      onSelect={() => HandleDelete(cultivator?.id, cultivator?.cultivator?.cultivator_code)}
+                      className="text-destructive"
+                    >
+                      <UserX /> Delete
+                    </DropdownMenuItem>
+                  </div>
+                ) : (
+                  " "
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           );

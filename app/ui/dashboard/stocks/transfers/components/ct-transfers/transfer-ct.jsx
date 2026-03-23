@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, MoreHorizontal, Search } from "lucide-react";
+import { ArrowUpDownIcon, MoreHorizontal, Search, UserX } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,9 @@ import ViewImageDialog from "@/components/ui/view-image-dialog";
 // import PaginationControls from "@/components/ui/pagination-controls";
 import PaginationContent from "@/components/ui/pagination-content";
 import DetailsTransfer from "./details-transfer";
-
+import { UserContext } from "@/app/ui/context/User_Context";
+import { toast } from "sonner";
+import { fetchData } from "@/app/_utils/api";
 export default function TransferCtDep({
   data = [],
   fethTransfertbtnLoading,
@@ -46,11 +48,13 @@ export default function TransferCtDep({
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
-
+  const user = React.useContext(UserContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
@@ -89,7 +93,40 @@ export default function TransferCtDep({
   };
 
   const paginatedData = datapagination ? data : data.slice(resolvedPointer, resolvedPointer + resolvedLimit);
+  const HandleDelete = async (id, name) => {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const results = await fetchData("delete", `/cafe/transfer_ct_sdl/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+        });
+        if (results) {
+          resolve({ name });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
 
+    toast.promise(promise, {
+      loading: "Suppression...",
+      success: (data) => {
+        setTimeout(() => window.location.reload(), 500);
+        return `Le transfert de ${data.name} a été supprimé avec succès`;
+      },
+      error: "Erreur lors de la suppression",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const columns = [
     {
       id: "actions",
@@ -119,17 +156,28 @@ export default function TransferCtDep({
               <div>
                 <DetailsTransfer />
               </div>
+              {user?.session?.category === "Admin" ? (
+                <div>
+                  <EditTransfers
+                    from_ct={transfer.from_ct}
+                    to_depulpeur_name={transfer.to_depulpeur_name}
+                    society={transfer.society}
+                    localite={transfer.localite}
+                    qte_tranferer={transfer.qte_tranferer}
+                    photo_fiche={transfer.photo_fiche}
+                  />
 
-              <div>
-                <EditTransfers
-                  from_ct={transfer.from_ct}
-                  to_depulpeur_name={transfer.to_depulpeur_name}
-                  society={transfer.society}
-                  localite={transfer.localite}
-                  qte_tranferer={transfer.qte_tranferer}
-                  photo_fiche={transfer.photo_fiche}
-                />
-              </div>
+                  <DropdownMenuItem
+                    onClick={() => HandleDelete(transfer?.id, transfer?.from_ct)}
+                    className="text-destructive"
+                  >
+                    Supprimer
+                  </DropdownMenuItem>
+                </div>
+              ) : (" ")
+
+              }
+
             </DropdownMenuContent>
           </DropdownMenu>
         );

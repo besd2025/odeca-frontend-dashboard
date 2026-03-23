@@ -160,6 +160,7 @@ export default function EditIndividualAchats({
                     type="text"
                     value={ficheNumber}
                     onChange={(e) => setFicheNumber(e.target.value)}
+                    disabled
                   />
                 </div>
                 <div className="space-y-2">
@@ -211,7 +212,7 @@ export default function EditIndividualAchats({
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} onClick={handleSubmit}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enregistrer
             </Button>

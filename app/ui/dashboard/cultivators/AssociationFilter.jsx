@@ -111,11 +111,11 @@ function AssociationFilter({ handleFilter }) {
       return;
     }
     try {
-      const response = await fetchData("get", `adress/colline/`, {
+      const response = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
         params: { zone: value },
       });
       setColline(
-        response?.results?.map((item) => ({
+        response?.map((item) => ({
           value: item.colline_name,
           label: item.colline_name,
         })) || [],
