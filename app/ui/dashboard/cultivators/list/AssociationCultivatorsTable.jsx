@@ -485,10 +485,6 @@ export default function AssociationCultivatorsTable({
     setPagination((prev) => ({ ...prev, pageSize: newLimit, pageIndex: 0 }));
   };
 
-  // On affiche le skeleton complet seulement au premier chargement (data vide)
-  if (loading && data.length === 0) {
-    return <TableSkeleton columns={6} rows={10} />;
-  }
 
   return (
     <div className="w-full bg-sidebar p-2 rounded-lg">

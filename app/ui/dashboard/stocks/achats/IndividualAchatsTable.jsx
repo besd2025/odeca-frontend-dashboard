@@ -85,6 +85,7 @@ export default function IndividualAchatsTable({
   useEffect(() => {
     if (!isCultivatorsPage) return;
     const getAchats = async () => {
+      setLoading(true);
       try {
         const response = await fetchData("get", "cafe/achat_cafe/", {
           params: {
@@ -554,10 +555,6 @@ export default function IndividualAchatsTable({
     setCurrentPage(1);
   };
 
-  // On affiche le skeleton complet seulement au premier chargement (data vide)
-  if (loading && data.length === 0) {
-    return <TableSkeleton columns={10} rows={limit} />;
-  }
 
   return (
     <div className="w-full bg-sidebar rounded-lg p-2">
