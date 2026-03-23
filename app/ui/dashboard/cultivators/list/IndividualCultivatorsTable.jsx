@@ -240,38 +240,34 @@ export default function IndividualCultivatorsTable({
     }
   };
 
-  const HandleDelete = async (id) => {
+  const HandleDelete = async (id, code) => {
 
     setLoading(true);
 
     const promise = new Promise(async (resolve, reject) => {
       try {
-        const results = await fetchData(
+        await fetchData(
           "delete",
-          `/cultivators/`,
+          `/cultivators/${id}/`,
           {
-            params: { id: id },
+            params: {},
             additionalHeaders: {},
-            body: {},
+
           },
         );
-        if (results.status == 200) {
-          resolve({ code });
-        } else {
-          reject(new Error("Erreur"));
-        }
+        resolve({ code: code || 'Le cultivateur' });
       } catch (error) {
         reject(error);
       }
     });
 
     toast.promise(promise, {
-      loading: "SUPPRIME...",
+      loading: "SUPPRESSION...",
       success: (data) => {
         setTimeout(() => window.location.reload(), 1000);
-        return `${data.code} a été supprime avec succès `;
+        return `${data.code} a été supprimé avec succès `;
       },
-      error: "Donnée non supprime",
+      error: "Donnée non supprimée",
     });
 
     try {
@@ -326,7 +322,7 @@ export default function IndividualCultivatorsTable({
                       champs={result?.champs}
                     />
                     <DropdownMenuItem
-                      onSelect={() => HandleDelete(result?.id)}
+                      onSelect={() => HandleDelete(result?.id, cultivator?.cultivator_code)}
                       className="text-destructive"
                     >
                       <UserX /> Delete
