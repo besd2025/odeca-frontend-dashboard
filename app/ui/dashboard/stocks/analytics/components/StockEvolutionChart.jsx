@@ -72,10 +72,10 @@ export function StockEvolutionChart() {
           period === "jour"
             ? "day"
             : period === "semaine"
-            ? "week"
-            : period === "annee"
-            ? "year"
-            : "month";
+              ? "week"
+              : period === "annee"
+                ? "year"
+                : "month";
         console.log("Fetching data for period:", periodParam);
         const results = await fetchData(
           "get",
@@ -87,7 +87,7 @@ export function StockEvolutionChart() {
 
         const chartData = results.map((item) => ({
           date: item.period,
-          amount: item.total_stock || 0,
+          amount: item.quantite_total || 0,
           ca: item.quantite_cerise_a || 0,
           cb: item.quantite_cerise_b || 0,
         }));

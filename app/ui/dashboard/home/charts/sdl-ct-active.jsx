@@ -47,11 +47,6 @@ export function ChartPieSdlCtActive() {
         );
         const chartData = [
           {
-            entity: "UDPs",
-            active: response?.usine_active,
-            inactive: response?.total_usine - response?.usine_active,
-          },
-          {
             entity: "SDLs",
             active: response?.achat_cafes_sdl,
             inactive: response?.total_sdl - response?.achat_cafes_sdl,
@@ -60,6 +55,11 @@ export function ChartPieSdlCtActive() {
             entity: "CTs",
             active: response?.achat_cafes_ct,
             inactive: response?.total_ct - response?.achat_cafes_ct,
+          },
+          {
+            entity: "UDPs",
+            active: response?.usine_active,
+            inactive: response?.total_usine - response?.usine_active,
           },
         ];
 

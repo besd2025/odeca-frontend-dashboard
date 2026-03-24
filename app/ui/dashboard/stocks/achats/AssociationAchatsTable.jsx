@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, MoreHorizontal, Search, Users, UserX } from "lucide-react";
+import { ArchiveX, ArrowUpDownIcon, MoreHorizontal, Search, Users, UserX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -327,7 +327,7 @@ export default function AssociationAchatsTable({
                       onSelect={() => HandleDelete(cultivator?.id, cultivator?.cultivator?.cultivator_code)}
                       className="text-destructive"
                     >
-                      <UserX /> Delete
+                      <ArchiveX className="text-destructive" /> Delete
                     </DropdownMenuItem>
                   </div>
                 ) : (

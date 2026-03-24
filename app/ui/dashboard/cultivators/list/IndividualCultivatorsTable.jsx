@@ -325,7 +325,7 @@ export default function IndividualCultivatorsTable({
                       onSelect={() => HandleDelete(result?.id, cultivator?.cultivator_code)}
                       className="text-destructive"
                     >
-                      <UserX /> Delete
+                      <UserX className="text-destructive" /> Delete
                     </DropdownMenuItem>
                   </div>
                 ) : (

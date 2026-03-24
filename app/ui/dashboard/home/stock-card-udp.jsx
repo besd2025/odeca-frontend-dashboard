@@ -148,7 +148,7 @@ export function StockSummaryCardUDP() {
               <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">Valeur Totale</span>
+              <span className="text-sm font-medium">Montant</span>
               <span className="text-xs text-muted-foreground">Estimée</span>
             </div>
           </div>

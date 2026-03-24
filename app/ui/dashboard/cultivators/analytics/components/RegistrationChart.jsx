@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { AreaChart, CartesianGrid, Area, XAxis } from "recharts";
+import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
+import { TrendingUp } from "lucide-react";
 
 import {
   Card,
@@ -46,10 +47,10 @@ export function RegistrationChart() {
           period === "jour"
             ? "day"
             : period === "semaine"
-            ? "week"
-            : period === "annee"
-            ? "year"
-            : "month";
+              ? "week"
+              : period === "annee"
+                ? "year"
+                : "month";
         console.log("Fetching data for period:", periodParam);
         const results = await fetchData(
           "get",
@@ -114,10 +115,11 @@ export function RegistrationChart() {
           config={chartConfig}
           className="aspect-auto h-[300px] w-full"
         >
-          <AreaChart
+          <LineChart
             accessibilityLayer
             data={dataByPeriod[period] || []}
             margin={{
+              top: 20,
               left: 12,
               right: 12,
             }}
@@ -128,10 +130,10 @@ export function RegistrationChart() {
                 period === "jour"
                   ? "time"
                   : period === "semaine"
-                  ? "day"
-                  : period === "mois"
-                  ? "month"
-                  : "year"
+                    ? "day"
+                    : period === "mois"
+                      ? "month"
+                      : "year"
               }
               tickLine={false}
               axisLine={false}
@@ -144,33 +146,33 @@ export function RegistrationChart() {
                 ) {
                   return value;
                 }
-                return value.slice(0, 3);
+                return value.slice(0, 4);
               }}
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <defs>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-count)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-count)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
-            <Area
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="line" />}
+            />
+            <Line
               dataKey="count"
               type="natural"
-              fill="url(#fillMobile)"
-              fillOpacity={0.4}
               stroke="var(--color-count)"
-              stackId="a"
-            />
-          </AreaChart>
+              strokeWidth={2}
+              dot={{
+                fill: "var(--color-count)",
+              }}
+              activeDot={{
+                r: 6,
+              }}
+            >
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
+            </Line>
+          </LineChart>
         </ChartContainer>
       </CardContent>
     </Card>
