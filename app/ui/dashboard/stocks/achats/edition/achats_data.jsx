@@ -3,10 +3,8 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AchatsListTable from "./achats-list-table";
 import { ChartColumn, Edit, List } from "lucide-react";
-import AchatsListTableEdition from "./edition/achats-list-table";
-import { Badge } from "@/components/ui/badge";
 
-function AchatsData() {
+function AchatsDataEdition() {
   return (
     <div className="p-4">
       <Tabs defaultValue="list" className="w-full">
@@ -17,7 +15,7 @@ function AchatsData() {
           </TabsTrigger>
           <TabsTrigger value="details">
             <Edit />
-            <span>Edition  <Badge className="min-w-5.5 px-1 ml-2">10</Badge></span>
+            <span>Edition</span>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="list">
@@ -27,11 +25,13 @@ function AchatsData() {
         </TabsContent>
         <TabsContent value="details">
           <h1 className="text-2xl font-semibold m-2">Demandes de modification des achats</h1>
-          <AchatsListTableEdition isCultivatorsPage={true} />
+          <div className="p-4 border rounded-lg bg-background text-center">
+            Demandes de modification des achats
+          </div>
         </TabsContent>
       </Tabs>
     </div>
   );
 }
 
-export default AchatsData;
+export default AchatsDataEdition;

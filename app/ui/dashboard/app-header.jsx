@@ -41,6 +41,7 @@ import {
 } from "@tabler/icons-react";
 import CampaigneAnnee from "./home/campaigne-annee";
 import Image from "next/image";
+import Link from "next/link";
 const menuItems = {
   navMain: [
     {
@@ -159,10 +160,13 @@ export function AppHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <IconUserCircle />
-                    Account
-                  </DropdownMenuItem>
+                  <Link href="/odeca-dashboard/settings">
+                    <DropdownMenuItem>
+                      <IconUserCircle />
+                      Account
+                    </DropdownMenuItem>
+                  </Link>
+
                   <DropdownMenuItem>
                     <IconNotification />
                     Notifications

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { AreaChart, CartesianGrid, Area, XAxis } from "recharts";
+import { AreaChart, CartesianGrid, XAxis, Area, LabelList, LineChart } from "recharts";
+import { TrendingUp } from "lucide-react";
 
 import {
   Card,
@@ -26,7 +27,7 @@ const chartConfig = {
 
 export function ChartLineAchats() {
   const [period, setPeriod] = useState("mois");
-  const [dataByPeriod, setDataByPeriod] = useState({}); // ← nouveau nom
+  const [dataByPeriod, setDataByPeriod] = useState({});
   const [isLoading, setIsLoading] = React.useState(true);
 
   const handleTimePeriodChange = (value) => {
@@ -50,7 +51,6 @@ export function ChartLineAchats() {
           `/cafe/stationslavage/get_recent_total_7_cultivators_per_days_or_weeks_or_months_for_line_chart?period=${periodParam}`,
           { params: {}, additionalHeaders: {}, body: {} },
         );
-        console.log("Fetching data for period:", results);
         if (!Array.isArray(results)) return;
 
         const chartData = results.map((item) => ({
@@ -111,11 +111,41 @@ export function ChartLineAchats() {
         >
           <AreaChart
             accessibilityLayer
-            data={dataByPeriod[period] || []} // ← corrected
-            margin={{ left: 12, right: 12 }}
-          >
-            <CartesianGrid vertical={false} />
+            data={dataByPeriod[period] || []}
+            margin={{
+              top: 24,
+              left: 12,
+              right: 20,
+            }}
 
+          >
+            <defs>
+              <linearGradient id="fillCeriseA" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-ceriseA)"
+                  stopOpacity={0.5}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-ceriseA)"
+                  stopOpacity={0}
+                />
+              </linearGradient>
+              <linearGradient id="fillCeriseB" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-ceriseB)"
+                  stopOpacity={0.5}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-ceriseB)"
+                  stopOpacity={0}
+                />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} />
             <XAxis
               dataKey={
                 period === "jour"
@@ -130,54 +160,58 @@ export function ChartLineAchats() {
               axisLine={false}
               tickMargin={8}
             />
-
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-
-            <defs>
-              <linearGradient id="fillCeriseA" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-ceriseA)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-ceriseA)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-
-              <linearGradient id="fillCeriseB" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-ceriseB)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-ceriseB)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
-
-            <Area
-              dataKey="ceriseB"
-              type="natural"
-              fill="url(#fillCeriseB)"
-              stroke="var(--color-ceriseB)"
-              stackId="a"
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="line" />}
             />
             <Area
               dataKey="ceriseA"
               type="natural"
               fill="url(#fillCeriseA)"
               stroke="var(--color-ceriseA)"
-              stackId="a"
-            />
+              strokeWidth={2}
+              dot={{
+                fill: "var(--color-ceriseA)",
+              }}
+              activeDot={{
+                r: 6,
+              }}
+            >
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground font-medium"
+                fontSize={12}
+              />
+            </Area>
+            <Area
+              dataKey="ceriseB"
+              type="natural"
+              fill="url(#fillCeriseB)"
+              stroke="var(--color-ceriseB)"
+              strokeWidth={2}
+              dot={{
+                fill: "var(--color-ceriseB)",
+              }}
+              activeDot={{
+                r: 6,
+              }}
+            >
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground font-medium"
+                fontSize={12}
+              />
+            </Area>
           </AreaChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="flex gap-2 leading-none font-medium">
+          Affichage des achats par {period} <TrendingUp className="h-4 w-4" />
+        </div>
+      </CardFooter>
     </Card>
   );
 }

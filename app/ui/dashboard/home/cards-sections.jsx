@@ -206,7 +206,7 @@ export function SectionCards() {
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-12">
-      <Card className="@container/card col-span-5 @5xl/main:col-span-5 relative">
+      <Card className="@container/card col-span-12 @5xl/main:col-span-5 relative">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-primary p-2 rounded-md">
@@ -362,7 +362,7 @@ export function SectionCards() {
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card col-span-4">
+      <Card className="@container/card col-span-12 @5xl/main:col-span-4">
         <CardContent>
           <div>
             <div className="flex flex-row gap-x-2 items-center ml-2">
@@ -509,7 +509,7 @@ export function SectionCards() {
         </CardContent>
         <CardFooter className="flex flex-row "></CardFooter>
       </Card>
-      <Card className="@container/card col-span-3">
+      <Card className="@container/card col-span-12 @5xl/main:col-span-3">
         <CardContent>
           <div>
             <div className="flex flex-row gap-x-2 items-center ml-2">
@@ -533,10 +533,10 @@ export function SectionCards() {
             </CardTitle>
           </div>
         </CardContent>
-        <div className="flex flex-row gap-x-2 justify-between mx-6 bg-background/70 py-2 px-2 rounded-lg">
+        <div className="flex flex-row gap-x-2 justify-between mx-3 bg-background/70 py-2 px-2 rounded-lg">
           <div>
             <div>
-              <div className="flex flex-row gap-x-2 items-center ml-2">
+              <div className="flex flex-row gap-x-1 items-center">
                 <div className="bg-chart-3 p-1 rounded-md">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -551,11 +551,11 @@ export function SectionCards() {
                     />
                   </svg>
                 </div>
-                <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+                <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
                   {totalCts?.toLocaleString("fr-FR")}
                 </CardTitle>
               </div>
-              <CardTitle className="text-sm font-normal ml-2 mt-1 ">
+              <CardTitle className="text-sm font-normal ml-1 mt-1 ">
                 CTs
               </CardTitle>
             </div>
@@ -563,7 +563,7 @@ export function SectionCards() {
           <Separator orientation="vertical" />
           <div>
             <div>
-              <div className="flex flex-row gap-x-2 items-center ml-2">
+              <div className="flex flex-row gap-x-1 items-center">
                 <div className="bg-chart-3 p-1 rounded-md">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -578,11 +578,11 @@ export function SectionCards() {
                     />
                   </svg>
                 </div>
-                <CardTitle className="text-xl font-semibold tracking-tight tabular-     nums">
+                <CardTitle className="text-md font-semibold tracking-tight tabular-     nums">
                   {totalSdls?.toLocaleString("fr-FR")}
                 </CardTitle>
               </div>
-              <CardTitle className="text-sm font-normal ml-2 mt-1 ">
+              <CardTitle className="text-sm font-normal ml-1 mt-1 ">
                 SDLs
               </CardTitle>
             </div>
@@ -590,15 +590,15 @@ export function SectionCards() {
           <Separator orientation="vertical" />
           <div>
             <div>
-              <div className="flex flex-row gap-x-2 items-center ml-2">
+              <div className="flex flex-row gap-x-1 items-center">
                 <div className="bg-chart-3 p-1 rounded-md">
                   <Columns3Cog className="size-5 text-white" />
                 </div>
-                <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+                <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
                   {totalUdps?.toLocaleString("fr-FR")}
                 </CardTitle>
               </div>
-              <CardTitle className="text-sm font-normal ml-2 mt-1 ">
+              <CardTitle className="text-sm font-normal ml-1 mt-1 ">
                 UDPs
               </CardTitle>
             </div>
