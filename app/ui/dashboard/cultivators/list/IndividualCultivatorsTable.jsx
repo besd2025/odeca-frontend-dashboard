@@ -131,6 +131,7 @@ export default function IndividualCultivatorsTable({
           champs: cultivator?.nombre_champs,
         }));
 
+
         setData(formattedData);
         setTotalCount(response.count);
       } catch (error) {

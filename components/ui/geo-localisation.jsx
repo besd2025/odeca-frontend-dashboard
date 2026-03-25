@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/map";
 import { X, MapPin, Waypoints, Check, ChevronsUpDown } from "lucide-react";
 import { useMap } from "react-leaflet";
+import Link from "next/link";
 
 function MapFlyTo({ position }) {
   const map = useMap();
@@ -134,8 +135,8 @@ export default function GeoLocalisation({
   center = [-3.3896077, 29.9255829],
   zoom = 9,
   selectedPlace = null,
-  onSelectPlace = () => {},
-  onCloseDetails = () => {},
+  onSelectPlace = () => { },
+  onCloseDetails = () => { },
   flyToPosition = null,
   onLocateError = null,
   children,
@@ -160,9 +161,9 @@ export default function GeoLocalisation({
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(deg2rad(lat1)) *
-        Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const d = R * c; // Distance in km
     return d.toFixed(2);
@@ -383,34 +384,97 @@ export default function GeoLocalisation({
                       Stock Café Vert
                     </p>
                     <p className="text-xl font-bold text-gray-900 dark:text-white">
-                      {selectedPlace.stockCafeVert?.toLocaleString()}{" "}
-                      <span className="text-sm font-normal text-gray-500">
-                        kg
-                      </span>
+                      {selectedPlace.stockCafeVert >= 1000 ? (
+                        <>
+                          {(selectedPlace.stockCafeVert / 1000).toLocaleString(
+                            "fr-FR",
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            },
+                          )}{" "}
+                          <span className="text-sm">T</span>
+                        </>
+                      ) : (
+                        <>
+                          {selectedPlace.stockCafeVert?.toLocaleString("fr-FR") || 0}{" "}
+                          <span className="text-sm">Kg</span>
+                        </>
+                      )}
                     </p>
                   </div>
                 ) : (
                   <>
-                    <div className="bg-gray-100 dark:bg-zinc-800/50 p-2.5 rounded-lg border border-dashed">
+                    <div className="col-span-2 bg-gray-100 dark:bg-zinc-800/50 p-2.5 rounded-lg border border-dashed">
                       <p className="text-[10px] text-gray-500  uppercase mb-1">
-                        Stock CA
+                        Qte Totale CAB
                       </p>
                       <p className="text-sm font-bold text-gray-900 dark:text-white">
-                        {selectedPlace.stockCA?.toLocaleString()}{" "}
-                        <span className="text-[10px] font-normal text-gray-500">
-                          kg
-                        </span>
+                        {selectedPlace.stockCAB >= 1000 ? (
+                          <>
+                            {(selectedPlace.stockCAB / 1000).toLocaleString(
+                              "fr-FR",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              },
+                            )}{" "}
+                            <span className="text-sm">T</span>
+                          </>
+                        ) : (
+                          <>
+                            {selectedPlace.stockCAB?.toLocaleString("fr-FR") || 0}{" "}
+                            <span className="text-sm">Kg</span>
+                          </>
+                        )}
                       </p>
                     </div>
-                    <div className="bg-gray-50 dark:bg-zinc-800/50 p-2.5 rounded-lg border border-dashed">
+                    <div className="bg-primary/20 dark:bg-zinc-800/50 p-2.5 rounded-lg border border-dashed">
                       <p className="text-[10px] text-gray-500  uppercase mb-1">
-                        Stock CB
+                        Qte CA
                       </p>
                       <p className="text-sm font-bold text-gray-900 dark:text-white">
-                        {selectedPlace.stockCB?.toLocaleString()}{" "}
-                        <span className="text-[10px] font-normal text-gray-500">
-                          kg
-                        </span>
+                        {selectedPlace.stockCA >= 1000 ? (
+                          <>
+                            {(selectedPlace.stockCA / 1000).toLocaleString(
+                              "fr-FR",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              },
+                            )}{" "}
+                            <span className="text-sm">T</span>
+                          </>
+                        ) : (
+                          <>
+                            {selectedPlace.stockCA?.toLocaleString("fr-FR") || 0}{" "}
+                            <span className="text-sm">Kg</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <div className="bg-secondary/20 dark:bg-zinc-800/50 p-2.5 rounded-lg border border-dashed">
+                      <p className="text-[10px] text-gray-500  uppercase mb-1">
+                        Qte CB
+                      </p>
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">
+                        {selectedPlace.stockCB >= 1000 ? (
+                          <>
+                            {(selectedPlace.stockCB / 1000).toLocaleString(
+                              "fr-FR",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              },
+                            )}{" "}
+                            <span className="text-sm">T</span>
+                          </>
+                        ) : (
+                          <>
+                            {selectedPlace.stockCB?.toLocaleString("fr-FR") || 0}{" "}
+                            <span className="text-sm">Kg</span>
+                          </>
+                        )}
                       </p>
                     </div>
                     <div className="col-span-2 mt-1">
@@ -429,9 +493,11 @@ export default function GeoLocalisation({
             </div>
 
             <div className="px-4 pb-4">
-              <button className="w-full py-2 bg-secondary text-white text-sm font-medium rounded-lg hover:bg-secondary/90 transition-colors shadow-sm">
-                Voir {selectedPlace.name}
-              </button>
+              <Link href={`/odeca-dashboard/sdl/details?id=${selectedPlace.id}`}>
+                <button className="w-full py-2 bg-secondary text-white text-sm font-medium rounded-lg hover:bg-secondary/90 transition-colors shadow-sm">
+                  Voir {selectedPlace.name}
+                </button>
+              </Link>
             </div>
           </div>
         </div>

@@ -1,14 +1,160 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SharedGeoLocalisation from "@/components/ui/geo-localisation";
 import { Search, X, MapPin } from "lucide-react";
+import { fetchData } from "@/app/_utils/api";
 
 export default function Maps() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sdlData, setSdlData] = useState([]);
+  const [sdlMapData, setSdlMapData] = useState([]);
+  const [sdlQteAchete, setSdlQteAchete] = useState([]);
+  const [sdlNombreCultivateurs, setSdlNombreCultivateurs] = useState([]);
+  const [ctData, setCtData] = useState([]);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
+  const [filterData, setFilterData] = useState(null);
+  const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    const getSdls = async () => {
+      setLoading(true);
+      try {
+        const response = await fetchData("get", "cafe/stationslavage/", {
+          params: {
+            limit: limit,
+            offset: pointer,
+            ...filterData,
+            search: search,
+          },
+          additionalHeaders: {},
+          body: {},
+        });
+        const results = response?.results;
+        const sdlData = results.map((sdl) => ({
+          id: sdl?.id,
+          sdl: {
+            sdl_code: sdl?.sdl_code,
+            sdl_name: sdl?.sdl_nom,
+            type: "",
+          },
+          society: sdl?.societe?.nom_societe || "",
+          responsable: {
+            first_name: sdl?.sdl_responsable?.user?.first_name || "",
+            last_name: sdl?.sdl_responsable?.user?.last_name || "",
+            telephone: sdl?.sdl_responsable?.user?.phone || "",
+          },
+          localite: {
+            province:
+              sdl?.sdl_adress?.zone_code?.commune_code?.province_code
+                ?.province_name || "",
+            commune:
+              sdl?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
+          },
+        }));
+
+        setSdlData(sdlData);
+        console.log("sdlData", sdlData);
+        setTotalCount(response?.count);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getSdls();
+  }, [limit, pointer, filterData, search]);
+
+  useEffect(() => {
+    const getCultivatorsIndividual = async (id) => {
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_cultivators/`,
+          {
+            params: { limit: 1, offset: 0 },
+          },
+        );
+        const results = response?.results;
+        const cultivatorsData = results?.map((cultivator) => ({
+          id: cultivator?.id,
+          cultivator: {
+            cultivator_code: cultivator?.cultivator_code,
+            first_name: cultivator?.cultivator_first_name,
+            last_name: cultivator?.cultivator_last_name,
+            image_url: cultivator?.cultivator_photo,
+            telephone: cultivator?.cultivator_telephone,
+          },
+          cni: cultivator?.cultivator_cni,
+          cni_image_url: cultivator?.cultivator_cni_photo,
+          localite: {
+            province:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name,
+            commune:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name,
+          },
+          champs: cultivator?.nombre_champs,
+          SDL_map_coordinates: {
+            latitude: cultivator?.latitude,
+            longitude: cultivator?.longitude,
+          },
+        }));
+        setSdlMapData(cultivatorsData);
+        console.log("individualCultivatorsData", cultivatorsData);
+        setTotalCount(response?.count);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      }
+    };
+    getCultivatorsIndividual(sdlData[0]?.id);
+  }, [sdlData]);
+
+  React.useEffect(() => {
+    const getSdls = async (id) => {
+      try {
+        const qte_achete = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_total_achat_par_sdl/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          },
+        );
+
+        const nombre_cultivateurs = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_total_cultivators_sdl/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          },
+        );
+
+        const response = { qte_achete, nombre_cultivateurs };
+        console.log("response", response);
+
+        setSdlQteAchete(response?.qte_achete);
+        setSdlNombreCultivateurs(response?.nombre_cultivateurs.hommes + response?.nombre_cultivateurs.femmes);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getSdls(sdlData[0]?.id);
+  }, [sdlData]);
   const TYPE = [
     {
       name: "CT",
@@ -123,22 +269,15 @@ export default function Maps() {
       ),
       places: [
         {
-          name: "SDL GATABO",
-          coordinates: [-3.3896077, 29.9755819],
+          id: sdlData[0]?.id,
+          name: sdlData[0]?.sdl?.sdl_name,
+          coordinates: [sdlMapData[0]?.SDL_map_coordinates?.latitude, sdlMapData[0]?.SDL_map_coordinates?.longitude],
           type: "SDL",
-          address: "Zone Gatabo, Commune Kayanza",
-          stockCA: 5600,
-          stockCB: 1200,
-          farmersCount: 89,
-        },
-        {
-          name: "SDL KIGENGE",
-          coordinates: [-3.3896077, 29.9755819],
-          type: "SDL",
-          address: "Zone Kigenge, Commune Ngozi",
-          stockCA: 7800,
-          stockCB: 2300,
-          farmersCount: 112,
+          address: sdlData[0]?.localite?.province + ", " + sdlData[0]?.localite?.commune,
+          stockCA: sdlQteAchete?.cerise_a,
+          stockCB: sdlQteAchete?.cerise_b,
+          stockCAB: sdlQteAchete?.cerise_a + sdlQteAchete?.cerise_b,
+          farmersCount: sdlNombreCultivateurs,
         },
       ],
     },
