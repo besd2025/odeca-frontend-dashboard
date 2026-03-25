@@ -4,6 +4,7 @@ import { AppSidebar } from "@/app/ui/dashboard/app-sidebar";
 import { AppHeader } from "@/app/ui/dashboard/app-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
+import NextTopLoader from 'nextjs-toploader';
 export default function Layout({ children }) {
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const router = useRouter();
@@ -50,6 +51,8 @@ export default function Layout({ children }) {
         "--header-height": "calc(var(--spacing) * 12)",
       }}
     >
+      {/* #8f3d00 */}
+      <NextTopLoader color="#8f3d00" />
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
