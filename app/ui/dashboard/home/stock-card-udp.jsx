@@ -22,7 +22,6 @@ export function StockSummaryCardUDP() {
     total_value: 0,
   });
   const [isLoading, setIsLoading] = React.useState(true);
-
   React.useEffect(() => {
     const getDatas = async () => {
       setIsLoading(true);

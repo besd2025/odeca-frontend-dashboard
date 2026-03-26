@@ -122,7 +122,7 @@ export default function IndividualAchatsTableEdition({
           },
           num_fiche: achat?.achat?.cafeiculteur?.cultivator_assoc_numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
-          photo_fiche: achat?.photo_fiche,
+          photo_fiche: achat?.achat?.photo_fiche,
           num_page: achat?.numero_page,
           ca: achat?.quantite_cerise_a || 0,
           cb: achat?.quantite_cerise_b || 0,

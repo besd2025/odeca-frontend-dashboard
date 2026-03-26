@@ -89,7 +89,8 @@ export function LoginForm({ className, ...props }) {
       if (
         user?.category === "Admin" ||
         user?.category === "General" ||
-        user?.category === "Cafe_ODECA"
+        user?.category === "Cafe_ODECA"||
+        user?.category === "Cafe_Chef_societe"
       ) {
         document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
         localStorage.setItem("Access_Token", data.access);

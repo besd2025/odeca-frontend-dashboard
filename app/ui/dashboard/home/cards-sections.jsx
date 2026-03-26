@@ -1,6 +1,6 @@
 "use client";
 import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
-import React from "react";
+import React, { useContext } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -24,6 +24,7 @@ import {
 import { fetchData } from "@/app/_utils/api";
 import { StatsCardSkeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
+import { UserContext } from "@/app/ui/context/User_Context";
 export function SectionCards() {
   const [data, setData] = React.useState({});
   const [rendement, setRendement] = React.useState({});
@@ -36,6 +37,7 @@ export function SectionCards() {
   const [newToday, setNewToday] = React.useState(0);
   const [newQtyToday, setNewQtyToday] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(true);
+  const user=React.useContext(UserContext)
   React.useEffect(() => {
     const getDatas = async () => {
       setIsLoading(true);
@@ -460,6 +462,7 @@ export function SectionCards() {
             </div>
           </div>
         </CardContent>
+        {user?.session?.category !== "Cafe_Chef_societe" && ( 
         <CardContent>
           <div>
             <div className="flex flex-row gap-x-2 items-center ml-2">
@@ -507,6 +510,7 @@ export function SectionCards() {
             </div>
           </div>
         </CardContent>
+        )}
         <CardFooter className="flex flex-row "></CardFooter>
       </Card>
       <Card className="@container/card col-span-12 @5xl/main:col-span-3">
@@ -589,7 +593,8 @@ export function SectionCards() {
           </div>
           <Separator orientation="vertical" />
           <div>
-            <div>
+            {user?.session?.category !== "Cafe_Chef_societe" && ( 
+              <div>
               <div className="flex flex-row gap-x-1 items-center">
                 <div className="bg-chart-3 p-1 rounded-md">
                   <Columns3Cog className="size-5 text-white" />
@@ -602,9 +607,10 @@ export function SectionCards() {
                 UDPs
               </CardTitle>
             </div>
+            )}
           </div>
         </div>
-
+        {user?.session?.category !== "Cafe_Chef_societe" && (
         <CardContent>
           <div>
             <div className="flex flex-row gap-x-2 items-center ml-2">
@@ -623,15 +629,19 @@ export function SectionCards() {
                   <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V6.75Z" />
                 </svg>
               </div>
-              <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+           
+                <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
                 {totalSocieties?.toLocaleString("fr-FR")}
-              </CardTitle>
+                </CardTitle>
             </div>
+         
             <CardTitle className="text-sm font-normal ml-2 mt-1 ">
               Sociétés
             </CardTitle>
+             
           </div>
         </CardContent>
+        )}
       </Card>
     </div>
   );
