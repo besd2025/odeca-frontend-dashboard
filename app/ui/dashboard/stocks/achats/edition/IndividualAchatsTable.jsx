@@ -110,8 +110,8 @@ export default function IndividualAchatsTableEdition({
             ? "SDL " + achat.achat?.responsable.sdl_ct.sdl.sdl_nom
             : "CT " + achat?.achat?.responsable?.sdl_ct?.ct?.ct_nom,
           society:
-            achat?.responsable?.sdl_ct?.sdl?.societe?.nom_societe ||
-            achat?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
+            achat?.achat?.responsable?.sdl_ct?.sdl?.societe?.nom_societe ||
+            achat?.achat?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
           localite: {
             province:
               achat?.achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
