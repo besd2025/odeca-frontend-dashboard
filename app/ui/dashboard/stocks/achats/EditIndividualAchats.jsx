@@ -26,6 +26,7 @@ export default function EditIndividualAchats({
   cb = 0,
   date = "",
   photo_fiche = "",
+  responsable_id=""
 }) {
   const [open, setOpen] = React.useState(false);
   const [code, setCode] = React.useState(cultivator.cultivator_code || "");
@@ -40,6 +41,7 @@ export default function EditIndividualAchats({
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
+    console.log("responsable_id: ", responsable_id)
     setCode(cultivator.cultivator_code || "");
     setFirstName(cultivator.first_name || "");
     setLastName(cultivator.last_name || "");
@@ -60,8 +62,9 @@ export default function EditIndividualAchats({
     bodyToSend.append("num_recu", recuNumber);
     bodyToSend.append("quantite_cerise_a", caValue);
     bodyToSend.append("quantite_cerise_b", cbValue);
-    bodyToSend.append("date_achat", purchaseDate);
-
+    bodyToSend.append("date_achat", purchaseDate); 
+    bodyToSend.append("responsable_code", responsable_id); 
+    bodyToSend.append("cafeiculteur_code", cultivator.cultivator_code);
     if (photoFicheUrl instanceof File) {
       bodyToSend.append("photo_fiche", photoFicheUrl);
     }

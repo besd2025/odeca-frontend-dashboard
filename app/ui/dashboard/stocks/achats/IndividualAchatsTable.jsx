@@ -95,8 +95,10 @@ export default function IndividualAchatsTable({
             search: searchvalue,
           },
         });
+      
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
+          responsable_id: achat?.responsable?.unique_code,
           cultivator: {
             cultivator_id: achat?.cafeiculteur?.id,
             cultivator_code: achat?.cafeiculteur?.cultivator_code,
@@ -127,6 +129,7 @@ export default function IndividualAchatsTable({
           date: achat?.date_achat || "N/A",
         }));
         setData(formattedData || []);
+        console.log(formattedData)
         setTotalCount(response?.count || 0);
       } catch (error) {
         console.error("Error fetching individual achats:", error);
@@ -317,6 +320,7 @@ export default function IndividualAchatsTable({
                       cb={cultivator.cb}
                       date={cultivator.date}
                       photo_fiche={cultivator.photo_fiche}
+                      responsable_id={cultivator?.responsable_id}
                     />
                     <DropdownMenuItem
                       onSelect={() => HandleDelete(cultivator?.id, cultivator?.cultivator?.cultivator_code)}
