@@ -29,11 +29,28 @@ function ExportButton({
 }) {
   const value = typeExport || "individuel";
   const [exportTypeState, setExportTypeState] = React.useState("");
+  const [downloading, setDownloading] = React.useState(false);
+  // TODO: Use this state when server provides real download progress
+  // const [progress, setProgress] = React.useState(0);
 
   React.useEffect(() => {
     setExportTypeState(exportType);
     console.log(exportType);
   }, [exportType]);
+
+  const handleDownload = async () => {
+    setDownloading(true);
+
+    try {
+      await Promise.resolve(onClickDownloadButton());
+    } catch (e) {
+      console.error("Download error:", e);
+    }
+
+    setDownloading(false);
+  };
+
+  const isDisabled = loading || downloading;
 
   return (
     <div className="flex items-center">
@@ -41,16 +58,18 @@ function ExportButton({
         <TooltipTrigger asChild>
           <Button
             className={cn(
-              "min-w-[120px] transition-all duration-300",
-              activedownloadBtn || loading
-                ? "bg-primary text-white hover:bg-primary/80"
-                : "bg-green-600 text-white hover:bg-green-700",
+              "min-w-[120px] transition-all duration-300 relative overflow-hidden",
+              downloading
+                ? "bg-green-600 text-white hover:bg-green-700"
+                : activedownloadBtn || loading
+                  ? "bg-primary text-white hover:bg-primary/80"
+                  : "bg-green-600 text-white hover:bg-green-700",
               "px-3 py-2 text-sm h-10",
             )}
             onClick={() => {
-              if (loading) return;
+              if (isDisabled) return;
               if (activedownloadBtn) {
-                onClickDownloadButton();
+                handleDownload();
               } else {
                 if (exportTypeState === "cultivator_individual") {
                   onExportToExcel();
@@ -71,8 +90,16 @@ function ExportButton({
                 }
               }
             }}
-            disabled={loading}
+            disabled={isDisabled}
           >
+            {/* TODO: Uncomment progress bar when server provides real download progress
+            {downloading && (
+              <div
+                className="absolute inset-0 bg-green-900 transition-all duration-200 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            )} */}
+
             {loading ? (
               <Item
                 variant="muted"
@@ -87,6 +114,13 @@ function ExportButton({
                   </ItemTitle>
                 </ItemContent>
               </Item>
+            ) : downloading ? (
+              <div className="flex items-center gap-2 relative z-10">
+                <Spinner className="size-4" />
+                <span className="text-xs font-medium">
+                  Téléchargement...
+                </span>
+              </div>
             ) : activedownloadBtn ? (
               <div className="flex items-center gap-2">
                 <svg
@@ -130,9 +164,11 @@ function ExportButton({
           <p>
             {loading
               ? "Operation en cours..."
-              : activedownloadBtn
-                ? "Prêt pour le téléchargement"
-                : "Exporter en Excel"}
+              : downloading
+                ? "Téléchargement en cours..."
+                : activedownloadBtn
+                  ? "Prêt pour le téléchargement"
+                  : "Exporter en Excel"}
           </p>
         </TooltipContent>
       </Tooltip>

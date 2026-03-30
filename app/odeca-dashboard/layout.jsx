@@ -52,7 +52,7 @@ export default function Layout({ children }) {
       }}
     >
       {/* #8f3d00 */}
-      <NextTopLoader color="#8f3d00" />
+      <NextTopLoader color="#8f3d00" showSpinner={false} />
       <AppSidebar />
       <SidebarInset>
         <AppHeader />

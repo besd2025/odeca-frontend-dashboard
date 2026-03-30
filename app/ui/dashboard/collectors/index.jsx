@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
-import { Search, MoreHorizontal } from "lucide-react";
+import { Search, MoreHorizontal, SquareUserRound, IdCardLanyard } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,8 +22,12 @@ import {
 import PaginationContent from "@/components/ui/pagination-content";
 import { Edit } from "./edit";
 import { fetchData } from "@/app/_utils/api";
+import { UserContext } from "@/app/ui/context/User_Context";
+import { useContext } from "react";
+import AddCollector from "./add-collector";
 
 export default function CollectorsList() {
+  const user = useContext(UserContext);
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(5);
@@ -89,7 +93,7 @@ export default function CollectorsList() {
             className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background border-none"
           />
         </div>
-        {/* Ajouter d'autres actions ici si nécessaire */}
+        {user?.session?.category === "Admin" && <AddCollector />}
       </div>
 
       <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden ">
@@ -107,13 +111,17 @@ export default function CollectorsList() {
               allCollectors.map((collector) => (
                 <TableRow className="odd:bg-muted/50" key={collector.id}>
                   <TableCell>
-                    <div>
-                      <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                        {`${collector?.last_name} ${collector?.first_name}`}
-                      </span>
-                      <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                        {collector?.identifiant}
-                      </span>
+                    <div className="flex items-center gap-2">
+                      <IdCardLanyard className="h-6 w-6 text-primary" />
+                      <div>
+                        <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
+                          {`${collector?.last_name} ${collector?.first_name}`}
+                        </span>
+                        <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                          {collector?.identifiant}
+                        </span>
+                      </div>
+
                     </div>
                   </TableCell>
                   <TableCell>{collector.phone}</TableCell>

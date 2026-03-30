@@ -4,352 +4,265 @@ import SharedGeoLocalisation from "@/components/ui/geo-localisation";
 import { Search, X, MapPin } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 
+const TYPE_TEMPLATE = [
+  {
+    name: "CT",
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-10 text-secondary drop-shadow-xl">
+        <path fillRule="evenodd" d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z" clipRule="evenodd" />
+      </svg>
+    ),
+    mapIcon: (
+      <div className="relative size-16 flex items-center justify-center">
+        <svg viewBox="0 0 24 24" fill="currentColor" className="absolute inset-0 size-full text-secondary/50 drop-shadow-xl z-0">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+        </svg>
+        <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 text-white drop-shadow-md">
+            <path fillRule="evenodd" d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z" clipRule="evenodd" />
+          </svg>
+        </div>
+      </div>
+    )
+  },
+  {
+    name: "SDL",
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-10 text-red-500 drop-shadow-xl">
+        <path fillRule="evenodd" d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" clipRule="evenodd" />
+      </svg>
+    ),
+    mapIcon: (
+      <div className="relative size-16 flex items-center justify-center">
+        <svg viewBox="0 0 24 24" fill="currentColor" className="absolute inset-0 size-full text-red-500/50 drop-shadow-xl z-0">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+        </svg>
+        <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 text-white drop-shadow-md">
+            <path fillRule="evenodd" d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" clipRule="evenodd" />
+          </svg>
+        </div>
+      </div>
+    )
+  },
+  {
+    name: "UDP",
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-10 text-yellow-500 drop-shadow-xl">
+        <path d="M11.584 2.376a.75.75 0 0 1 .832 0l9 6a.75.75 0 1 1-.832 1.248L12 3.901 3.416 9.624a.75.75 0 0 1-.832-1.248l9-6Z" />
+        <path fillRule="evenodd" d="M20.25 10.332v9.918H21a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1 0-1.5h.75v-9.918a.75.75 0 0 1 .634-.74A49.109 49.109 0 0 1 12 9c2.59 0 5.134.202 7.616.592a.75.75 0 0 1 .634.74Zm-7.5 2.418a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Zm3-.75a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-1.5 0v-6.75a.75.75 0 0 1 .75-.75ZM9 12.75a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Z" clipRule="evenodd" />
+        <path d="M12 7.875a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" />
+      </svg>
+    ),
+    mapIcon: (
+      <div className="relative size-16 flex items-center justify-center">
+        <svg viewBox="0 0 24 24" fill="currentColor" className="absolute inset-0 size-full text-yellow-500/50 drop-shadow-xl z-0">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+        </svg>
+        <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 text-white drop-shadow-md">
+            <path d="M11.584 2.376a.75.75 0 0 1 .832 0l9 6a.75.75 0 1 1-.832 1.248L12 3.901 3.416 9.624a.75.75 0 0 1-.832-1.248l9-6Z" />
+            <path fillRule="evenodd" d="M20.25 10.332v9.918H21a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1 0-1.5h.75v-9.918a.75.75 0 0 1 .634-.74A49.109 49.109 0 0 1 12 9c2.59 0 5.134.202 7.616.592a.75.75 0 0 1 .634.74Zm-7.5 2.418a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Zm3-.75a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-1.5 0v-6.75a.75.75 0 0 1 .75-.75ZM9 12.75a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Z" clipRule="evenodd" />
+            <path d="M12 7.875a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" />
+          </svg>
+        </div>
+      </div>
+    )
+  }
+];
+
 export default function Maps() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
-  const [data, setData] = useState([]);
+
+  const [data, setData] = useState([
+    { ...TYPE_TEMPLATE[0], places: [] },
+    { ...TYPE_TEMPLATE[1], places: [] },
+    { ...TYPE_TEMPLATE[2], places: [] }
+  ]);
   const [loading, setLoading] = useState(true);
-  const [sdlData, setSdlData] = useState([]);
-  const [sdlMapData, setSdlMapData] = useState([]);
-  const [sdlQteAchete, setSdlQteAchete] = useState([]);
-  const [sdlNombreCultivateurs, setSdlNombreCultivateurs] = useState([]);
-  const [ctData, setCtData] = useState([]);
-  const [pointer, setPointer] = useState(0);
-  const [limit, setLimit] = useState(5);
-  const [totalCount, setTotalCount] = useState(0);
+
+  // States for filter and search parameters
   const [filterData, setFilterData] = useState(null);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const getSdls = async () => {
+    let isMounted = true;
+
+    const loadAllMapData = async () => {
       setLoading(true);
       try {
-        const response = await fetchData("get", "cafe/stationslavage/", {
-          params: {
-            limit: limit,
-            offset: pointer,
-            ...filterData,
-            search: search,
-          },
-          additionalHeaders: {},
-          body: {},
+        const params = { limit: 100, offset: 0, ...filterData, search };
+        const paramsUdp = { search };
+
+        const [sdlRes, ctRes, udpRes] = await Promise.allSettled([
+          fetchData("get", "cafe/stationslavage/", { params }),
+          fetchData("get", "cafe/centres_transite/", { params }),
+          fetchData("get", "cafe/usine_deparchage/", { params: paramsUdp })
+        ]);
+
+        const sdls = sdlRes.status === "fulfilled" && sdlRes.value?.results ? sdlRes.value.results : [];
+        const cts = ctRes.status === "fulfilled" && ctRes.value?.results ? ctRes.value.results : [];
+        const udps = udpRes.status === "fulfilled" && udpRes.value?.results ? udpRes.value.results : [];
+
+        // 1. Process SDLs (uses cultivators as fallback for coordinates, and fetch stats)
+        const sdlPlaces = await Promise.all(sdls.map(async (sdl) => {
+          let coords = null;
+
+          try {
+            const cultRes = await fetchData("get", `cafe/stationslavage/${sdl.id}/get_cultivators/`, { params: { limit: 1 } });
+            if (cultRes?.results?.length > 0) {
+              const c = cultRes.results[0];
+              if (c.latitude && c.longitude) {
+                coords = [parseFloat(c.latitude), parseFloat(c.longitude)];
+              }
+            }
+          } catch (e) {
+            console.error("Error fetching map cultivators for SDL", e);
+          }
+
+          if (!coords || isNaN(coords[0]) || isNaN(coords[1])) {
+            coords = null;
+          }
+
+          let stats = { qte_achete: { cerise_a: 0, cerise_b: 0 }, nombre_cultivateurs: 0 };
+          try {
+            const [qteRes, cultCountRes] = await Promise.allSettled([
+              fetchData("get", `cafe/stationslavage/${sdl.id}/get_total_achat_par_sdl/`),
+              fetchData("get", `cafe/stationslavage/${sdl.id}/get_total_cultivators_sdl/`)
+            ]);
+            if (qteRes.status === "fulfilled") stats.qte_achete = qteRes.value || stats.qte_achete;
+            if (cultCountRes.status === "fulfilled") {
+              stats.nombre_cultivateurs = (cultCountRes.value?.hommes || 0) + (cultCountRes.value?.femmes || 0);
+            }
+          } catch (e) { }
+
+          const province = sdl.sdl_adress?.zone_code?.commune_code?.province_code?.province_name || "";
+          const commune = sdl.sdl_adress?.zone_code?.commune_code?.commune_name || "";
+
+          return {
+            id: sdl.id,
+            name: sdl.sdl_nom || "SDL",
+            coordinates: coords,
+            type: "SDL",
+            address: `${province}, ${commune}`,
+            stockCA: stats.qte_achete?.cerise_a || 0,
+            stockCB: stats.qte_achete?.cerise_b || 0,
+            stockCAB: (stats.qte_achete?.cerise_a || 0) + (stats.qte_achete?.cerise_b || 0),
+            farmersCount: stats.nombre_cultivateurs,
+          };
+        }));
+
+        // 2. Process CTs
+        const ctPlaces = await Promise.all(cts.map(async (ct) => {
+          let coords = null;
+          if (ct.ct_adress?.latitude && ct.ct_adress?.longitude) {
+            coords = [parseFloat(ct.ct_adress.latitude), parseFloat(ct.ct_adress.longitude)];
+          } else if (ct.latitude && ct.longitude) {
+            coords = [parseFloat(ct.latitude), parseFloat(ct.longitude)];
+          }
+          try {
+            const cultRes = await fetchData("get", `cafe/centres_transite/${ct.id}/get_cultivators/`, { params: { limit: 1 } });
+            if (cultRes?.results?.length > 0) {
+              const c = cultRes.results[0];
+              if (c.latitude && c.longitude) {
+                coords = [parseFloat(c.latitude), parseFloat(c.longitude)];
+              }
+            }
+          } catch (e) {
+            console.error("Error fetching map cultivators for CT", e);
+          }
+          if (!coords || isNaN(coords[0]) || isNaN(coords[1])) {
+             // Fallback vers les anciennes coordonnées par défaut pour forcer l'affichage
+            coords = [-3.3896077 + (Math.random() * 0.02 - 0.01), 29.9255809 + (Math.random() * 0.02 - 0.01)];
+          }
+          let stats = { qte_achete: { cerise_a: 0, cerise_b: 0 }, nombre_cultivateurs: 0 };
+          try {
+            const [qteRes, cultCountRes] = await Promise.allSettled([
+              fetchData("get", `cafe/centres_transite/${ct.id}/get_total_achat_par_ct/`),
+              fetchData("get", `cafe/centres_transite/${ct.id}/get_total_cultivators_ct/`)
+            ]);
+            if (qteRes.status === "fulfilled") stats.qte_achete = qteRes.value || stats.qte_achete;
+            if (cultCountRes.status === "fulfilled") {
+              stats.nombre_cultivateurs = (cultCountRes.value?.hommes || 0) + (cultCountRes.value?.femmes || 0);
+            }
+          } catch (e) { }
+          const province = ct.ct_adress?.zone_code?.commune_code?.province_code?.province_name || "";
+          const commune = ct.ct_adress?.zone_code?.commune_code?.commune_name || "";
+
+          return {
+            id: ct.id,
+            name: ct.ct_nom || "CT",
+            coordinates: coords,
+            type: "CT",
+            address: `${province}, ${commune}`,
+            stockCA: stats.qte_achete?.cerise_a || 0,
+            stockCB: stats.qte_achete?.cerise_b || 0,
+            stockCAB: (stats.qte_achete?.cerise_a || 0) + (stats.qte_achete?.cerise_b || 0),
+            farmersCount: stats.nombre_cultivateurs,
+          };
+        }));
+
+        // 3. Process UDPs (user specifically asked to ignore fallback data if missing)
+        const udpPlaces = udps.map((udp) => {
+          let coords = null;
+          if (udp.usine_adress?.latitude && udp.usine_adress?.longitude) {
+            coords = [parseFloat(udp.usine_adress.latitude), parseFloat(udp.usine_adress.longitude)];
+          } else if (udp.latitude && udp.longitude) {
+            coords = [parseFloat(udp.latitude), parseFloat(udp.longitude)];
+          }
+
+          if (!coords || isNaN(coords[0]) || isNaN(coords[1])) {
+            coords = null;
+          }
+
+          const province = udp.usine_adress?.zone_code?.commune_code?.province_code?.province_name || "";
+          const commune = udp.usine_adress?.zone_code?.commune_code?.commune_name || "";
+
+          return {
+            id: udp.id,
+            name: udp.usine_name || "UDP",
+            coordinates: coords,
+            type: "UDP",
+            address: `${province}, ${commune}`,
+            stockCafeVert: 0,
+          };
         });
-        const results = response?.results;
-        const sdlData = results.map((sdl) => ({
-          id: sdl?.id,
-          sdl: {
-            sdl_code: sdl?.sdl_code,
-            sdl_name: sdl?.sdl_nom,
-            type: "",
-          },
-          society: sdl?.societe?.nom_societe || "",
-          responsable: {
-            first_name: sdl?.sdl_responsable?.user?.first_name || "",
-            last_name: sdl?.sdl_responsable?.user?.last_name || "",
-            telephone: sdl?.sdl_responsable?.user?.phone || "",
-          },
-          localite: {
-            province:
-              sdl?.sdl_adress?.zone_code?.commune_code?.province_code
-                ?.province_name || "",
-            commune:
-              sdl?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
-          },
-        }));
 
-        setSdlData(sdlData);
-        console.log("sdlData", sdlData);
-        setTotalCount(response?.count);
+        if (isMounted) {
+          const finalMapData = [
+            {
+              ...TYPE_TEMPLATE[0], // CT
+              places: ctPlaces.filter(p => p.coordinates)
+            },
+            {
+              ...TYPE_TEMPLATE[1], // SDL
+              places: sdlPlaces.filter(p => p.coordinates)
+            },
+            {
+              ...TYPE_TEMPLATE[2], // UDP
+              places: udpPlaces.filter(p => p.coordinates) // Les UDPs sans donnees (coords manquantes) sont completement ignores / filtres.
+            }
+          ];
+
+          setData(finalMapData);
+        }
+
       } catch (error) {
-        console.error("Error fetching cultivators data:", error);
+        console.error("Error loading map data:", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
-    getSdls();
-  }, [limit, pointer, filterData, search]);
+    loadAllMapData();
 
-  useEffect(() => {
-    const getCultivatorsIndividual = async (id) => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/stationslavage/${id}/get_cultivators/`,
-          {
-            params: { limit: 1, offset: 0 },
-          },
-        );
-        const results = response?.results;
-        const cultivatorsData = results?.map((cultivator) => ({
-          id: cultivator?.id,
-          cultivator: {
-            cultivator_code: cultivator?.cultivator_code,
-            first_name: cultivator?.cultivator_first_name,
-            last_name: cultivator?.cultivator_last_name,
-            image_url: cultivator?.cultivator_photo,
-            telephone: cultivator?.cultivator_telephone,
-          },
-          cni: cultivator?.cultivator_cni,
-          cni_image_url: cultivator?.cultivator_cni_photo,
-          localite: {
-            province:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
-            commune:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
-          },
-          champs: cultivator?.nombre_champs,
-          SDL_map_coordinates: {
-            latitude: cultivator?.latitude,
-            longitude: cultivator?.longitude,
-          },
-        }));
-        setSdlMapData(cultivatorsData);
-        console.log("individualCultivatorsData", cultivatorsData);
-        setTotalCount(response?.count);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
+    return () => {
+      isMounted = false;
     };
-    getCultivatorsIndividual(sdlData[0]?.id);
-  }, [sdlData]);
-
-  React.useEffect(() => {
-    const getSdls = async (id) => {
-      try {
-        const qte_achete = await fetchData(
-          "get",
-          `cafe/stationslavage/${id}/get_total_achat_par_sdl/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          },
-        );
-
-        const nombre_cultivateurs = await fetchData(
-          "get",
-          `cafe/stationslavage/${id}/get_total_cultivators_sdl/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          },
-        );
-
-        const response = { qte_achete, nombre_cultivateurs };
-        console.log("response", response);
-
-        setSdlQteAchete(response?.qte_achete);
-        setSdlNombreCultivateurs(response?.nombre_cultivateurs.hommes + response?.nombre_cultivateurs.femmes);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getSdls(sdlData[0]?.id);
-  }, [sdlData]);
-  const TYPE = [
-    {
-      name: "CT",
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="size-10 text-secondary drop-shadow-xl"
-        >
-          <path
-            fillRule="evenodd"
-            d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      mapIcon: (
-        <div className="relative size-16 flex items-center justify-center">
-          {/* PIN */}
-          <svg
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="absolute inset-0 size-full text-secondary/50 drop-shadow-xl z-0"
-          >
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-          </svg>
-
-          {/* ICÔNE AU CENTRE DU PIN */}
-          <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="size-6 text-white drop-shadow-md"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </div>
-      ),
-
-      places: [
-        {
-          name: "CT KAREHE",
-          coordinates: [-3.3896077, 29.9255809],
-          type: "CT",
-          address: "Zone Karehe, Commune Buyenzi",
-          stockCA: 12500,
-          stockCB: 4500,
-          farmersCount: 342,
-        },
-        {
-          name: "CT KIGUSU",
-          coordinates: [-3.3896077, 29.9255809],
-          type: "CT",
-          address: "Zone Kigusu, Commune Buyenzi",
-          stockCA: 8900,
-          stockCB: 2100,
-          farmersCount: 156,
-        },
-      ],
-    },
-    {
-      name: "SDL",
-      coordinates: [-3.3896077, 29.9755819],
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="size-10 text-red-500 drop-shadow-xl"
-        >
-          <path
-            fillRule="evenodd"
-            d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      mapIcon: (
-        <div className="relative size-16 flex items-center justify-center">
-          {/* PIN */}
-          <svg
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="absolute inset-0 size-full text-red-500/50 drop-shadow-xl z-0"
-          >
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-          </svg>
-
-          {/* ICÔNE AU CENTRE DU PIN */}
-          <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="size-6 text-white drop-shadow-md"
-            >
-              <path
-                fillRule="evenodd"
-                d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </div>
-      ),
-      places: [
-        {
-          id: sdlData[0]?.id,
-          name: sdlData[0]?.sdl?.sdl_name,
-          coordinates: [sdlMapData[0]?.SDL_map_coordinates?.latitude, sdlMapData[0]?.SDL_map_coordinates?.longitude],
-          type: "SDL",
-          address: sdlData[0]?.localite?.province + ", " + sdlData[0]?.localite?.commune,
-          stockCA: sdlQteAchete?.cerise_a,
-          stockCB: sdlQteAchete?.cerise_b,
-          stockCAB: sdlQteAchete?.cerise_a + sdlQteAchete?.cerise_b,
-          farmersCount: sdlNombreCultivateurs,
-        },
-      ],
-    },
-    {
-      name: "UDP",
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="size-10 text-yellow-500 drop-shadow-xl"
-        >
-          <path d="M11.584 2.376a.75.75 0 0 1 .832 0l9 6a.75.75 0 1 1-.832 1.248L12 3.901 3.416 9.624a.75.75 0 0 1-.832-1.248l9-6Z" />
-          <path
-            fillRule="evenodd"
-            d="M20.25 10.332v9.918H21a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1 0-1.5h.75v-9.918a.75.75 0 0 1 .634-.74A49.109 49.109 0 0 1 12 9c2.59 0 5.134.202 7.616.592a.75.75 0 0 1 .634.74Zm-7.5 2.418a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Zm3-.75a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-1.5 0v-6.75a.75.75 0 0 1 .75-.75ZM9 12.75a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Z"
-            clipRule="evenodd"
-          />
-          <path d="M12 7.875a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" />
-        </svg>
-      ),
-      mapIcon: (
-        <div className="relative size-16 flex items-center justify-center">
-          {/* PIN */}
-          <svg
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="absolute inset-0 size-full text-yellow-500/50 drop-shadow-xl z-0"
-          >
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-          </svg>
-
-          {/* ICÔNE AU CENTRE DU PIN */}
-          <div className="absolute -top-2 inset-0 flex items-center justify-center z-999">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="size-6 text-white drop-shadow-md"
-            >
-              <path
-                d="M11.584 2.376a.75.75 0 0 1 .832 0l9 6a.75.75 0 1 1-.832
-              1.248L12 3.901 3.416 9.624a.75.75 0 0 1-.832-1.248l9-6Z"
-              />
-              <path
-                fillRule="evenodd"
-                d="M20.25 10.332v9.918H21a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1 0-1.5h.75v-9.918a.75.75 0 0 1 .634-.74A49.109 49.109 0 0 1 12 9c2.59 0 5.134.202 7.616.592a.75.75 0 0 1 .634.74Zm-7.5 2.418a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Zm3-.75a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-1.5 0v-6.75a.75.75 0 0 1 .75-.75ZM9 12.75a.75.75 0 0 0-1.5 0v6.75a.75.75 0 0 0 1.5 0v-6.75Z"
-                clipRule="evenodd"
-              />
-              <path d="M12 7.875a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" />
-            </svg>
-          </div>
-        </div>
-      ),
-      places: [
-        {
-          name: "UDP CAFO",
-          coordinates: [-3.3896077, 29.90005829],
-          type: "UDP",
-          address: "Zone Cafo, Commune Gitega",
-          stockCafeVert: 25000,
-        },
-        {
-          name: "UDP KAWA",
-          coordinates: [-3.3896077, 29.9995829],
-          type: "UDP",
-          address: "Zone Kawa, Commune Ngozi",
-          stockCafeVert: 18000,
-        },
-      ],
-    },
-  ];
+  }, [filterData, search]);
 
   const handleSearch = (e) => {
     const query = e.target.value;
@@ -360,7 +273,7 @@ export default function Maps() {
     }
 
     const results = [];
-    TYPE.forEach((type) => {
+    data.forEach((type) => {
       type.places.forEach((place) => {
         if (place.name.toLowerCase().includes(query.toLowerCase())) {
           results.push(place);
@@ -384,7 +297,7 @@ export default function Maps() {
 
   return (
     <SharedGeoLocalisation
-      data={TYPE}
+      data={data}
       selectedPlace={selectedPlace}
       onSelectPlace={handleSelectResult} // Also triggers updating search state from map clicks
       onCloseDetails={() => setSelectedPlace(null)}

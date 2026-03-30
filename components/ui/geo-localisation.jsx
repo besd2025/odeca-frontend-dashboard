@@ -368,10 +368,10 @@ export default function GeoLocalisation({
             </div>
             <div className="p-4 space-y-4">
               <div>
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">
+                <p className="text-xs text-gray-500  uppercase tracking-wider mb-1">
                   Address
                 </p>
-                <p className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                <p className="text-xs text-gray-700 dark:text-gray-300 flex items-start gap-2">
                   <MapPin className="size-4 text-gray-400 mt-0.5 shrink-0" />
                   {selectedPlace.address}
                 </p>
@@ -409,7 +409,7 @@ export default function GeoLocalisation({
                       <p className="text-[10px] text-gray-500  uppercase mb-1">
                         Qte Totale CAB
                       </p>
-                      <p className="text-sm font-bold text-gray-900 dark:text-white">
+                      <p className="text-base font-bold text-gray-900 dark:text-white">
                         {selectedPlace.stockCAB >= 1000 ? (
                           <>
                             {(selectedPlace.stockCAB / 1000).toLocaleString(
@@ -433,7 +433,7 @@ export default function GeoLocalisation({
                       <p className="text-[10px] text-gray-500  uppercase mb-1">
                         Qte CA
                       </p>
-                      <p className="text-sm font-bold text-gray-900 dark:text-white">
+                      <p className="text-base font-bold text-gray-900 dark:text-white">
                         {selectedPlace.stockCA >= 1000 ? (
                           <>
                             {(selectedPlace.stockCA / 1000).toLocaleString(
@@ -457,7 +457,7 @@ export default function GeoLocalisation({
                       <p className="text-[10px] text-gray-500  uppercase mb-1">
                         Qte CB
                       </p>
-                      <p className="text-sm font-bold text-gray-900 dark:text-white">
+                      <p className="text-base font-bold text-gray-900 dark:text-white">
                         {selectedPlace.stockCB >= 1000 ? (
                           <>
                             {(selectedPlace.stockCB / 1000).toLocaleString(
@@ -482,7 +482,7 @@ export default function GeoLocalisation({
                         <span className="text-xs text-gray-500 font-medium">
                           Caféiculteurs
                         </span>
-                        <span className="text-sm font-bold text-gray-900 dark:text-white">
+                        <span className="text-base font-bold text-gray-900 dark:text-white">
                           {selectedPlace.farmersCount}
                         </span>
                       </div>

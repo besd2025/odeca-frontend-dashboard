@@ -39,6 +39,7 @@ import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
 import { useState, useContext } from "react";
+import AddCt from "../add-ct";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 export default function CtsListTable({ isLoading: externalLoading }) {
@@ -408,6 +409,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
               <Filter handleFilter={handleFilter} />
             </div>
             <div className="flex items-center gap-3 text-gray-700">
+              {user?.session?.category === "Admin" && <AddCt />}
               <ExportButton
                 exportType="ct_data"
                 handleExportCTs={handleExportCTs}

@@ -46,7 +46,7 @@ export default function EditSociety({ id }) {
           response?.adresse?.zone_code?.commune_code?.commune_name || "",
         );
 
-        console.log("data: ",response)
+        console.log("data: ", response)
       } catch (error) {
         console.error("Error fetching society data:", error);
       }
@@ -71,8 +71,8 @@ export default function EditSociety({ id }) {
           body: formData,
         });
 
-        if (results.status === 200||results.status==201) {
-      resolve({ code });
+        if (results.status === 200 || results.status == 201) {
+          resolve({ code });
 
         } else {
           reject(new Error("Erreur"));
@@ -106,19 +106,19 @@ export default function EditSociety({ id }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <form onSubmit={handleSubmit}>
         <DialogTrigger asChild>
-          <Button variant="secondary" size="sm">
+          <Button variant="secondary" size="sm" className="w-full">
             <SquarePen className="h-4 w-4 mr-2" />
             Modifier
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[700px] bg-sidebar">
+        <DialogContent className="sm:max-w-[500px] bg-sidebar">
           <DialogHeader>
             <DialogTitle>Modification</DialogTitle>
             <DialogDescription>
               Modifier les informations de la société
             </DialogDescription>
           </DialogHeader>
-          <div className="custom-scrollbar h-[60vh] lg:max-h-[500px] overflow-y-auto px-2 pb-3">
+          <div className="custom-scrollbar h-max overflow-y-auto px-2 pb-3">
             <div>
               <h5 className="mb-5 text-xl font-medium text-primary dark:text-white/90 lg:mb-6">
                 Code Société
@@ -146,72 +146,13 @@ export default function EditSociety({ id }) {
                 </div>
               </div>
             </div>
-            <div className="mt-7">
-              <h5 className="mb-5 text-xl font-medium text-primary dark:text-white/90 lg:mb-6">
-                Informations Responsable
-              </h5>
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Nom</Label>
-                  <Input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    disabled // Assuming responsible info is edited elsewhere or readonly
-                  />
-                </div>
-                <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Prénom</Label>
-                  <Input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    disabled // Assuming responsible info is edited elsewhere or readonly
-                  />
-                </div>
-                <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Téléphone</Label>
-                  <Input
-                    type="text"
-                    value={telephone}
-                    onChange={(e) => setTelephone(e.target.value)}
-                    disabled // Assuming responsible info is edited elsewhere or readonly
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="mt-7">
-              <h5 className="mb-5 text-xl font-medium text-primary dark:text-white/90 lg:mb-6">
-                Localité
-              </h5>
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Province</Label>
-                  <Input
-                    type="text"
-                    value={province}
-                    onChange={(e) => setProvince(e.target.value)}
-                    disabled
-                  />
-                </div>
-                <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Commune</Label>
-                  <Input
-                    type="text"
-                    value={commune}
-                    onChange={(e) => setCommune(e.target.value)}
-                    disabled
-                  />
-                </div>
-              </div>
-            </div>
           </div>
 
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit}  disabled={loading}>
+            <Button type="submit" onClick={handleSubmit} disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enregistrer
             </Button>

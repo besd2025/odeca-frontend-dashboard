@@ -43,6 +43,7 @@ import PaginationControls from "@/components/ui/pagination-controls";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
 import { useState, useContext } from "react";
+import AddSdl from "../add-sdl";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 export default function SdlsListTable({ isLoading: externalLoading }) {
@@ -105,7 +106,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
               sdl?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
           },
         }));
-        console.log(response);
+        // console.log(response);
         setData(sdlData);
         setTotalCount(response?.count);
       } catch (error) {
@@ -407,6 +408,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
               <Filter handleFilter={handleFilter} />
             </div>
             <div className="flex items-center gap-3 text-gray-700">
+              {user?.session?.category === "Admin" && <AddSdl />}
               <ExportButton
                 handleExportSDLs={handleExportSDLs}
                 exportType="sdl_data"
