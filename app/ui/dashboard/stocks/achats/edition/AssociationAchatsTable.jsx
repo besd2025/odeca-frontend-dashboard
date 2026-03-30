@@ -123,6 +123,7 @@ export default function AssociationAchatsTableEdition({
           },
           num_fiche: achat?.numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
+          num_page: achat?.numero_page,
           photo_fiche: achat?.photo_fiche,
           ca: achat?.quantite_cerise_a || 0,
           cb: achat?.quantite_cerise_b || 0,

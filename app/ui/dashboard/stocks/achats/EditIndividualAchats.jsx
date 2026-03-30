@@ -22,11 +22,12 @@ export default function EditIndividualAchats({
   cultivator = {},
   num_fiche = "",
   num_recu = "",
+  num_page = "",
   ca = 0,
   cb = 0,
   date = "",
   photo_fiche = "",
-  responsable_id=""
+  responsable_id = ""
 }) {
   const [open, setOpen] = React.useState(false);
   const [code, setCode] = React.useState(cultivator.cultivator_code || "");
@@ -34,6 +35,7 @@ export default function EditIndividualAchats({
   const [lastName, setLastName] = React.useState(cultivator.last_name || "");
   const [ficheNumber, setFicheNumber] = React.useState(num_fiche || "");
   const [recuNumber, setRecuNumber] = React.useState(num_recu || "");
+  const [pageNumber, setPageNumber] = React.useState(num_page || "");
   const [caValue, setCaValue] = React.useState(ca || 0);
   const [cbValue, setCbValue] = React.useState(cb || 0);
   const [purchaseDate, setPurchaseDate] = React.useState(date || "");
@@ -41,12 +43,12 @@ export default function EditIndividualAchats({
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    console.log("responsable_id: ", responsable_id)
     setCode(cultivator.cultivator_code || "");
     setFirstName(cultivator.first_name || "");
     setLastName(cultivator.last_name || "");
     setFicheNumber(num_fiche || "");
     setRecuNumber(num_recu || "");
+    setPageNumber(num_page || "");
     setCaValue(ca || 0);
     setCbValue(cb || 0);
     setPurchaseDate(date || "");
@@ -60,10 +62,11 @@ export default function EditIndividualAchats({
     const bodyToSend = new FormData();
     bodyToSend.append("num_fiche", ficheNumber);
     bodyToSend.append("num_recu", recuNumber);
+    bodyToSend.append("numero_page", pageNumber);
     bodyToSend.append("quantite_cerise_a", caValue);
     bodyToSend.append("quantite_cerise_b", cbValue);
-    bodyToSend.append("date_achat", purchaseDate); 
-    bodyToSend.append("responsable_code", responsable_id); 
+    bodyToSend.append("date_achat", purchaseDate);
+    bodyToSend.append("responsable_code", responsable_id);
     bodyToSend.append("cafeiculteur_code", cultivator.cultivator_code);
     if (photoFicheUrl instanceof File) {
       bodyToSend.append("photo_fiche", photoFicheUrl);
@@ -164,6 +167,15 @@ export default function EditIndividualAchats({
                     value={ficheNumber}
                     onChange={(e) => setFicheNumber(e.target.value)}
                     disabled
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Numéro de Page</Label>
+                  <Input
+                    type="text"
+                    value={pageNumber}
+                    onChange={(e) => setPageNumber(e.target.value)}
+
                   />
                 </div>
                 <div className="space-y-2">

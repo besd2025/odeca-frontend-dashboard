@@ -95,7 +95,7 @@ export default function IndividualAchatsTable({
             search: searchvalue,
           },
         });
-      
+
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
           responsable_id: achat?.responsable?.unique_code,
@@ -123,6 +123,7 @@ export default function IndividualAchatsTable({
           },
           num_fiche: achat?.cafeiculteur?.cultivator_assoc_numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
+          num_page: achat?.numero_page || "N/A",
           photo_fiche: achat?.photo_fiche,
           ca: achat?.quantite_cerise_a || 0,
           cb: achat?.quantite_cerise_b || 0,
@@ -316,6 +317,7 @@ export default function IndividualAchatsTable({
                       cultivator={cultivator.cultivator}
                       num_fiche={cultivator.num_fiche}
                       num_recu={cultivator.num_recu}
+                      num_page={cultivator.num_page}
                       ca={cultivator.ca}
                       cb={cultivator.cb}
                       date={cultivator.date}

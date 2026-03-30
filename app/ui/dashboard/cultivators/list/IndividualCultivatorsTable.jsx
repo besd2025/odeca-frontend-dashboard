@@ -106,7 +106,6 @@ export default function IndividualCultivatorsTable({
             },
           },
         );
-
         const formattedData = response.results.map((cultivator) => ({
           id: cultivator.id,
           cultivator: {
@@ -264,7 +263,7 @@ export default function IndividualCultivatorsTable({
     toast.promise(promise, {
       loading: "SUPPRESSION...",
       success: (data) => {
-        setTimeout(() => window.location.reload(), 1000);
+        setTimeout(() => setOpen(false), 1000);
         return `${data.code} a été supprimé avec succès `;
       },
       error: "Donnée non supprimée",

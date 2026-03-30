@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { toast } from "sonner";
+
 export default function Edit({
   cultivator,
   sdl_ct = "",
@@ -23,36 +24,72 @@ export default function Edit({
   localite = {},
   champs = 0,
 }) {
-  // local state initialized from props
-  const [open, setOpen] = React.useState(false);
-  const [code, setCode] = React.useState("");
-  const [firstName, setFirstName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
-  const [imageUrl, setImageUrl] = React.useState("");
-  const [sdl, setSdl] = React.useState("");
-  const [soc, setSoc] = React.useState("");
-  const [numFiche, setNumFiche] = React.useState("");
-  const [province, setProvince] = React.useState("");
-  const [commune, setCommune] = React.useState("");
-  const [zone, setZone] = React.useState("");
-  const [colline, setColline] = React.useState("");
-  const [nbChamps, setNbChamps] = React.useState(0);
-  const [date_naissance, setDateNaissance] = React.useState("");
-  const [phone, setPhone] = React.useState("");
-  const [cni, setCni] = React.useState("");
-  const [payment_mode, setPaymentMode] = React.useState("");
-  const [bank_name, setBankName] = React.useState("");
-  const [bank_account, setBankAccount] = React.useState("");
-  const [payment_phone, setPaymentPhone] = React.useState("");
-  const [proprietaire, setProprietaire] = React.useState("");
-  const [collector_code, setCollectorCode] = React.useState("");
-  const [address_code, setAdressCode] = React.useState("");
-  const [error, setError] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-  React.useEffect(() => {
-    async function getData() {
-      // keep local state in sync if props change
+  // Dialog state
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
+  // Personal information state
+  const [code, setCode] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [date_naissance, setDateNaissance] = useState("");
+  const [phone, setPhone] = useState("");
+  const [cni, setCni] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+
+  // Association info state
+  const [sdl, setSdl] = useState("");
+  const [soc, setSoc] = useState("");
+  const [numFiche, setNumFiche] = useState("");
+
+  // Location state
+  const [province, setProvince] = useState("");
+  const [commune, setCommune] = useState("");
+  const [zone, setZone] = useState("");
+  const [colline, setColline] = useState("");
+  const [address_code, setAdressCode] = useState("");
+
+  // Location options state
+  const [provinceOptions, setProvinceOptions] = useState([]);
+  const [communeOptions, setCommuneOptions] = useState([]);
+  const [zoneOptions, setZoneOptions] = useState([]);
+  const [collineOptions, setCollineOptions] = useState([]);
+
+  // Field information state
+  const [nbChamps, setNbChamps] = useState(0);
+
+  // Payment information state
+  const [payment_mode, setPaymentMode] = useState("");
+  const [bank_name, setBankName] = useState("");
+  const [bank_account, setBankAccount] = useState("");
+  const [payment_phone, setPaymentPhone] = useState("");
+  const [proprietaire, setProprietaire] = useState("");
+  const [collector_code, setCollectorCode] = useState("");
+
+  // Load initial data
+  useEffect(() => {
+    async function loadProvinces() {
+      try {
+        const data = await fetchData("get", `adress/province/`, {
+          params: { offset: 0, limit: 100 },
+        });
+        const options = data?.results?.map((item) => ({
+          value: item.province_name,
+          label: item.province_name,
+        })) || [];
+        setProvinceOptions(options);
+      } catch (error) {
+        setError(error);
+        console.error("Error loading provinces:", error);
+      }
+    }
+    loadProvinces();
+  }, []);
+
+  // Load cultivator data
+  useEffect(() => {
+    async function loadCultivatorData() {
       try {
         const response = await fetchData("get", `/cultivators/${cultivator}/`, {
           params: {},
@@ -71,6 +108,8 @@ export default function Edit({
         setNumFiche(response?.cultivator_assoc_numero_fiche || "");
         setProvince(localite?.province || "");
         setCommune(localite?.commune || "");
+        setZone(localite?.zone || "");
+        setColline(localite?.colline || "");
         setNbChamps(champs || 0);
         setPaymentMode(response?.cultivator_payment_type || "");
         setBankName(response?.cultivator_bank_name || "");
@@ -78,14 +117,111 @@ export default function Edit({
         setPaymentPhone(response?.cultivator_mobile_payment_account || "");
         setProprietaire(response?.cultivator_account_owner || "");
         setCollectorCode(response?.collector?.unique_code || "");
-        setAdressCode(response?.cultivator_adress?.colline_code);
+        setColline(response?.cultivator_adress?.colline_code || "");
       } catch (error) {
-        console.error("Error in Edit useEffect:", error);
+        console.error("Error loading cultivator data:", error);
       }
     }
-    getData();
-  }, [cultivator]);
+    loadCultivatorData();
+  }, [cultivator, sdl_ct, society, localite, champs]);
 
+  // Handle province change
+  const handleProvinceChange = async (e) => {
+    const value = e.target.value;
+    setProvince(value);
+
+    if (!value) {
+      setCommuneOptions([]);
+      setCommune("");
+      setZoneOptions([]);
+      setZone("");
+      setCollineOptions([]);
+      setColline("");
+      return;
+    }
+
+    try {
+      const data = await fetchData(
+        "get",
+        `adress/commune/get_communes_by_province`,
+        { params: { province: value } }
+      );
+      const options = data?.map((item) => ({
+        value: item.commune_name,
+        label: item.commune_name,
+      })) || [];
+      setCommuneOptions(options);
+      setCommune("");
+      setZoneOptions([]);
+      setZone("");
+      setCollineOptions([]);
+      setColline("");
+    } catch (error) {
+      console.error("Error loading communes:", error);
+    }
+  };
+
+  // Handle commune change
+  const handleCommuneChange = async (e) => {
+    const value = e.target.value;
+    setCommune(value);
+
+    if (!value) {
+      setZoneOptions([]);
+      setZone("");
+      setCollineOptions([]);
+      setColline("");
+      return;
+    }
+
+    try {
+      const data = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
+        params: { commune: value },
+      });
+      const options = data?.map((item) => ({
+        value: item.zone_name,
+        label: item.zone_name,
+      })) || [];
+      setZoneOptions(options);
+      setZone("");
+      setCollineOptions([]);
+      setColline("");
+    } catch (error) {
+      console.error("Error loading zones:", error);
+    }
+  };
+
+  // Handle zone change
+  const handleZoneChange = async (e) => {
+    const value = e.target.value;
+    setZone(value);
+
+    if (!value) {
+      setCollineOptions([]);
+      setColline("");
+      return;
+    }
+
+    try {
+      const data = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
+        params: { zone: value },
+      });
+      const options = data?.map((item) => ({
+        value: item.colline_code,
+        label: item.colline_name,
+      })) || [];
+      setCollineOptions(options);
+      setColline("");
+    } catch (error) {
+      console.error("Error loading collines:", error);
+    }
+  };
+
+  // Handle colline change
+  const handleCollineChange = (e) => {
+    setColline(e.target.value);
+  };
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = {
@@ -93,19 +229,15 @@ export default function Edit({
       cultivator_first_name: firstName,
       cultivator_last_name: lastName,
       cultivator_cni: cni,
-      cultivator_assoc_numero_fiche: numFiche,
+      cultivator_telephone: phone,
       date_naissance: date_naissance,
+      cultivator_assoc_numero_fiche: numFiche,
       cultivator_payment_type: payment_mode,
       cultivator_bank_name: bank_name,
       cultivator_bank_account: bank_account,
-      cultivator_assoc_numero_fiche: numFiche,
       cultivator_mobile_payment_account: payment_phone,
       cultivator_account_owner: proprietaire,
-      cultivator_bank_name: bank_name,
-      cultivator_mobile_payment: payment_phone,
-      cultivator_mobile_payment_user_name: proprietaire,
-      cultivator_adress_code: address_code,
-      cultivator_telephone: phone,
+      cultivator_adress_code: colline,
       collector_code: collector_code,
     };
 
@@ -120,12 +252,12 @@ export default function Edit({
             params: {},
             additionalHeaders: {},
             body: formData,
-          },
+          }
         );
-        if (results.status == 200) {
+        if (results.status === 200 || results.id) {
           resolve({ code });
         } else {
-          reject(new Error("Erreur"));
+          reject(new Error("Erreur lors de la modification"));
         }
       } catch (error) {
         reject(error);
@@ -133,10 +265,11 @@ export default function Edit({
     });
 
     toast.promise(promise, {
-      loading: "Modification...",
+      loading: "Modification en cours...",
       success: (data) => {
-        setTimeout(() => window.location.reload(), 1000);
-        return `${data.code} a été modifié avec succès `;
+        setOpen(false);
+        setTimeout(() => setOpen(false), 1000);
+        return `${data.code} a été modifié avec succès`;
       },
       error: "Donnée non modifiée",
     });
@@ -145,7 +278,7 @@ export default function Edit({
       await promise;
     } catch (error) {
       console.error(error);
-      setError(error);
+      setError(error.message || "Une erreur est survenue");
     } finally {
       setLoading(false);
     }
@@ -253,24 +386,71 @@ export default function Edit({
             </div>
             <div className="mt-7">
               <h5 className="mb-5 text-xl font-medium text-primary dark:text-white/90 lg:mb-6">
-                Localite
+                Localité
               </h5>
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Province</Label>
-                  <Input
-                    type="text"
+                  <select
                     value={province}
-                    onChange={(e) => setProvince(e.target.value)}
-                  />
+                    onChange={handleProvinceChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Sélectionner une province</option>
+                    {provinceOptions.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Commune</Label>
-                  <Input
-                    type="text"
+                  <select
                     value={commune}
-                    onChange={(e) => setCommune(e.target.value)}
-                  />
+                    onChange={handleCommuneChange}
+                    disabled={!province}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Sélectionner une commune</option>
+                    {communeOptions.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-2 lg:col-span-1 space-y-2">
+                  <Label>Zone</Label>
+                  <select
+                    value={zone}
+                    onChange={handleZoneChange}
+                    disabled={!commune}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Sélectionner une zone</option>
+                    {zoneOptions.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-2 lg:col-span-1 space-y-2">
+                  <Label>Colline</Label>
+                  <select
+                    value={colline}
+                    onChange={handleCollineChange}
+                    disabled={!zone}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Sélectionner une colline</option>
+                    {collineOptions.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
