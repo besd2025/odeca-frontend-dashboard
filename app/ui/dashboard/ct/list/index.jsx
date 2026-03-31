@@ -82,7 +82,6 @@ export default function CtsListTable({ isLoading: externalLoading }) {
           body: {},
         });
         const results = response?.results;
-        console.log("result: ", results)
         const ctData = results.map((ct) => ({
           id: ct?.id,
           ct: {

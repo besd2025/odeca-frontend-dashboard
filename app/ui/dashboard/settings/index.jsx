@@ -2,10 +2,13 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ProfileUser from "./profile";
 import UsersContent from "./users/UsersContent";
-
+import ChefSocietesContent from "./chef_societtes/ChefSocietesContent";
+import SupervisorsContent from "./supervisors/SuperviseursContent.jsx";
 const tabs = [
   { name: 'Generale', value: 'profil' },
-  { name: 'Utilisateurs', value: 'users' }
+  { name: 'Utilisateurs', value: 'users' },
+  { name: 'chef_societes', value: 'chef_societes' },
+  { name: 'superviseurs', value: 'superviseurs' }
 ]
 
 
@@ -34,6 +37,12 @@ export default function Settings() {
         </TabsContent>
         <TabsContent value="users" className="pt-4">
           <UsersContent />
+        </TabsContent>
+        <TabsContent value="chef_societes" className="pt-4">
+          <ChefSocietesContent />
+        </TabsContent>
+        <TabsContent value="superviseurs" className="pt-4">
+          <SupervisorsContent />
         </TabsContent>
       </Tabs>
     </div>

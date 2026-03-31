@@ -57,6 +57,7 @@ export default function CollectorsList() {
             params: { limit: limit, offset: pointer, search: searchValue, },
           },
         );
+        console.log("response: ", response)
 
         const data = response?.results?.map((item) => ({
           id: item?.id,
@@ -66,8 +67,16 @@ export default function CollectorsList() {
           identifiant: item?.identifiant,
           sdl_ct: "",
           cni: item?.cni || "",
+          localite: {
+            province:
+              item?.adress?.zone_code?.commune_code?.province_code
+                ?.province_name || "",
+            commune: item?.adress?.zone_code?.commune_code?.commune_name,
+            zone:
+              item?.adress?.zone_code?.zone_name || "",
+            colline: item?.adress?.colline_name || "",
+          },
         }))
-        console.log(response)
         setAllCollectors(data)
         setTotalCount(response.count);
       } catch (error) {
@@ -119,6 +128,9 @@ export default function CollectorsList() {
                         </span>
                         <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                           {collector?.identifiant}
+                        </span>
+                        <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                          {collector?.localite?.province} - {collector?.localite?.commune} - {collector?.localite?.zone} - {collector?.localite?.colline}
                         </span>
                       </div>
 
