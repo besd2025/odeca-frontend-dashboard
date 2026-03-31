@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, BarChart3, ClipboardPlus, Eye } from "lucide-react";
+import { FileText, BarChart3, ClipboardPlus, Eye, HandCoins } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -22,20 +22,21 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import Filter from "./filter";
 import PaymentStats from "./payment-stats";
 import Link from "next/link";
 import ComingSoonOverlay from "../../components/coming-soon-overlay";
 
 const recentFiles = [
   {
-    name: "-1 ere tranche ",
-    date: "12/05/2024",
+    name: "1ere Tranche collecte 2026",
+    date: "12/03/2026",
+    intervalle: "01 Avr - 30 Jun 2026",
     icon: FileText,
   },
   {
-    name: "-2 ere tranche ",
-    date: "12/05/2024",
+    name: "2eme Tranche collecte 2026",
+    date: "12/06/2026",
+    intervalle: "01 Juil - 30 Aout 2026",
     icon: FileText,
   },
 ];
@@ -67,7 +68,7 @@ export default function PaymentsPage() {
 
   return (
     <div className="bg-sidebar flex rounded-lg relative">
-      <ComingSoonOverlay transparent={true} />
+      {/* <ComingSoonOverlay transparent={true} /> */}
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
@@ -122,84 +123,38 @@ export default function PaymentsPage() {
                   Liste des paiements recents
                 </h2>
               </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-8">
                 {recentFiles.map((file, index) => (
                   <Card key={index} className="p-2">
                     <div className="flex items-center gap-3">
-                      <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
-                        <file.icon className="text-muted-foreground h-5 w-5" />
+                      <div className="bg-muted flex p-2 items-center justify-center rounded-lg">
+                        <HandCoins className="text-secondary/80 h-12 w-12" />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">
+                      <div className="min-w-0 flex-1 ml-2">
+                        <p className="truncate text-lg font-medium">
                           {file.name}
                         </p>
-                        <p className="text-muted-foreground text-xs flex flex-row items-center">
-                          <Link href="/odeca-dashboard/payments/view-list">
-                            <Button variant="link" className="p-0 m-0 mr-1 ">
+                        <div className="flex flex-row items-center text-sm text-accent-foreground">
+                          <span className="block">du {file.intervalle}</span>
+                        </div>
+                        <div className="text-muted-foreground text-xs flex flex-row items-center justify-between">
+
+                          <span className="block">Exportee le : {file.date}</span>
+                          <Link href="/odeca-dashboard/payments/tranche">
+                            <Button variant="secondary" className=" p-0 m-0 mr-1 ">
                               <Eye />
                               Consulter
                             </Button>
                           </Link>
-
-                          <span className="block">{file.date}</span>
-                        </p>
+                        </div>
                       </div>
                     </div>
                   </Card>
                 ))}
               </div>
             </div>
-
-            {/* All files section */}
-            <div className="bg-sidebar p-2  rounded-lg">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-base font-medium lg:text-lg">
-                  Toutes les listes
-                </h2>
-                <div className="flex items-center gap-2">
-                  <Filter />
-                </div>
-              </div>
-
-              <div className="w-full border rounded-md overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nom</TableHead>
-                      <TableHead>Nbre de Cafeiculteurs</TableHead>
-                      <TableHead>Intervalle</TableHead>
-                      <TableHead>Date de sortie</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {Listes.map((list, index) => (
-                      <TableRow
-                        key={`${list.name}-${index}`}
-                        className="odd:bg-muted/50"
-                      >
-                        <TableCell className="font-medium">
-                          {list.name}
-                        </TableCell>
-                        <TableCell>{list.nbre_cafeiculteurs}</TableCell>
-                        <TableCell>{list.intervalle}</TableCell>
-                        <TableCell>{list.date}</TableCell>
-                        <TableCell className="sticky right-0 bg-background/50">
-                          <Link href="/odeca-dashboard/payments/view-list">
-                            <Button variant="link" className="p-0 m-0 mr-1 ">
-                              <Eye />
-                              Consulter
-                            </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
           </div>
-
-          <div className="border-border bg-card hidden w-80 border-l p-6 xl:block">
+          <div className="border-border bg-card hidden w-96 border-l p-6 xl:block">
             <PaymentStats />
           </div>
         </div>

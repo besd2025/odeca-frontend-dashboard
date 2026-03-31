@@ -148,7 +148,7 @@ export function TopFiveCards() {
             " " +
             item?.cafeiculteur__cultivator_first_name,
           value: item?.total_cerise,
-          sub: "Pieds",
+          sub: "KG",
         }));
         setDataTopQtes(topQtes);
       } catch (error) {
@@ -210,7 +210,7 @@ export function TopFiveCards() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <TopListCard
+      {/* <TopListCard
         title="Top 5 - Nombre de Champs"
         icon={<Sprout className="h-4 w-4" />}
         data={datatopChamps}
@@ -219,12 +219,17 @@ export function TopFiveCards() {
         title="Top 5 - Nombre de Pieds"
         icon={<Trees className="h-4 w-4" />}
         data={datatopPieds}
-      />
-      {/* <TopListCard
-        title="Top 5 - Quantité Produite"
+      /> */}
+      <TopListCard
+        title="Top 5 - Quantité personne Physique"
         icon={<Scale className="h-4 w-4" />}
         data={datatopQtes}
-      /> */}
+      />
+      <TopListCard
+        title="Top 5 - Quantité personne Morale"
+        icon={<Scale className="h-4 w-4" />}
+        data={datatopQtes}
+      />
     </div>
   );
 }

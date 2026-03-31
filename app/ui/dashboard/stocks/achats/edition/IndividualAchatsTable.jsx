@@ -296,7 +296,7 @@ export default function IndividualAchatsTableEdition({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" ? (
+                {/* {user?.session?.category === "Admin" ? (
                   <div>
                     <EditIndividualAchats
                       id={cultivator?.id}
@@ -317,7 +317,7 @@ export default function IndividualAchatsTableEdition({
                   </div>
                 ) : (
                   " "
-                )}
+                )} */}
               </DropdownMenuContent>
             </DropdownMenu>
           );
