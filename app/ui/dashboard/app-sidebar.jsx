@@ -196,7 +196,7 @@ const menuItems = {
       title: "Stocks",
       items: [
         {
-          title: "Details",
+          title: "Détails",
           url: "/odeca-dashboard/stocks",
         },
         {
@@ -204,7 +204,7 @@ const menuItems = {
           url: "/odeca-dashboard/stocks/achats",
         },
         {
-          title: "Transfers",
+          title: "Transferts",
           url: "/odeca-dashboard/stocks/transfers",
         },
       ],
