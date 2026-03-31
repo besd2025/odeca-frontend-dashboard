@@ -149,6 +149,7 @@ const menuItems = {
         </svg>
       ),
       keyword: "usine",
+      roles: ["Admin", "General", "Cafe_ODECA"],
     },
     {
       title: "Societes",
@@ -169,6 +170,7 @@ const menuItems = {
         </svg>
       ),
       keyword: "societies",
+      roles: ["Admin", "General", "Cafe_ODECA"],
     },
     {
       title: "Collecteurs",

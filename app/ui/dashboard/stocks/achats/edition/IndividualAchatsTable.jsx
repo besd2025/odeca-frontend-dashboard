@@ -85,7 +85,7 @@ export default function IndividualAchatsTableEdition({
     const getAchats = async () => {
       setLoading(true);
       try {
-        const response = await fetchData("get", "cafe/achat_cafe/", {
+        const response = await fetchData("get", "cafe/achat_modification/", {
           params: {
             limit: limit,
             offset: pointer,
@@ -93,36 +93,40 @@ export default function IndividualAchatsTableEdition({
             search: searchvalue,
           },
         });
+        console.log("data,", response)
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
+          achat_id: achat?.achat?.id,
+          responsable_id: achat?.achat?.responsable?.unique_code,
           cultivator: {
-            cultivator_id: achat?.cafeiculteur?.id,
-            cultivator_code: achat?.cafeiculteur?.cultivator_code,
-            first_name: achat?.cafeiculteur?.cultivator_first_name,
-            last_name: achat?.cafeiculteur?.cultivator_last_name,
-            image_url: achat?.cafeiculteur?.cultivator_photo,
+            cultivator_id: achat?.achat?.cafeiculteur?.id,
+            cultivator_code: achat?.achat?.cafeiculteur?.cultivator_code,
+            first_name: achat?.achat?.cafeiculteur?.cultivator_first_name,
+            last_name: achat?.achat?.cafeiculteur?.cultivator_last_name,
+            image_url: achat?.achat?.cafeiculteur?.cultivator_photo,
             cultivator_type: "personel",
           },
-          sdl_ct: achat?.responsable?.sdl_ct?.sdl?.sdl_nom
-            ? "SDL " + achat.responsable.sdl_ct.sdl.sdl_nom
-            : "CT " + achat?.responsable?.sdl_ct?.ct?.ct_nom,
+          sdl_ct: achat?.achat?.responsable?.sdl_ct?.sdl?.sdl_nom
+            ? "SDL " + achat.achat?.responsable.sdl_ct.sdl.sdl_nom
+            : "CT " + achat?.achat?.responsable?.sdl_ct?.ct?.ct_nom,
           society:
-            achat?.responsable?.sdl_ct?.sdl?.societe?.nom_societe ||
-            achat?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
+            achat?.achat?.responsable?.sdl_ct?.sdl?.societe?.nom_societe ||
+            achat?.achat?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
           localite: {
             province:
-              achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+              achat?.achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
                 ?.province_code?.province_name || "N/A",
             commune:
-              achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+              achat?.achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
                 ?.commune_name || "N/A",
           },
-          num_fiche: achat?.cafeiculteur?.cultivator_assoc_numero_fiche || "0",
+          num_fiche: achat?.achat?.cafeiculteur?.cultivator_assoc_numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
-          photo_fiche: achat?.photo_fiche,
+          photo_fiche: achat?.achat?.photo_fiche,
+          num_page: achat?.numero_page,
           ca: achat?.quantite_cerise_a || 0,
           cb: achat?.quantite_cerise_b || 0,
-          date: achat?.date_achat || "N/A",
+          date: achat?.achat?.date_achat || "N/A",
         }));
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
@@ -176,13 +180,30 @@ export default function IndividualAchatsTableEdition({
     }
   };
 
-  const HandleApprove = async (id, code) => {
+  const HandleApprove = async (id, num_recu, num_page, ca, cb, responsable_id, cultivator_code) => {
 
     setLoading(true);
 
     const promise = new Promise(async (resolve, reject) => {
       try {
-        //api logic 
+        const formdata = {
+          id: id,
+          numero_page: num_page,
+          numero_recu: num_recu,
+          quantite_cerise_a: ca,
+          quantite_cerise_b: cb,
+          responsable_code: responsable_id,
+          cafeiculteur_code: cultivator_code
+        }
+        const results = await fetchData("patch", `/cafe/achat_cafe/${id}/`, {
+          body: formdata,
+        });
+
+        if (results) {
+          resolve({ cultivator_code });
+        } else {
+          reject(new Error("Erreur"));
+        }
       } catch (error) {
         reject(error);
       }
@@ -192,7 +213,7 @@ export default function IndividualAchatsTableEdition({
       loading: "MODIFICATION...",
       success: (data) => {
         setTimeout(() => window.location.reload(), 1000);
-        return `${data.code} a été modifié avec succès `;
+        return `${cultivator_code} a été modifié avec succès `;
       },
       error: "Donnée non modifiée",
     });
@@ -206,13 +227,18 @@ export default function IndividualAchatsTableEdition({
     }
   };
 
-  const HandleReject = async (id, code) => {
-
-    setLoading(true);
+  const HandleReject = async (id, num_recu, num_page, ca, cb) => {
 
     const promise = new Promise(async (resolve, reject) => {
       try {
-        //api logic 
+        const formdata = {
+          id: id,
+          numero_page: num_page,
+          numero_recu: num_recu,
+          quantite_cerise_a: ca,
+          quantite_cerise_b: cb
+        }
+
       } catch (error) {
         reject(error);
       }
@@ -467,12 +493,12 @@ export default function IndividualAchatsTableEdition({
         header: "Approuver",
         cell: ({ row }) => (
           <div className="text-center font-semibold flex items-center gap-2">
-            <Button onClick={() => HandleApprove(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-green-500/20">
+            <Button onClick={() => HandleApprove(row.original.achat_id, row.original.num_recu, row.original?.num_page, row.original?.ca, row.original?.cb, row?.original?.responsable_id, row?.original?.cultivator?.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-green-500/20">
               <Check className="text-green-500" size={20} />
             </Button>
-            <Button onClick={() => HandleReject(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-red-500/20">
+            {/* <Button onClick={() => HandleReject(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-red-500/20">
               <X className="text-red-500" size={20} />
-            </Button>
+            </Button> */}
           </div>
         ),
       },

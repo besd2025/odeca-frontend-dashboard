@@ -124,11 +124,12 @@ export default function AddUserDialog() {
               <Select onValueChange={handleSelectChange} value={formData.category}>
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner un rôle" />
-                </SelectTrigger>
+                </SelectTrigger> 
                 <SelectContent>
                   <SelectItem value="Admin">Administrateur</SelectItem>
                   <SelectItem value="General">Général</SelectItem>
                   <SelectItem value="Cafe_ODECA">ODECA</SelectItem>
+                  <SelectItem value="Cafe_Chef_societe">SOCIETE</SelectItem>
                 </SelectContent>
               </Select>
             </div>

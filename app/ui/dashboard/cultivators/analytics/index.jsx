@@ -32,7 +32,7 @@ export default function CultivatorAnalytics() {
       </div>
 
       {/* Top 5 Cards */}
-      <TopFiveCards />
+      {/* <TopFiveCards /> */}
 
       {/* Radial Chart: Payment Mode */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -98,7 +98,6 @@ export default function AssociationAchatsTable({
             },
           },
         );
-
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
           cultivator: {
@@ -125,12 +124,12 @@ export default function AssociationAchatsTable({
           },
           num_fiche: achat?.numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
+          num_page: achat?.numero_page || "N/A",
           photo_fiche: achat?.photo_fiche,
           ca: achat?.quantite_cerise_a || 0,
           cb: achat?.quantite_cerise_b || 0,
           date: achat?.date_achat || "N/A",
         }));
-        console.log(response?.results);
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
       } catch (error) {
@@ -318,6 +317,7 @@ export default function AssociationAchatsTable({
                       cultivator={cultivator.cultivator}
                       num_fiche={cultivator.num_fiche}
                       num_recu={cultivator.num_recu}
+                      num_page={cultivator.num_page}
                       ca={cultivator.ca}
                       cb={cultivator.cb}
                       date={cultivator.date}
