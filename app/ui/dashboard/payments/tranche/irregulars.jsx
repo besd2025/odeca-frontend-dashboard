@@ -30,10 +30,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import ExportButton from "@/components/ui/export_button";
-import Filter from "./filter";
+import Filter from "../filter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Link from "next/link";
 import PaginationControls from "@/components/ui/pagination-controls";
+
 const RHData = [
   {
     id: "cultivator_001",
@@ -53,7 +54,7 @@ const RHData = [
   },
 ];
 
-export default function ListView({ data = RHData, title }) {
+export default function Irregulars({ data = RHData }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -62,6 +63,7 @@ export default function ListView({ data = RHData, title }) {
     pageIndex: 0,
     pageSize: 10,
   });
+
   const columns = [
     {
       id: "actions",
@@ -226,11 +228,9 @@ export default function ListView({ data = RHData, title }) {
   return (
     <div className="w-full bg-sidebar rounded-lg">
       <div className="flex flex-col items-start justify-between gap-4 mb-4">
-        {title && (
-          <h1 className="text-xl font-semibold">
-            {title}
-          </h1>
-        )}
+        <h1 className="text-xl font-semibold">
+          Liste des irrégularités
+        </h1>
         <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 w-full">
           <div className="relative w-full sm:w-[300px] lg:w-[380px]">
             <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
@@ -304,8 +304,6 @@ export default function ListView({ data = RHData, title }) {
       </div>
       <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected. */}
         </div>
         <PaginationControls
           page={table.getState().pagination.pageIndex + 1}

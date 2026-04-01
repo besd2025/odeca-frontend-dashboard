@@ -72,8 +72,8 @@ function StatsCard({ id }) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-      <Card className="@container/card col-span-1 lg:col-span-2 relative">
+    <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+      <Card className="@container/card col-span-1 lg:col-span-5 relative">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-primary p-2 rounded-md">
@@ -191,7 +191,7 @@ function StatsCard({ id }) {
 
         </CardHeader>
       </Card>
-      <Card className="@container/card">
+      <Card className="@container/card lg:col-span-3">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-yellow-500 p-2 rounded-md">
@@ -210,22 +210,48 @@ function StatsCard({ id }) {
               .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
             <span className="text-base">FBU</span>
           </CardTitle>
-          <div className="mt-3">
-            <div className="flex flex-row gap-x-1 items-center">
-              <Banknote className="text-secondary" />
+          <div className="flex flex-wrap justify-between items-center gap-2">
+            <div className="">
+              <div className="flex flex-row gap-x-1 items-center">
+                <Banknote className="text-secondary" />
 
-              <CardTitle className="text-muted-foreground font-normal text-sm  ">
-                Tranche 1
+                <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                  Tranche 1
+                </CardTitle>
+              </div>
+              <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
+                0 <span className="text-base">FBU</span>
               </CardTitle>
             </div>
-            <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
-              0 <span className="text-base">FBU</span>
-            </CardTitle>
+            <div className="mt">
+              <div className="flex flex-row gap-x-1 items-center">
+                <Banknote className="text-secondary" />
+
+                <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                  Tranche 2
+                </CardTitle>
+              </div>
+              <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
+                0 <span className="text-base">FBU</span>
+              </CardTitle>
+            </div>
+            <div className="mt-">
+              <div className="flex flex-row gap-x-1 items-center">
+                <Banknote className="text-secondary" />
+
+                <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                  Avance
+                </CardTitle>
+              </div>
+              <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
+                0 <span className="text-base">FBU</span>
+              </CardTitle>
+            </div>
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card ">
-        <CardHeader>
+      <Card className="@container/card col-span-2 p-2">
+        <CardHeader className="p-2">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-full">
               <Users className="text-white" />
