@@ -129,7 +129,6 @@ export default function AssociationAchatsTableEdition({
           cb: achat?.quantite_cerise_b || 0,
           date: achat?.date_achat || "N/A",
         }));
-        console.log(response?.results);
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
       } catch (error) {
@@ -216,7 +215,7 @@ export default function AssociationAchatsTableEdition({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" ? (
+                {/* {user?.session?.category === "Admin" ? (
                   <div>
                     <EditAssociationAchats
                       id={cultivator?.id}
@@ -237,7 +236,7 @@ export default function AssociationAchatsTableEdition({
                   </div>
                 ) : (
                   " "
-                )}
+                )} */}
               </DropdownMenuContent>
             </DropdownMenu>
           );

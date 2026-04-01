@@ -20,12 +20,11 @@ export function UserList() {
         const getUsers = async () => {
             setLoading(true);
             try {
-                const response = await fetchData("get", `cafe/cafe_registration/`, {
+                const response = await fetchData("get", `cafe/chef_societe_registration/`, {
                     params: { limit: 40 },
                     additionalHeaders: {},
                     body: {},
                 });
-                console.log("response: ",response)
                 const users = response.results.map((user) => {
                     return {
                         id: user.id,
@@ -36,6 +35,9 @@ export function UserList() {
                         category: user.category,
                         phone: user.phone,
                         status: user.status,
+                        societe: user.societe_name,
+                        cni: user.cni,
+
                     };
                 });
                 setUsers(users);
@@ -54,25 +56,29 @@ export function UserList() {
                 <TableCaption>Liste des utilisateurs de la plateforme.</TableCaption>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[200px]">Utilisateur</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Catégorie</TableHead>
+                        <TableHead>#</TableHead>
+                        <TableHead>Utilisateur</TableHead>
+                        <TableHead>IDENTIFIANT</TableHead>
+                        <TableHead>CNI</TableHead>
                         <TableHead>Téléphone</TableHead>
+                        <TableHead>Société</TableHead>
                         {/* <TableHead>Statut</TableHead> */}
 
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {users.map((user) => (
+                    {users.map((user, i = 0) => (
                         <TableRow key={user.id} className="hover:bg-muted/30">
+                            <TableCell>{i + 1}</TableCell>
                             <TableCell className="font-medium">
                                 <div className="flex flex-col">
                                     <span className="font-bold text-gray-800 dark:text-white/90">{user.first_name} {user.last_name}</span>
                                 </div>
                             </TableCell>
                             <TableCell>{user.identifiant}</TableCell>
-                            <TableCell>{user.category}</TableCell>
+                            <TableCell>{user.cni}</TableCell>
                             <TableCell>{user.phone}</TableCell>
+                            <TableCell>{user.societe}</TableCell>
                             {/* <TableCell>
                                 <span className={`flex items-center gap-1.5 ${user.status === "Actif" ? "text-green-600" : "text-gray-400"}`}>
                                     <span className={`h-1.5 w-1.5 rounded-full ${user.status === "Actif" ? "bg-green-600 animate-pulse" : "bg-gray-400"}`} />

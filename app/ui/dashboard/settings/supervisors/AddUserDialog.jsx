@@ -27,6 +27,7 @@ export default function AddUserDialog() {
     cni: "",
     telephone: "",
     password: "",
+    adress: "",
     province_code: ""
   });
 
@@ -34,7 +35,7 @@ export default function AddUserDialog() {
   const [commune, setCommune] = useState("");
   const [zone, setZone] = useState("");
   const [colline, setColline] = useState("");
-
+  const [province_code, setProvince_code] = useState("");
   const [provinceOptions, setProvinceOptions] = useState([]);
   const [communeOptions, setCommuneOptions] = useState([]);
   const [zoneOptions, setZoneOptions] = useState([]);
@@ -52,6 +53,7 @@ export default function AddUserDialog() {
 
         setProvinceOptions(provData?.results?.map(p => ({
           value: p.province_name,
+          value_code: p.province_code,
           label: p.province_name
         })) || []);
 
@@ -130,7 +132,7 @@ export default function AddUserDialog() {
         params: { zone: value }
       });
       setCollineOptions(data?.map(c => ({
-        value: c.colline_code,
+        value: c.id,
         label: c.colline_name
       })) || []);
     } catch (err) {
@@ -148,13 +150,18 @@ export default function AddUserDialog() {
     setLoading(true);
 
     const payload = {
-      ...formData,
-
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      identifiant: formData.identifiant,
+      cni: formData.cni,
+      telephone: formData.telephone,
+      password: formData.password,
+      province_code: province_code,
+      adress: colline
     };
-
     try {
       const response = await fetchData("post", `cafe/superviseur_regional_registration/`, {
-        body: formData,
+        body: payload,
       });
       if (response.status === 201 || response.status === 200) {
         toast.success("Superviseur ajouté avec succès");
@@ -284,8 +291,8 @@ export default function AddUserDialog() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Choisir une province</option>
-                    {provinceOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {provinceOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>
@@ -298,8 +305,8 @@ export default function AddUserDialog() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une commune</option>
-                    {communeOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {communeOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>
@@ -312,8 +319,8 @@ export default function AddUserDialog() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une zone</option>
-                    {zoneOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {zoneOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>
@@ -326,8 +333,8 @@ export default function AddUserDialog() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une colline</option>
-                    {collineOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {collineOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>
@@ -341,14 +348,14 @@ export default function AddUserDialog() {
                 <div className="space-y-2">
                   <Label>Province Supervisee</Label>
                   <select
-                    name="adress"
-                    value={formData.adress}
-                    onChange={handleChange}
+                    name="province_code"
+                    value={province_code}
+                    onChange={(e) => setProvince_code(e.target.value)}
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Sélectionner une province</option>
-                    {provinceOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {provinceOptions.map((opt, index) => (
+                      <option key={`${opt.value_code}-${index}`} value={opt.value_code}>{opt.label}</option>
                     ))}
                   </select>
                 </div>

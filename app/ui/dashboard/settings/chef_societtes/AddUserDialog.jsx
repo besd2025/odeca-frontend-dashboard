@@ -296,8 +296,8 @@ export default function AddUserDialog() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Choisir une province</option>
-                    {provinceOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {provinceOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>
@@ -310,8 +310,8 @@ export default function AddUserDialog() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une commune</option>
-                    {communeOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {communeOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>
@@ -324,8 +324,8 @@ export default function AddUserDialog() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une zone</option>
-                    {zoneOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {zoneOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>
@@ -338,8 +338,8 @@ export default function AddUserDialog() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une colline</option>
-                    {collineOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {collineOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>
@@ -360,8 +360,8 @@ export default function AddUserDialog() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Sélectionner une société</option>
-                    {societeOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {societeOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>

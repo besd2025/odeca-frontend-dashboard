@@ -397,8 +397,8 @@ export default function Edit({
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="">Sélectionner une province</option>
-                    {provinceOptions.map((item) => (
-                      <option key={item.value} value={item.value}>
+                    {provinceOptions.map((item, index) => (
+                      <option key={`${item.value}-${index}`} value={item.value}>
                         {item.label}
                       </option>
                     ))}
@@ -413,8 +413,8 @@ export default function Edit({
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="">Sélectionner une commune</option>
-                    {communeOptions.map((item) => (
-                      <option key={item.value} value={item.value}>
+                    {communeOptions.map((item, index) => (
+                      <option key={`${item.value}-${index}`} value={item.value}>
                         {item.label}
                       </option>
                     ))}
@@ -429,8 +429,8 @@ export default function Edit({
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="">Sélectionner une zone</option>
-                    {zoneOptions.map((item) => (
-                      <option key={item.value} value={item.value}>
+                    {zoneOptions.map((item, index) => (
+                      <option key={`${item.value}-${index}`} value={item.value}>
                         {item.label}
                       </option>
                     ))}
@@ -445,8 +445,8 @@ export default function Edit({
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="">Sélectionner une colline</option>
-                    {collineOptions.map((item) => (
-                      <option key={item.value} value={item.value}>
+                    {collineOptions.map((item, index) => (
+                      <option key={`${item.value}-${index}`} value={item.value}>
                         {item.label}
                       </option>
                     ))}

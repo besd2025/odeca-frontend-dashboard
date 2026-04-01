@@ -54,7 +54,9 @@ const PaginationContent = ({
   const actualLimit = Number(limit);
 
   React.useEffect(() => {
-    datapaginationlimit(limit);
+    if (typeof datapaginationlimit === "function") {
+      datapaginationlimit(limit);
+    }
   }, [limit]);
 
   const canGoToPrevious = currentPage > 1;

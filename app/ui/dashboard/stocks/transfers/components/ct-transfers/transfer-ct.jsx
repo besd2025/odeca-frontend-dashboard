@@ -66,33 +66,16 @@ export default function TransferCtDep({
     }
   }, [fethTransfertbtnLoading]);
 
-  // Handle local pagination since parent might not provide datapagination
+  // Use pagination props from parent if available
   const totalCount = datapagination?.totalCount ?? data.length;
   const resolvedTotalPages = datapagination?.totalPages ?? Math.ceil(totalCount / limit);
   const resolvedCurrentPage = datapagination?.currentPage ?? currentPage;
   const resolvedPointer = datapagination?.pointer ?? pointer;
   const resolvedLimit = datapagination?.limit ?? limit;
 
-  const onPageChange = (page) => {
-    if (datapagination?.onPageChange) {
-      datapagination.onPageChange(page);
-    } else {
-      setCurrentPage(page);
-      setPointer((page - 1) * limit);
-    }
-  };
 
-  const onLimitChange = (newLimit) => {
-    if (datapagination?.onLimitChange) {
-      datapagination.onLimitChange(newLimit);
-    } else {
-      setLimit(newLimit);
-      setPointer(0);
-      setCurrentPage(1);
-    }
-  };
-
-  const paginatedData = datapagination ? data : data.slice(resolvedPointer, resolvedPointer + resolvedLimit);
+  // When using server-side pagination, data is already sliced/filtered by the API
+  const paginatedData = data;
   const HandleDelete = async (id, name) => {
     const promise = new Promise(async (resolve, reject) => {
       try {
@@ -330,6 +313,25 @@ export default function TransferCtDep({
     },
     manualPagination: true,
   });
+  const onPageChange = (pageNumber) => {
+    if (datapagination?.onPageChange) {
+      datapagination.onPageChange(pageNumber);
+    } else {
+      setCurrentPage(pageNumber);
+      setPointer((pageNumber - 1) * limit);
+    }
+    setPagination((prev) => ({ ...prev, pageIndex: pageNumber - 1 }));
+  };
+  const onLimitChange = (newLimit) => {
+    if (datapagination?.onLimitChange) {
+      datapagination.onLimitChange(newLimit);
+    } else {
+      setLimit(newLimit);
+      setPointer(0);
+      setCurrentPage(1);
+    }
+    setPagination((prev) => ({ ...prev, pageSize: newLimit, pageIndex: 0 }));
+  };
 
   return (
     <div className="w-full bg-sidebar rounded-lg">

@@ -53,7 +53,7 @@ export default function IndividualAchatsTableEdition({
   const [pointer, setPointer] = useState(0);
   const [filterData, setFilterData] = useState({});
   const [searchvalue, setSearchValue] = useState("");
-
+  const [open, setOpen] = useState(false);
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -93,7 +93,6 @@ export default function IndividualAchatsTableEdition({
             search: searchvalue,
           },
         });
-        console.log("data,", response)
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
           achat_id: achat?.achat?.id,
@@ -180,10 +179,7 @@ export default function IndividualAchatsTableEdition({
     }
   };
 
-  const HandleApprove = async (id, num_recu, num_page, ca, cb, responsable_id, cultivator_code) => {
-
-    setLoading(true);
-
+  const HandleApprove = async (id, achat_id, num_recu, num_page, ca, cb, responsable_id, cultivator_code) => {
     const promise = new Promise(async (resolve, reject) => {
       try {
         const formdata = {
@@ -195,14 +191,20 @@ export default function IndividualAchatsTableEdition({
           responsable_code: responsable_id,
           cafeiculteur_code: cultivator_code
         }
-        const results = await fetchData("patch", `/cafe/achat_cafe/${id}/`, {
+        const results = await fetchData("patch", `/cafe/achat_cafe/${achat_id}/`, {
           body: formdata,
         });
 
-        if (results) {
-          resolve({ cultivator_code });
-        } else {
-          reject(new Error("Erreur"));
+        if (results.status === 200 || results.status === 201) {
+          const response = await fetchData("patch", `/cafe/achat_modification/${id}/`, {
+            body: { is_validated: true },
+          });
+
+          if (response) {
+            resolve({ cultivator_code });
+          } else {
+            reject(new Error("Erreur"));
+          }
         }
       } catch (error) {
         reject(error);
@@ -212,7 +214,7 @@ export default function IndividualAchatsTableEdition({
     toast.promise(promise, {
       loading: "MODIFICATION...",
       success: (data) => {
-        setTimeout(() => window.location.reload(), 1000);
+        setTimeout(() => setOpen(false), 1000);
         return `${cultivator_code} a été modifié avec succès `;
       },
       error: "Donnée non modifiée",
@@ -493,7 +495,7 @@ export default function IndividualAchatsTableEdition({
         header: "Approuver",
         cell: ({ row }) => (
           <div className="text-center font-semibold flex items-center gap-2">
-            <Button onClick={() => HandleApprove(row.original.achat_id, row.original.num_recu, row.original?.num_page, row.original?.ca, row.original?.cb, row?.original?.responsable_id, row?.original?.cultivator?.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-green-500/20">
+            <Button onClick={() => HandleApprove(row.original.id, row.original.achat_id, row.original.num_recu, row.original?.num_page, row.original?.ca, row.original?.cb, row?.original?.responsable_id, row?.original?.cultivator?.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-green-500/20">
               <Check className="text-green-500" size={20} />
             </Button>
             {/* <Button onClick={() => HandleReject(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-red-500/20">

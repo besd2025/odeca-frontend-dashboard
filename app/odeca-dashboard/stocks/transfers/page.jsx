@@ -14,26 +14,24 @@ export default function TransfersPage() {
   const [sdlTransfers, setSdlTransfers] = useState([]);
   const [ctTransfers, setCtTransfers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("sdl");
 
+  // Shared Pagination states
+  const [limit, setLimit] = useState(10);
+  const [pointer, setPointer] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Single useEffect for all data fetching
   useEffect(() => {
-    const getAllTransfers = async () => {
+    const fetchDataForActiveTab = async () => {
       try {
-        setLoading(true);
-        const response = await fetchData("get", "cafe/transfert_sdl_usine/", {
-          body: { limit: 1000, offset: 0 },
-        });
-        const response_ct_sdl = await fetchData(
-          "get",
-          "cafe/transfer_ct_sdl/",
-          {
-            body: { limit: 1000, offset: 0 },
-          },
-        );
-        const results = response?.results || [];
-        const results2 = response_ct_sdl.results || [];
-        const mappedSdlTransfers = results
-          .filter((t) => t.sdl && !t.ct)
-          .map((transfer) => ({
+        if (activeTab === "sdl") {
+          const response = await fetchData("get", "cafe/transfert_sdl_usine/", {
+            params: { limit: limit, offset: pointer },
+          });
+          const results = response?.results || [];
+          const mappedSdlTransfers = results.map((transfer) => ({
             id: transfer.id,
             from_sdl: transfer.sdl?.sdl_nom || "Inconnu",
             usine: transfer.usine_deparchage?.usine_name || "Inconnu",
@@ -51,10 +49,14 @@ export default function TransfersPage() {
                 transfer.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
             },
           }));
-
-        const mappedCtTransfers = results2
-          .filter((t) => t.ct) // Assuming presence of CT source
-          .map((transfer) => ({
+          setSdlTransfers(mappedSdlTransfers);
+          setTotalCount(response?.count || 0);
+        } else {
+          const response_ct_sdl = await fetchData("get", "cafe/transfer_ct_sdl/", {
+            params: { limit: limit, offset: pointer },
+          });
+          const results2 = response_ct_sdl.results || [];
+          const mappedCtTransfers = results2.map((transfer) => ({
             id: transfer.id,
             from_ct: transfer.ct?.ct_nom || "Inconnu",
             to_depulpeur_name: transfer.sdl?.sdl_nom || "Inconnu",
@@ -74,17 +76,43 @@ export default function TransfersPage() {
                 transfer.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
             },
           }));
-        setSdlTransfers(mappedSdlTransfers);
-        setCtTransfers(mappedCtTransfers);
+          setCtTransfers(mappedCtTransfers);
+          setTotalCount(response_ct_sdl?.count || 0);
+        }
       } catch (error) {
-        console.error("Error fetching transfers:", error);
+        console.error(`Error fetching ${activeTab} transfers:`, error);
       } finally {
         setLoading(false);
       }
     };
 
-    getAllTransfers();
-  }, []);
+    fetchDataForActiveTab();
+  }, [activeTab, limit, pointer]);
+
+  const datapagination = {
+    totalCount: totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+    currentPage: currentPage,
+    pointer: pointer,
+    limit: limit,
+
+    onPageChange: (page) => {
+      setCurrentPage(page);
+      setPointer((page - 1) * limit);
+    },
+    onLimitChange: (newLimit) => {
+      setLimit(newLimit);
+      setPointer(0);
+      setCurrentPage(1);
+    },
+  };
+  console.log("pagination", datapagination);
+  const handleTabChange = (value) => {
+    setActiveTab(value);
+    setPointer(0);
+    setCurrentPage(1);
+    setTotalCount(0);
+  };
 
   return (
     <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE]}>
@@ -93,7 +121,7 @@ export default function TransfersPage() {
           <h1 className="text-2xl font-bold">Gestion des Transferts</h1>
         </div>
 
-        <Tabs defaultValue="sdl" className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="w-full h-10 lg:w-fit">
             <TabsTrigger value="sdl" className="flex gap-2">
               <Building2 className="w-4 h-4" />
@@ -119,7 +147,7 @@ export default function TransfersPage() {
               {loading ? (
                 <TableSkeleton rows={5} columns={5} />
               ) : (
-                <TransferSdlDep data={sdlTransfers} />
+                <TransferSdlDep data={sdlTransfers} datapagination={datapagination} />
               )}
             </div>
             <ComingSoonOverlay transparent={true} />
@@ -138,7 +166,7 @@ export default function TransfersPage() {
               {loading ? (
                 <TableSkeleton rows={5} columns={5} />
               ) : (
-                <TransferCtDep data={ctTransfers} />
+                <TransferCtDep data={ctTransfers} datapagination={datapagination} />
               )}
             </div>
           </TabsContent>

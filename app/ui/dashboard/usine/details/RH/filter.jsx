@@ -133,8 +133,8 @@ function Filter({ handleFilter }) {
                         className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner province</option>
-                        {provinceOptions.map((p) => (
-                          <option key={p.value} value={p.value}>
+                        {provinceOptions.map((p, index) => (
+                          <option key={`${p.value}-${index}`} value={p.value}>
                             {p.label}
                           </option>
                         ))}
@@ -153,8 +153,8 @@ function Filter({ handleFilter }) {
                         className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Commune</option>
-                        {communeOptions.map((c) => (
-                          <option key={c.value} value={c.value}>
+                        {communeOptions.map((c, index) => (
+                          <option key={`${c.value}-${index}`} value={c.value}>
                             {c.label}
                           </option>
                         ))}
@@ -172,8 +172,8 @@ function Filter({ handleFilter }) {
                         className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner zone</option>
-                        {zoneOptions.map((z) => (
-                          <option key={z.value} value={z.value}>
+                        {zoneOptions.map((z, index) => (
+                          <option key={`${z.value}-${index}`} value={z.value}>
                             {z.label}
                           </option>
                         ))}
@@ -191,8 +191,8 @@ function Filter({ handleFilter }) {
                         className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Colline</option>
-                        {collineOptions.map((c) => (
-                          <option key={c.value} value={c.value}>
+                        {collineOptions.map((c, index) => (
+                          <option key={`${c.value}-${index}`} value={c.value}>
                             {c.label}
                           </option>
                         ))}
@@ -210,8 +210,8 @@ function Filter({ handleFilter }) {
                         className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner societe</option>
-                        {collineOptions.map((c) => (
-                          <option key={c.value} value={c.value}>
+                        {collineOptions.map((c, index) => (
+                          <option key={`${c.value}-${index}`} value={c.value}>
                             {c.label}
                           </option>
                         ))}
@@ -229,8 +229,8 @@ function Filter({ handleFilter }) {
                         className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
                       >
                         <option value="">Selectionner Colline</option>
-                        {collineOptions.map((c) => (
-                          <option key={c.value} value={c.value}>
+                        {collineOptions.map((c, index) => (
+                          <option key={`${c.value}-${index}`} value={c.value}>
                             {c.label}
                           </option>
                         ))}

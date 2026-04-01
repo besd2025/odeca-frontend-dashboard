@@ -337,8 +337,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Choisir une province</option>
-                    {provinceOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {provinceOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -353,8 +353,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une commune</option>
-                    {communeOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {communeOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -371,8 +371,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une zone</option>
-                    {zoneOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {zoneOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -387,8 +387,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une colline</option>
-                    {collineOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {collineOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -411,8 +411,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Choisir une province</option>
-                    {provinceOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {provinceOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -427,8 +427,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une commune</option>
-                    {communeOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {communeOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -445,8 +445,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une zone</option>
-                    {zoneOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {zoneOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -461,8 +461,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une colline</option>
-                    {collineOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {collineOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -477,8 +477,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une colline</option>
-                    {collineOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {collineOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -505,8 +505,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une colline</option>
-                    {sdlOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {sdlOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -520,8 +520,8 @@ export default function AddCollector() {
                       className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                     >
                       <option value="">Choisir une colline</option>
-                      {sdlOptions.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
+                      {sdlOptions.map((opt, index) => (
+                        <option key={`${opt.value}-${index}`} value={opt.value}>
                           {opt.label}
                         </option>
                       ))}
@@ -546,8 +546,8 @@ export default function AddCollector() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir un CT</option>
-                    {ctOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {ctOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}

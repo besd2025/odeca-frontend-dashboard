@@ -33,6 +33,7 @@ export default function AddCt() {
   const [commune, setCommune] = useState("");
   const [zone, setZone] = useState("");
   const [colline, setColline] = useState("");
+  const [collineCode, setCollineCode] = useState("");
   const [sdl, setSDL] = useState("");
 
   // Options states
@@ -133,6 +134,7 @@ export default function AddCt() {
       });
       setCollineOptions(data?.map(c => ({
         value: c.colline_name,
+        code: c.colline_code,
         label: c.colline_name
       })) || []);
     } catch (err) {
@@ -140,29 +142,40 @@ export default function AddCt() {
     }
   };
 
-  const handleCollineChange = async (e) => {
-    const value = e.target.value;
-    setColline(value);
-    console.log("value", value)
-    setSDL("");
-    setSdlOptions([]);
-
-    if (!value) return;
-
-    try {
-      const data = await fetchData("get", `cafe/stationslavage/`, {
-        params: { colline_name: value }
-      });
-      console.log("data", data)
-      // cafe/stationslavage is paginated, so we use data.results
-      setSdlOptions(data?.results?.map(s => ({
-        value: s.sdl_code,
-        label: s.sdl_nom
-      })) || []);
-    } catch (err) {
-      console.error("Error fetching SDLs:", err);
-    }
+  const handleCollineChange = (e) => {
+    const name = e.target.value;
+    setColline(name);
+    const selected = collineOptions.find(opt => opt.value === name);
+    setCollineCode(selected?.code || "");
+    setSDL(""); // Clear previous SDL selection
   };
+
+  // Fetch SDLs whenever colline or societe changes
+  useEffect(() => {
+    async function fetchSDLs() {
+      if (!colline || !soc) {
+        setSdlOptions([]);
+        return;
+      }
+
+      try {
+        const data = await fetchData("get", `cafe/stationslavage/`, {
+          params: { societe_code: soc, colline_name: colline }
+        });
+
+        setSdlOptions(data?.results?.map(s => ({
+          value: s.sdl_code,
+          label: s.sdl_nom
+        })) || []);
+      } catch (err) {
+        console.error("Error fetching SDLs:", err);
+      }
+    }
+
+    if (open) {
+      fetchSDLs();
+    }
+  }, [colline, soc, open]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -177,7 +190,7 @@ export default function AddCt() {
       ct_code: code,
       ct_nom: ctName,
       societe_code: soc,
-      ct_adress_code: colline,
+      ct_adress_code: collineCode,
       sdl_code: sdl,
     };
 
@@ -207,6 +220,7 @@ export default function AddCt() {
           setCommune("");
           setZone("");
           setColline("");
+          setCollineCode("");
           setCode("");
           setCtName("");
           setSoc("");
@@ -327,8 +341,8 @@ export default function AddCt() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Choisir une province</option>
-                    {provinceOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {provinceOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -343,8 +357,8 @@ export default function AddCt() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une commune</option>
-                    {communeOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {communeOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -361,8 +375,8 @@ export default function AddCt() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une zone</option>
-                    {zoneOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {zoneOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -377,8 +391,8 @@ export default function AddCt() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une colline</option>
-                    {collineOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {collineOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -401,8 +415,8 @@ export default function AddCt() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Choisir une société</option>
-                    {societeOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {societeOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}
@@ -416,8 +430,8 @@ export default function AddCt() {
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="">Choisir une SDL</option>
-                    {sdlOptions?.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
+                    {sdlOptions?.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
                     ))}

@@ -34,7 +34,7 @@ import Filter from "../filter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Link from "next/link";
 import PaginationControls from "@/components/ui/pagination-controls";
-
+import { fetchData } from "@/app/_utils/api";
 const RHData = [
   {
     id: "cultivator_001",
@@ -64,6 +64,33 @@ export default function Validate({ data = RHData }) {
     pageSize: 10,
   });
 
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchData("get", `cafe/cafe_payments/`);
+        consolelog("data", data)
+        const RHData = data?.results?.map((item) => ({
+          id: item.id,
+          cultivator: {
+            cultivator_code: item.cultivator.cultivator_code,
+            first_name: item.cultivator.first_name,
+            last_name: "CultiPrenom",
+            image_url: "/images/logo_1.jpg",
+          },
+          cni: "74/565",
+          ca: 78,
+          ca_price: 7855,
+          cb: 785,
+          cb_price: 4544,
+          qte_total: 555,
+          total_price: 457,
+        }))
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, []);
   const columns = [
     {
       id: "actions",

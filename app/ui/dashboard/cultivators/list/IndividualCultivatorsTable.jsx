@@ -160,7 +160,6 @@ export default function IndividualCultivatorsTable({
         },
       );
       if (initial_export.data?.status == "PENDING") {
-        console.log("initial_export", initial_export);
         const task_id = initial_export?.data?.report_id;
         let isDone = false;
         while (!isDone) {
@@ -194,7 +193,7 @@ export default function IndividualCultivatorsTable({
         params: { report_id: reportId },
         isBlob: true,
       });
-      console.log("downloard", response);
+
       // Créer le blob avec le bon type MIME
       const blob = new Blob([response.data], {
         type:
