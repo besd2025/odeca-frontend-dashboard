@@ -336,9 +336,8 @@ export default function AddCollector({ id }) {
                   <select
                     value={province}
                     onChange={handleProvinceChange}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  >
-                    <option value="">Choisir une province</option>
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20">
+                    <option value="3">Choisir une province</option>
                     {provinceOptions.map((opt, index) => (
                       <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
@@ -384,7 +383,7 @@ export default function AddCollector({ id }) {
                   <Label>Colline</Label>
                   <select
                     value={colline}
-                    onChange={(e) => setColline(e.target.value)}
+                    onChange={handleCollineChange}
                     disabled={!zone}
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
@@ -399,11 +398,14 @@ export default function AddCollector({ id }) {
               </div>
             </div>
 
+
+
+
           </div>
-          <DialogFooter className="mt-6">
-            <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-              Annuler
-            </Button>
+          <DialogFooter className="mt-4">
+            <DialogClose asChild>
+              <Button variant="outline" type="button">Annuler</Button>
+            </DialogClose>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enregistrer
