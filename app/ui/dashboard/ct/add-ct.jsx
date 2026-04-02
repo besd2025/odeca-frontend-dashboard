@@ -49,7 +49,7 @@ export default function AddCt() {
     async function loadInitialData() {
       try {
         const [provData, socData] = await Promise.all([
-          fetchData("get", `adress/province/`, { params: { offset: 0, limit: 5 } }),
+          fetchData("get", `adress/province/`, { params: { offset: 0, limit: 100 } }),
           fetchData("get", `cafe/societes/`, { params: { offset: 0, limit: 150 } })
         ]);
 

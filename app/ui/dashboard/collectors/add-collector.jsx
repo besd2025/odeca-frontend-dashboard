@@ -13,11 +13,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Workflow } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { toast } from "sonner";
 
-export default function AddCollector() {
+
+
+export default function AddCollector({ id }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -31,7 +33,6 @@ export default function AddCollector() {
     identifiant: "",
     password: "",
   });
-
   const [province, setProvince] = useState("");
   const [commune, setCommune] = useState("");
   const [zone, setZone] = useState("");
@@ -51,13 +52,14 @@ export default function AddCollector() {
   useEffect(() => {
     async function loadInitialData() {
       try {
-        const provData = await fetchData("get", `adress/province/`, {
-          params: { offset: 0, limit: 5 }
-        });
+        const provData = await fetchData("get", `adress/province/`, { params: { offset: 0, limit: 5 } });
+
         setProvinceOptions(provData?.results?.map(p => ({
           value: p.province_name,
           label: p.province_name
         })) || []);
+
+
       } catch (err) {
         console.error("Error loading initial data:", err);
       }
@@ -191,51 +193,51 @@ export default function AddCollector() {
       adress_code: colline,
       ct_code: ct,
     };
+    console.log("payload", payload)
+    // const promise = new Promise(async (resolve, reject) => {
+    //   try {
+    //     const results = await fetchData("post", `/cafe/responsable_registration/`, {
+    //       body: payload,
+    //     });
 
-    const promise = new Promise(async (resolve, reject) => {
-      try {
-        const results = await fetchData("post", `/cafe/responsable_registration/`, {
-          body: payload,
-        });
+    //     if (results.status === 200 || results.status === 201) {
+    //       resolve(results);
+    //     } else {
+    //       reject(new Error("Erreur de l'ajout"));
+    //     }
+    //   } catch (err) {
+    //     reject(err);
+    //   }
+    // });
 
-        if (results.status === 200 || results.status === 201) {
-          resolve(results);
-        } else {
-          reject(new Error("Erreur de l'ajout"));
-        }
-      } catch (err) {
-        reject(err);
-      }
-    });
+    // toast.promise(promise, {
+    //   loading: "Ajout du collecteur...",
+    //   success: () => {
+    //     setTimeout(() => {
+    //       setOpen(false);
+    //       // window.location.reload(); 
+    //     }, 1000);
+    //     return `Le collecteur ${formData.first_name} ${formData.last_name} a été ajouté avec succès`;
+    //   },
+    //   error: (err) => err.message || "Donnée non ajoutée",
+    // });
 
-    toast.promise(promise, {
-      loading: "Ajout du collecteur...",
-      success: () => {
-        setTimeout(() => {
-          setOpen(false);
-          // window.location.reload(); 
-        }, 1000);
-        return `Le collecteur ${formData.first_name} ${formData.last_name} a été ajouté avec succès`;
-      },
-      error: (err) => err.message || "Donnée non ajoutée",
-    });
-
-    try {
-      await promise;
-    } catch (err) {
-      console.error(err);
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
+    // try {
+    //   await promise;
+    // } catch (err) {
+    //   console.error(err);
+    //   setError(err);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="font-normal text-sm">
-          <Plus className="mr-2 h-4 w-4" />
-          Ajouter Un Collecteur
+        <Button className="font-normal text-sm w-full bg-transparent border-none" variant="outline">
+          <Workflow />
+          <span>Affecter</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] bg-sidebar">
@@ -323,7 +325,7 @@ export default function AddCollector() {
               </div>
             </div>
 
-            {/* Locality Collector */}
+            {/* Locality Section */}
             <div className="mt-7">
               <h5 className="mb-5 text-xl font-medium text-primary dark:text-white/90 lg:mb-6">
                 Localité
@@ -334,7 +336,7 @@ export default function AddCollector() {
                   <select
                     value={province}
                     onChange={handleProvinceChange}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une province</option>
                     {provinceOptions.map((opt, index) => (
@@ -382,7 +384,7 @@ export default function AddCollector() {
                   <Label>Colline</Label>
                   <select
                     value={colline}
-                    onChange={handleCollineChange}
+                    onChange={(e) => setColline(e.target.value)}
                     disabled={!zone}
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
@@ -397,164 +399,6 @@ export default function AddCollector() {
               </div>
             </div>
 
-            {/* Locality LIEU DE TRAVAIL */}
-            <div className="mt-7">
-              <h5 className="mb-5 text-xl font-medium text-primary dark:text-white/90 lg:mb-6">
-                Lieu de travail
-              </h5>
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Province</Label>
-                  <select
-                    value={province}
-                    onChange={handleProvinceChange}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="">Choisir une province</option>
-                    {provinceOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Commune</Label>
-                  <select
-                    value={commune}
-                    onChange={handleCommuneChange}
-                    disabled={!province}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  >
-                    <option value="">Choisir une commune</option>
-                    {communeOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2 mt-5">
-                <div className="space-y-2">
-                  <Label>Zone</Label>
-                  <select
-                    value={zone}
-                    onChange={handleZoneChange}
-                    disabled={!commune}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  >
-                    <option value="">Choisir une zone</option>
-                    {zoneOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Colline</Label>
-                  <select
-                    value={colline}
-                    onChange={handleCollineChange}
-                    disabled={!zone}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  >
-                    <option value="">Choisir une colline</option>
-                    {collineOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Colline</Label>
-                  <select
-                    value={colline}
-                    onChange={handleCollineChange}
-                    disabled={!zone}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  >
-                    <option value="">Choisir une colline</option>
-                    {collineOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label>SDL/CT</Label>
-                  <select
-                    value={sdl_ct}
-                    onChange={handleSdlCtChange}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  >
-                    <option value="">Choisir une colline</option>
-                    <option value="SDL">SDL</option>
-                    <option value="CT">CT</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label>SDL</Label>
-                  <select
-                    value={colline}
-                    onChange={handleCollineChange}
-                    disabled={!zone}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  >
-                    <option value="">Choisir une colline</option>
-                    {sdlOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="space-y-2">
-                    <Label>CT</Label>
-                    <select
-                      value={colline}
-                      onChange={handleCollineChange}
-                      disabled={!zone}
-                      className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                    >
-                      <option value="">Choisir une colline</option>
-                      {sdlOptions.map((opt, index) => (
-                        <option key={`${opt.value}-${index}`} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Affiliation Section */}
-            <div className="mt-7">
-              <h5 className="mb-5 text-xl font-medium text-primary dark:text-white/90 lg:mb-6">
-                Affiliation
-              </h5>
-              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Centre de Traitement (CT)</Label>
-                  <select
-                    value={ct}
-                    onChange={(e) => setCt(e.target.value)}
-                    disabled={!colline}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  >
-                    <option value="">Choisir un CT</option>
-                    {ctOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
           </div>
           <DialogFooter className="mt-6">
             <Button variant="outline" type="button" onClick={() => setOpen(false)}>

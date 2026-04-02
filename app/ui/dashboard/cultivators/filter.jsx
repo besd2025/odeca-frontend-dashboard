@@ -79,7 +79,7 @@ function Filter({ handleFilter }) {
     async function getData() {
       try {
         const provinces = await fetchData("get", `adress/province/`, {
-          params: { offset: 0, limit: 5 },
+          params: { offset: 0, limit: 100 },
           additionalHeaders: {},
           body: {},
         });

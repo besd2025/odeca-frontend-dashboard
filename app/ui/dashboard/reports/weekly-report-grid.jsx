@@ -14,11 +14,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { fetchData } from "@/app/_utils/api";
+import { toast } from "sonner";
 
-export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = false }) {
+export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = false, dateFrom, dateTo }) {
   // Initialiser le state avec les données reçues
   const [data, setData] = useState([]);
+  const [formData, setFormData] = useState({
 
+  })
   useEffect(() => {
     // Transformer les items en un format gérable par le state
     const initialData = items.map((item) => ({
@@ -39,7 +43,9 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
         if (row.id === id) {
           // Validation de base pour s'assurer que seuls les nombres positifs sont entrés pour ca et cb
           if ((field === "ca" || field === "cb") && value !== "" && Number(value) < 0) {
-            return row;
+            setFormData({
+              row
+            })
           }
           return { ...row, [field]: value };
         }
@@ -48,6 +54,26 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
     );
   };
 
+  const handleSend = async () => {
+    const formatData = data.map((item) => ({
+      id: item.id,
+      name: item.name,
+      ca: item.ca,
+      cb: item.cb,
+      date_from: dateFrom,
+      date_to: dateTo,
+
+    }));
+    const response = await fetchData("post", `cafe/weekly-report/`, {
+      body: formatData,
+    });
+    if (response.status === 201) {
+      toast.success("Rapport envoyé avec succès");
+    } else {
+      toast.error("Erreur lors de l'envoi du rapport");
+    }
+
+  }
   return (
     <Card className=" shadow-none p-1 ">
       <CardContent className="p-0">
@@ -131,7 +157,7 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
                   Assurez-vous de vérifier les "Totaux" avant de valider votre semaine.
                 </p>
                 <div className="flex gap-3 w-full sm:w-auto">
-                  <Button className="w-full sm:w-auto flex gap-2 bg-primary hover:bg-primary/90 text-white shadow-md">
+                  <Button className="w-full sm:w-auto flex gap-2 bg-primary hover:bg-primary/90 text-white shadow-md" onClick={handleSend}>
                     <Send className="w-4 h-4" />
                     Envoyer
                   </Button>
