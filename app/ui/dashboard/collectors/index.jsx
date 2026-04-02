@@ -93,7 +93,7 @@ export default function CollectorsList() {
             className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background border-none"
           />
         </div>
-        {user?.session?.category === "Admin" && <AddCollector />}
+
       </div>
 
       <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden ">

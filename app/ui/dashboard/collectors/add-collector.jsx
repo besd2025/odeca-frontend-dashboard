@@ -12,9 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus } from "lucide-react";
+import { Plus, Workflow } from "lucide-react";
 
-export default function AddCollector() {
+export default function AddCollector({ id }) {
   const [open, setOpen] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -48,9 +48,9 @@ export default function AddCollector() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="font-normal text-sm">
-          <Plus className="mr-2 h-4 w-4" />
-          Ajouter Un Collecteur
+        <Button className="font-normal text-sm w-full bg-transparent border-none" variant="outline">
+          <Workflow />
+          <span>Affecter</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] bg-sidebar">
