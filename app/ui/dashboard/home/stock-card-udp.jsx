@@ -118,7 +118,7 @@ export function StockSummaryCardUDP() {
               {formatValue(data.total)}
             </span>
             <span className="text-sm font-medium">
-              {data.total_value
+              {Math.round(data.total_value ?? 0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
               FBU

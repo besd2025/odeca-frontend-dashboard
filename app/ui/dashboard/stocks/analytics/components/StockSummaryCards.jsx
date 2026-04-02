@@ -158,7 +158,7 @@ export function StockSummaryCards() {
         <CardContent>
           <div className="text-2xl font-bold">
             {" "}
-            {(data?.total_montant_achat ?? 0)
+            {Math.round(data?.total_montant_achat ?? 0)
               .toString()
               .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
             FBU

@@ -206,7 +206,7 @@ export default function StatsCard({ id }) {
               </CardTitle>
             </div>
             <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-              {(data?.total_montant_achat ?? 0)
+              {Math.round(data?.total_montant_achat ?? 0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
               <span className="text-xs font-normal text-muted-foreground">

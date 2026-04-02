@@ -79,16 +79,16 @@ export function SdlLocationChart() {
           <CardTitle>Répartition Géographique</CardTitle>
           <CardDescription>Par Province ou Région</CardDescription>
         </div>
-        <Tabs
+        {/* <Tabs
           defaultValue="province"
           onValueChange={setLocFilter}
           className="w-full lg:w-[250px]"
         >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="province">Province</TabsTrigger>
-            {/* <TabsTrigger value="region">Région</TabsTrigger> */}
+             <TabsTrigger value="region">Région</TabsTrigger>
           </TabsList>
-        </Tabs>
+        </Tabs> */}
       </CardHeader>
       <CardContent>
         <ChartContainer
