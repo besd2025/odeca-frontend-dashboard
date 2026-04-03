@@ -27,6 +27,7 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
     // Transformer les items en un format gérable par le state
     const initialData = items.map((item) => ({
       id: item.id,
+      responsable_id: item.responsable_id,
       name: item.name,
       ca: item.ca || "",
       cb: item.cb || "",
@@ -46,6 +47,7 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
             setFormData({
               row
             })
+            return row;
           }
           return { ...row, [field]: value };
         }
@@ -55,25 +57,44 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
   };
 
   const handleSend = async () => {
-    const formatData = data.map((item) => ({
-      id: item.id,
-      name: item.name,
-      ca: item.ca,
-      cb: item.cb,
-      date_from: dateFrom,
-      date_to: dateTo,
-
-    }));
-    const response = await fetchData("post", `cafe/weekly-report/`, {
-      body: formatData,
-    });
-    if (response.status === 201) {
-      toast.success("Rapport envoyé avec succès");
-    } else {
-      toast.error("Erreur lors de l'envoi du rapport");
+    if (!dateFrom || !dateTo) {
+      toast.error("Veuillez sélectionner une période (Date début et Date fin)");
+      return;
     }
 
-  }
+    // Filtrer les lignes qui ont au moins une valeur saisie pour éviter d'envoyer des rapports vides si nécessaire
+    // Mais ici le code original envoyait tout, donc on garde l'envoi de tout pour être sûr.
+
+    try {
+      const promises = data.map((item) => {
+        const payload = {
+          sdl_ct: item.responsable_id,
+          quantite_cerise_a: Number(item.ca) || 0,
+          quantite_cerise_b: Number(item.cb) || 0,
+          week_beginning: dateFrom,
+          week_end: dateTo,
+        };
+        return fetchData("post", `cafe/rapportages_sdl_ct/`, {
+          body: payload,
+        });
+      });
+
+      const responses = await Promise.all(promises);
+
+      const failures = responses.filter(res => res.status !== 201 && res.status !== 200);
+
+      if (failures.length === 0) {
+        toast.success("Tous les rapports ont été envoyés avec succès");
+      } else if (failures.length < data.length) {
+        toast.warning(`${data.length - failures.length} rapports envoyés, ${failures.length} échecs.`);
+      } else {
+        toast.error("Échec de l'envoi des rapports");
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Une erreur est survenue lors de l'envoi");
+    }
+  };
   return (
     <Card className=" shadow-none p-1 ">
       <CardContent className="p-0">

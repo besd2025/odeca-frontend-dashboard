@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -12,11 +13,16 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
-
-
+import { useEffect, useState } from 'react';
+import { fetchData } from '@/app/_utils/api';
+import { useSearchParams } from 'next/navigation';
 
 export default function DetailsReports() {
     // Mocks de données pour la province du superviseur (ex: Ngozi)
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id_rapport");
+    const [SDLreport, setSDLReport] = useState([]);
+    const [CTreport, setCTReport] = useState([]);
     const mockSdlData = [
         { id: 1, name: "SDL Kiremba", ca: "300", cb: "350" },
         { id: 2, name: "SDL Nyarusagera", ca: "400", cb: "420" },
@@ -28,6 +34,46 @@ export default function DetailsReports() {
         { id: 101, name: "CT Ngozi Centre", ca: "50", cb: "60" },
         { id: 102, name: "CT Murehe", ca: "50", cb: "40" },
     ];
+
+
+    const [totals, setTotals] = useState({ ca: 0, cb: 0, general: 0 });
+    useEffect(() => {
+        const fetchReport = async () => {
+            try {
+                const response = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/${id}/get_list_sdl_ct_per_week/`);
+                const responseValue = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/${id}/`);
+                const items = response?.results || [];
+
+                const sdlItems = items.filter(item => item.sdl_ct?.sdl_ct?.sdl?.sdl_nom).map((item) => ({
+                    id: item.id,
+                    responsable_id: item.sdl_ct?.sdl_ct?.sdl?.id,
+                    name: item.sdl_ct?.sdl_ct?.sdl?.sdl_nom,
+                    ca: item.quantite_cerise_a,
+                    cb: item.quantite_cerise_b
+                }));
+                const ctItems = items.filter(item => item.sdl_ct?.sdl_ct?.ct?.ct_nom).map((item) => ({
+                    id: item.id,
+                    responsable_id: item.sdl_ct?.sdl_ct?.ct?.id,
+                    name: item.sdl_ct?.sdl_ct?.ct?.ct_nom,
+                    ca: item.quantite_cerise_a,
+                    cb: item.quantite_cerise_b
+                }));
+
+                setSDLReport(sdlItems);
+                setCTReport(ctItems);
+
+                // Calculer les totaux dynamiques
+                setTotals({
+                    ca: responseValue?.quantite_cerise_a,
+                    cb: responseValue?.quantite_cerise_b,
+                    general: responseValue?.quantite_cerise_a + responseValue?.quantite_cerise_b
+                });
+            } catch (error) {
+                console.error("Error fetching report:", error);
+            }
+        };
+        if (id) fetchReport();
+    }, [id]);
 
     return (
         <div className="p-2 md:p-8 gap-y-6 max-w-7xl flex flex-col min-h-screen">
@@ -60,12 +106,12 @@ export default function DetailsReports() {
 
             <div className=" shadow-none">
                 <div className="flex flex-col gap-y-1 bg-card rounded-md p-3 mb-4">
-                    <h1 className="text-xl font-semibold">Total General: 2584 Kg</h1>
+                    <h1 className="text-xl font-semibold">Total General: {totals.general.toLocaleString()} Kg</h1>
                     <div className="flex items-center gap-x-1 pl-4"><Grape className="text-primary size-5" />
-                        <h1 className="text-md ">Total CA: 1254 Kg</h1>
+                        <h1 className="text-md ">Total CA: {totals.ca.toLocaleString()} Kg</h1>
                     </div>
                     <div className="flex items-center gap-x-1 pl-4"><Grape className="text-secondary size-5" />
-                        <h1 className="text-md ">Total CB: 1330 Kg</h1>
+                        <h1 className="text-md ">Total CB: {totals.cb.toLocaleString()} Kg</h1>
                     </div>
                 </div>
                 <Tabs defaultValue="sdl" className="w-full">
@@ -102,11 +148,11 @@ export default function DetailsReports() {
 
                     <TabsContent value="sdl" className="border-none outline-none p-0 focus:ring-0">
 
-                        <WeeklyReportGrid items={mockSdlData} type="SDL" readOnly={true} />
+                        <WeeklyReportGrid items={SDLreport} type="SDL" readOnly={true} />
                     </TabsContent>
 
                     <TabsContent value="ct" className="m-0 border-none outline-none   p-0 focus:ring-0">
-                        <WeeklyReportGrid items={mockCtData} type="CT" readOnly={true} />
+                        <WeeklyReportGrid items={CTreport} type="CT" readOnly={true} />
                     </TabsContent>
                 </Tabs>
 

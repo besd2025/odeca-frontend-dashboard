@@ -14,11 +14,10 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import PaginationContent from '@/components/ui/pagination-content';
-
+import { fetchData } from '@/app/_utils/api';
 export const metadata = {
     title: "Historique des Rapports | ODECA",
 };
-
 export default function ReportsPage() {
     // Mocks simplifiés de rapports passés
     const pastReports = [
@@ -30,7 +29,29 @@ export default function ReportsPage() {
     const [pointer, setPointer] = useState(0);
     const [allCollectors, setAllCollectors] = useState([])
     const [totalCount, setTotalCount] = useState(0);
+    const [reports, setReports] = useState([])
 
+    React.useEffect(() => {
+
+        const fetchReports = async () => {
+            try {
+                const response = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/`);
+                const pastReports = response?.results?.map((item) => ({
+                    id: item.id,
+                    week: item.semaine,
+                    dates: item?.week_beginning + " - " + item?.week_end,
+                    totalCa: item.quantite_cerise_a,
+                    totalCb: item.quantite_cerise_b,
+                    status: item.statut,
+                }))
+                setReports(pastReports);
+                setTotalCount(response?.count);
+            } catch (error) {
+                console.error("Error fetching reports:", error);
+            }
+        };
+        fetchReports();
+    }, []);
 
     const onPageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -72,31 +93,31 @@ export default function ReportsPage() {
                         <Table className="lg:min-w-[800px] min-w-full">
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[150px]">Semaine</TableHead>
+                                    {/* <TableHead className="w-[150px]">Semaine</TableHead> */}
                                     <TableHead>Période</TableHead>
                                     <TableHead>Total CA</TableHead>
                                     <TableHead>Total CB</TableHead>
-                                    <TableHead>Auteur</TableHead>
-                                    <TableHead>Statut</TableHead>
+                                    {/* <TableHead>Auteur</TableHead> */}
+                                    {/* <TableHead>Statut</TableHead> */}
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {pastReports.map((report) => (
+                                {reports.map((report) => (
                                     <TableRow key={report.id}>
-                                        <TableCell className="font-medium">{report.week}</TableCell>
+                                        {/* <TableCell className="font-medium">{report.week}</TableCell> */}
                                         <TableCell>{report.dates}</TableCell>
                                         <TableCell>{report.totalCa.toLocaleString()} kg</TableCell>
                                         <TableCell>{report.totalCb.toLocaleString()} kg</TableCell>
-                                        <TableCell>{report.author}</TableCell>
-                                        <TableCell>
+                                        {/* <TableCell>{report.author}</TableCell> */}
+                                        {/* <TableCell>
                                             <Badge variant="secondary" >
                                                 {report.status}
                                             </Badge>
-                                        </TableCell>
+                                        </TableCell> */}
                                         <TableCell className="text-right">
                                             <Button variant="ghost" size="sm">
-                                                <Link href={`/odeca-dashboard/reports/details`} className="flex items-center">
+                                                <Link href={`/odeca-dashboard/reports/details?id_rapport=${report.id}`} className="flex items-center">
                                                     <Eye className="w-4 h-4 mr-2" /> Voir
                                                 </Link>
                                             </Button>

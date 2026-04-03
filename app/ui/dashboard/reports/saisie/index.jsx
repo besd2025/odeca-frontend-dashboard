@@ -39,6 +39,7 @@ export default function Saisie() {
         const data = await fetchData("get", `cafe/stationslavage/`);
         const mockSdlData = data?.results?.map((item) => ({
           id: item.id,
+          responsable_id: item.sdl_responsable?.id,
           name: item.sdl_nom,
           ca: "",
           cb: ""
@@ -46,6 +47,7 @@ export default function Saisie() {
         const ct = await fetchData("get", `cafe/centres_transite/`);
         const mockCtData = ct?.results?.map((item) => ({
           id: item.id,
+          responsable_id: item.ct_responsable?.id,
           name: item.ct_nom,
           ca: "",
           cb: ""
