@@ -26,7 +26,7 @@ function ActivityList({ cult_id }) {
           <Ventes cult_id={cult_id} />
         </TabsContent>
         <TabsContent value="edits">
-          <EditHistory />
+          <EditHistory cult_id={cult_id} />
         </TabsContent>
         <TabsContent value="maps">
           <CultivatorMap cult_id={cult_id} />
