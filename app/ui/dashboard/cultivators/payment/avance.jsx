@@ -207,7 +207,7 @@ export default function AvancePayment({
             <DialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className="w-full justify-start font-normal text-sm"
+                    className="justify-start font-normal text-sm"
                 >
                     <HandCoins className="mr-2 h-4 w-4" />
                     Avance
@@ -239,7 +239,7 @@ export default function AvancePayment({
                             <div className="space-y-2">
                                 <Label>Province</Label>
                                 <Select value={province} onValueChange={handleProvinceChange}>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Province" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -254,7 +254,7 @@ export default function AvancePayment({
                             <div className="space-y-2">
                                 <Label>Commune</Label>
                                 <Select value={commune} onValueChange={handleCommuneChange} disabled={!province}>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Commune" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -269,7 +269,7 @@ export default function AvancePayment({
                             <div className="space-y-2">
                                 <Label>Zone</Label>
                                 <Select value={zone} onValueChange={handleZoneChange} disabled={!commune}>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Zone" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -284,7 +284,7 @@ export default function AvancePayment({
                             <div className="space-y-2">
                                 <Label>Colline</Label>
                                 <Select value={colline} onValueChange={handleCollineChange} disabled={!zone}>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Colline" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -304,7 +304,7 @@ export default function AvancePayment({
                         <div className="space-y-2">
                             <Label>Sélectionner la SDL</Label>
                             <Select value={sdlId} onValueChange={setSdlId} disabled={!colline}>
-                                <SelectTrigger>
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder={colline ? "Sélectionner une SDL" : "Veuillez d'abord choisir une colline"} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -322,7 +322,7 @@ export default function AvancePayment({
                         <h5 className="text-lg font-medium text-primary">Montant de l'avance</h5>
                         <div className="space-y-2">
                             <Label>Montant (FBU)</Label>
-                            <Input type="number" placeholder="Entrez le montant" required />
+                            <Input type="number" placeholder="Entrez le montant" required className="w-48" />
                         </div>
                     </div>
 
