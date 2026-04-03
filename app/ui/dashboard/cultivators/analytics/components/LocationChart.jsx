@@ -151,7 +151,7 @@ export function LocationChart() {
                 dataKey="count"
                 position="insideRight"
                 offset={8}
-                className="fill-black dark:fill-white"
+                className="fill-white"
                 fontSize={12}
               />
             </Bar>

@@ -107,7 +107,7 @@ export function StockSummaryCard() {
               )}
             </span>
             <span className="text-sm font-medium">
-              {(data?.total_montant_cerise_a_achat ?? 0)
+              {Math.round(data?.total_montant_cerise_a_achat ?? 0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
               FBU
@@ -133,7 +133,7 @@ export function StockSummaryCard() {
               )}
             </span>
             <span className="text-sm font-medium">
-              {(data?.total_montant_cerise_b_achat ?? 0)
+              {Math.round(data?.total_montant_cerise_b_achat ?? 0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
               FBU
@@ -255,7 +255,7 @@ export function StockSummaryCard() {
           </div>
           <span className="text-xl font-bold tabular-nums">
             {" "}
-            {(data?.total_montant_achat ?? 0)
+            {Math.round(data?.total_montant_achat ?? 0)
               .toString()
               .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
             FBU

@@ -243,7 +243,7 @@ export default function NoAffectedCts({ isLoading: externalLoading }) {
                                 onSelect={(e) => e.preventDefault()}
                                 className="w-full p-0"
                             >
-                                <AddCollector id={ct.id} />
+                                <AddCollector code={ct?.ct?.ct_code} type="CT" />
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <Link href={`/odeca-dashboard/ct/details/?id=${ct.id}`}>

@@ -249,7 +249,7 @@ export default function NoAffectedSDLs({ isLoading: externalLoading }) {
                                 onSelect={(e) => e.preventDefault()}
                                 className="w-full p-0"
                             >
-                                <AddCollector id={sdl.id} />
+                                <AddCollector code={sdl?.sdl?.sdl_code} type="SDL" />
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <Link href={`/odeca-dashboard/sdl/details/?id=${sdl?.id}`}>

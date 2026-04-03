@@ -50,15 +50,18 @@ export function GenreChart() {
             body: {},
           }
         );
+        const total = (response?.hommes || 0) + (response?.femmes || 0);
         const chartData = [
           {
             browser: "hommes",
-            visitors: response?.hommes,
+            visitors: response?.hommes || 0,
+            percentage: total > 0 ? ((response?.hommes / total) * 100).toFixed(1) : 0,
             fill: "var(--color-hommes)",
           },
           {
             browser: "femmes",
-            visitors: response?.femmes,
+            visitors: response?.femmes || 0,
+            percentage: total > 0 ? ((response?.femmes / total) * 100).toFixed(1) : 0,
             fill: "var(--color-femmes)",
           },
         ];
@@ -97,11 +100,19 @@ export function GenreChart() {
             />
             <Pie data={data} dataKey="visitors">
               <LabelList
-                dataKey="browser"
+                // dataKey="browser"
                 className="fill-black"
                 stroke="none"
                 fontSize={12}
                 formatter={(value) => chartConfig[value]?.label}
+              />
+              <LabelList
+                dataKey="percentage"
+                position="inside"
+                className="fill-white"
+                stroke="none"
+                fontSize={13}
+                formatter={(value) => `${value}%`}
               />
             </Pie>
             <ChartLegend

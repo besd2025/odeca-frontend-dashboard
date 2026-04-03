@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sprout, Trees, Scale, MoreHorizontal } from "lucide-react";
+import { Sprout, Trees, Scale, MoreHorizontal, Users } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
@@ -28,7 +28,7 @@ function TopListCard({ title, icon, data }) {
           {data.map((item, i) => (
             <div key={i} className="grid grid-cols-3">
               <div className="flex items-center gap-2 col-span-1">
-                <ViewImageDialog imageUrl={item.image} />
+                {item.image && <ViewImageDialog imageUrl={item.image} />}
                 <span className="text-sm font-medium leading-none">
                   {item.name}
                 </span>
@@ -69,6 +69,43 @@ export function TopFiveCards() {
   const [datatopChamps, setDataTopChamps] = React.useState([]);
   const [datatopPieds, setDataTopPieds] = React.useState([]);
   const [datatopQtes, setDataTopQtes] = React.useState([]);
+  const [datatopSocieties, setDataTopSocieties] = React.useState([
+    {
+      id: 1,
+      name: "SOGESTAL KAYANZA",
+      value: 12450,
+      sub: "Cafeic...",
+      image: null,
+    },
+    {
+      id: 2,
+      name: "SOGESTAL NGOZI",
+      value: 10800,
+      sub: "Cafeic...",
+      image: null,
+    },
+    {
+      id: 3,
+      name: "GREENCO",
+      value: 8500,
+      sub: "Cafeic...",
+      image: null,
+    },
+    {
+      id: 4,
+      name: "HORAMAMA COFFEE",
+      value: 7200,
+      sub: "Cafeic...",
+      image: null,
+    },
+    {
+      id: 5,
+      name: "BUGESTAL",
+      value: 5400,
+      sub: "Cafeic...",
+      image: null,
+    },
+  ]);
   React.useEffect(() => {
     const getChamps = async () => {
       try {
@@ -225,11 +262,16 @@ export function TopFiveCards() {
         icon={<Scale className="h-4 w-4" />}
         data={datatopQtes}
       />
-      <TopListCard
+      {/* <TopListCard
         title="Top 5 - Quantité personne Morale"
         icon={<Scale className="h-4 w-4" />}
         data={datatopQtes}
       />
+      <TopListCard
+        title="Top 5 - Societe avec cafeiculteurs enregistrée"
+        icon={<Users className="h-4 w-4" />}
+        data={datatopSocieties}
+      /> */}
     </div>
   );
 }
