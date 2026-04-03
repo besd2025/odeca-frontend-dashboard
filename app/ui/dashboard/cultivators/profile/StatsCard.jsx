@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
+import { Separator } from "@/components/ui/separator";
 
 function StatsCard({ cult_id }) {
   const [data, setData] = React.useState({});
@@ -192,23 +193,39 @@ function StatsCard({ cult_id }) {
               Montant total
             </CardTitle>
           </div>
-          <CardTitle className="text-3xl @[250px]/card:text-2xl font-semibold tracking-tight tabular-nums">
+          <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
             {(values?.montant_cerise_a + values?.montant_cerise_b ?? 0)
               .toString()
               .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
             <span className="text-base">FBU</span>
           </CardTitle>
-          <div className="mt-3">
-            <div className="flex flex-row gap-x-2 items-center">
-              <Banknote className="text-secondary" />
+          <Separator />
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-row gap-x-4 items-center">
+              <div className="flex flex-row gap-x-1 items-center">
+                <Banknote className="text-secondary" />
 
-              <CardTitle className="text-muted-foreground font-normal    ">
-                Tranche 1
+                <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                  Payé
+                </CardTitle>
+              </div>
+              <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
+                0 <span className="text-base">FBU</span>
               </CardTitle>
             </div>
-            <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
-              0 <span className="text-base">FBU</span>
-            </CardTitle>
+            <Separator />
+            <div className="flex flex-row gap-x-4 items-center">
+              <div className="flex flex-row gap-x-1 items-center">
+                <Banknote className="text-secondary" />
+
+                <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                  Avance
+                </CardTitle>
+              </div>
+              <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
+                0 <span className="text-base">FBU</span>
+              </CardTitle>
+            </div>
           </div>
         </CardHeader>
       </Card>

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
+import { Separator } from "@/components/ui/separator";
 function StatsCard({ id }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
@@ -203,7 +204,7 @@ function StatsCard({ id }) {
               Montant
             </CardTitle>
           </div>
-          <CardTitle className="text-3xl @[250px]/card:text-2xl font-semibold tracking-tight tabular-nums">
+          <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
             {(
               data?.qte_achete?.montant_cerise_a +
               data?.qte_achete?.montant_cerise_b ?? 0
@@ -212,8 +213,9 @@ function StatsCard({ id }) {
               .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
             <span className="text-base">FBU</span>
           </CardTitle>
-          <div className="flex flex-wrap justify-between items-center gap-2">
-            <div className="">
+          <Separator />
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-row gap-x-4 items-center">
               <div className="flex flex-row gap-x-1 items-center">
                 <Banknote className="text-secondary" />
 
@@ -221,11 +223,12 @@ function StatsCard({ id }) {
                   Tranche 1
                 </CardTitle>
               </div>
-              <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
+              <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
                 0 <span className="text-base">FBU</span>
               </CardTitle>
             </div>
-            <div className="mt">
+            <Separator />
+            <div className="flex flex-row gap-x-4 items-center">
               <div className="flex flex-row gap-x-1 items-center">
                 <Banknote className="text-secondary" />
 
@@ -233,11 +236,12 @@ function StatsCard({ id }) {
                   Tranche 2
                 </CardTitle>
               </div>
-              <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
+              <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
                 0 <span className="text-base">FBU</span>
               </CardTitle>
             </div>
-            <div className="mt-">
+            <Separator />
+            <div className="flex flex-row gap-x-4 items-center">
               <div className="flex flex-row gap-x-1 items-center">
                 <Banknote className="text-secondary" />
 
@@ -245,7 +249,7 @@ function StatsCard({ id }) {
                   Avance
                 </CardTitle>
               </div>
-              <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
+              <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
                 0 <span className="text-base">FBU</span>
               </CardTitle>
             </div>
