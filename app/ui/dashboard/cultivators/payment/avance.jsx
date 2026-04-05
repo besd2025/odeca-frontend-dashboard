@@ -38,20 +38,23 @@ export default function AvancePayment({
     const [lastName, setLastName] = useState("");
 
     // Association info state
-    const [sdlId, setSdlId] = useState("");
+    const [type, setType] = useState(""); // "sdl" or "ct"
+    const [sdlId, setSdlId] = useState(""); // Stores selected name for display
+    const [responsibleId, setResponsibleId] = useState(""); // Stores ID for submission
 
     // Location state
     const [province, setProvince] = useState("");
     const [commune, setCommune] = useState("");
     const [zone, setZone] = useState("");
     const [colline, setColline] = useState("");
-
+    const [amount, setAmount] = useState("");
     // Location options state
     const [provinceOptions, setProvinceOptions] = useState([]);
     const [communeOptions, setCommuneOptions] = useState([]);
     const [zoneOptions, setZoneOptions] = useState([]);
     const [collineOptions, setCollineOptions] = useState([]);
     const [sdlOptions, setSdlOptions] = useState([]);
+    const [ctOptions, setCtOptions] = useState([]);
 
     // Field information state
     const [nbChamps, setNbChamps] = useState(0);
@@ -85,7 +88,9 @@ export default function AvancePayment({
         setCollineOptions([]);
         setColline("");
         setSdlOptions([]);
+        setCtOptions([]);
         setSdlId("");
+        setResponsibleId("");
 
         if (!value) return;
 
@@ -113,7 +118,9 @@ export default function AvancePayment({
         setCollineOptions([]);
         setColline("");
         setSdlOptions([]);
+        setCtOptions([]);
         setSdlId("");
+        setResponsibleId("");
 
         if (!value) return;
 
@@ -137,7 +144,9 @@ export default function AvancePayment({
         setCollineOptions([]);
         setColline("");
         setSdlOptions([]);
+        setCtOptions([]);
         setSdlId("");
+        setResponsibleId("");
 
         if (!value) return;
 
@@ -146,7 +155,7 @@ export default function AvancePayment({
                 params: { zone: value },
             });
             const options = data?.map((item) => ({
-                value: item.colline_code,
+                value: item.colline_name,
                 label: item.colline_name,
             })) || [];
             setCollineOptions(options);
@@ -155,27 +164,89 @@ export default function AvancePayment({
         }
     };
 
-    // Handle colline change -> selection les SDL par colline
+    // Handle colline change -> selection les SDL ou CT par colline
     const handleCollineChange = async (value) => {
         setColline(value);
         setSdlOptions([]);
+        setCtOptions([]);
         setSdlId("");
+        setResponsibleId("");
 
-        if (!value) return;
+        if (!value || !type) return;
 
         try {
-            const response = await fetchData("get", `cafe/stationslavage/`, {
-                params: { sdl_adress__colline_code: value }
-            });
-
-            console.log("response", response)
-            const options = response?.results?.map((item) => ({
-                value: item.id.toString(),
-                label: item.sdl_nom,
-            })) || [];
-            setSdlOptions(options);
+            if (type === "sdl") {
+                const response = await fetchData("get", `cafe/stationslavage/`, {
+                    params: { colline_name: value }
+                });
+                const options = response?.results?.map((item) => ({
+                    value: item.sdl_nom,
+                    label: item.sdl_nom,
+                    id: item?.sdl_responsable?.id?.toString() || ""
+                })) || [];
+                setSdlOptions(options);
+            } else if (type === "ct") {
+                const response = await fetchData("get", `cafe/centres_transite/`, {
+                    params: { colline_name: value }
+                });
+                const options = response?.results?.map((item) => ({
+                    value: item.ct_nom,
+                    label: item.ct_nom,
+                    id: item?.ct_responsable?.id?.toString() || ""
+                })) || [];
+                setCtOptions(options);
+            }
         } catch (error) {
-            console.error("Error loading SDLs:", error);
+            console.error("Error loading options:", error);
+        }
+    };
+
+    // Handle type change
+    const handleTypeChange = async (value) => {
+        setType(value);
+        setSdlId("");
+        setResponsibleId("");
+        setSdlOptions([]);
+        setCtOptions([]);
+
+        if (colline && value) {
+            try {
+                if (value === "sdl") {
+                    const response = await fetchData("get", `cafe/stationslavage/`, {
+                        params: { colline_name: colline }
+                    });
+                    const options = response?.results?.map((item) => ({
+                        value: item.sdl_nom,
+                        label: item.sdl_nom,
+                        id: item?.sdl_responsable?.id?.toString() || ""
+                    })) || [];
+                    setSdlOptions(options);
+                } else if (value === "ct") {
+                    const response = await fetchData("get", `cafe/centres_transite/`, {
+                        params: { colline_name: colline }
+                    });
+                    const options = response?.results?.map((item) => ({
+                        value: item.ct_nom,
+                        label: item.ct_nom,
+                        id: item?.ct_responsable?.id?.toString() || ""
+                    })) || [];
+                    setCtOptions(options);
+                }
+            } catch (error) {
+                console.error("Error loading options on type change:", error);
+            }
+        }
+    };
+
+    // Handle station/centre change
+    const handleStationChange = (value) => {
+        setSdlId(value);
+        const options = type === "sdl" ? sdlOptions : ctOptions;
+        const selected = options.find(opt => opt.value === value);
+        if (selected) {
+            setResponsibleId(selected.id);
+        } else {
+            setResponsibleId("");
         }
     };
 
@@ -197,9 +268,30 @@ export default function AvancePayment({
     }, [open, cultivator, champs]);
 
     const handleSubmit = async (e) => {
+        const formData = {
+            responsable: responsibleId,
+            cafeiculteur: cultivator,
+            montant: amount,
+            is_paid: true
+        }
         e.preventDefault();
-        toast.info("Fonctionnalité d'envoi en cours de développement");
-        setOpen(false);
+        setLoading(true);
+        try {
+            const response = await fetchData("post", `/cafe/payment_advances/`, { body: formData });
+            if (response.status === 201 || response.status === 200) {
+                toast.success("Avance payée avec succès");
+                setOpen(false);
+                setAmount("");
+                setSdlId("");
+            } else {
+                toast.error("Erreur lors du paiement de l'avance");
+            }
+        } catch (error) {
+            console.error("Error paying advance:", error);
+            toast.error("Erreur lors du paiement de l'avance");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -300,29 +392,63 @@ export default function AvancePayment({
                     </div>
 
                     <div className="space-y-4">
-                        <h5 className="text-lg font-medium text-primary">Station de Lavage (SDL)</h5>
-                        <div className="space-y-2">
-                            <Label>Sélectionner la SDL</Label>
-                            <Select value={sdlId} onValueChange={setSdlId} disabled={!colline}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder={colline ? "Sélectionner une SDL" : "Veuillez d'abord choisir une colline"} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {sdlOptions.map((item) => (
-                                        <SelectItem key={item.value} value={item.value}>
-                                            {item.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <h5 className="text-lg font-medium text-primary">Type & Destination</h5>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Type de destination</Label>
+                                <Select value={type} onValueChange={handleTypeChange}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Choisir le type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="sdl">Station de Lavage (SDL)</SelectItem>
+                                        <SelectItem value="ct">Centre de Traitement (CT)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {type === "sdl" && (
+                                <div className="space-y-2">
+                                    <Label>Sélectionner la SDL</Label>
+                                    <Select value={sdlId} onValueChange={handleStationChange} disabled={!colline}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder={colline ? "Sélectionner une SDL" : "Veuillez d'abord choisir une colline"} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {sdlOptions.map((item) => (
+                                                <SelectItem key={item.id} value={item.value}>
+                                                    {item.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {type === "ct" && (
+                                <div className="space-y-2">
+                                    <Label>Sélectionner le CT</Label>
+                                    <Select value={sdlId} onValueChange={handleStationChange} disabled={!colline}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder={colline ? "Sélectionner un CT" : "Veuillez d'abord choisir une colline"} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {ctOptions.map((item) => (
+                                                <SelectItem key={item.id} value={item.value}>
+                                                    {item.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
                         </div>
                     </div>
-
                     <div className="space-y-4">
                         <h5 className="text-lg font-medium text-primary">Montant de l'avance</h5>
                         <div className="space-y-2">
                             <Label>Montant (FBU)</Label>
-                            <Input type="number" placeholder="Entrez le montant" required className="w-48" />
+                            <Input type="number" placeholder="Entrez le montant" value={amount} onChange={(e) => setAmount(e.target.value)} required className="w-48" />
                         </div>
                     </div>
 

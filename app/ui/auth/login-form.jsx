@@ -86,11 +86,13 @@ export function LoginForm({ className, ...props }) {
       }
       const data = await response.json();
       const user = DecodeToJwt(data.access);
+      console.log("user", user)
       if (
         user?.category === "Admin" ||
         user?.category === "General" ||
-        user?.category === "Cafe_ODECA"||
-        user?.category === "Cafe_Chef_societe"
+        user?.category === "Cafe_ODECA" ||
+        user?.category === "Cafe_Chef_societe" ||
+        user?.category === "Superviseur_Regional"
       ) {
         document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
         localStorage.setItem("Access_Token", data.access);

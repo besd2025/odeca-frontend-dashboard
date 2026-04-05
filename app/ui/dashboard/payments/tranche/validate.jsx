@@ -35,26 +35,11 @@ import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Link from "next/link";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { fetchData } from "@/app/_utils/api";
-const RHData = [
-  {
-    id: "cultivator_001",
-    cultivator: {
-      cultivator_code: "2530-522-7545",
-      first_name: "CultiNom",
-      last_name: "CultiPrenom",
-      image_url: "/images/logo_1.jpg",
-    },
-    cni: "74/565",
-    ca: 78,
-    ca_price: 7855,
-    cb: 785,
-    cb_price: 4544,
-    qte_total: 555,
-    total_price: 457,
-  },
-];
-
-export default function Validate({ data = RHData }) {
+export default function Validate() {
+  const [data, setData] = React.useState([]);
+  const [totalCount, setTotalCount] = React.useState(0);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -63,34 +48,70 @@ export default function Validate({ data = RHData }) {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [filterData, setFilterData] = React.useState({});
 
+  // Debounce search value
   React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchData("get", `cafe/cafe_payments/`);
-        consolelog("data", data)
-        const RHData = data?.results?.map((item) => ({
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchValue);
+      setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset to first page on search
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchValue]);
+
+  const fetchDatas = React.useCallback(async () => {
+    console.log("data :", filterData);
+    try {
+      const response = await fetchData("get", `cafe/cafe_payments`, {
+        params: {
+          validation_state: "VALIDATED",
+          search: debouncedSearch,
+          limit: pagination.pageSize,
+          offset: pagination.pageIndex * pagination.pageSize,
+          ...filterData
+        }
+      });
+
+      const mappedData = response?.results?.map((item) => {
+        const culti = item?.achat?.cafeiculteur;
+        const isPersonne = culti?.cultivator_entity_type === "personne";
+        return {
           id: item.id,
           cultivator: {
-            cultivator_code: item.cultivator.cultivator_code,
-            first_name: item.cultivator.first_name,
-            last_name: "CultiPrenom",
-            image_url: "/images/logo_1.jpg",
+            cultivator_code: culti?.cultivator_code,
+            first_name: isPersonne
+              ? culti?.cultivator_first_name || culti?.first_name
+              : culti?.cultivator_assoc_name,
+            last_name: isPersonne
+              ? culti?.cultivator_last_name
+              : (culti?.cultivator_assoc_rep_name ? `(Rep: ${culti.cultivator_assoc_rep_name})` : ""),
+            image_url: culti?.cultivator_photo || "/images/logo_1.jpg",
           },
-          cni: "74/565",
-          ca: 78,
-          ca_price: 7855,
-          cb: 785,
-          cb_price: 4544,
-          qte_total: 555,
-          total_price: 457,
-        }))
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, []);
+          cni: isPersonne ? culti?.cultivator_cni : culti?.cultivator_assoc_nif,
+          ca: item?.achat?.quantite_cerise_a,
+          ca_price: (item?.achat?.quantite_cerise_a || 0) * 2800,
+          cb: item?.achat?.quantite_cerise_b,
+          cb_price: (item?.achat?.quantite_cerise_b || 0) * 1400,
+          qte_total: (item?.achat?.quantite_cerise_a || 0) + (item?.achat?.quantite_cerise_b || 0),
+          total_price: (item?.achat?.quantite_cerise_a || 0) * 2800 + (item?.achat?.quantite_cerise_b || 0) * 1400,
+        };
+      });
+      setData(mappedData);
+      setTotalCount(response?.count || 0);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [debouncedSearch, pagination.pageIndex, pagination.pageSize, filterData]);
+
+  const handleFilter = (data) => {
+    setFilterData(data);
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  React.useEffect(() => {
+    fetchDatas();
+  }, [fetchDatas]);
+
   const columns = [
     {
       id: "actions",
@@ -243,6 +264,9 @@ export default function Validate({ data = RHData }) {
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount: Math.ceil(totalCount / pagination.pageSize),
     state: {
       sorting,
       columnFilters,
@@ -263,15 +287,13 @@ export default function Validate({ data = RHData }) {
             <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
             <Input
               placeholder="Rechercher..."
-              value={table.getColumn("cultivator")?.getFilterValue() ?? ""}
-              onChange={(event) =>
-                table.getColumn("cultivator")?.setFilterValue(event.target.value)
-              }
+              value={searchValue}
+              onChange={(event) => setSearchValue(event.target.value)}
               className="pl-10 shadow-none w-full rounded-lg bg-background border-none"
             />
           </div>
           <div className="flex items-center gap-2">
-            <Filter />
+            <Filter handleFilter={handleFilter} />
             <ExportButton />
           </div>
         </div>
@@ -333,14 +355,14 @@ export default function Validate({ data = RHData }) {
         <div className="flex-1 text-sm text-muted-foreground">
         </div>
         <PaginationControls
-          page={table.getState().pagination.pageIndex + 1}
-          pageSize={table.getState().pagination.pageSize}
-          totalItems={table.getFilteredRowModel().rows.length}
-          totalPages={table.getPageCount()}
-          onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
-          onPageSizeChange={(size) => table.setPageSize(size)}
-          hasNextPage={table.getCanNextPage()}
-          hasPreviousPage={table.getCanPreviousPage()}
+          page={pagination.pageIndex + 1}
+          pageSize={pagination.pageSize}
+          totalItems={totalCount}
+          totalPages={Math.ceil(totalCount / pagination.pageSize)}
+          onPageChange={(pageNumber) => setPagination((prev) => ({ ...prev, pageIndex: pageNumber - 1 }))}
+          onPageSizeChange={(size) => setPagination((prev) => ({ ...prev, pageSize: size, pageIndex: 0 }))}
+          hasNextPage={pagination.pageIndex < Math.ceil(totalCount / pagination.pageSize) - 1}
+          hasPreviousPage={pagination.pageIndex > 0}
         />
       </div>
     </div>

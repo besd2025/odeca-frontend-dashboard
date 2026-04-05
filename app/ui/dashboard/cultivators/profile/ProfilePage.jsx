@@ -11,13 +11,23 @@ function ProfilePage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const user = useContext(UserContext)
+  console.log("user", user)
   return (
     <div className=" space-y-6">
-      {user?.session?.category === "Admin" ? (
-        <div className="flex justify-end gap-2">
-          <Edit cultivator={id} />
-          <AvancePayment cultivator={id} />
-        </div>) : ""}
+
+      <div className="flex justify-end gap-2">
+        {user?.session?.category === "Admin" ? (
+          <>
+            <Edit cultivator={id} />
+          </>
+        ) : ""}
+        {user?.session?.category === "Admin" || user?.session?.category === "Cafe_Chef_societe" ? (
+          <>
+            <AvancePayment cultivator={id} />
+          </>
+        ) : ""}
+
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         <ProfileCard cult_id={id} />
