@@ -191,6 +191,7 @@ const menuItems = {
         {
           title: "Détails",
           url: "/odeca-dashboard/stocks",
+          roles: ["Admin", "General", "Cafe_ODECA"],
         },
         {
           title: "Achats",
@@ -216,6 +217,7 @@ const menuItems = {
     {
       title: "Paiement",
       url: "/odeca-dashboard/payments",
+      roles: ["Admin", "General", "Cafe_ODECA", "Cafe_Chef_societe"],
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"

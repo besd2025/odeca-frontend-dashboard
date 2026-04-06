@@ -51,7 +51,6 @@ export function RegistrationChart() {
               : period === "annee"
                 ? "year"
                 : "month";
-        console.log("Fetching data for period:", periodParam);
         const results = await fetchData(
           "get",
           `/cafe/stationslavage/cultivateurs_statistiques_par_temps?period=${periodParam}`,

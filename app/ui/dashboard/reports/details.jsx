@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/app/_utils/api';
 import { useSearchParams } from 'next/navigation';
-
+import { UserContext } from '@/app/ui/context/User_Context';
 export default function DetailsReports() {
     // Mocks de données pour la province du superviseur (ex: Ngozi)
     const searchParams = useSearchParams();
@@ -34,14 +34,13 @@ export default function DetailsReports() {
         { id: 101, name: "CT Ngozi Centre", ca: "50", cb: "60" },
         { id: 102, name: "CT Murehe", ca: "50", cb: "40" },
     ];
-
-
+    const user = React.useContext(UserContext);
+    console.log(user);
     const [totals, setTotals] = useState({ ca: 0, cb: 0, general: 0 });
     useEffect(() => {
         const fetchReport = async () => {
             try {
                 const response = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/${id}/get_list_sdl_ct_per_week/`);
-                const responseValue = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/${id}/`);
                 const items = response?.results || [];
 
                 const sdlItems = items.filter(item => item.sdl_ct?.sdl_ct?.sdl?.sdl_nom).map((item) => ({
@@ -66,7 +65,9 @@ export default function DetailsReports() {
                 setTotals({
                     ca: responseValue?.quantite_cerise_a,
                     cb: responseValue?.quantite_cerise_b,
-                    general: responseValue?.quantite_cerise_a + responseValue?.quantite_cerise_b
+                    general: responseValue?.quantite_cerise_a + responseValue?.quantite_cerise_b,
+                    dates: responseValue?.week_beginning + " - " + responseValue?.week_end,
+
                 });
             } catch (error) {
                 console.error("Error fetching report:", error);
@@ -89,17 +90,18 @@ export default function DetailsReports() {
                         </Link>
                         <span className="text-gray-300 dark:text-gray-600">|</span>
                         <Badge variant="outline" className="text-sm text-secondary border-secondary bg-secondary/10 dark:bg-secondary/20 dark:border-secondary dark:text-secondary">
-                            Province: Butanyerera
+                            {user?.session?.category === "Cafe_Chef_societe" ? "SOCIETE" : user?.session?.category === "Cafe_Superviseur" ? "SUPERVISEUR" : ""}
+
                         </Badge>
                     </div>
 
                     <h1 className="text-2xl font-semibold">
-                        Rapportage de la Semaine 12 (Du 25 au 31 Mars 2026)
+                        Rapportage de la Semaine du {totals.dates}
                     </h1>
                     <div className="flex items-center gap-x-1 mt-2">
                         <User />
                         <span>Superviseur:</span>
-                        <span className="font-medium ">Jean Claude</span>
+                        <span className="font-medium ">{user?.session?.last_name} {user?.session?.first_name}</span>
                     </div>
                 </div>
             </div>

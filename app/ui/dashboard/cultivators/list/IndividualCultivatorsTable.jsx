@@ -521,27 +521,29 @@ export default function IndividualCultivatorsTable({
           <div className="flex items-center gap-3">
             <IndividualFilter handleFilter={setFilterData} />
           </div>
-          <div className="flex items-center gap-3 text-gray-700">
-            <ExportButton
-              exportType="cultivator_individual"
-              onExportToExcel={async () => {
-                setLoadingEportBtn(true);
-                setActivedownloadBtn(false);
-                try {
-                  if (externalExportFn) {
-                    await externalExportFn();
-                  } else {
-                    await exportCultivatorsToExcel();
+          {(user?.session?.category !== "Superviseur" && user?.session?.category !== "Superviseur_Regional") && (
+            <div className="flex items-center gap-3 text-gray-700">
+              <ExportButton
+                exportType="cultivator_individual"
+                onExportToExcel={async () => {
+                  setLoadingEportBtn(true);
+                  setActivedownloadBtn(false);
+                  try {
+                    if (externalExportFn) {
+                      await externalExportFn();
+                    } else {
+                      await exportCultivatorsToExcel();
+                    }
+                  } finally {
+                    setLoadingEportBtn(false);
                   }
-                } finally {
-                  setLoadingEportBtn(false);
-                }
-              }}
-              loading={LoadingEportBtn}
-              activedownloadBtn={externalExportFn ? false : ActivedownloadBtn}
-              onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
-            />
-          </div>
+                }}
+                loading={LoadingEportBtn}
+                activedownloadBtn={externalExportFn ? false : ActivedownloadBtn}
+                onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
+              />
+            </div>
+          )}
         </div>
       </div>
       <div className="grid w-full [&>div]:border [&>div]:rounded-md">

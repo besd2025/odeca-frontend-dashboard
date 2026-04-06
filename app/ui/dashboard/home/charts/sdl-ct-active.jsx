@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/chart";
 import { fetchData } from "@/app/_utils/api";
 import { ChartSkeleton } from "@/components/ui/skeletons";
+import { UserContext } from "@/app/ui/context/User_Context";
 
 const chartConfig = {
   active: {
@@ -32,6 +33,7 @@ const chartConfig = {
 export function ChartPieSdlCtActive() {
   const [data, setData] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const user = React.useContext(UserContext)
   React.useEffect(() => {
     const getDatas = async () => {
       setIsLoading(true);
@@ -56,11 +58,13 @@ export function ChartPieSdlCtActive() {
             active: response?.achat_cafes_ct,
             inactive: response?.total_ct - response?.achat_cafes_ct,
           },
-          {
-            entity: "UDPs",
-            active: response?.usine_active,
-            inactive: response?.total_usine - response?.usine_active,
-          },
+          ...(user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional"
+            ? [{
+              entity: "UDPs",
+              active: response?.usine_active,
+              inactive: (response?.total_usine || 0) - (response?.usine_active || 0),
+            }]
+            : [])
         ];
 
         setData(chartData);

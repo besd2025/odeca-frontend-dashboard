@@ -73,19 +73,19 @@ export default function Saisie() {
               </Button>
             </Link>
             <span className="text-gray-300 dark:text-gray-600">|</span>
-            <Badge variant="outline" className="text-sm text-secondary border-secondary bg-secondary/10 dark:bg-secondary/20 dark:border-secondary dark:text-secondary">
+            {/* <Badge variant="outline" className="text-sm text-secondary border-secondary bg-secondary/10 dark:bg-secondary/20 dark:border-secondary dark:text-secondary">
               Province: Butanyerera
-            </Badge>
+            </Badge> */}
           </div>
 
           <h1 className="text-2xl font-semibold">
             Rapportage de la Semaine
           </h1>
-          <div className="flex items-center gap-x-1 mt-2">
+          {/* <div className="flex items-center gap-x-1 mt-2">
             <User />
             <span>Superviseur:</span>
             <span className="font-medium ">Jean Claude</span>
-          </div>
+          </div> */}
         </div>
 
         {/* Sélecteur de semaine en haut */}

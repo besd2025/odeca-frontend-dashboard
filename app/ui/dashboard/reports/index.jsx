@@ -77,7 +77,7 @@ export default function ReportsPage() {
                         Gérez et soumettez vos rapports de station de lavage et centre de traitement.
                     </p>
                 </div>
-                {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" || user?.session?.category === "Admin" && (
+                {user?.session?.category !== "General" && user?.session?.category !== "Cafe_ODECA" && user?.session?.category !== "Cafe_Responsable" && (
                     <Link href="/odeca-dashboard/reports/saisie">
                         <Button size="lg" className="flex gap-2">
                             <Plus className="w-5 h-5" />
