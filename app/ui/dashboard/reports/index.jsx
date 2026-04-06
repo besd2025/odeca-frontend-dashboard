@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plus, Eye } from 'lucide-react';
@@ -15,10 +15,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import PaginationContent from '@/components/ui/pagination-content';
 import { fetchData } from '@/app/_utils/api';
+import { UserContext } from '@/app/ui/context/User_Context';
 export const metadata = {
     title: "Historique des Rapports | ODECA",
 };
 export default function ReportsPage() {
+    const user = useContext(UserContext)
     // Mocks simplifiés de rapports passés
     const pastReports = [
         { id: 1, week: 'Semaine 11', dates: 'Du 11 au 17 Mars 2026', totalCa: 4500, totalCb: 1200, status: 'Soumis', author: 'Superviseur Ngozi' },
@@ -75,12 +77,14 @@ export default function ReportsPage() {
                         Gérez et soumettez vos rapports de station de lavage et centre de traitement.
                     </p>
                 </div>
-                <Link href="/odeca-dashboard/reports/saisie">
-                    <Button size="lg" className="flex gap-2">
-                        <Plus className="w-5 h-5" />
-                        Nouveau Rapport
-                    </Button>
-                </Link>
+                {user?.session?.category !== "General" && user?.session?.category !== "Cafe_ODECA" && user?.session?.category !== "Cafe_Responsable" && (
+                    <Link href="/odeca-dashboard/reports/saisie">
+                        <Button size="lg" className="flex gap-2">
+                            <Plus className="w-5 h-5" />
+                            Nouveau Rapport
+                        </Button>
+                    </Link>
+                )}
             </div>
 
             <Card>

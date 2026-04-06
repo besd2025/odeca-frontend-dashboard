@@ -8,7 +8,7 @@ import { StockSummaryCardUDP } from "./stock-card-udp";
 import { UserContext } from "@/app/ui/context/User_Context";
 import React, { useContext } from "react";
 function DashboardContainer() {
-    const user = useContext(UserContext)
+  const user = useContext(UserContext)
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
@@ -34,13 +34,13 @@ function DashboardContainer() {
               <ChartLineAchats />
             </div>
           </div>
-          {user?.session?.category !== "Cafe_Chef_societe" && ( 
-          <div className="px-4 lg:px-6 grid grid-cols-5 gap-4">
-            {/* Existing Charts + Stock Card */}
-            <div className="col-span-5 flex flex-col gap-4">
-              <StockSummaryCardUDP />
+          {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" && (
+            <div className="px-4 lg:px-6 grid grid-cols-5 gap-4">
+              {/* Existing Charts + Stock Card */}
+              <div className="col-span-5 flex flex-col gap-4">
+                <StockSummaryCardUDP />
+              </div>
             </div>
-          </div>
           )}
         </div>
       </div>

@@ -86,21 +86,18 @@ export function LoginForm({ className, ...props }) {
       }
       const data = await response.json();
       const user = DecodeToJwt(data.access);
+      console.log("user", user)
       if (
         user?.category === "Admin" ||
         user?.category === "General" ||
-        user?.category === "Cafe_ODECA"||
-        user?.category === "Cafe_Chef_societe"
+        user?.category === "Cafe_ODECA" ||
+        user?.category === "Cafe_Chef_societe" ||
+        user?.category === "Superviseur_Regional" ||
+        user?.category === "Superviseur"
       ) {
         document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
         localStorage.setItem("Access_Token", data.access);
         router.push("/odeca-dashboard/home");
-        // } else if (user?.category === "Communal") {
-        //   router.push("/municipal/cultivators");
-        // } else if (user?.category === "Provincial") {
-        //   router.push("/provincial/cultivators");
-        // } else if (user?.category === "Regional") {
-        //   router.push("/regional/cultivators");
       } else {
         setError("Vous n'avez pas d'accès.");
       }

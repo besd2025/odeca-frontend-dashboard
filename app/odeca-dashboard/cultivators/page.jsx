@@ -5,7 +5,7 @@ import { ROLES } from "@/lib/permissions";
 function page() {
   return (
 
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE]}>
+    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE, ROLES.SUPERVISEUR_REGIONAL, ROLES.SUPERVISEUR]}>
       <CultivatorData />
     </ProtectedRoute>
   )

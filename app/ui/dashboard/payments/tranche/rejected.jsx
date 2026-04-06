@@ -34,7 +34,7 @@ import Filter from "../filter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Link from "next/link";
 import PaginationControls from "@/components/ui/pagination-controls";
-
+import { fetchData } from "@/app/_utils/api";
 const RHData = [
   {
     id: "cultivator_001",
@@ -54,7 +54,7 @@ const RHData = [
   },
 ];
 
-export default function Rejected({ data = RHData }) {
+export default function Rejected() {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -63,6 +63,73 @@ export default function Rejected({ data = RHData }) {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [filterData, setFilterData] = React.useState({});
+
+  const [data, setData] = React.useState([]);
+  const [totalCount, setTotalCount] = React.useState(0);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [debouncedSearch, setDebouncedSearch] = React.useState("");
+
+  // Debounce search value
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchValue);
+      setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset to first page on search
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchValue]);
+
+  const fetchDatas = React.useCallback(async () => {
+    try {
+      const response = await fetchData("get", `cafe/cafe_payments`, {
+        params: {
+          validation_state: "REJECTED",
+          search: debouncedSearch,
+          limit: pagination.pageSize,
+          offset: pagination.pageIndex * pagination.pageSize,
+          ...filterData
+        }
+      });
+      console.log("response :", response);
+      const mappedData = response?.results?.map((item) => {
+        const cafeiculteur = item?.achat?.cafeiculteur;
+        const isPersonne = cafeiculteur?.cultivator_entity_type === "personne";
+        return {
+          id: item?.id,
+          cultivator: {
+            cultivator_code: cafeiculteur?.code,
+            first_name: isPersonne
+              ? cafeiculteur?.cultivator_first_name
+              : cafeiculteur?.cultivator_assoc_name,
+            last_name: isPersonne
+              ? cafeiculteur?.cultivator_last_name
+              : (cafeiculteur?.cultivator_assoc_rep_name ? `(Rep: ${cafeiculteur.cultivator_assoc_rep_name})` : ""),
+            image_url: cafeiculteur?.cultivator_photo,
+          },
+          cni: isPersonne ? cafeiculteur?.cultivator_cni : cafeiculteur?.cultivator_assoc_nif,
+          ca: item?.achat?.quantite_cerise_a,
+          ca_price: (item?.achat?.quantite_cerise_a || 0) * 2800,
+          cb: item?.achat?.quantite_cerise_b,
+          cb_price: (item?.achat?.quantite_cerise_b || 0) * 1400,
+          qte_total: (item?.achat?.quantite_cerise_a || 0) + (item?.achat?.quantite_cerise_b || 0),
+          total_price: (item?.achat?.quantite_cerise_a || 0) * 2800 + (item?.achat?.quantite_cerise_b || 0) * 1400,
+        };
+      });
+      setData(mappedData);
+      setTotalCount(response?.count || 0);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [debouncedSearch, pagination.pageIndex, pagination.pageSize, filterData]);
+
+  const handleFilter = (data) => {
+    setFilterData(data);
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  React.useEffect(() => {
+    fetchDatas();
+  }, [fetchDatas]);
 
   const columns = [
     {
@@ -71,7 +138,6 @@ export default function Rejected({ data = RHData }) {
       header: "Actions",
       cell: ({ row }) => {
         const cultivator = row.original;
-
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -216,6 +282,9 @@ export default function Rejected({ data = RHData }) {
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount: Math.ceil(totalCount / pagination.pageSize),
     state: {
       sorting,
       columnFilters,
@@ -236,15 +305,13 @@ export default function Rejected({ data = RHData }) {
             <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
             <Input
               placeholder="Rechercher..."
-              value={table.getColumn("cultivator")?.getFilterValue() ?? ""}
-              onChange={(event) =>
-                table.getColumn("cultivator")?.setFilterValue(event.target.value)
-              }
+              value={searchValue}
+              onChange={(event) => setSearchValue(event.target.value)}
               className="pl-10 shadow-none w-full rounded-lg bg-background border-none"
             />
           </div>
           <div className="flex items-center gap-2">
-            <Filter />
+            <Filter handleFilter={handleFilter} />
             <ExportButton />
           </div>
         </div>
@@ -306,14 +373,14 @@ export default function Rejected({ data = RHData }) {
         <div className="flex-1 text-sm text-muted-foreground">
         </div>
         <PaginationControls
-          page={table.getState().pagination.pageIndex + 1}
-          pageSize={table.getState().pagination.pageSize}
-          totalItems={table.getFilteredRowModel().rows.length}
-          totalPages={table.getPageCount()}
-          onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
-          onPageSizeChange={(size) => table.setPageSize(size)}
-          hasNextPage={table.getCanNextPage()}
-          hasPreviousPage={table.getCanPreviousPage()}
+          page={pagination.pageIndex + 1}
+          pageSize={pagination.pageSize}
+          totalItems={totalCount}
+          totalPages={Math.ceil(totalCount / pagination.pageSize)}
+          onPageChange={(pageNumber) => setPagination((prev) => ({ ...prev, pageIndex: pageNumber - 1 }))}
+          onPageSizeChange={(size) => setPagination((prev) => ({ ...prev, pageSize: size, pageIndex: 0 }))}
+          hasNextPage={pagination.pageIndex < Math.ceil(totalCount / pagination.pageSize) - 1}
+          hasPreviousPage={pagination.pageIndex > 0}
         />
       </div>
     </div>

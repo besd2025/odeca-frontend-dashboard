@@ -8,8 +8,9 @@ import { LocationChart } from "./components/LocationChart";
 import { AgeChart } from "./components/AgeChart";
 import { TopFiveCards } from "./components/TopFiveCards";
 import { PaymentChart } from "./components/PaymentChart";
-
+import { UserContext } from "@/app/ui/context/User_Context";
 export default function CultivatorAnalytics() {
+  const user = React.useContext(UserContext);
   return (
     <div className="lg:p-4 space-y-6 bg-muted/10 min-h-screen">
       {/* Top Cards */}
@@ -24,9 +25,12 @@ export default function CultivatorAnalytics() {
       </div>
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-        {/* Bar Chart: Location */}
-        <LocationChart />
-
+        {user?.session?.category !== "Superviseur_Regional" && (
+          <>
+            {/* Bar Chart: Location */}
+            <LocationChart />
+          </>
+        )}
         {/* Bar Chart: Age Pyramid */}
         <AgeChart />
       </div>

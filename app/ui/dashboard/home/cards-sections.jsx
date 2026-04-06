@@ -37,7 +37,7 @@ export function SectionCards() {
   const [newToday, setNewToday] = React.useState(0);
   const [newQtyToday, setNewQtyToday] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(true);
-  const user=React.useContext(UserContext)
+  const user = React.useContext(UserContext)
   React.useEffect(() => {
     const getDatas = async () => {
       setIsLoading(true);
@@ -462,54 +462,54 @@ export function SectionCards() {
             </div>
           </div>
         </CardContent>
-        {user?.session?.category !== "Cafe_Chef_societe" && ( 
-        <CardContent>
-          <div>
-            <div className="flex flex-row gap-x-2 items-center ml-2">
-              <div className="bg-secondary p-1 rounded-md">
-                <Grape className="text-white" />
-              </div>
-              <CardTitle className="text-2xl @[250px]/card:text-2xl font-semibold tracking-tight tabular-nums">
-                {cafe_vert_produit?.total_cafe_vert >= 1000 ? (
-                  <>
-                    {(cafe_vert_produit?.total_cafe_vert / 1000).toLocaleString(
-                      "fr-FR",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      },
-                    )}
-                    <span className="text-sm">T</span>
-                  </>
-                ) : (
-                  <>
-                    {cafe_vert_produit?.total_cafe_vert?.toLocaleString(
-                      "fr-FR",
-                    ) || 0}{" "}
-                    <span className="text-sm">Kg</span>
-                  </>
-                )}
-              </CardTitle>
-            </div>
-            <CardTitle className="text-md font-medium tabular-nums ml-2">
-              Cafe vert
-            </CardTitle>
-            <div className="hidden flex-col gap-y-1">
-              <div className="flex flex-row gap-x-2 items-center">
-                <div className="rounded-md">
-                  <CircleDollarSign className="text-yellow-600" />
+        {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" && (
+          <CardContent>
+            <div>
+              <div className="flex flex-row gap-x-2 items-center ml-2">
+                <div className="bg-secondary p-1 rounded-md">
+                  <Grape className="text-white" />
                 </div>
-                <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
-                  Montant
+                <CardTitle className="text-2xl @[250px]/card:text-2xl font-semibold tracking-tight tabular-nums">
+                  {cafe_vert_produit?.total_cafe_vert >= 1000 ? (
+                    <>
+                      {(cafe_vert_produit?.total_cafe_vert / 1000).toLocaleString(
+                        "fr-FR",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        },
+                      )}
+                      <span className="text-sm">T</span>
+                    </>
+                  ) : (
+                    <>
+                      {cafe_vert_produit?.total_cafe_vert?.toLocaleString(
+                        "fr-FR",
+                      ) || 0}{" "}
+                      <span className="text-sm">Kg</span>
+                    </>
+                  )}
                 </CardTitle>
               </div>
-              <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-                0 <span className="text-base">FBU</span>
+              <CardTitle className="text-md font-medium tabular-nums ml-2">
+                Cafe vert
               </CardTitle>
-              <div className="text-muted-foreground">≈ 194 559 456 $</div>
+              <div className="hidden flex-col gap-y-1">
+                <div className="flex flex-row gap-x-2 items-center">
+                  <div className="rounded-md">
+                    <CircleDollarSign className="text-yellow-600" />
+                  </div>
+                  <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
+                    Montant
+                  </CardTitle>
+                </div>
+                <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+                  0 <span className="text-base">FBU</span>
+                </CardTitle>
+                <div className="text-muted-foreground">≈ 194 559 456 $</div>
+              </div>
             </div>
-          </div>
-        </CardContent>
+          </CardContent>
         )}
         <CardFooter className="flex flex-row "></CardFooter>
       </Card>
@@ -593,54 +593,54 @@ export function SectionCards() {
           </div>
           <Separator orientation="vertical" />
           <div>
-            {user?.session?.category !== "Cafe_Chef_societe" && ( 
+            {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" && (
               <div>
-              <div className="flex flex-row gap-x-1 items-center">
-                <div className="bg-chart-3 p-1 rounded-md">
-                  <Columns3Cog className="size-5 text-white" />
+                <div className="flex flex-row gap-x-1 items-center">
+                  <div className="bg-chart-3 p-1 rounded-md">
+                    <Columns3Cog className="size-5 text-white" />
+                  </div>
+                  <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
+                    {totalUdps?.toLocaleString("fr-FR")}
+                  </CardTitle>
                 </div>
-                <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
-                  {totalUdps?.toLocaleString("fr-FR")}
+                <CardTitle className="text-sm font-normal ml-1 mt-1 ">
+                  UDPs
                 </CardTitle>
               </div>
-              <CardTitle className="text-sm font-normal ml-1 mt-1 ">
-                UDPs
-              </CardTitle>
-            </div>
             )}
           </div>
         </div>
-        {user?.session?.category !== "Cafe_Chef_societe" && (
-        <CardContent>
-          <div>
-            <div className="flex flex-row gap-x-2 items-center ml-2">
-              <div className="bg-secondary p-1 rounded-md">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="size-5 text-white"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.125 3C3.089 3 2.25 3.84 2.25 4.875V18a3 3 0 0 0 3 3h15a3 3 0 0 1-3-3V4.875C17.25 3.839 16.41 3 15.375 3H4.125ZM12 9.75a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H12Zm-.75-2.25a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75ZM6 12.75a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5H6Zm-.75 3.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5H6a.75.75 0 0 1-.75-.75ZM6 6.75a.75.75 0 0 0-.75.75v3c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-3A.75.75 0 0 0 9 6.75H6Z"
-                    clipRule="evenodd"
-                  />
-                  <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V6.75Z" />
-                </svg>
-              </div>
-           
+        {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" && (
+          <CardContent>
+            <div>
+              <div className="flex flex-row gap-x-2 items-center ml-2">
+                <div className="bg-secondary p-1 rounded-md">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="size-5 text-white"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.125 3C3.089 3 2.25 3.84 2.25 4.875V18a3 3 0 0 0 3 3h15a3 3 0 0 1-3-3V4.875C17.25 3.839 16.41 3 15.375 3H4.125ZM12 9.75a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H12Zm-.75-2.25a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75ZM6 12.75a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5H6Zm-.75 3.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5H6a.75.75 0 0 1-.75-.75ZM6 6.75a.75.75 0 0 0-.75.75v3c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-3A.75.75 0 0 0 9 6.75H6Z"
+                      clipRule="evenodd"
+                    />
+                    <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V6.75Z" />
+                  </svg>
+                </div>
+
                 <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-                {totalSocieties?.toLocaleString("fr-FR")}
+                  {totalSocieties?.toLocaleString("fr-FR")}
                 </CardTitle>
+              </div>
+
+              <CardTitle className="text-sm font-normal ml-2 mt-1 ">
+                Sociétés
+              </CardTitle>
+
             </div>
-         
-            <CardTitle className="text-sm font-normal ml-2 mt-1 ">
-              Sociétés
-            </CardTitle>
-             
-          </div>
-        </CardContent>
+          </CardContent>
         )}
       </Card>
     </div>

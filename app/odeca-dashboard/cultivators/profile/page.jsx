@@ -6,7 +6,7 @@ import { ROLES } from "@/lib/permissions";
 // Charger le composant client dynamiquement
 export default function page() {
   return (
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE]}>
+    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE, ROLES.SUPERVISEUR_REGIONAL, ROLES.SUPERVISEUR]}>
       <div className="p-4 relative">
         <h1 className="text-xl lg:text-2xl font-semibold mx-2 mb-4">
           Profile du cultivateur

@@ -197,14 +197,16 @@ export default function IndividualAchatsTableEdition({
 
         if (results.status === 200 || results.status === 201) {
           const response = await fetchData("patch", `/cafe/achat_modification/${id}/`, {
-            body: { is_validated: true },
+            body: { status: "VALIDATED" },
           });
 
-          if (response) {
+          if (response.status === 200 || response.status === 201) {
             resolve({ cultivator_code });
           } else {
             reject(new Error("Erreur"));
           }
+        } else {
+          reject(new Error("Erreur"));
         }
       } catch (error) {
         reject(error);
@@ -229,16 +231,16 @@ export default function IndividualAchatsTableEdition({
     }
   };
 
-  const HandleReject = async (id, num_recu, num_page, ca, cb) => {
-
+  const HandleReject = async (id, cultivator_code) => {
     const promise = new Promise(async (resolve, reject) => {
       try {
-        const formdata = {
-          id: id,
-          numero_page: num_page,
-          numero_recu: num_recu,
-          quantite_cerise_a: ca,
-          quantite_cerise_b: cb
+        const response = await fetchData("patch", `/cafe/achat_modification/${id}/`, {
+          body: { status: "REJECTED" },
+        });
+        if (response.status === 200 || response.status === 201) {
+          resolve({ id });
+        } else {
+          reject(new Error("Erreur"));
         }
 
       } catch (error) {
@@ -250,7 +252,7 @@ export default function IndividualAchatsTableEdition({
       loading: "REJET ...",
       success: (data) => {
         setTimeout(() => window.location.reload(), 1000);
-        return `${data.code} a été rejeté avec succès `;
+        return `${cultivator_code} a été rejeté avec succès `;
       },
       error: "Donnée non rejetée",
     });
@@ -498,9 +500,9 @@ export default function IndividualAchatsTableEdition({
             <Button onClick={() => HandleApprove(row.original.id, row.original.achat_id, row.original.num_recu, row.original?.num_page, row.original?.ca, row.original?.cb, row?.original?.responsable_id, row?.original?.cultivator?.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-green-500/20">
               <Check className="text-green-500" size={20} />
             </Button>
-            {/* <Button onClick={() => HandleReject(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-red-500/20">
+            <Button onClick={() => HandleReject(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-red-500/20">
               <X className="text-red-500" size={20} />
-            </Button> */}
+            </Button>
           </div>
         ),
       },
