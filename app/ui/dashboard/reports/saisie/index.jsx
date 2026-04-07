@@ -14,21 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
 import { fetchData } from '@/app/_utils/api';
-
-
 export default function Saisie() {
-  // Mocks de données pour la province du superviseur (ex: Ngozi)
-  const mockSdlData = [
-    { id: 1, name: "SDL Kiremba", ca: "", cb: "" },
-    { id: 2, name: "SDL Nyarusagera", ca: "", cb: "" },
-    { id: 3, name: "SDL Gashiru", ca: "", cb: "" },
-    { id: 4, name: "SDL Mwumba", ca: "", cb: "" },
-  ];
-
-  const mockCtData = [
-    { id: 101, name: "CT Ngozi Centre", ca: "", cb: "" },
-    { id: 102, name: "CT Murehe", ca: "", cb: "" },
-  ];
   const [sdlData, setSdlData] = React.useState([]);
   const [ctData, setCtData] = React.useState([]);
   const [dateFrom, setDateFrom] = React.useState("");
@@ -36,7 +22,9 @@ export default function Saisie() {
   React.useEffect(() => {
     const fetchSdlData = async () => {
       try {
-        const data = await fetchData("get", `cafe/stationslavage/`);
+        const data = await fetchData("get", `cafe/stationslavage/`, {
+          param: { limit: 100 }
+        })
         const mockSdlData = data?.results?.map((item) => ({
           id: item.id,
           responsable_id: item.sdl_responsable?.id,
@@ -44,7 +32,9 @@ export default function Saisie() {
           ca: "",
           cb: ""
         }))
-        const ct = await fetchData("get", `cafe/centres_transite/`);
+        const ct = await fetchData("get", `cafe/centres_transite/`, {
+          param: { limit: 100 }
+        });
         const mockCtData = ct?.results?.map((item) => ({
           id: item.id,
           responsable_id: item.ct_responsable?.id,
