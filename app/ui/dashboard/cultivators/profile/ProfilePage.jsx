@@ -21,7 +21,7 @@ function ProfilePage() {
             <Edit cultivator={id} />
           </>
         ) : ""}
-        {user?.session?.category === "Admin" || user?.session?.category === "Cafe_Chef_societe" ? (
+        {user?.session?.category === "Admin" || user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
           <>
             <AvancePayment cultivator={id} />
           </>
