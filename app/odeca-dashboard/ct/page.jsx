@@ -10,7 +10,7 @@ import { UserContext } from "@/app/ui/context/User_Context";
 function page() {
   const user = React.useContext(UserContext);
   return (
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE, ROLES.SUPERVISEUR_REGIONAL]}>
+    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE, ROLES.SUPERVISEUR_REGIONAL, ROLES.SUPERVISEUR]}>
       <div className="p-4">
         <Tabs defaultValue="list" className="w-full">
           <TabsList className="w-full h-10 lg:w-[50%]">
