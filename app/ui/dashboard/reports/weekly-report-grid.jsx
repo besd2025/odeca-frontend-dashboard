@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Send } from "lucide-react";
+import { Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
 import { toast } from "sonner";
@@ -23,6 +23,9 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
   const [formData, setFormData] = useState({
 
   })
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
     // Transformer les items en un format gérable par le state
     const initialData = items.map((item) => ({
@@ -84,7 +87,22 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
       const failures = responses.filter(res => res.status !== 201 && res.status !== 200);
 
       if (failures.length === 0) {
-        toast.success("Tous les rapports ont été envoyés avec succès");
+        let countdown = 3;
+        const toastId = toast.success(`Tous les rapports ont été envoyés avec succès. Rechargement dans ${countdown}s…`, {
+          duration: countdown * 1000,
+        });
+        const interval = setInterval(() => {
+          countdown -= 1;
+          if (countdown <= 0) {
+            clearInterval(interval);
+            window.location.reload();
+          } else {
+            toast.success(`Tous les rapports ont été envoyés avec succès. Rechargement dans ${countdown}s…`, {
+              id: toastId,
+              duration: countdown * 1000,
+            });
+          }
+        }, 1000);
       } else if (failures.length < data.length) {
         toast.warning(`${data.length - failures.length} rapports envoyés, ${failures.length} échecs.`);
       } else {
@@ -92,9 +110,13 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
       }
     } catch (error) {
       console.error("Submission error:", error);
-      toast.error("Une erreur est survenue lors de l'envoi");
+      toast.error("Error");
     }
   };
+
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const paginatedData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <Card className=" shadow-none p-1 ">
       <CardContent className="p-0">
@@ -116,7 +138,7 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
                   </TableCell>
                 </TableRow>
               ) : (
-                data.map((row) => {
+                paginatedData.map((row) => {
                   const total = (Number(row.ca) || 0) + (Number(row.cb) || 0);
 
                   return (
@@ -171,6 +193,17 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
             </TableBody>
 
           </Table>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 py-4">
+              <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <span className="text-sm text-gray-600">Page {currentPage} sur {totalPages}</span>
+              <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
           {!readOnly && (
             <div className="w-full">
               <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 border-t /50 p-6 mt-4">

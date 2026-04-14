@@ -54,7 +54,7 @@ export default function AssociationAchatsTable({
   const [pointer, setPointer] = useState(0);
   const [filterData, setFilterData] = useState({});
   const [searchvalue, setSearchValue] = useState("");
-
+  const users = useContext(UserContext)
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -579,27 +579,29 @@ export default function AssociationAchatsTable({
           <div className="flex items-center gap-3">
             <AssociationAchatsFilter handleFilter={handleFilter} />
           </div>
-          <div className="flex items-center gap-3 text-gray-700">
-            <ExportButton
-              exportType="achats_association"
-              handleExportSocieties={async () => {
-                setLoadingEportBtn(true);
-                setActivedownloadBtn(false);
-                try {
-                  if (externalExportFn) {
-                    await externalExportFn();
-                  } else {
-                    await exportCultivatorsToExcel();
+          {(users?.session?.category !== "Superviseur" && users?.session?.category !== "Superviseur_Regional") && (
+            <div className="flex items-center gap-3 text-gray-700">
+              <ExportButton
+                exportType="achats_association"
+                handleExportSocieties={async () => {
+                  setLoadingEportBtn(true);
+                  setActivedownloadBtn(false);
+                  try {
+                    if (externalExportFn) {
+                      await externalExportFn();
+                    } else {
+                      await exportCultivatorsToExcel();
+                    }
+                  } finally {
+                    setLoadingEportBtn(false);
                   }
-                } finally {
-                  setLoadingEportBtn(false);
-                }
-              }}
-              loading={LoadingEportBtn}
-              activedownloadBtn={externalExportFn ? false : ActivedownloadBtn}
-              onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
-            />
-          </div>
+                }}
+                loading={LoadingEportBtn}
+                activedownloadBtn={externalExportFn ? false : ActivedownloadBtn}
+                onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
+              />
+            </div>
+          )}
         </div>
       </div>
       <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">

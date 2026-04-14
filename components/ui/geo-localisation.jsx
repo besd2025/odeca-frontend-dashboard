@@ -493,7 +493,7 @@ export default function GeoLocalisation({
             </div>
 
             <div className="px-4 pb-4">
-              <Link href={`/odeca-dashboard/sdl/details?id=${selectedPlace.id}`}>
+              <Link href={`/odeca-dashboard/${selectedPlace.type.toLowerCase()}/details?id=${selectedPlace.id}`}>
                 <button className="w-full py-2 bg-secondary text-white text-sm font-medium rounded-lg hover:bg-secondary/90 transition-colors shadow-sm">
                   Voir {selectedPlace.name}
                 </button>

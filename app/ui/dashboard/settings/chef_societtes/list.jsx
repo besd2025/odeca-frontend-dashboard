@@ -25,6 +25,7 @@ export function UserList() {
                     additionalHeaders: {},
                     body: {},
                 });
+                console.log(response);
                 const users = response.results.map((user) => {
                     return {
                         id: user.id,

@@ -57,7 +57,6 @@ export default function CollectorsList() {
             params: { limit: limit, offset: pointer, search: searchValue, },
           },
         );
-        console.log("response: ", response)
 
         const data = response?.results?.map((item) => ({
           id: item?.id,

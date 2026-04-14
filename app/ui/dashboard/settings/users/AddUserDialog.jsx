@@ -32,7 +32,7 @@ export default function AddUserDialog() {
     cni: "",
     category: "",
     adresse: "",
-    telephone: "",
+    phone: "",
     password: "",
   });
 
@@ -124,7 +124,7 @@ export default function AddUserDialog() {
               <Select onValueChange={handleSelectChange} value={formData.category}>
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner un rôle" />
-                </SelectTrigger> 
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Admin">Administrateur</SelectItem>
                   <SelectItem value="General">Général</SelectItem>
@@ -150,8 +150,8 @@ export default function AddUserDialog() {
               <Label htmlFor="telephone">Téléphone</Label>
               <Input
                 id="telephone"
-                name="telephone"
-                value={formData.telephone}
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
                 placeholder="+257 ..."
               />
