@@ -175,13 +175,13 @@ export function SectionCards() {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-7">
-        <div className="col-span-3">
+        <div className="col-span-1 lg:col-span-3">
           <StatsCardSkeleton />
         </div>
-        <div className="col-span-2">
+        <div className="col-span-1 lg:col-span-2">
           <StatsCardSkeleton />
         </div>
-        <div className="col-span-2">
+        <div className="col-span-1 lg:col-span-2">
           <StatsCardSkeleton />
         </div>
       </div>

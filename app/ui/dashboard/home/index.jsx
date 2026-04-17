@@ -7,6 +7,7 @@ import { KPIGrid } from "./kpi-stats";
 import { StockSummaryCardUDP } from "./stock-card-udp";
 import { UserContext } from "@/app/ui/context/User_Context";
 import React, { useContext } from "react";
+import { SocietyTopFiveCards } from "./charts/SocietyTopFiveCards";
 function DashboardContainer() {
   const user = useContext(UserContext)
   return (
@@ -32,6 +33,12 @@ function DashboardContainer() {
             </div>
             <div className="col-span-5 lg:col-span-4">
               <ChartLineAchats />
+            </div>
+          </div>
+          <div className="px-4 lg:px-6 grid grid-cols-5 gap-4">
+            {/* Existing Charts + Stock Card */}
+            <div className="col-span-5 flex flex-col gap-4">
+              <SocietyTopFiveCards />
             </div>
           </div>
           {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" && (

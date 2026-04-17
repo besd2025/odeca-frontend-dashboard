@@ -12,9 +12,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { fetchData } from "@/app/_utils/api";
+import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SocietyListDialog } from "../../../home/components/SocietyListDialog";
+import { SocietyListDialog } from "../components/SocietyListDialog";
+import { SdlTopFiveCards } from "../../sdl/analytics/components/SdlTopFiveCards";
 
 function TopListCard({ title, icon, data }) {
   // Main card only shows the top 5
@@ -23,20 +24,22 @@ function TopListCard({ title, icon, data }) {
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <div className="space-y-1">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        </div>
         <div className="text-muted-foreground">{icon}</div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
         <div className="space-y-4 mt-2 flex-1">
           {topFive.map((item, i) => (
             <div key={i} className="grid grid-cols-3">
-              <div className="flex items-center gap-2 col-span-1">
+              <div className="flex items-center gap-2 col-span-1 ">
                 <span className="text-sm font-medium leading-none">
                   {item.name}
                 </span>
               </div>
-              <div className="col-span-1 flex  justify-center">
-                <div className="text-sm text-muted-foreground">
+              <div className="flex items-center justify-center col-span-1">
+                <div className="text-sm text-muted-foreground ">
                   {item.value.toLocaleString()}{" "}
                   <span className="text-xs">{item.sub}</span>
                 </div>
@@ -50,7 +53,7 @@ function TopListCard({ title, icon, data }) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start">
-                    <Link href={`/odeca-dashboard/sdl/details/?id=${item?.id}`}>
+                    <Link href={`/odeca-dashboard/ct/details?id=${item.id}`}>
                       <DropdownMenuItem>Profile</DropdownMenuItem>
                     </Link>
                   </DropdownMenuContent>
@@ -68,70 +71,37 @@ function TopListCard({ title, icon, data }) {
   );
 }
 
-export function SdlTopFiveCards() {
-  const [loading, setLoading] = React.useState(true);
-  const [datatopMembers, setDataTopMembers] = React.useState([]);
-  const [datatopAchats, setDataTopAchats] = React.useState([]);
-  React.useEffect(() => {
-    const getSdls = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/stationslavage/get_top_5_sdl_with_more_cultivators_ordered_by_count/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          }
-        );
-        const topMembers = response.map((item) => ({
-          id: item?.collector__responsable_sdl__sdl__id,
-          image: "/images/logo_1.jpg",
-          name: item?.collector__responsable_sdl__sdl__sdl_nom,
-          value: item?.count,
-          sub: "Cafeiculteurs",
-        }));
-        setDataTopMembers(topMembers);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-    const getTopAchats = async () => {
-      try {
-        const response = await fetchData(
-          "get",
-          `cafe/stationslavage/get_top_5_sdl_with_more_quantity_cerise_ordered_by_count/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          }
-        );
-        const topAchats = response.map((item) => ({
-          name: item?.responsable__responsable_sdl__sdl__sdl_nom,
-          value: item?.total_cerise,
-          sub: "Kg",
-        }));
+export function SocietyTopFiveCards() {
+  const [datatopMembers, setDataTopMembers] = React.useState([
+    { id: 1, name: "ODECA", value: 1250, sub: "Cafeiculteurs" },
+    { id: 2, name: "SOGESTAL", value: 1100, sub: "Cafeiculteurs" },
+    { id: 3, name: "BUGESTAL", value: 950, sub: "Cafeiculteurs" },
+    { id: 4, name: "COCOCA", value: 800, sub: "Cafeiculteurs" },
+    { id: 5, name: "SUCCAM", value: 750, sub: "Cafeiculteurs" },
+    { id: 6, name: "SOGESTAL Kayanza", value: 650, sub: "Cafeiculteurs" },
+    { id: 7, name: "SOGESTAL Ngozi", value: 600, sub: "Cafeiculteurs" },
+    { id: 8, name: "SOGESTAL Kirundo", value: 550, sub: "Cafeiculteurs" },
+    { id: 9, name: "SOGESTAL Muyinga", value: 500, sub: "Cafeiculteurs" },
+    { id: 10, name: "SOGESTAL Karuzi", value: 450, sub: "Cafeiculteurs" },
+  ]);
+  const [datatopAchats, setDataTopAchats] = React.useState([
+    { id: 1, name: "ODECA", value: 450000, sub: "Kg" },
+    { id: 2, name: "SOGESTAL", value: 380000, sub: "Kg" },
+    { id: 3, name: "BUGESTAL", value: 310000, sub: "Kg" },
+    { id: 4, name: "COCOCA", value: 275000, sub: "Kg" },
+    { id: 5, name: "SUCCAM", value: 240000, sub: "Kg" },
+    { id: 6, name: "SOGESTAL Kayanza", value: 210000, sub: "Kg" },
+    { id: 7, name: "SOGESTAL Ngozi", value: 180000, sub: "Kg" },
+    { id: 8, name: "SOGESTAL Kirundo", value: 150000, sub: "Kg" },
+    { id: 9, name: "SOGESTAL Muyinga", value: 120000, sub: "Kg" },
+    { id: 10, name: "SOGESTAL Karuzi", value: 90000, sub: "Kg" },
+  ]);
+  const [loading, setLoading] = React.useState(false);
 
-
-        setDataTopAchats(topAchats);
-      } catch (error) {
-        console.error("Error fetching cultivators data:", error);
-      }
-    };
-
-    const fetchAll = async () => {
-      setLoading(true);
-      await Promise.all([getTopAchats(), getSdls()]);
-      setLoading(false);
-    };
-    fetchAll();
-  }, []);
-
-  if (loading) {
+  if (loading)
     return (
       <div className="grid gap-4 md:grid-cols-3">
-        {Array.from({ length: 3 }).map((_, idx) => (
+        {Array.from({ length: 2 }).map((_, idx) => (
           <Card key={idx}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <Skeleton className="h-4 w-32" />
@@ -151,20 +121,23 @@ export function SdlTopFiveCards() {
         ))}
       </div>
     );
-  }
-
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 md:grid-cols-4">
       <TopListCard
-        title="Top 5 - Quantité Collectée"
+        title="Top 5 - Societes les plus de quantitees"
         icon={<Scale className="h-4 w-4" />}
         data={datatopAchats}
       />
       <TopListCard
-        title="Top 5 - Nombre de Cafeiculteurs"
+        title="Top 5 - Societes les plus de cafeiculteurs"
         icon={<Users className="h-4 w-4" />}
         data={datatopMembers}
       />
+      <div className="col-span-2">
+        <SdlTopFiveCards />
+      </div>
+
     </div>
+
   );
 }
