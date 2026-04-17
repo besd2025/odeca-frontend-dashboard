@@ -14,16 +14,27 @@ import {
 } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
 import { fetchData } from '@/app/_utils/api';
+import PaginationContent from "@/components/ui/pagination-content";
 export default function Saisie() {
   const [sdlData, setSdlData] = React.useState([]);
   const [ctData, setCtData] = React.useState([]);
+  const [sdlLimit, setSdlLimit] = React.useState(10);
+  const [sdlPointer, setSdlPointer] = React.useState(0);
+  const [sdlTotalCount, setSdlTotalCount] = React.useState(0);
+  const [sdlCurrentPage, setSdlCurrentPage] = React.useState(1);
+
+  const [ctLimit, setCtLimit] = React.useState(10);
+  const [ctPointer, setCtPointer] = React.useState(0);
+  const [ctTotalCount, setCtTotalCount] = React.useState(0);
+  const [ctCurrentPage, setCtCurrentPage] = React.useState(1);
+
   const [dateFrom, setDateFrom] = React.useState("");
   const [dateTo, setDateTo] = React.useState("");
   React.useEffect(() => {
     const fetchSdlData = async () => {
       try {
         const data = await fetchData("get", `cafe/stationslavage/`, {
-          param: { limit: 100 }
+          params: { limit: sdlLimit, offset: sdlPointer }
         })
         const mockSdlData = data?.results?.map((item) => ({
           id: item.id,
@@ -32,8 +43,20 @@ export default function Saisie() {
           ca: "",
           cb: ""
         }))
+        setSdlData(mockSdlData || []);
+        setSdlTotalCount(data?.count || 0);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchSdlData();
+  }, [sdlLimit, sdlPointer])
+
+  React.useEffect(() => {
+    const fetchCtData = async () => {
+      try {
         const ct = await fetchData("get", `cafe/centres_transite/`, {
-          param: { limit: 100 }
+          params: { limit: ctLimit, offset: ctPointer }
         });
         const mockCtData = ct?.results?.map((item) => ({
           id: item.id,
@@ -42,14 +65,36 @@ export default function Saisie() {
           ca: "",
           cb: ""
         }))
-        setSdlData(mockSdlData);
-        setCtData(mockCtData);
+        setCtData(mockCtData || []);
+        setCtTotalCount(ct?.count || 0);
       } catch (err) {
         console.log(err);
       }
     };
-    fetchSdlData();
-  }, [])
+    fetchCtData();
+  }, [ctLimit, ctPointer])
+
+  const onSdlPageChange = (pageNumber) => {
+    setSdlCurrentPage(pageNumber);
+    setSdlPointer((pageNumber - 1) * sdlLimit);
+  };
+
+  const onSdlLimitChange = (newLimit) => {
+    setSdlLimit(newLimit);
+    setSdlPointer(0);
+    setSdlCurrentPage(1);
+  };
+
+  const onCtPageChange = (pageNumber) => {
+    setCtCurrentPage(pageNumber);
+    setCtPointer((pageNumber - 1) * ctLimit);
+  };
+
+  const onCtLimitChange = (newLimit) => {
+    setCtLimit(newLimit);
+    setCtPointer(0);
+    setCtCurrentPage(1);
+  };
   return (
     <div className="p-2 md:p-8 gap-y-6 max-w-7xl flex flex-col min-h-screen">
       {/* En-tête */}
@@ -169,12 +214,33 @@ export default function Saisie() {
           </TabsList>
 
           <TabsContent value="sdl" className="border-none outline-none p-0 focus:ring-0">
-
-            <WeeklyReportGrid items={sdlData} dateFrom={dateFrom} dateTo={dateTo} type="SDL" />
+            <WeeklyReportGrid items={sdlData} dateFrom={dateFrom} dateTo={dateTo} type="SDL" internalPagination={false} />
+            <div className="mt-4 bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800">
+              <PaginationContent
+                currentPage={sdlCurrentPage}
+                totalPages={Math.ceil(sdlTotalCount / sdlLimit)}
+                onPageChange={onSdlPageChange}
+                pointer={sdlPointer}
+                totalCount={sdlTotalCount}
+                onLimitChange={onSdlLimitChange}
+                limit={sdlLimit}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="ct" className="m-0 border-none outline-none   p-0 focus:ring-0">
-            <WeeklyReportGrid items={ctData} dateFrom={dateFrom} dateTo={dateTo} type="CT" />
+            <WeeklyReportGrid items={ctData} dateFrom={dateFrom} dateTo={dateTo} type="CT" internalPagination={false} />
+            <div className="mt-4 bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800">
+              <PaginationContent
+                currentPage={ctCurrentPage}
+                totalPages={Math.ceil(ctTotalCount / ctLimit)}
+                onPageChange={onCtPageChange}
+                pointer={ctPointer}
+                totalCount={ctTotalCount}
+                onLimitChange={onCtLimitChange}
+                limit={ctLimit}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

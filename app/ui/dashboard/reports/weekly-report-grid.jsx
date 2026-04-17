@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
 import { toast } from "sonner";
 
-export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = false, dateFrom, dateTo }) {
+export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = false, dateFrom, dateTo, internalPagination = true }) {
   // Initialiser le state avec les données reçues
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState({
@@ -115,7 +115,7 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
   };
 
   const totalPages = Math.ceil(data.length / itemsPerPage);
-  const paginatedData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const paginatedData = internalPagination ? data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) : data;
 
   return (
     <Card className=" shadow-none p-1 ">
@@ -193,7 +193,7 @@ export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = 
             </TableBody>
 
           </Table>
-          {totalPages > 1 && (
+          {internalPagination && totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 py-4">
               <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
                 <ChevronLeft className="w-4 h-4" />

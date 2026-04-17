@@ -232,21 +232,21 @@ export default function AddCt() {
     const name = e.target.value;
     setSdlColline(name);
     const selected = sdlCollineOptions.find(opt => opt.value === name);
-    setSdlCollineCode(selected?.code || "");
+    setSdlCollineCode(selected?.name || "");
     setSDL(""); // Clear previous SDL selection
   };
 
-  // Fetch SDLs whenever sdlColline or societe changes
+  // Fetch SDLs whenever sdlCollineCode or societe changes
   useEffect(() => {
     async function fetchSDLs() {
-      if (!sdlColline || !soc) {
+      if (!sdlCollineCode || !soc) {
         setSdlOptions([]);
         return;
       }
 
       try {
         const data = await fetchData("get", `cafe/stationslavage/`, {
-          params: { societe_code: soc, colline_name: sdlColline }
+          params: { societe_code: soc, colline_name: sdlCollineCode }
         });
 
         setSdlOptions(data?.results?.map(s => ({
@@ -261,7 +261,7 @@ export default function AddCt() {
     if (open) {
       fetchSDLs();
     }
-  }, [sdlColline, soc, open]);
+  }, [sdlCollineCode, soc, open]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
