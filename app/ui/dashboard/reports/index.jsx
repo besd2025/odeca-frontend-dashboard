@@ -47,6 +47,7 @@ export default function ReportsPage() {
                     status: item.statut,
                 }))
                 setReports(pastReports);
+                console.log("pastReports", pastReports);
                 setTotalCount(response?.count);
             } catch (error) {
                 console.error("Error fetching reports:", error);

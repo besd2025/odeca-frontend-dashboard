@@ -86,6 +86,8 @@ export default function Validate() {
               ? culti?.cultivator_last_name
               : (culti?.cultivator_assoc_rep_name ? `(Rep: ${culti.cultivator_assoc_rep_name})` : ""),
             image_url: culti?.cultivator_photo || "/images/logo_1.jpg",
+            nom_banque: culti?.cultivator_bank_name,
+            Numero_compte: culti?.cultivator_bank_account,
           },
           cni: isPersonne ? culti?.cultivator_cni : culti?.cultivator_assoc_nif,
           ca: item?.achat?.quantite_cerise_a,
@@ -198,6 +200,20 @@ export default function Validate() {
       header: "CNI",
       cell: ({ row }) => (
         <div className="text-center font-semibold">{row.getValue("cni")}</div>
+      ),
+    },
+    {
+      accessorKey: "nom_banque",
+      header: "Nom de la banque",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">{row.original.cultivator.nom_banque}</div>
+      ),
+    },
+    {
+      accessorKey: "Numero_compte",
+      header: "Numero_compte",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">{row.original.cultivator.Numero_compte}</div>
       ),
     },
     {

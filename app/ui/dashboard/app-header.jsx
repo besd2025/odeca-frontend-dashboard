@@ -70,6 +70,7 @@ const deconnecter = () => {
 
 export function AppHeader() {
   const user = React.useContext(UserContext);
+  console.log(user);
   const initials = `${user?.session?.first_name?.[0] || ""}${user?.session?.last_name?.[0] || ""
     }`.toUpperCase();
 
@@ -92,8 +93,12 @@ export function AppHeader() {
               />
               DECA
             </h1>
+            <Separator
+              orientation="vertical"
+              className="mx-2 data-[orientation=vertical]:h-4"
+            />
             {/* <Logo className="shrink-0" /> */}
-
+            {user?.session?.category === "Cafe_Chef_societe" && <span className="text-sm font-medium flex gap-x-1 items-center"> Société: <span className="text-secondary text-lg font-bold">{user?.session?.societe}</span></span>}
             <div className="relative hidden md:blo/ck">
               <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
               <Input

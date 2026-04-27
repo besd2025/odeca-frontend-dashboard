@@ -105,6 +105,8 @@ export default function Rejected() {
               ? cafeiculteur?.cultivator_last_name
               : (cafeiculteur?.cultivator_assoc_rep_name ? `(Rep: ${cafeiculteur.cultivator_assoc_rep_name})` : ""),
             image_url: cafeiculteur?.cultivator_photo,
+            nom_banque: cafeiculteur?.cultivator_bank_name,
+            Numero_compte: cafeiculteur?.cultivator_bank_account,
           },
           cni: isPersonne ? cafeiculteur?.cultivator_cni : cafeiculteur?.cultivator_assoc_nif,
           ca: item?.achat?.quantite_cerise_a,
@@ -216,6 +218,20 @@ export default function Rejected() {
       header: "CNI",
       cell: ({ row }) => (
         <div className="text-center font-semibold">{row.getValue("cni")}</div>
+      ),
+    },
+    {
+      accessorKey: "nom_banque",
+      header: "Nom de la banque",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">{row.original.cultivator.nom_banque}</div>
+      ),
+    },
+    {
+      accessorKey: "Numero_compte",
+      header: "Numero_compte",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">{row.original.cultivator.Numero_compte}</div>
       ),
     },
     {

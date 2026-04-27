@@ -215,19 +215,25 @@ export function SectionCards() {
               <Archive className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {data?.total_cerise_achat >= 1000 ? (
-                <>
-                  {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  <span className="text-base">T</span>
-                </>
-              ) : (
-                <>
-                  {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}{" "}
-                  <span className="text-sm">Kg</span>
-                </>
+              {
+                data?.total_cerise_achat >= 1000 ? (
+                  <>
+                    {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    <span className="text-base">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
+              {user?.session?.category === "Cafe_Chef_societe" && user?.session?.category === "Superviseur_Regional" && (
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  ({data?.total_cerise_achat} kg)
+                </span>
               )}
             </CardTitle>
             {newQtyToday > 0 && (
@@ -301,9 +307,15 @@ export function SectionCards() {
                       <span className="text-sm">Kg</span>
                     </>
                   )}
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({percentageA.toFixed(1)}%)
-                  </span>
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({percentageA.toFixed(1)}%)
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.total_cerise_a_achat} kg)
+                    </span>
+                  )}
                 </CardDescription>
               </div>
               <span className="w-0.5 h-8 bg-black/20 hidden @5xl/main:block">
@@ -337,9 +349,15 @@ export function SectionCards() {
                       <span className="text-sm">Kg</span>
                     </>
                   )}
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({percentageB.toFixed(1)}%)
-                  </span>
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({percentageB.toFixed(1)}%)
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.total_cerise_b_achat} kg)
+                    </span>
+                  )}
                 </CardDescription>
               </div>
             </div>

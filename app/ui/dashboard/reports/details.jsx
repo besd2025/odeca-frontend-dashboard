@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Grape, Save, Send, User } from 'lucide-react';
@@ -13,34 +13,41 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
-import { useEffect, useState } from 'react';
 import { fetchData } from '@/app/_utils/api';
 import { useSearchParams } from 'next/navigation';
 import { UserContext } from '@/app/ui/context/User_Context';
+import PaginationContent from "@/components/ui/pagination-content";
 export default function DetailsReports() {
     // Mocks de données pour la province du superviseur (ex: Ngozi)
     const searchParams = useSearchParams();
     const id = searchParams.get("id_rapport");
-    const [SDLreport, setSDLReport] = useState([]);
-    const [CTreport, setCTReport] = useState([]);
-    const mockSdlData = [
-        { id: 1, name: "SDL Kiremba", ca: "300", cb: "350" },
-        { id: 2, name: "SDL Nyarusagera", ca: "400", cb: "420" },
-        { id: 3, name: "SDL Gashiru", ca: "254", cb: "260" },
-        { id: 4, name: "SDL Mwumba", ca: "200", cb: "200" },
-    ];
-
-    const mockCtData = [
-        { id: 101, name: "CT Ngozi Centre", ca: "50", cb: "60" },
-        { id: 102, name: "CT Murehe", ca: "50", cb: "40" },
-    ];
     const user = React.useContext(UserContext);
-    console.log(user);
     const [totals, setTotals] = useState({ ca: 0, cb: 0, general: 0 });
+
+    // Pagination states
+    const [sdlLimit, setSdlLimit] = useState(10);
+    const [sdlPointer, setSdlPointer] = useState(0);
+    const [sdlCurrentPage, setSdlCurrentPage] = useState(1);
+
+    const [ctLimit, setCtLimit] = useState(10);
+    const [ctPointer, setCtPointer] = useState(0);
+    const [ctCurrentPage, setCtCurrentPage] = useState(1);
+
+    const [allSdlItems, setAllSdlItems] = useState([]);
+    const [allCtItems, setAllCtItems] = useState([]);
+    const [activeTab, setActiveTab] = useState("sdl");
+    const [totalCount, setTotalCount] = useState(0);
     useEffect(() => {
         const fetchReport = async () => {
             try {
-                const response = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/${id}/get_list_sdl_ct_per_week/`);
+                // Fetch paginated results from the API
+                const response = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/${id}/get_list_sdl_ct_per_week/`, {
+                    params: {
+                        limit: sdlLimit,
+                        offset: sdlPointer,
+                    }
+                });
+                console.log("response", response);
                 const items = response?.results || [];
 
                 const sdlItems = items.filter(item => item.sdl_ct?.sdl_ct?.sdl?.sdl_nom).map((item) => ({
@@ -57,24 +64,25 @@ export default function DetailsReports() {
                     ca: item.quantite_cerise_a,
                     cb: item.quantite_cerise_b
                 }));
-
-                setSDLReport(sdlItems);
-                setCTReport(ctItems);
+                setAllSdlItems(sdlItems);
+                setAllCtItems(ctItems);
+                setTotalCount(response?.count || 0);
 
                 // Calculer les totaux dynamiques
+                const total_ca = items.reduce((acc, item) => acc + item.quantite_cerise_a, 0);
+                const total_cb = items.reduce((acc, item) => acc + item.quantite_cerise_b, 0);
                 setTotals({
-                    ca: responseValue?.quantite_cerise_a,
-                    cb: responseValue?.quantite_cerise_b,
-                    general: responseValue?.quantite_cerise_a + responseValue?.quantite_cerise_b,
-                    dates: responseValue?.week_beginning + " - " + responseValue?.week_end,
-
+                    ca: total_ca,
+                    cb: total_cb,
+                    general: total_ca + total_cb,
+                    dates: (response?.results[0]?.rapportage_sdl_ct_semaine?.week_beginning || "") + " - " + (response?.results[0]?.rapportage_sdl_ct_semaine?.week_end || ""),
                 });
             } catch (error) {
                 console.error("Error fetching report:", error);
             }
         };
         if (id) fetchReport();
-    }, [id]);
+    }, [id, activeTab, sdlLimit, sdlPointer, ctLimit, ctPointer]);
 
     return (
         <div className="p-2 md:p-8 gap-y-6 max-w-7xl flex flex-col min-h-screen">
@@ -90,7 +98,7 @@ export default function DetailsReports() {
                         </Link>
                         <span className="text-gray-300 dark:text-gray-600">|</span>
                         <Badge variant="outline" className="text-sm text-secondary border-secondary bg-secondary/10 dark:bg-secondary/20 dark:border-secondary dark:text-secondary">
-                            {user?.session?.category === "Cafe_Chef_societe" ? "SOCIETE" : user?.session?.category === "Cafe_Superviseur" ? "SUPERVISEUR" : ""}
+                            {user?.session?.category === "Cafe_Chef_societe" ? `SOCIETE ${user?.session?.societe}` : user?.session?.category === "Cafe_Superviseur" ? "SUPERVISEUR" : ""}
 
                         </Badge>
                     </div>
@@ -116,7 +124,7 @@ export default function DetailsReports() {
                         <h1 className="text-md ">Total CB: {totals.cb.toLocaleString()} Kg</h1>
                     </div>
                 </div>
-                <Tabs defaultValue="sdl" className="w-full">
+                <Tabs defaultValue="sdl" onValueChange={setActiveTab} className="w-full">
                     <TabsList className="mb-2">
                         <TabsTrigger value="sdl">
                             <svg
@@ -149,12 +157,57 @@ export default function DetailsReports() {
                     </TabsList>
 
                     <TabsContent value="sdl" className="border-none outline-none p-0 focus:ring-0">
-
-                        <WeeklyReportGrid items={SDLreport} type="SDL" readOnly={true} />
+                        <WeeklyReportGrid
+                            items={allSdlItems}
+                            type="SDL"
+                            readOnly={true}
+                            internalPagination={false}
+                        />
+                        <div className="mt-4 bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800">
+                            <PaginationContent
+                                currentPage={sdlCurrentPage}
+                                totalPages={Math.ceil(totalCount / sdlLimit)}
+                                onPageChange={(page) => {
+                                    setSdlCurrentPage(page);
+                                    setSdlPointer((page - 1) * sdlLimit);
+                                }}
+                                pointer={sdlPointer}
+                                totalCount={totalCount}
+                                onLimitChange={(limit) => {
+                                    setSdlLimit(limit);
+                                    setSdlPointer(0);
+                                    setSdlCurrentPage(1);
+                                }}
+                                limit={sdlLimit}
+                            />
+                        </div>
                     </TabsContent>
 
                     <TabsContent value="ct" className="m-0 border-none outline-none   p-0 focus:ring-0">
-                        <WeeklyReportGrid items={CTreport} type="CT" readOnly={true} />
+                        <WeeklyReportGrid
+                            items={allCtItems}
+                            type="CT"
+                            readOnly={true}
+                            internalPagination={false}
+                        />
+                        <div className="mt-4 bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800">
+                            <PaginationContent
+                                currentPage={ctCurrentPage}
+                                totalPages={Math.ceil(totalCount / ctLimit)}
+                                onPageChange={(page) => {
+                                    setCtCurrentPage(page);
+                                    setCtPointer((page - 1) * ctLimit);
+                                }}
+                                pointer={ctPointer}
+                                totalCount={totalCount}
+                                onLimitChange={(limit) => {
+                                    setCtLimit(limit);
+                                    setCtPointer(0);
+                                    setCtCurrentPage(1);
+                                }}
+                                limit={ctLimit}
+                            />
+                        </div>
                     </TabsContent>
                 </Tabs>
 

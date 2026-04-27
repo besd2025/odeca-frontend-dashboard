@@ -11,54 +11,43 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
-import PaginationControls from "@/components/ui/pagination-controls";
+import PaginationContent from "@/components/ui/pagination-content";
 import { useSearchParams } from "next/navigation";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
-const products = [
-  {
-    id: 101,
-    date: "12/8/2025",
-    sdl_ct_type: "SDL",
-    sdl_ct_name: "Ngome",
-    No_fiche: 59.99,
-    No_recus: 4.5,
-    ca: 452,
-    cb: 52,
-    fiche_photo: "/images/logo_1.jpg",
-    montant: 5555555,
-  },
-  {
-    id: 102,
-    date: "12/8/2025",
-    sdl_ct_type: "SDL",
-    sdl_ct_name: "Ngome",
-    No_fiche: 59.99,
-    No_recus: 4.5,
-    ca: 452,
-    cb: 52,
-    fiche_photo: "/images/logo_1.jpg",
-    montant: 5555555,
-  },
-];
-
 export default function Ventes({ cult_id }) {
-  const [page, setPage] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(10);
-  const [loading, setLoading] = React.useState(true);
-
-  const totalItems = products.length;
-  const totalPages = Math.max(Math.ceil(totalItems / pageSize), 1);
-  React.useEffect(() => {
-    if (page > totalPages) {
-      setPage(totalPages);
-    }
-  }, [page, totalPages]);
-
-  const paginatedProducts = React.useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return products.slice(start, start + pageSize);
-  }, [page, pageSize]);
   const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [limit, setLimit] = React.useState(10);
+  const [totalCount, setTotalCount] = React.useState(0);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [pointer, setPointer] = React.useState(0);
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
+  const datapaginationlimit = (limitdata) => {
+    setLimit(limitdata);
+  };
+
+  const datapagination = {
+    totalCount: totalCount,
+    currentPage: currentPage,
+    onPageChange: onPageChange,
+    totalPages: totalPages,
+    pointer: pointer,
+    onLimitChange: onLimitChange,
+    limit: limit,
+  };
   React.useEffect(() => {
     const getCultivators = async () => {
       setLoading(true);
@@ -67,7 +56,10 @@ export default function Ventes({ cult_id }) {
           "get",
           `/cultivators/${cult_id}/get_cafe_cafeiculteur_achat_cafe/`,
           {
-            params: {},
+            params: {
+              limit: limit,
+              offset: pointer,
+            },
             additionalHeaders: {},
             body: {},
           },
@@ -88,6 +80,7 @@ export default function Ventes({ cult_id }) {
         }));
 
         setData(AchatsData);
+        setTotalCount(valuesdata?.count || 0);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -96,7 +89,7 @@ export default function Ventes({ cult_id }) {
     };
 
     getCultivators();
-  }, [cult_id]);
+  }, [cult_id, currentPage, limit, pointer]);
 
   if (loading && data?.length === 0)
     return <TableSkeleton rows={5} columns={9} />;
@@ -107,7 +100,7 @@ export default function Ventes({ cult_id }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="pl-4">ID</TableHead>
+              {/* <TableHead className="pl-4">ID</TableHead> */}
               <TableHead>Date d'achat</TableHead>
               <TableHead>SDL/CT</TableHead>
               <TableHead>No Fiche</TableHead>
@@ -124,7 +117,7 @@ export default function Ventes({ cult_id }) {
             ) : (
               data.map((product) => (
                 <TableRow key={product.id} className="odd:bg-muted/50">
-                  <TableCell className="pl-4">{product.id}</TableCell>
+                  {/* <TableCell className="pl-4">{product.id}</TableCell> */}
                   <TableCell className="font-medium">{product.date}</TableCell>
                   <TableCell>{product.sdl_ct}</TableCell>
                   <TableCell>{product.No_fiche}</TableCell>
@@ -150,19 +143,14 @@ export default function Ventes({ cult_id }) {
         </Table>
       </div>
 
-      <PaginationControls
-        className="mt-4"
-        page={page}
-        pageSize={pageSize}
-        totalItems={totalItems}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPage(1);
-          setPageSize(size);
-        }}
-        hasNextPage={page < totalPages}
-        hasPreviousPage={page > 1}
+      <PaginationContent
+        datapaginationlimit={datapaginationlimit}
+        currentPage={datapagination.currentPage}
+        totalPages={datapagination.totalPages}
+        onPageChange={datapagination.onPageChange}
+        pointer={datapagination.pointer}
+        totalCount={datapagination.totalCount}
+        onLimitChange={datapagination.onLimitChange}
       />
     </div>
   );
