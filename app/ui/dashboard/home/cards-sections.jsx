@@ -230,10 +230,12 @@ export function SectionCards() {
                     <span className="text-sm">Kg</span>
                   </>
                 )}
-              {user?.session?.category === "Cafe_Chef_societe" && user?.session?.category === "Superviseur_Regional" && (
+              {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
                 <span className="text-sm font-normal text-muted-foreground ml-2">
                   ({data?.total_cerise_achat} kg)
                 </span>
+              ) : (
+                <></>
               )}
             </CardTitle>
             {newQtyToday > 0 && (
