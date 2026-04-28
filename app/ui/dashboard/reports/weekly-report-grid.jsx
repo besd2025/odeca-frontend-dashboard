@@ -61,9 +61,9 @@ export default function WeeklyReportGrid({
             ) : (
               items.map((item) => {
                 const entry = inputs[item.id] ?? { ca: "", cb: "" };
-                const total =
-                  (Number(item.ca) || 0) + (Number(item.cb) || 0);
-                //console.log("item", item);
+                const caVal = readOnly ? (Number(item.ca) || 0) : (Number(entry.ca) || 0);
+                const cbVal = readOnly ? (Number(item.cb) || 0) : (Number(entry.cb) || 0);
+                const total = caVal + cbVal;
                 return (
                   <TableRow
                     key={item.id}
