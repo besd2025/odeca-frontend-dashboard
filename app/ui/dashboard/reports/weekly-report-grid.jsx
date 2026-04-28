@@ -62,8 +62,8 @@ export default function WeeklyReportGrid({
               items.map((item) => {
                 const entry = inputs[item.id] ?? { ca: "", cb: "" };
                 const total =
-                  (Number(entry.ca) || 0) + (Number(entry.cb) || 0);
-
+                  (Number(item.ca) || 0) + (Number(item.cb) || 0);
+                //console.log("item", item);
                 return (
                   <TableRow
                     key={item.id}
@@ -77,13 +77,13 @@ export default function WeeklyReportGrid({
                     <TableCell className="align-middle text-center p-2">
                       {readOnly ? (
                         <span className="font-medium text-gray-700 dark:text-gray-300">
-                          {(Number(entry.ca) || 0).toLocaleString()}
+                          {(Number(item.ca) || 0).toLocaleString()}
                         </span>
                       ) : (
                         <Input
                           type="number"
                           min="0"
-                          value={entry.ca}
+                          value={item.ca}
                           onChange={(e) =>
                             onInputChange(
                               item.id,
@@ -102,13 +102,13 @@ export default function WeeklyReportGrid({
                     <TableCell className="align-middle text-center p-2">
                       {readOnly ? (
                         <span className="font-medium text-gray-700 dark:text-gray-300">
-                          {(Number(entry.cb) || 0).toLocaleString()}
+                          {(Number(item.cb) || 0).toLocaleString()}
                         </span>
                       ) : (
                         <Input
                           type="number"
                           min="0"
-                          value={entry.cb}
+                          value={item.cb}
                           onChange={(e) =>
                             onInputChange(
                               item.id,

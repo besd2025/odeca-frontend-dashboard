@@ -34,10 +34,14 @@ export default function ReportsPage() {
     const [reports, setReports] = useState([])
 
     React.useEffect(() => {
-
         const fetchReports = async () => {
             try {
-                const response = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/`);
+                const response = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/`, {
+                    params: {
+                        limit,
+                        offset: pointer,
+                    }
+                });
                 const pastReports = response?.results?.map((item) => ({
                     id: item.id,
                     week: item.semaine,
@@ -47,14 +51,13 @@ export default function ReportsPage() {
                     status: item.statut,
                 }))
                 setReports(pastReports);
-                console.log("pastReports", pastReports);
                 setTotalCount(response?.count);
             } catch (error) {
                 console.error("Error fetching reports:", error);
             }
         };
         fetchReports();
-    }, []);
+    }, [limit, pointer]);
 
     const onPageChange = (pageNumber) => {
         setCurrentPage(pageNumber);

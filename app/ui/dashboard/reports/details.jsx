@@ -36,18 +36,20 @@ export default function DetailsReports() {
     const [allSdlItems, setAllSdlItems] = useState([]);
     const [allCtItems, setAllCtItems] = useState([]);
     const [activeTab, setActiveTab] = useState("sdl");
-    const [totalCount, setTotalCount] = useState(0);
+    const [sdlTotalCount, setSdlTotalCount] = useState(0);
+    const [ctTotalCount, setCtTotalCount] = useState(0);
+
+    // Fetch SDL data with its own pagination
     useEffect(() => {
-        const fetchReport = async () => {
+        const fetchSdlReport = async () => {
             try {
-                // Fetch paginated results from the API
                 const response = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/${id}/get_list_sdl_ct_per_week/`, {
                     params: {
                         limit: sdlLimit,
                         offset: sdlPointer,
+                        type: "sdl",
                     }
                 });
-                console.log("response", response);
                 const items = response?.results || [];
 
                 const sdlItems = items.filter(item => item.sdl_ct?.sdl_ct?.sdl?.sdl_nom).map((item) => ({
@@ -57,6 +59,40 @@ export default function DetailsReports() {
                     ca: item.quantite_cerise_a,
                     cb: item.quantite_cerise_b
                 }));
+                setAllSdlItems(sdlItems);
+                setSdlTotalCount(response?.count || 0);
+
+                // Calculer les totaux dynamiques à partir des données SDL
+                const total_ca = items.reduce((acc, item) => acc + item.quantite_cerise_a, 0);
+                const total_cb = items.reduce((acc, item) => acc + item.quantite_cerise_b, 0);
+                setTotals(prev => ({
+                    ...prev,
+                    ca: total_ca,
+                    cb: total_cb,
+                    general: total_ca + total_cb,
+                    dates: (items[0]?.rapportage_sdl_ct_semaine?.week_beginning || prev.dates?.split(" - ")[0] || "") + " - " + (items[0]?.rapportage_sdl_ct_semaine?.week_end || prev.dates?.split(" - ")[1] || ""),
+                }));
+            } catch (error) {
+                console.error("Error fetching SDL report:", error);
+            }
+        };
+        if (id) fetchSdlReport();
+    }, [id, sdlLimit, sdlPointer]);
+
+    // Fetch CT data with its own pagination
+    useEffect(() => {
+        const fetchCtReport = async () => {
+            try {
+                const response = await fetchData("get", `cafe/rapportages_sdl_ct_semaine/${id}/get_list_sdl_ct_per_week/`, {
+                    params: {
+                        limit: ctLimit,
+                        offset: ctPointer,
+                        type: "ct",
+                    }
+                });
+                console.log("CT response", response);
+                const items = response?.results || [];
+
                 const ctItems = items.filter(item => item.sdl_ct?.sdl_ct?.ct?.ct_nom).map((item) => ({
                     id: item.id,
                     responsable_id: item.sdl_ct?.sdl_ct?.ct?.id,
@@ -64,25 +100,14 @@ export default function DetailsReports() {
                     ca: item.quantite_cerise_a,
                     cb: item.quantite_cerise_b
                 }));
-                setAllSdlItems(sdlItems);
                 setAllCtItems(ctItems);
-                setTotalCount(response?.count || 0);
-
-                // Calculer les totaux dynamiques
-                const total_ca = items.reduce((acc, item) => acc + item.quantite_cerise_a, 0);
-                const total_cb = items.reduce((acc, item) => acc + item.quantite_cerise_b, 0);
-                setTotals({
-                    ca: total_ca,
-                    cb: total_cb,
-                    general: total_ca + total_cb,
-                    dates: (response?.results[0]?.rapportage_sdl_ct_semaine?.week_beginning || "") + " - " + (response?.results[0]?.rapportage_sdl_ct_semaine?.week_end || ""),
-                });
+                setCtTotalCount(response?.count || 0);
             } catch (error) {
-                console.error("Error fetching report:", error);
+                console.error("Error fetching CT report:", error);
             }
         };
-        if (id) fetchReport();
-    }, [id, activeTab, sdlLimit, sdlPointer, ctLimit, ctPointer]);
+        if (id) fetchCtReport();
+    }, [id, ctLimit, ctPointer]);
 
     return (
         <div className="p-2 md:p-8 gap-y-6 max-w-7xl flex flex-col min-h-screen">
@@ -166,13 +191,13 @@ export default function DetailsReports() {
                         <div className="mt-4 bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800">
                             <PaginationContent
                                 currentPage={sdlCurrentPage}
-                                totalPages={Math.ceil(totalCount / sdlLimit)}
+                                totalPages={Math.ceil(sdlTotalCount / sdlLimit)}
                                 onPageChange={(page) => {
                                     setSdlCurrentPage(page);
                                     setSdlPointer((page - 1) * sdlLimit);
                                 }}
                                 pointer={sdlPointer}
-                                totalCount={totalCount}
+                                totalCount={sdlTotalCount}
                                 onLimitChange={(limit) => {
                                     setSdlLimit(limit);
                                     setSdlPointer(0);
@@ -193,13 +218,13 @@ export default function DetailsReports() {
                         <div className="mt-4 bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800">
                             <PaginationContent
                                 currentPage={ctCurrentPage}
-                                totalPages={Math.ceil(totalCount / ctLimit)}
+                                totalPages={Math.ceil(ctTotalCount / ctLimit)}
                                 onPageChange={(page) => {
                                     setCtCurrentPage(page);
                                     setCtPointer((page - 1) * ctLimit);
                                 }}
                                 pointer={ctPointer}
-                                totalCount={totalCount}
+                                totalCount={ctTotalCount}
                                 onLimitChange={(limit) => {
                                     setCtLimit(limit);
                                     setCtPointer(0);
