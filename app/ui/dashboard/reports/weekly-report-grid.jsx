@@ -1,225 +1,140 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Send, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { fetchData } from "@/app/_utils/api";
-import { toast } from "sonner";
 
-export default function WeeklyReportGrid({ items = [], type = "SDL", readOnly = false, dateFrom, dateTo, internalPagination = true }) {
-  // Initialiser le state avec les données reçues
-  const [data, setData] = useState([]);
-  const [formData, setFormData] = useState({
-
-  })
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
-  useEffect(() => {
-    // Transformer les items en un format gérable par le state
-    const initialData = items.map((item) => ({
-      id: item.id,
-      responsable_id: item.responsable_id,
-      name: item.name,
-      ca: item.ca || "",
-      cb: item.cb || "",
-
-    }));
-    setData(initialData);
-  }, [items]);
-
-  // Gérer la mise à jour d'un champ
-  const handleChange = (id, field, value) => {
-    if (readOnly) return;
-    setData((prevData) =>
-      prevData.map((row) => {
-        if (row.id === id) {
-          // Validation de base pour s'assurer que seuls les nombres positifs sont entrés pour ca et cb
-          if ((field === "ca" || field === "cb") && value !== "" && Number(value) < 0) {
-            setFormData({
-              row
-            })
-            return row;
-          }
-          return { ...row, [field]: value };
-        }
-        return row;
-      })
-    );
-  };
-
-  const handleSend = async () => {
-    if (!dateFrom || !dateTo) {
-      toast.error("Veuillez sélectionner une période (Date début et Date fin)");
-      return;
-    }
-
-    // Filtrer les lignes qui ont au moins une valeur saisie pour éviter d'envoyer des rapports vides si nécessaire
-    // Mais ici le code original envoyait tout, donc on garde l'envoi de tout pour être sûr.
-
-    try {
-      const promises = data.map((item) => {
-        const payload = {
-          sdl_ct: item.responsable_id,
-          quantite_cerise_a: Number(item.ca) || 0,
-          quantite_cerise_b: Number(item.cb) || 0,
-          week_beginning: dateFrom,
-          week_end: dateTo,
-        };
-        return fetchData("post", `cafe/rapportages_sdl_ct/`, {
-          body: payload,
-        });
-      });
-
-      const responses = await Promise.all(promises);
-
-      const failures = responses.filter(res => res.status !== 201 && res.status !== 200);
-
-      if (failures.length === 0) {
-        let countdown = 3;
-        const toastId = toast.success(`Tous les rapports ont été envoyés avec succès. Rechargement dans ${countdown}s…`, {
-          duration: countdown * 1000,
-        });
-        const interval = setInterval(() => {
-          countdown -= 1;
-          if (countdown <= 0) {
-            clearInterval(interval);
-            window.location.reload();
-          } else {
-            toast.success(`Tous les rapports ont été envoyés avec succès. Rechargement dans ${countdown}s…`, {
-              id: toastId,
-              duration: countdown * 1000,
-            });
-          }
-        }, 1000);
-      } else if (failures.length < data.length) {
-        toast.warning(`${data.length - failures.length} rapports envoyés, ${failures.length} échecs.`);
-      } else {
-        toast.error("Échec de l'envoi des rapports");
-      }
-    } catch (error) {
-      console.error("Submission error:", error);
-      toast.error("Error");
-    }
-  };
-
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-  const paginatedData = internalPagination ? data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) : data;
-
+/**
+ * WeeklyReportGrid – composant d'affichage pur.
+ * L'état des saisies est géré par le parent via `inputs` et `onInputChange`.
+ *
+ * Props:
+ *  - items          : liste des SDL/CT de la page courante
+ *  - inputs         : objet { [id]: { ca, cb, responsable_id } } (toutes les pages)
+ *  - onInputChange  : (id, field, value, responsable_id) => void
+ *  - readOnly       : boolean
+ */
+export default function WeeklyReportGrid({
+  items = [],
+  inputs = {},
+  onInputChange,
+  readOnly = false,
+}) {
   return (
-    <Card className=" shadow-none p-1 ">
+    <Card className="shadow-none p-1">
       <CardContent className="p-0">
-        <div className="">
-          <Table className="min-w-[700px]">
-            <TableHeader className="">
+        <Table className="min-w-[700px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[200px] md:w-[300px] font-semibold">
+                Nom de la SDL/CT
+              </TableHead>
+              <TableHead className="w-[150px] font-semibold text-center">
+                CA (kg)
+              </TableHead>
+              <TableHead className="w-[150px] font-semibold text-center">
+                CB (kg)
+              </TableHead>
+              <TableHead className="w-[150px] font-semibold text-center">
+                Total (kg)
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.length === 0 ? (
               <TableRow>
-                <TableHead className="w-[200px] md:w-[300px] font-semibold">Nom de la SDL/CT</TableHead>
-                <TableHead className="w-[150px] font-semibold text-center">CA (kg)</TableHead>
-                <TableHead className="w-[150px] font-semibold text-center">CB (kg)</TableHead>
-                <TableHead className="w-[150px] font-semibold text-center">Total (kg)</TableHead>
+                <TableCell
+                  colSpan={4}
+                  className="text-center py-8 text-gray-500"
+                >
+                  Aucune SDL/CT trouvée pour cette catégorie.
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                    Aucune SDL/CT trouvée pour cette catégorie.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                paginatedData.map((row) => {
-                  const total = (Number(row.ca) || 0) + (Number(row.cb) || 0);
+            ) : (
+              items.map((item) => {
+                const entry = inputs[item.id] ?? { ca: "", cb: "" };
+                const total =
+                  (Number(entry.ca) || 0) + (Number(entry.cb) || 0);
 
-                  return (
-                    <TableRow key={row.id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/50 transition-colors">
-                      <TableCell className="font-medium align-middle">
-                        <div className="flex items-center gap-2">
-                          {row.name}
-                        </div>
-                      </TableCell>
-                      <TableCell className="align-middle text-center p-2">
-                        {readOnly ? (
-                          <span className="font-medium text-gray-700 dark:text-gray-300">
-                            {(Number(row.ca) || 0).toLocaleString()}
-                          </span>
-                        ) : (
-                          <Input
-                            type="number"
-                            min="0"
-                            value={row.ca}
-                            onChange={(e) => handleChange(row.id, "ca", e.target.value)}
-                            className="text-center  border-gray-200 dark:border-zinc-800 h-10 w-full hover:border-blue-400 focus:border-blue-500 transition-colors"
-                            placeholder="0"
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell className="align-middle text-center p-2">
-                        {readOnly ? (
-                          <span className="font-medium text-gray-700 dark:text-gray-300">
-                            {(Number(row.cb) || 0).toLocaleString()}
-                          </span>
-                        ) : (
-                          <Input
-                            type="number"
-                            min="0"
-                            value={row.cb}
-                            onChange={(e) => handleChange(row.id, "cb", e.target.value)}
-                            className="text-center  border-gray-200 dark:border-zinc-800 h-10 w-full hover:border-blue-400 focus:border-blue-500 transition-colors"
-                            placeholder="0"
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell className="align-middle text-center font-bold text-gray-700 dark:text-gray-300">
-                        <span className="bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-gray-200 py-1.5 px-3 rounded-md w-full inline-block">
-                          {total.toLocaleString()}
+                return (
+                  <TableRow
+                    key={item.id}
+                    className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/50 transition-colors"
+                  >
+                    <TableCell className="font-medium align-middle">
+                      {item.name}
+                    </TableCell>
+
+                    {/* CA */}
+                    <TableCell className="align-middle text-center p-2">
+                      {readOnly ? (
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          {(Number(entry.ca) || 0).toLocaleString()}
                         </span>
-                      </TableCell>
+                      ) : (
+                        <Input
+                          type="number"
+                          min="0"
+                          value={entry.ca}
+                          onChange={(e) =>
+                            onInputChange(
+                              item.id,
+                              "ca",
+                              e.target.value,
+                              item.responsable_id
+                            )
+                          }
+                          className="text-center border-gray-200 dark:border-zinc-800 h-10 w-full hover:border-blue-400 focus:border-blue-500 transition-colors"
+                          placeholder="0"
+                        />
+                      )}
+                    </TableCell>
 
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
+                    {/* CB */}
+                    <TableCell className="align-middle text-center p-2">
+                      {readOnly ? (
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          {(Number(entry.cb) || 0).toLocaleString()}
+                        </span>
+                      ) : (
+                        <Input
+                          type="number"
+                          min="0"
+                          value={entry.cb}
+                          onChange={(e) =>
+                            onInputChange(
+                              item.id,
+                              "cb",
+                              e.target.value,
+                              item.responsable_id
+                            )
+                          }
+                          className="text-center border-gray-200 dark:border-zinc-800 h-10 w-full hover:border-blue-400 focus:border-blue-500 transition-colors"
+                          placeholder="0"
+                        />
+                      )}
+                    </TableCell>
 
-          </Table>
-          {internalPagination && totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 py-4">
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <span className="text-sm text-gray-600">Page {currentPage} sur {totalPages}</span>
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
-          {!readOnly && (
-            <div className="w-full">
-              <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 border-t /50 p-6 mt-4">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Assurez-vous de vérifier les "Totaux" avant de valider votre semaine.
-                </p>
-                <div className="flex gap-3 w-full sm:w-auto">
-                  <Button className="w-full sm:w-auto flex gap-2 bg-primary hover:bg-primary/90 text-white shadow-md" onClick={handleSend}>
-                    <Send className="w-4 h-4" />
-                    Envoyer
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+                    {/* Total */}
+                    <TableCell className="align-middle text-center font-bold text-gray-700 dark:text-gray-300">
+                      <span className="bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-gray-200 py-1.5 px-3 rounded-md w-full inline-block">
+                        {total.toLocaleString()}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );

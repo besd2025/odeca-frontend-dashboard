@@ -122,7 +122,7 @@ export default function AssociationAchatsTable({
               achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
                 ?.commune_name || "N/A",
           },
-          num_fiche: achat?.numero_fiche || "0",
+          num_fiche: achat?.cafeiculteur?.cultivator_assoc_numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
           num_page: achat?.numero_page || "N/A",
           photo_fiche: achat?.photo_fiche,
