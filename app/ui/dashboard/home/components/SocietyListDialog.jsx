@@ -35,16 +35,16 @@ export function SocietyListDialog({ title, data }) {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="w-full gap-2">
+      <DialogTrigger asChild >
+        <Button variant="ghost" size="sm" className="flex items-center justify-end gap-2">
           <Eye className="h-4 w-4" />
-          Voir la liste complète
+          Voir plus
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl sm:max-w-[70vw]">
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <DialogTitle>{title}</DialogTitle>
-          <div className="mr-8">
+        <DialogHeader className="flex flex-col md:flex-row items-center md:justify-between justify-center mt-4">
+          <DialogTitle className="line-clamp-1">{title}</DialogTitle>
+          <div className="mr-">
             <ExportButton
               exportType="society_data"
               handleExportSocieties={() => console.log("Exporting...", data)}

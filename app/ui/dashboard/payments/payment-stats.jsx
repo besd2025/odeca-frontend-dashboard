@@ -1,7 +1,7 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users } from "lucide-react";
-import { Label, Pie, PieChart } from "recharts";
+import { Label, LabelList, Pie, PieChart } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -12,25 +12,21 @@ export default function PaymentStats() {
   const chartData = [
     {
       browser: "chrome",
-      type: " Pas encore paye",
+      type: "Pas encore payé",
       cafeiculteurs: 275,
       fill: "var(--chart-1)",
-      taux: "11% ",
     },
-
     {
       browser: "firefox",
-      type: " Paye en moyenne",
+      type: "Payé en moyenne",
       cafeiculteurs: 287,
       fill: "var(--chart-3)",
-      taux: "28.6% ",
     },
     {
       browser: "other",
-      type: " Paye en totalite",
+      type: "Payé en totalité",
       cafeiculteurs: 190,
       fill: "var(--chart-5)",
-      taux: "63.9% ",
     },
   ];
   const chartConfig = {
@@ -59,7 +55,8 @@ export default function PaymentStats() {
       {/* Storage usage */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="text-lg">Statut des paiements</CardTitle>
+          <CardTitle>Statut des paiements</CardTitle>
+          <CardDescription>Cafeiculteurs ayant vendus</CardDescription>
         </CardHeader>
         <CardContent>
           <ChartContainer
@@ -100,11 +97,27 @@ export default function PaymentStats() {
                             y={(viewBox.cy || 0) + 24}
                             className="fill-muted-foreground"
                           >
-                            Cafeiculteurs
+                            Caféiculteurs
                           </tspan>
                         </text>
                       );
                     }
+                  }}
+                />
+                <LabelList
+                  dataKey="browser"
+                  className="fill-sidebar-foreground"
+                  stroke="none"
+                  fontSize={15}
+                  formatter={(value) => {
+                    const item = chartData.find((d) => d.browser === value);
+                    const pct =
+                      totalCafeiculteurs > 0
+                        ? Math.round(
+                          ((item?.cafeiculteurs ?? 0) / totalCafeiculteurs) * 100
+                        )
+                        : 0;
+                    return `${pct}%`;
                   }}
                 />
               </Pie>
@@ -124,9 +137,14 @@ export default function PaymentStats() {
                 <div className="flex-1">
                   <div className="mb-1 flex items-center justify-between">
                     <span className="text-sm font-medium">{item.type}</span>
+                    <span className="text-sm font-semibold">
+                      {totalCafeiculteurs > 0
+                        ? Math.round((item.cafeiculteurs / totalCafeiculteurs) * 100)
+                        : 0}%
+                    </span>
                   </div>
                   <div className="text-muted-foreground text-xs">
-                    {item.taux} | {item.cafeiculteurs} Cafeiculteurs
+                    {item.cafeiculteurs} Caféiculteurs
                   </div>
                 </div>
               </div>

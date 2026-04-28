@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Scale, Users, Warehouse, MoreHorizontal } from "lucide-react";
+import { Scale, Users, MoreHorizontal, Building2 } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SocietyListDialog } from "../components/SocietyListDialog";
 import { SdlTopFiveCards } from "../../sdl/analytics/components/SdlTopFiveCards";
 
-function TopListCard({ title, icon, data }) {
+function TopListCard({ title, icon, data, itemIcon }) {
   // Main card only shows the top 5
   const topFive = data.slice(0, 5);
 
@@ -34,6 +34,7 @@ function TopListCard({ title, icon, data }) {
           {topFive.map((item, i) => (
             <div key={i} className="grid grid-cols-3">
               <div className="flex items-center gap-2 col-span-1 ">
+                <span className="text-sm text-muted-foreground">{itemIcon}</span>
                 <span className="text-sm font-medium leading-none">
                   {item.name}
                 </span>
@@ -44,7 +45,11 @@ function TopListCard({ title, icon, data }) {
                   <span className="text-xs">{item.sub}</span>
                 </div>
               </div>
-              <div className="col-span-1 flex justify-end">
+              <p className="text-sm col-span-1 flex justify-end items-center text-secondary font-medium">
+                50%
+                <span className="text-xs font-normal ml-1">du Total</span>
+              </p>
+              {/* <div className="col-span-1 flex justify-end">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -58,7 +63,7 @@ function TopListCard({ title, icon, data }) {
                     </Link>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
+              </div> */}
             </div>
           ))}
         </div>
@@ -122,21 +127,24 @@ export function SocietyTopFiveCards() {
       </div>
     );
   return (
-    <div className="grid gap-4 md:grid-cols-4">
-      <TopListCard
-        title="Top 5 - Societes les plus de quantitees"
-        icon={<Scale className="h-4 w-4" />}
-        data={datatopAchats}
-      />
-      <TopListCard
-        title="Top 5 - Societes les plus de cafeiculteurs"
-        icon={<Users className="h-4 w-4" />}
-        data={datatopMembers}
-      />
-      <div className="col-span-2">
+    <div className="">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+        <TopListCard
+          title="Top 5 - Societes les plus de quantitees"
+          itemIcon={<Building2 className="h-4 w-4" />}
+          icon={<Scale className="h-4 w-4" />}
+          data={datatopAchats}
+        />
+        <TopListCard
+          title="Top 5 - Societes les plus de cafeiculteurs"
+          itemIcon={<Building2 className="h-4 w-4" />}
+          icon={<Users className="h-4 w-4" />}
+          data={datatopMembers}
+        />
+      </div>
+      <div className="mt-6">
         <SdlTopFiveCards />
       </div>
-
     </div>
 
   );

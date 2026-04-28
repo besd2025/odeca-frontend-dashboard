@@ -16,7 +16,7 @@ import { fetchData } from "@/app/_utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SocietyListDialog } from "../../../home/components/SocietyListDialog";
 
-function TopListCard({ title, icon, data }) {
+function TopListCard({ title, icon, data, itemIcon }) {
   // Main card only shows the top 5
   const topFive = data.slice(0, 5);
 
@@ -31,9 +31,9 @@ function TopListCard({ title, icon, data }) {
           {topFive.map((item, i) => (
             <div key={i} className="grid grid-cols-3">
               <div className="flex items-center gap-2 col-span-1">
-                <span className="text-sm font-medium leading-none">
+                <span className="text-sm text-muted-foreground">{itemIcon}</span> <p className="text-sm font-medium leading-none">
                   {item.name}
-                </span>
+                </p>
               </div>
               <div className="col-span-1 flex  justify-center">
                 <div className="text-sm text-muted-foreground">
@@ -41,7 +41,11 @@ function TopListCard({ title, icon, data }) {
                   <span className="text-xs">{item.sub}</span>
                 </div>
               </div>
-              <div className="col-span-1 flex justify-end">
+              <p className="text-sm col-span-1 flex justify-end items-center text-secondary font-medium">
+                50%
+                <span className="text-xs font-normal ml-1">du Total</span>
+              </p>
+              {/* <div className="col-span-1 flex justify-end">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -55,7 +59,7 @@ function TopListCard({ title, icon, data }) {
                     </Link>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
+              </div> */}
             </div>
           ))}
         </div>
@@ -156,12 +160,19 @@ export function SdlTopFiveCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <TopListCard
-        title="Top 5 - Quantité Collectée"
+        title="Top 5 -SDL les plus de quantitees"
+        itemIcon={<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-4">
+          <path fillRule="evenodd" d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" clipRule="evenodd" />
+        </svg>
+        }
         icon={<Scale className="h-4 w-4" />}
         data={datatopAchats}
       />
       <TopListCard
-        title="Top 5 - Nombre de Cafeiculteurs"
+        title="Top 5 -SDL les plus de cafeiculteurs"
+        itemIcon={<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-4">
+          <path fillRule="evenodd" d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm.75 2.25a.75.75 0 0 0-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 0 0 .75-.75v-.008a.75.75 0 0 0-.75-.75h-.008ZM18 17.25a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" clipRule="evenodd" />
+        </svg>}
         icon={<Users className="h-4 w-4" />}
         data={datatopMembers}
       />

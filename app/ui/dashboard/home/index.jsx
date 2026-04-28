@@ -8,6 +8,9 @@ import { StockSummaryCardUDP } from "./stock-card-udp";
 import { UserContext } from "@/app/ui/context/User_Context";
 import React, { useContext } from "react";
 import { SocietyTopFiveCards } from "./charts/SocietyTopFiveCards";
+import { PaymentChart } from "../cultivators/analytics/components/PaymentChart";
+import { UniqueAccountChart } from "../cultivators/analytics/components/UniqueAccountChart";
+import PaymentStats from "../payments/payment-stats";
 function DashboardContainer() {
   const user = useContext(UserContext)
   return (
@@ -41,6 +44,18 @@ function DashboardContainer() {
               <SocietyTopFiveCards />
             </div>
           </div>
+          <div className="px-4 lg:px-6 grid grid-cols-3 gap-4">
+            {/* Existing Charts + Stock Card */}
+            <div className="col-span-1 flex flex-col gap-4">
+              <PaymentChart />
+            </div>
+            <div className="col-span-1 flex flex-col gap-4">
+              <UniqueAccountChart />
+            </div>
+            <div className="col-span-1 flex flex-col gap-4">
+              <PaymentStats />
+            </div>
+          </div>
           {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" && (
             <div className="px-4 lg:px-6 grid grid-cols-5 gap-4">
               {/* Existing Charts + Stock Card */}
@@ -51,7 +66,7 @@ function DashboardContainer() {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
