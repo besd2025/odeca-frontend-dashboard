@@ -333,11 +333,107 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
     },
     {
       accessorKey: "qte_tot_rapportee",
+      header: "Qte Total collectee",
+      cell: ({ row }) => {
+        const qte_tot_rapportee = row.original.qte_tot_rapportee;
+        return (
+          <div className="relative flex flex-col gap-y-1">
+            <div>
+              <div className="text-lg  font-semibold tracking-tight tabular-nums">
+                {data?.total_cerise_achat >= 1000 ? (
+                  <>
+                    {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    <span className="text-base">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
+              </div>
+            </div>
+            <div>
+              <div className="flex flex-col gap-y-1 text-xs font-medium">
+                <div className="flex flex-row gap-x-2 items-center">
+                  <span className="text-primary flex items-center gap-1">●</span>
+                  <div className="flex flex-row gap-x-1 items-center">
+                    <div className="text-md font-semibold text-primary">
+                      CA :
+                    </div>
+                  </div>
+                  <div className="font-semibold text-accent-foreground text-sm">
+                    {data?.total_cerise_a_achat >= 1000 ? (
+                      <>
+                        {(data?.total_cerise_a_achat / 1000).toLocaleString(
+                          "fr-FR",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          },
+                        )}{" "}
+                        <span className="text-sm">T</span>
+                      </>
+                    ) : (
+                      <>
+                        {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        <span className="text-xs">Kg</span>
+                      </>
+                    )}
+                    {/* <span className="text-xs font-normal text-muted-foreground ml-2">
+                                    ({percentageA.toFixed(1)}%)
+                                </span> */}
+                  </div>
+                </div>
+                <div className="flex flex-row gap-x-2 items-center">
+                  <span className="text-secondary flex items-center gap-1">
+                    ●
+                  </span>
+                  <div className="flex flex-row gap-x-1 items-center">
+                    <div className="text-md font-semibold text-secondary">
+                      CB :
+                    </div>
+                  </div>
+                  <div className="font-semibold text-accent-foreground text-sm">
+                    {data?.total_cerise_b_achat >= 1000 ? (
+                      <>
+                        {(data?.total_cerise_b_achat / 1000).toLocaleString(
+                          "fr-FR",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          },
+                        )}
+                        <span className="text-xs">T</span>
+                      </>
+                    ) : (
+                      <>
+                        {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        <span className="text-xs">Kg</span>
+                      </>
+                    )}
+                    {/* <span className="text-xs font-normal text-muted-foreground ml-2">
+                                    ({percentageB.toFixed(1)}%)
+                                </span> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "qte_tot_rapportee",
       header: "Qte Total rapportee",
       cell: ({ row }) => {
         const qte_tot_rapportee = row.original.qte_tot_rapportee;
         return (
-          <div className="@container/card col-span-4 @5xl/main:col-span-2 relative flex flex-col gap-y-1 ">
+          <div className="relative flex flex-col gap-y-1">
             <div>
               <div className="text-lg  font-semibold tracking-tight tabular-nums">
                 {data?.total_cerise_achat >= 1000 ? (
@@ -433,9 +529,9 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
       cell: ({ row }) => {
         const gap = row.original.gap;
         return (
-          <div className="@container/card col-span-4 @5xl/main:col-span-2 relative flex flex-col gap-y-1 ">
+          <div className="relative flex flex-col gap-y-1">
             <div>
-              <div className="text-lg text-destructive  font-semibold tracking-tight tabular-nums">
+              <div className="text-lg text-destructive font-semibold tracking-tight tabular-nums">
                 {data?.total_cerise_achat >= 1000 ? (
                   <>
                     {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
@@ -452,6 +548,73 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                 )}
               </div>
             </div>
+            <div>
+              <div className="flex flex-col gap-y-1 text-xs font-medium">
+                <div className="flex flex-row gap-x-2 items-center">
+                  <span className="text-primary flex items-center gap-1">●</span>
+                  <div className="flex flex-row gap-x-1 items-center">
+                    <div className="text-md font-semibold text-primary">
+                      CA :
+                    </div>
+                  </div>
+                  <div className="font-semibold text-accent-foreground text-sm">
+                    {data?.total_cerise_a_achat >= 1000 ? (
+                      <>
+                        {(data?.total_cerise_a_achat / 1000).toLocaleString(
+                          "fr-FR",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          },
+                        )}{" "}
+                        <span className="text-sm">T</span>
+                      </>
+                    ) : (
+                      <>
+                        {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        <span className="text-xs">Kg</span>
+                      </>
+                    )}
+                    {/* <span className="text-xs font-normal text-muted-foreground ml-2">
+                                    ({percentageA.toFixed(1)}%)
+                                </span> */}
+                  </div>
+                </div>
+                <div className="flex flex-row gap-x-2 items-center">
+                  <span className="text-secondary flex items-center gap-1">
+                    ●
+                  </span>
+                  <div className="flex flex-row gap-x-1 items-center">
+                    <div className="text-md font-semibold text-secondary">
+                      CB :
+                    </div>
+                  </div>
+                  <div className="font-semibold text-accent-foreground text-sm">
+                    {data?.total_cerise_b_achat >= 1000 ? (
+                      <>
+                        {(data?.total_cerise_b_achat / 1000).toLocaleString(
+                          "fr-FR",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          },
+                        )}
+                        <span className="text-xs">T</span>
+                      </>
+                    ) : (
+                      <>
+                        {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        <span className="text-xs">Kg</span>
+                      </>
+                    )}
+                    {/* <span className="text-xs font-normal text-muted-foreground ml-2">
+                                    ({percentageB.toFixed(1)}%)
+                                </span> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         );
       },
