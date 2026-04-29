@@ -11,6 +11,7 @@ import { AlignEndHorizontal, Badge } from 'lucide-react'
 import SdlsListTableReports from './sdl'
 import CtsListTableReports from './ct'
 
+
 export default function Reports() {
     return (
         <div><div className="flex flex-1 flex-col">

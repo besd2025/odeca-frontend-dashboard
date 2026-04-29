@@ -34,6 +34,11 @@ export default function AddCt() {
   const [zone, setZone] = useState("");
   const [colline, setColline] = useState("");
   const [collineCode, setCollineCode] = useState("");
+  const [sdlProvince, setSdlProvince] = useState("");
+  const [sdlCommune, setSdlCommune] = useState("");
+  const [sdlZone, setSdlZone] = useState("");
+  const [sdlColline, setSdlColline] = useState("");
+  const [sdlCollineCode, setSdlCollineCode] = useState("");
   const [sdl, setSDL] = useState("");
 
   // Options states
@@ -41,6 +46,9 @@ export default function AddCt() {
   const [communeOptions, setCommuneOptions] = useState([]);
   const [zoneOptions, setZoneOptions] = useState([]);
   const [collineOptions, setCollineOptions] = useState([]);
+  const [sdlCommuneOptions, setSdlCommuneOptions] = useState([]);
+  const [sdlZoneOptions, setSdlZoneOptions] = useState([]);
+  const [sdlCollineOptions, setSdlCollineOptions] = useState([]);
   const [societeOptions, setSocieteOptions] = useState([]);
   const [sdlOptions, setSdlOptions] = useState([]);
 
@@ -147,20 +155,98 @@ export default function AddCt() {
     setColline(name);
     const selected = collineOptions.find(opt => opt.value === name);
     setCollineCode(selected?.code || "");
+  };
+
+  // Handlers for SDL cascading address selects
+  const handleSdlProvinceChange = async (e) => {
+    const value = e.target.value;
+    setSdlProvince(value);
+    setSdlCommune("");
+    setSdlZone("");
+    setSdlColline("");
+    setSdlCommuneOptions([]);
+    setSdlZoneOptions([]);
+    setSdlCollineOptions([]);
+
+    if (!value) return;
+
+    try {
+      const data = await fetchData("get", `adress/commune/get_communes_by_province`, {
+        params: { province: value }
+      });
+      setSdlCommuneOptions(data?.map(c => ({
+        value: c.commune_name,
+        label: c.commune_name
+      })) || []);
+    } catch (err) {
+      console.error("Error fetching SDL communes:", err);
+    }
+  };
+
+  const handleSdlCommuneChange = async (e) => {
+    const value = e.target.value;
+    setSdlCommune(value);
+    setSdlZone("");
+    setSdlColline("");
+    setSdlZoneOptions([]);
+    setSdlCollineOptions([]);
+
+    if (!value) return;
+
+    try {
+      const data = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
+        params: { commune: value }
+      });
+      setSdlZoneOptions(data?.map(z => ({
+        value: z.zone_name,
+        label: z.zone_name
+      })) || []);
+    } catch (err) {
+      console.error("Error fetching SDL zones:", err);
+    }
+  };
+
+  const handleSdlZoneChange = async (e) => {
+    const value = e.target.value;
+    setSdlZone(value);
+    setSdlColline("");
+    setSdlCollineOptions([]);
+
+    if (!value) return;
+
+    try {
+      const data = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
+        params: { zone: value }
+      });
+      setSdlCollineOptions(data?.map(c => ({
+        value: c.colline_name,
+        code: c.colline_code,
+        label: c.colline_name
+      })) || []);
+    } catch (err) {
+      console.error("Error fetching SDL collines:", err);
+    }
+  };
+
+  const handleSdlCollineChange = (e) => {
+    const name = e.target.value;
+    setSdlColline(name);
+    const selected = sdlCollineOptions.find(opt => opt.value === name);
+    setSdlCollineCode(selected?.name || "");
     setSDL(""); // Clear previous SDL selection
   };
 
-  // Fetch SDLs whenever colline or societe changes
+  // Fetch SDLs whenever sdlCollineCode or societe changes
   useEffect(() => {
     async function fetchSDLs() {
-      if (!colline || !soc) {
+      if (!sdlCollineCode || !soc) {
         setSdlOptions([]);
         return;
       }
 
       try {
         const data = await fetchData("get", `cafe/stationslavage/`, {
-          params: { societe_code: soc, colline_name: colline }
+          params: { societe_code: soc, colline_name: sdlCollineCode }
         });
 
         setSdlOptions(data?.results?.map(s => ({
@@ -175,7 +261,7 @@ export default function AddCt() {
     if (open) {
       fetchSDLs();
     }
-  }, [colline, soc, open]);
+  }, [sdlCollineCode, soc, open]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -221,6 +307,11 @@ export default function AddCt() {
           setZone("");
           setColline("");
           setCollineCode("");
+          setSdlProvince("");
+          setSdlCommune("");
+          setSdlZone("");
+          setSdlColline("");
+          setSdlCollineCode("");
           setCode("");
           setCtName("");
           setSoc("");
@@ -327,10 +418,10 @@ export default function AddCt() {
               </div>
             </div> */}
 
-            {/* Locality Section */}
+            {/* CT Locality Section */}
             <div className="mt-7">
               <h5 className="mb-5 text-xl font-medium text-primary dark:text-white/90 lg:mb-6">
-                Localité
+                Localité du CT
               </h5>
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div className="space-y-2">
@@ -422,12 +513,85 @@ export default function AddCt() {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* SDL Locality selectors */}
+              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2 mt-5">
+                <div className="space-y-2">
+                  <Label>Province du SDL</Label>
+                  <select
+                    value={sdlProvince}
+                    onChange={handleSdlProvinceChange}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">Choisir une province</option>
+                    {provinceOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Commune du SDL</Label>
+                  <select
+                    value={sdlCommune}
+                    onChange={handleSdlCommuneChange}
+                    disabled={!sdlProvince}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                  >
+                    <option value="">Choisir une commune</option>
+                    {sdlCommuneOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2 mt-5">
+                <div className="space-y-2">
+                  <Label>Zone du SDL</Label>
+                  <select
+                    value={sdlZone}
+                    onChange={handleSdlZoneChange}
+                    disabled={!sdlCommune}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                  >
+                    <option value="">Choisir une zone</option>
+                    {sdlZoneOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Colline du SDL</Label>
+                  <select
+                    value={sdlColline}
+                    onChange={handleSdlCollineChange}
+                    disabled={!sdlZone}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                  >
+                    <option value="">Choisir une colline</option>
+                    {sdlCollineOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2 mt-5">
                 <div className="space-y-2">
                   <Label>SDL DE DESTINATION</Label>
                   <select
                     value={sdl}
                     onChange={(e) => setSDL(e.target.value)}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+                    disabled={!sdlColline || !soc}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une SDL</option>
                     {sdlOptions?.map((opt, index) => (

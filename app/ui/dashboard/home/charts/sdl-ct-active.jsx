@@ -68,6 +68,7 @@ export function ChartPieSdlCtActive() {
         ];
 
         setData(chartData);
+        console.log("chartData", response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {

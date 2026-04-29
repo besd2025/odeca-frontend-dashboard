@@ -85,7 +85,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
         const ctData = results.map((ct) => ({
           id: ct?.id,
           ct: {
-            ct_code: ct?.sdl?.sdl_code,
+            ct_code: ct?.ct_code,
             ct_name: ct?.ct_nom,
             type: "",
           },

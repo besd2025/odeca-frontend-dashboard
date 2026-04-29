@@ -153,6 +153,20 @@ export default function Irregulars({ data = RHData }) {
       ),
     },
     {
+      accessorKey: "nom_banque",
+      header: "Nom de la banque",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">{row.getValue("nom_banque")}</div>
+      ),
+    },
+    {
+      accessorKey: "Numero_compte",
+      header: "Numero_compte",
+      cell: ({ row }) => (
+        <div className="text-center font-semibold">{row.getValue("Numero_compte")}</div>
+      ),
+    },
+    {
       accessorKey: "ca",
       header: "CA",
       cell: ({ row }) => (

@@ -154,7 +154,7 @@ export default function AddUserDialog() {
       last_name: formData.last_name,
       identifiant: formData.identifiant,
       cni: formData.cni,
-      telephone: formData.telephone,
+      phone: formData.telephone,
       password: formData.password,
       province_code: province_code,
       adress: colline

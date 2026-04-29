@@ -54,6 +54,7 @@ export default function IndividualAchatsTableEdition({
   const [filterData, setFilterData] = useState({});
   const [searchvalue, setSearchValue] = useState("");
   const [open, setOpen] = useState(false);
+  const [processedIds, setProcessedIds] = useState(new Set());
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -216,6 +217,7 @@ export default function IndividualAchatsTableEdition({
     toast.promise(promise, {
       loading: "MODIFICATION...",
       success: (data) => {
+        setProcessedIds((prev) => new Set(prev).add(id));
         setTimeout(() => setOpen(false), 1000);
         return `${cultivator_code} a été modifié avec succès `;
       },
@@ -251,7 +253,8 @@ export default function IndividualAchatsTableEdition({
     toast.promise(promise, {
       loading: "REJET ...",
       success: (data) => {
-        setTimeout(() => window.location.reload(), 1000);
+        setProcessedIds((prev) => new Set(prev).add(id));
+        setTimeout(() => setOpen(false), 1000);
         return `${cultivator_code} a été rejeté avec succès `;
       },
       error: "Donnée non rejetée",
@@ -497,17 +500,25 @@ export default function IndividualAchatsTableEdition({
         header: "Approuver",
         cell: ({ row }) => (
           <div className="text-center font-semibold flex items-center gap-2">
-            <Button onClick={() => HandleApprove(row.original.id, row.original.achat_id, row.original.num_recu, row.original?.num_page, row.original?.ca, row.original?.cb, row?.original?.responsable_id, row?.original?.cultivator?.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-green-500/20">
-              <Check className="text-green-500" size={20} />
-            </Button>
-            <Button onClick={() => HandleReject(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-red-500/20">
-              <X className="text-red-500" size={20} />
-            </Button>
+            {processedIds.has(row.original.id) ? (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded-full">
+                <Check size={12} /> Traité
+              </span>
+            ) : (
+              <>
+                <Button onClick={() => HandleApprove(row.original.id, row.original.achat_id, row.original.num_recu, row.original?.num_page, row.original?.ca, row.original?.cb, row?.original?.responsable_id, row?.original?.cultivator?.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-green-500/20">
+                  <Check className="text-green-500" size={20} />
+                </Button>
+                <Button onClick={() => HandleReject(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-red-500/20">
+                  <X className="text-red-500" size={20} />
+                </Button>
+              </>
+            )}
           </div>
         ),
       },
     ],
-    [isCultivatorsPage],
+    [isCultivatorsPage, processedIds],
   );
 
   const table = useReactTable({

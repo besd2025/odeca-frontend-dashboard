@@ -160,10 +160,9 @@ export default function AddUserDialog() {
       cni: formData.cni,
       identifiant: formData.identifiant,
       password: formData.password,
-      telephone: formData.telephone,
+      phone: formData.telephone,
       societe_code: formData.societe_code
     }
-    console.log("form data : ", FormData)
     try {
       const response = await fetchData("post", `cafe/chef_societe_registration/`, {
         body: FormData,

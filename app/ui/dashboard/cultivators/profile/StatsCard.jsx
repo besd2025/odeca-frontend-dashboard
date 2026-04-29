@@ -40,7 +40,6 @@ function StatsCard({ cult_id }) {
         );
         setData(response);
         setValues(valuesdata);
-        console.log("dataVALUE: ", response)
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {

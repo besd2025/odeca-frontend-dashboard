@@ -19,9 +19,11 @@ import {
 import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
+import { UserContext } from "@/app/ui/context/User_Context";
 function StatsCard({ id }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const user = React.useContext(UserContext)
   React.useEffect(() => {
     const getSdls = async () => {
       try {
@@ -97,6 +99,13 @@ function StatsCard({ id }) {
                   <span className="text-sm">Kg</span>
                 </>
               )}
+              {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
+                <span className="text-xs font-normal text-muted-foreground ml-2">
+                  ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+                </span>
+              ) : (
+                <></>
+              )}
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
@@ -150,9 +159,15 @@ function StatsCard({ id }) {
                       <span className="text-sm">Kg</span>
                     </>
                   )}
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({percentageA.toFixed(1)}%)
-                  </span>
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({percentageA.toFixed(1)}%)
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  )}
                 </CardDescription>
               </div>
               <span className="w-0.5 h-8 bg-black/20 hidden lg:block"></span>
@@ -184,9 +199,15 @@ function StatsCard({ id }) {
                       <span className="text-sm">Kg</span>
                     </>
                   )}
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({percentageB.toFixed(1)}%)
-                  </span>
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({percentageB.toFixed(1)}%)
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  )}
                 </CardDescription>
               </div>
             </div>

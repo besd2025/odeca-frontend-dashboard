@@ -88,6 +88,7 @@ function DetailsContent({ id }) {
           },
         },
       );
+      console.log("response", response);
       const mappedData =
         response?.results?.map((achats) => ({
           id: achats?.id,
@@ -111,7 +112,7 @@ function DetailsContent({ id }) {
               achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
                 ?.commune_name,
           },
-          num_fiche: 784,
+          num_fiche: achats?.cafeiculteur?.cultivator_assoc_numero_fiche || "",
           num_recu: achats?.numero_recu,
           photo_fiche: achats?.photo_fiche,
           ca: achats?.quantite_cerise_a,
@@ -121,6 +122,7 @@ function DetailsContent({ id }) {
         })) || [];
 
       setTotalCountAchat(response?.count || 0);
+      console.log("mappedData", mappedData);
 
       if (type == "personne") {
         setIndividualAchatsData(mappedData);
@@ -660,7 +662,6 @@ function DetailsContent({ id }) {
 
   const handleTabChange = (tab) => {
     setTab(tab);
-    console.log("Selected tab:", tab);
     if (tab === "cultivators") {
       fetchCultivatorsByType(cultivateur_type);
     } else if (tab === "achats") {

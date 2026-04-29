@@ -29,16 +29,16 @@ import ComingSoonOverlay from "../../components/coming-soon-overlay";
 const recentFiles = [
   {
     name: "1ere Tranche collecte 2026",
-    date: "12/03/2026",
-    intervalle: "01 Avr - 30 Jun 2026",
+    date: "30/04/2026",
+    intervalle: "01 Janvier - 30 Avril 2026",
     icon: FileText,
   },
-  {
-    name: "2eme Tranche collecte 2026",
-    date: "12/06/2026",
-    intervalle: "01 Juil - 30 Aout 2026",
-    icon: FileText,
-  },
+  // {
+  //   name: "2eme Tranche collecte 2026",
+  //   date: "12/06/2026",
+  //   intervalle: "01 Juil - 30 Aout 2026",
+  //   icon: FileText,
+  // },
 ];
 
 const Listes = [
