@@ -1,12 +1,11 @@
 import React from 'react'
-import DetailsReports from '@/app/ui/dashboard/reports/history/details'
+import ReportsPage from '@/app/ui/dashboard/reports/history'
 import ProtectedRoute from '@/app/ui/protection/ProtectedRoute'
 import { ROLES } from '@/lib/permissions'
-export const dynamic = "force-dynamic";
 export default function page() {
     return (
         <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE, ROLES.SUPERVISEUR_REGIONAL, ROLES.SUPERVISEUR]}>
-            <DetailsReports />
+            <ReportsPage />
         </ProtectedRoute>
     )
 }
