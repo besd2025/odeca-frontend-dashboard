@@ -90,7 +90,6 @@ export default function DetailsReports() {
                         type: "ct",
                     }
                 });
-                console.log("CT response", response);
                 const items = response?.results || [];
 
                 const ctItems = items.filter(item => item.sdl_ct?.sdl_ct?.ct?.ct_nom).map((item) => ({

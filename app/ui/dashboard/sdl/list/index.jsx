@@ -46,6 +46,8 @@ import { useState, useContext } from "react";
 import AddSdl from "../add-sdl";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
+import { ROLES } from "@/lib/permissions";
+
 export default function SdlsListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -165,31 +167,36 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
       });
 
       const allData = response.results || [];
-      const formattedData = allData.map((item) => ({
-        Province:
-          item.sdl_adress?.zone_code?.commune_code?.province_code
-            ?.province_name || "",
-        Commune: item.sdl_adress?.zone_code?.commune_code?.commune_name || "",
-        Zone: item.sdl_adress?.zone_code?.zone_name || "",
-        Colline: item.sdl_adress?.colline_name || "",
-        CODE_SDL: item?.sdl_code || "",
-        NON_SDL: item.sdl_nom || "",
-        SOCIETE: item?.societe?.nom_societe || "",
-        NOM_RESPONSABLE: item?.sdl_responsable?.user?.last_name || "",
-        PRENOM_RESPONSABLE: item?.sdl_responsable?.user?.first_name || "",
-        TELEPHONE_RESPONSABLE: item?.sdl_responsable?.user?.phone || "",
-        DATE_CREATION: item?.sdl_responsable?.created_at
-          ? new Date(item.sdl_responsable.created_at).toLocaleString('fr-FR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          })
-          : null
+      const formattedData = allData.map((item) => {
+        const row = {
+          Province:
+            item.sdl_adress?.zone_code?.commune_code?.province_code
+              ?.province_name || "",
+          Commune: item.sdl_adress?.zone_code?.commune_code?.commune_name || "",
+          Zone: item.sdl_adress?.zone_code?.zone_name || "",
+          Colline: item.sdl_adress?.colline_name || "",
+          NON_SDL: item.sdl_nom || "",
+          SOCIETE: item?.societe?.nom_societe || "",
+          NOM_RESPONSABLE: item?.sdl_responsable?.user?.last_name || "",
+          PRENOM_RESPONSABLE: item?.sdl_responsable?.user?.first_name || "",
+          TELEPHONE_RESPONSABLE: item?.sdl_responsable?.user?.phone || "",
+          DATE_CREATION: item?.sdl_responsable?.created_at
+            ? new Date(item.sdl_responsable.created_at).toLocaleString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })
+            : null
 
-      }));
+        }
+        if (user?.session?.category === ROLES.ADMIN) {
+          row.CODE_SDL = item?.sdl_code || "";
+        }
+        return row;
+      });
 
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
       const workbook = XLSX.utils.book_new();

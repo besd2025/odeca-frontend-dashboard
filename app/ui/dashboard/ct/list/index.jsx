@@ -39,6 +39,7 @@ import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
 import { useState, useContext } from "react";
+import { ROLES } from "@/lib/permissions";
 import AddCt from "../add-ct";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
@@ -156,31 +157,37 @@ export default function CtsListTable({ isLoading: externalLoading }) {
       });
 
       const allData = response.results || [];
-      const formattedData = allData.map((item) => ({
-        Province:
-          item.ct_adress?.zone_code?.commune_code?.province_code
-            ?.province_name || "",
-        Commune: item.ct_adress?.zone_code?.commune_code?.commune_name || "",
-        Zone: item.ct_adress?.zone_code?.zone_name || "",
-        Colline: item.ct_adress?.colline_name || "",
-        CODE_CT: item?.ct_code || "",
-        NON_CT: item.ct_nom || "",
-        SDL_DESTINATION: item?.sdl?.sdl_nom,
-        SOCIETE: item?.sdl?.societe?.nom_societe || "",
-        NOM_RESPONSABLE: item?.ct_responsable?.user?.last_name || "",
-        PRENOM_RESPONSABLE: item?.ct_responsable?.user?.first_name || "",
-        TELEPHONE_RESPONSABLE: item?.ct_responsable?.user?.phone || "",
-        DATE_CREATION: item?.ct_responsable?.created_at
-          ? new Date(item.ct_responsable.created_at).toLocaleString('fr-FR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          })
-          : null
-      }));
+      const formattedData = allData.map((item) => {
+        const row = {
+          Province:
+            item.ct_adress?.zone_code?.commune_code?.province_code
+              ?.province_name || "",
+          Commune: item.ct_adress?.zone_code?.commune_code?.commune_name || "",
+          Zone: item.ct_adress?.zone_code?.zone_name || "",
+          Colline: item.ct_adress?.colline_name || "",
+          NON_CT: item.ct_nom || "",
+          SDL_DESTINATION: item?.sdl?.sdl_nom,
+          SOCIETE: item?.sdl?.societe?.nom_societe || "",
+          NOM_RESPONSABLE: item?.ct_responsable?.user?.last_name || "",
+          PRENOM_RESPONSABLE: item?.ct_responsable?.user?.first_name || "",
+          TELEPHONE_RESPONSABLE: item?.ct_responsable?.user?.phone || "",
+          DATE_CREATION: item?.ct_responsable?.created_at
+            ? new Date(item?.ct_responsable?.created_at).toLocaleString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })
+            : null
+        }
+        if (user?.session?.category === ROLES.ADMIN) {
+          row.CODE_CT = item?.ct_code || "";
+        }
+
+        return row;
+      });
 
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
       const workbook = XLSX.utils.book_new();

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, } from "react";
 import {
   Card,
   CardDescription,
@@ -16,11 +16,15 @@ import {
 import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
+import { UserContext } from "@/app/ui/context/User_Context";
 
 function StatsCard({ cult_id }) {
   const [data, setData] = React.useState({});
   const [values, setValues] = React.useState({});
+  const [dataavance, setDataavance] = React.useState({});
   const [loading, setLoading] = React.useState(true);
+  const user = React.useContext(UserContext);
+  console.log(user?.session);
   useEffect(() => {
     const getCultivators = async () => {
       try {
@@ -38,8 +42,18 @@ function StatsCard({ cult_id }) {
             body: {},
           }
         );
+        const datacavance = await fetchData(
+          "get",
+          `/cultivators/${cult_id}/get_montan_total_avance_cafeiculteur/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          }
+        );
         setData(response);
         setValues(valuesdata);
+        setDataavance(datacavance);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -93,6 +107,14 @@ function StatsCard({ cult_id }) {
                 </>
               )}{" "}
             </CardTitle>
+            {((values?.cerise_a + values?.cerise_b >= 1000) && (user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional") ? (
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                ({(values?.cerise_a + values?.cerise_b)?.toLocaleString("fr-FR")} kg)
+              </span>
+            ) : (
+              <></>
+            )
+            )}
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
             Qte Vendue (CA+CB)
@@ -142,9 +164,17 @@ function StatsCard({ cult_id }) {
                       <span className="text-sm">Kg</span>
                     </>
                   )}{" "}
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({percentageA.toFixed(1)}%)
-                  </span>
+                  {(user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional") ? (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({values?.cerise_a?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({percentageA.toFixed(1)}%)
+                    </span>
+                  )}
+
+
                 </CardDescription>
               </div>
               <span className="w-0.5 h-8 bg-black/20 hidden lg:block"></span>
@@ -173,9 +203,18 @@ function StatsCard({ cult_id }) {
                       <span className="text-sm">Kg</span>
                     </>
                   )}{" "}
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({percentageB.toFixed(1)}%)
-                  </span>
+
+                  {(user?.session?.category == "Cafe_Chef_societe" || user?.session?.category == "Superviseur_Regional"
+                  ) ? (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({values?.cerise_b?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({percentageB.toFixed(1)}%)
+                    </span>
+
+                  )}
                 </CardDescription>
               </div>
             </div>
@@ -222,7 +261,7 @@ function StatsCard({ cult_id }) {
                 </CardTitle>
               </div>
               <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
-                0 <span className="text-base">FBU</span>
+                {dataavance?.montant_total?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} <span className="text-base">FBU</span>
               </CardTitle>
             </div>
           </div>

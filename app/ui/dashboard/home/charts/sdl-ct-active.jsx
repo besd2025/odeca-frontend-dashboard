@@ -22,11 +22,11 @@ import { UserContext } from "@/app/ui/context/User_Context";
 const chartConfig = {
   active: {
     label: "Actif",
-    color: "var(--chart-1)",
+    color: "var(--chart-5)",
   },
   inactive: {
     label: "Inactif",
-    color: "var(--chart-5)",
+    color: "var(--chart-1)",
   },
 };
 

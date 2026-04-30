@@ -7,6 +7,10 @@ import { KPIGrid } from "./kpi-stats";
 import { StockSummaryCardUDP } from "./stock-card-udp";
 import { UserContext } from "@/app/ui/context/User_Context";
 import React, { useContext } from "react";
+import { SocietyTopFiveCards } from "./charts/SocietyTopFiveCards";
+import { PaymentChart } from "../cultivators/analytics/components/PaymentChart";
+import { UniqueAccountChart } from "../cultivators/analytics/components/UniqueAccountChart";
+import PaymentStats from "../payments/payment-stats";
 function DashboardContainer() {
   const user = useContext(UserContext)
   return (
@@ -44,7 +48,7 @@ function DashboardContainer() {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 

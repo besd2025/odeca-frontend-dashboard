@@ -63,13 +63,18 @@ export function PaymentChart() {
     getCultivators();
   }, []);
 
+  const total = React.useMemo(
+    () => data.reduce((acc, item) => acc + (item.visitors ?? 0), 0),
+    [data]
+  );
+
   if (loading) return <ChartSkeleton />;
 
   return (
     <Card className="col-span-1">
       <CardHeader>
         <CardTitle>Modes de Paiement</CardTitle>
-        <CardDescription>Préférences de paiement</CardDescription>
+        <CardDescription>Préférences de paiement des cafeiculteurs</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -93,7 +98,14 @@ export function PaymentChart() {
                 className="fill-sidebar-foreground"
                 stroke="none"
                 fontSize={12}
-                formatter={(value) => paymentConfig[value]?.label}
+                formatter={(value, entry) => {
+                  const item = data.find((d) => d.mode === value);
+                  const pct =
+                    total > 0
+                      ? Math.round(((item?.visitors ?? 0) / total) * 100)
+                      : 0;
+                  return `${paymentConfig[value]?.label ?? value} ${pct}%`;
+                }}
               />
             </Pie>
             <ChartLegend

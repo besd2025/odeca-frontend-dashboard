@@ -247,6 +247,7 @@ const menuItems = {
 
       ),
       keyword: "reports",
+
     },
     {
       title: "Repartitions",
