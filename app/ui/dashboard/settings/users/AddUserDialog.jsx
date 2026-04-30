@@ -128,8 +128,12 @@ export default function AddUserDialog() {
                 <SelectContent>
                   <SelectItem value="Admin">Administrateur</SelectItem>
                   <SelectItem value="General">Général</SelectItem>
-                  <SelectItem value="Cafe_ODECA">ODECA</SelectItem>
-                  <SelectItem value="Cafe_Chef_societe">SOCIETE</SelectItem>
+                  <SelectItem value="Cafe_ODECA">CADRES ODECA</SelectItem>
+                  <SelectItem value="Cafe_Chef_societe">CHEF SOCIETE</SelectItem>
+                  <SelectItem value="Cafe_Responsable">CAFE RESPONSABLE</SelectItem>
+                  <SelectItem value="Superviseur_Regional">SUPERVISEUR REGIONAL</SelectItem>
+                  <SelectItem value="Cafe_Superviseur">SUPERVISEUR ODECA-CAFE</SelectItem>
+
                 </SelectContent>
               </Select>
             </div>

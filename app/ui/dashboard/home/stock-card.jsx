@@ -10,8 +10,9 @@ import {
 import { Package, DollarSign, TrendingUp } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { StockCardSkeleton } from "@/components/ui/skeletons";
-
+import { useUser } from "@/app/_context/UserContext";
 export function StockSummaryCard() {
+  const { user } = useUser();
   const [data, setData] = React.useState({});
   const [grade_a1, setGradeA1] = React.useState(0);
   const [grade_a2, setGradeA2] = React.useState(0);
