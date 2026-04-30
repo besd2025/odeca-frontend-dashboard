@@ -246,6 +246,17 @@ const menuItems = {
         </svg>
 
       ),
+      items: [
+        {
+          title: "Rapports",
+          url: "/odeca-dashboard/reports",
+        },
+        {
+          title: "Soumettre",
+          url: "/odeca-dashboard/reports/history",
+          roles: ["Admin"],
+        },
+      ],
       keyword: "reports",
 
     },
