@@ -139,8 +139,8 @@ function Filter({ handleFilter }) {
       zone_name: selectedZone,
       colline_name: selectedColline,
       societe_nom: selectedSociete,
-      created_after: dateTo,
-      created_before: dateFrom,
+      created_after: dateFrom,
+      created_before: dateTo,
     };
     handleFilter(filterData);
     setOpen(false);

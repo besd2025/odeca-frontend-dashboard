@@ -39,6 +39,7 @@ import { UserContext } from "@/app/ui/context/User_Context";
 import { useState, useContext } from "react";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
+import { ROLES } from "@/lib/permissions";
 export default function CtsListTableReports({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -68,7 +69,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
     const getSdls = async () => {
       setLoading(true);
       try {
-        const response = await fetchData("get", "cafe/centres_transite/", {
+        const response = await fetchData("get", "cafe/rapportages_sdl_ct/get_ct_rapport/", {
           params: {
             limit: limit,
             offset: pointer,
@@ -82,25 +83,37 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
         const ctData = results.map((ct) => ({
           id: ct?.id,
           ct: {
-            ct_code: ct?.sdl?.sdl_code,
-            ct_name: ct?.ct_nom,
-            type: "",
+            ct_code: ct?.sdl_ct?.sdl_ct?.ct?.ct_code,
+            ct_name: ct?.sdl_ct?.sdl_ct?.ct?.ct_nom,
+            ct_id: ct?.sdl_ct?.sdl_ct?.ct?.id,
           },
-          society: ct?.sdl?.societe?.nom_societe,
+          society: ct?.sdl_ct?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
           responsable: {
-            first_name: ct?.ct_responsable?.user?.first_name || "",
-            last_name: ct?.ct_responsable?.user?.last_name || "",
-            telephone: ct?.ct_responsable?.user?.phone || "",
+            first_name: ct?.sdl_ct?.ct_responsable?.user?.first_name || "",
+            last_name: ct?.sdl_ct?.ct_responsable?.user?.last_name || "",
+            telephone: ct?.sdl_ct?.ct_responsable?.user?.phone || "",
           },
           localite: {
             province:
-              ct?.ct_adress?.zone_code?.commune_code?.province_code
+              ct?.sdl_ct?.sdl_ct?.ct?.ct_adress?.zone_code?.commune_code?.province_code
                 ?.province_name || "",
-            commune: ct?.ct_adress?.zone_code?.commune_code?.commune_name,
+            commune: ct?.sdl_ct?.sdl_ct?.ct?.ct_adress?.zone_code?.commune_code?.commune_name,
           },
+          quantite: {
+            total_collecte: ct?.quantite_cerise_a_from_mobile + ct?.quantite_cerise_b_from_mobile || "",
+            total_ca_collecte: ct?.quantite_cerise_a_from_mobile || "",
+            total_cb_collecte: ct?.quantite_cerise_b_from_mobile || "",
+            total_rapport: ct?.quantite_cerise_a_rapport + ct?.quantite_cerise_b_rapport || "",
+            total_ca_rapport: ct?.quantite_cerise_a_rapport || "",
+            total_cb_rapport: ct?.quantite_cerise_b_rapport || "",
+            gap_total: (ct?.quantite_cerise_a_from_mobile + ct?.quantite_cerise_b_from_mobile) > (ct?.quantite_cerise_a_rapport + ct?.quantite_cerise_b_rapport) ? (ct?.quantite_cerise_a_from_mobile + ct?.quantite_cerise_b_from_mobile) - (ct?.quantite_cerise_a_rapport + ct?.quantite_cerise_b_rapport) : (ct?.quantite_cerise_a_rapport + ct?.quantite_cerise_b_rapport) - (ct?.quantite_cerise_a_from_mobile + ct?.quantite_cerise_b_from_mobile) || "",
+            total_gap_ca: ct?.quantite_cerise_a_from_mobile > ct?.quantite_cerise_a_rapport ? ct?.quantite_cerise_a_from_mobile - ct?.quantite_cerise_a_rapport : ct?.quantite_cerise_a_rapport - ct?.quantite_cerise_a_from_mobile || "",
+            total_gap_cb: ct?.quantite_cerise_b_from_mobile > ct?.quantite_cerise_b_rapport ? ct?.quantite_cerise_b_from_mobile - ct?.quantite_cerise_b_rapport : ct?.quantite_cerise_b_rapport - ct?.quantite_cerise_b_from_mobile || "",
+          }
         }));
 
         setData(ctData);
+        console.log("ctData :", results)
         setTotalCount(response?.count);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -139,7 +152,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
   const handleExportCTs = async () => {
     setLoadingEportBtn(true);
     try {
-      const initResponse = await fetchData("get", `cafe/centres_transite/`, {
+      const initResponse = await fetchData("get", `cafe/rapportages_sdl_ct/get_ct_rapport/`, {
         params: { limit: 1 },
       });
       const total = initResponse?.count || 0;
@@ -148,36 +161,52 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
         return;
       }
 
-      const response = await fetchData("get", `cafe/centres_transite/`, {
+      const response = await fetchData("get", `cafe/rapportages_sdl_ct/get_ct_rapport/`, {
         params: { limit: total },
       });
 
       const allData = response.results || [];
-      const formattedData = allData.map((item) => ({
-        Province:
-          item.ct_adress?.zone_code?.commune_code?.province_code
-            ?.province_name || "",
-        Commune: item.ct_adress?.zone_code?.commune_code?.commune_name || "",
-        Zone: item.ct_adress?.zone_code?.zone_name || "",
-        Colline: item.ct_adress?.colline_name || "",
-        CODE_CT: item?.ct_code || "",
-        NON_CT: item.ct_nom || "",
-        SDL_DESTINATION: item?.sdl?.sdl_nom,
-        SOCIETE: item?.sdl?.societe?.nom_societe || "",
-        NOM_RESPONSABLE: item?.ct_responsable?.user?.last_name || "",
-        PRENOM_RESPONSABLE: item?.ct_responsable?.user?.first_name || "",
-        TELEPHONE_RESPONSABLE: item?.ct_responsable?.user?.phone || "",
-        DATE_CREATION: item?.ct_responsable?.created_at
-          ? new Date(item.ct_responsable.created_at).toLocaleString('fr-FR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          })
-          : null
-      }));
+      const formattedData = allData.map((item) => {
+        const row = {
+          Province:
+            item.sdl_ct?.sdl_ct?.ct?.ct_adress?.zone_code?.commune_code?.province_code
+              ?.province_name || "",
+          Commune: item.sdl_ct?.sdl_ct?.ct?.ct_adress?.zone_code?.commune_code?.commune_name || "",
+          Zone: item.sdl_ct?.sdl_ct?.ct?.ct_adress?.zone_code?.zone_name || "",
+          Colline: item.sdl_ct?.sdl_ct?.ct?.ct_adress?.colline_name || "",
+          NON_CT: item.sdl_ct?.sdl_ct?.ct?.ct_nom || "",
+          SDL_DESTINATION: item?.sdl_ct?.sdl_ct?.ct?.sdl?.sdl_nom,
+          SOCIETE: item?.sdl_ct?.sdl_ct?.ct?.sdl?.societe?.nom_societe || "",
+          NOM_RESPONSABLE: item?.sdl_ct?.sdl_ct?.responsable?.user?.last_name || "",
+          PRENOM_RESPONSABLE: item?.sdl_ct?.sdl_ct?.responsable?.user?.first_name || "",
+          TELEPHONE_RESPONSABLE: item?.sdl_ct?.sdl_ct?.responsable?.user?.phone || "",
+          QUANTITE_A_RAPPORTEE: item?.quantite_cerise_a_rapport,
+          QUANTITE_B_RAPPORTEE: item?.quantite_cerise_b_rapport,
+          QUANTITE_A_COLLECTEE: item?.quantite_cerise_a_from_mobile,
+          QUANTITE_B_COLLECTEE: item?.quantite_cerise_b_from_mobile,
+          TOTAL_GAP_CELISE: (item?.quantite_cerise_a_from_mobile + item?.quantite_cerise_b_from_mobile) > (item?.quantite_cerise_a_rapport + item?.quantite_cerise_b_rapport) ? (item?.quantite_cerise_a_from_mobile + item?.quantite_cerise_b_from_mobile) - (item?.quantite_cerise_a_rapport + item?.quantite_cerise_b_rapport) : (item?.quantite_cerise_a_rapport + item?.quantite_cerise_b_rapport) - (item?.quantite_cerise_a_from_mobile + item?.quantite_cerise_b_from_mobile) || "",
+          TOTAL_GAP_CA: item?.quantite_cerise_a_from_mobile > item?.quantite_cerise_a_rapport ? item?.quantite_cerise_a_from_mobile - item?.quantite_cerise_a_rapport : item?.quantite_cerise_a_rapport - item?.quantite_cerise_a_from_mobile || "",
+          TOTAL_GAP_CB: item?.quantite_cerise_b_from_mobile > item?.quantite_cerise_b_rapport ? item?.quantite_cerise_b_from_mobile - item?.quantite_cerise_b_rapport : item?.quantite_cerise_b_rapport - item?.quantite_cerise_b_from_mobile || "",
+
+
+
+          DATE_CREATION: item?.created_at
+            ? new Date(item?.created_at).toLocaleString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })
+            : null
+        }
+        if (user?.session?.category === ROLES.ADMIN) {
+          row.CODE_CT = item.sdl_ct?.sdl_ct?.ct?.ct_code || "";
+        }
+
+        return row;
+      });
 
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
       const workbook = XLSX.utils.book_new();
@@ -236,7 +265,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href={`/odeca-dashboard/ct/details/?id=${ct.id}`}>
+              <Link href={`/odeca-dashboard/ct/details/?id=${ct.ct.ct_id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
 
@@ -332,17 +361,17 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
       },
     },
     {
-      accessorKey: "qte_tot_rapportee",
+      accessorKey: "qte_tot_collectee",
       header: "Qte Total collectee",
       cell: ({ row }) => {
-        const qte_tot_rapportee = row.original.qte_tot_rapportee;
+        const qte_tot_achetee = row.original.quantite;
         return (
           <div className="relative flex flex-col gap-y-1">
             <div>
               <div className="text-lg  font-semibold tracking-tight tabular-nums">
-                {data?.total_cerise_achat >= 1000 ? (
+                {qte_tot_achetee?.total_collecte >= 1000 ? (
                   <>
-                    {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
+                    {(qte_tot_achetee?.total_collecte / 1000).toLocaleString("fr-FR", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{" "}
@@ -350,7 +379,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                   </>
                 ) : (
                   <>
-                    {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}{" "}
+                    {qte_tot_achetee?.total_collecte?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -366,9 +395,9 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
-                    {data?.total_cerise_a_achat >= 1000 ? (
+                    {qte_tot_achetee?.total_ca_collecte >= 1000 ? (
                       <>
-                        {(data?.total_cerise_a_achat / 1000).toLocaleString(
+                        {(qte_tot_achetee?.total_ca_collecte / 1000).toLocaleString(
                           "fr-FR",
                           {
                             minimumFractionDigits: 2,
@@ -379,7 +408,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                       </>
                     ) : (
                       <>
-                        {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        {qte_tot_achetee?.total_ca_collecte?.toLocaleString("fr-FR") || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}
@@ -398,9 +427,9 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
-                    {data?.total_cerise_b_achat >= 1000 ? (
+                    {qte_tot_achetee?.total_cb_collecte >= 1000 ? (
                       <>
-                        {(data?.total_cerise_b_achat / 1000).toLocaleString(
+                        {(qte_tot_achetee?.total_cb_collecte / 1000).toLocaleString(
                           "fr-FR",
                           {
                             minimumFractionDigits: 2,
@@ -411,7 +440,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                       </>
                     ) : (
                       <>
-                        {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        {qte_tot_achetee?.total_cb_collecte?.toLocaleString("fr-FR") || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}
@@ -431,14 +460,14 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
       accessorKey: "qte_tot_rapportee",
       header: "Qte Total rapportee",
       cell: ({ row }) => {
-        const qte_tot_rapportee = row.original.qte_tot_rapportee;
+        const qte_tot_rapportee = row.original.quantite;
         return (
           <div className="relative flex flex-col gap-y-1">
             <div>
               <div className="text-lg  font-semibold tracking-tight tabular-nums">
-                {data?.total_cerise_achat >= 1000 ? (
+                {qte_tot_rapportee?.total_rapport >= 1000 ? (
                   <>
-                    {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
+                    {(qte_tot_rapportee?.total_rapport / 1000).toLocaleString("fr-FR", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{" "}
@@ -446,7 +475,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                   </>
                 ) : (
                   <>
-                    {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}{" "}
+                    {qte_tot_rapportee?.total_rapport?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -462,9 +491,9 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
-                    {data?.total_cerise_a_achat >= 1000 ? (
+                    {qte_tot_rapportee?.total_ca_rapport >= 1000 ? (
                       <>
-                        {(data?.total_cerise_a_achat / 1000).toLocaleString(
+                        {(qte_tot_rapportee?.total_ca_rapport / 1000).toLocaleString(
                           "fr-FR",
                           {
                             minimumFractionDigits: 2,
@@ -475,7 +504,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                       </>
                     ) : (
                       <>
-                        {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        {qte_tot_rapportee?.total_ca_rapport?.toLocaleString("fr-FR") || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}
@@ -494,9 +523,9 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
-                    {data?.total_cerise_b_achat >= 1000 ? (
+                    {qte_tot_rapportee?.total_cb_rapport >= 1000 ? (
                       <>
-                        {(data?.total_cerise_b_achat / 1000).toLocaleString(
+                        {(qte_tot_rapportee?.total_cb_rapport / 1000).toLocaleString(
                           "fr-FR",
                           {
                             minimumFractionDigits: 2,
@@ -507,7 +536,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                       </>
                     ) : (
                       <>
-                        {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        {qte_tot_rapportee?.total_cb_rapport?.toLocaleString("fr-FR") || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}
@@ -527,14 +556,14 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
       accessorKey: "gap",
       header: "GAP",
       cell: ({ row }) => {
-        const gap = row.original.gap;
+        const gap = row.original.quantite;
         return (
           <div className="relative flex flex-col gap-y-1">
             <div>
               <div className="text-lg text-destructive font-semibold tracking-tight tabular-nums">
-                {data?.total_cerise_achat >= 1000 ? (
+                {gap?.gap_total >= 1000 ? (
                   <>
-                    {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
+                    {(gap?.gap_total / 1000).toLocaleString("fr-FR", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{" "}
@@ -542,7 +571,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                   </>
                 ) : (
                   <>
-                    {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}{" "}
+                    {gap?.gap_total?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -558,9 +587,9 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
-                    {data?.total_cerise_a_achat >= 1000 ? (
+                    {gap?.total_gap_ca >= 1000 ? (
                       <>
-                        {(data?.total_cerise_a_achat / 1000).toLocaleString(
+                        {(gap?.total_gap_ca / 1000).toLocaleString(
                           "fr-FR",
                           {
                             minimumFractionDigits: 2,
@@ -571,7 +600,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                       </>
                     ) : (
                       <>
-                        {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        {gap?.total_gap_ca?.toLocaleString("fr-FR") || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}
@@ -590,9 +619,9 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
-                    {data?.total_cerise_b_achat >= 1000 ? (
+                    {gap?.total_gap_cb >= 1000 ? (
                       <>
-                        {(data?.total_cerise_b_achat / 1000).toLocaleString(
+                        {(gap?.total_gap_cb / 1000).toLocaleString(
                           "fr-FR",
                           {
                             minimumFractionDigits: 2,
@@ -603,7 +632,7 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
                       </>
                     ) : (
                       <>
-                        {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                        {gap?.total_gap_cb?.toLocaleString("fr-FR") || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}

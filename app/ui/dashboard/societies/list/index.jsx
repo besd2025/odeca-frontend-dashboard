@@ -38,7 +38,7 @@ import { Badge } from "@/components/ui/badge";
 import PaginationContent from "@/components/ui/pagination-content";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
-
+import { ROLES } from "@/lib/permissions";
 import { UserContext } from "@/app/ui/context/User_Context";
 import { useContext } from "react";
 import { Input } from "@/components/ui/input";
@@ -137,20 +137,25 @@ export default function SocietiesListTable({ isLoading: externalLoading }) {
       });
 
       const allData = response.results || [];
-      const formattedData = allData.map((item) => ({
-        Province:
-          item.adresse?.zone_code?.commune_code?.province_code?.province_name ||
-          "",
-        Commune: item.adresse?.zone_code?.commune_code?.commune_name || "",
-        Zone: item.adresse?.zone_code?.zone_name || "",
-        Colline: item.adresse?.colline_name || "",
-        CODE_SOCIETE: item?.code_societe || "",
-        NON_SOCIETE: item.nom_societe || "",
-        NOM_RESPONSABLE: item?.responsable?.user?.last_name || "",
-        PRENOM_RESPONSABLE: item?.responsable?.user?.first_name || "",
-        TELEPHONE_RESPONSABLE: item?.responsable?.user?.phone || "",
-        DATE_CREATION: item?.created_at,
-      }));
+      const formattedData = allData.map((item) => {
+        const row = {
+          Province:
+            item.adresse?.zone_code?.commune_code?.province_code?.province_name ||
+            "",
+          Commune: item.adresse?.zone_code?.commune_code?.commune_name || "",
+          Zone: item.adresse?.zone_code?.zone_name || "",
+          Colline: item.adresse?.colline_name || "",
+          NON_SOCIETE: item.nom_societe || "",
+          NOM_RESPONSABLE: item?.responsable?.user?.last_name || "",
+          PRENOM_RESPONSABLE: item?.responsable?.user?.first_name || "",
+          TELEPHONE_RESPONSABLE: item?.responsable?.user?.phone || "",
+          DATE_CREATION: item?.created_at,
+        };
+        if (user?.session?.category === ROLES.ADMIN) {
+          row.CODE_SOCIETE = item?.code_societe || "";
+        }
+        return row;
+      });
 
       const worksheet = XLSX.utils.json_to_sheet(formattedData);
       const workbook = XLSX.utils.book_new();

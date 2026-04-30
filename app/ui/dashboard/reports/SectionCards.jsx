@@ -1,3 +1,5 @@
+"use client"
+import React from "react";
 import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -12,9 +14,9 @@ import {
 } from "@/components/ui/card"
 import { Archive, Grape, CircleDollarSign } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-
+import { fetchData } from "@/app/_utils/api";
 export function SectionCards() {
-    const data = {
+    const datas = {
         total_cerise_achat: 15420.5,
         total_cerise_a_achat: 10023.3,
         total_cerise_b_achat: 5397.2,
@@ -23,12 +25,31 @@ export function SectionCards() {
     const newQtyToday = 2500;
     const percentageA = 65;
     const percentageB = 35;
-
-    // const total = data?.total_cerise_achat || 0;
-    // const percentageA =
-    //     total > 0 ? ((data?.total_cerise_a_achat || 0) / total) * 100 : 0;
-    // const percentageB =
-    //     total > 0 ? ((data?.total_cerise_b_achat || 0) / total) * 100 : 0;
+    const [data, setData] = React.useState([]);
+    React.useEffect(() => {
+        const fetchReport = async () => {
+            try {
+                const response = await fetchData("get", `cafe/rapportages_sdl_ct/get_details/`);
+                console.log("response", response);
+                setData({
+                    total_cerise_achat: response?.total_cerise_rapport,
+                    total_cerise_a_achat: response?.total_cerise_a_rapport,
+                    total_cerise_b_achat: response?.total_cerise_b_rapport,
+                    total_montant_achat: 0,
+                    gap_total: response?.total_cerise_rapport > response?.total_cerise_mobile ? response?.total_cerise_rapport - response?.total_cerise_mobile : response?.total_cerise_mobile - response?.total_cerise_rapport,
+                    total_gap_ca: response?.total_cerise_a_rapport > response?.total_cerise_a_mobile ? response?.total_cerise_a_rapport - response?.total_cerise_a_mobile : response?.total_cerise_a_mobile - response?.total_cerise_a_rapport,
+                    total_gap_cb: response?.total_cerise_b_rapport > response?.total_cerise_b_mobile ? response?.total_cerise_b_rapport - response?.total_cerise_b_mobile : response?.total_cerise_b_mobile - response?.total_cerise_b_rapport,
+                    percentage_a: (response?.total_cerise_a_rapport / response?.total_cerise_rapport) * 100,
+                    percentage_b: (response?.total_cerise_b_rapport / response?.total_cerise_rapport) * 100,
+                    pourcentage_total_gap: response?.total_cerise_rapport > response?.total_cerise_mobile ? (response?.total_cerise_rapport - response?.total_cerise_mobile) * 100 / response?.total_cerise_rapport : (response?.total_cerise_mobile - response?.total_cerise_rapport) * 100 / response?.total_cerise_mobile,
+                    message: response?.total_cerise_rapport > response?.total_cerise_mobile ? "Le rapport a depassé la quantité collectée" : "Le rapport est inferieur à la quantité collectée",
+                });
+            } catch (error) {
+                console.error("Error fetching CT report:", error);
+            }
+        };
+        fetchReport();
+    }, []);
     return (
         <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
             <Card className="@container/card col-span-4 @5xl/main:col-span-2 relative">
@@ -53,6 +74,7 @@ export function SectionCards() {
                                 </>
                             )}
                         </CardTitle>
+
                     </div>
                     <CardTitle className="text-lg font-semibold tabular-nums  ">
                         Qte rapportee (CAB)
@@ -71,11 +93,11 @@ export function SectionCards() {
                         <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted">
                             <div
                                 className="bg-primary/90"
-                                style={{ width: `${percentageA}%` }}
+                                style={{ width: `${data.percentage_a}%` }}
                             />
                             <div
                                 className="bg-secondary/90"
-                                style={{ width: `${percentageB}%` }}
+                                style={{ width: `${data.percentage_b}%` }}
                             />
                         </div>
                         <div className="flex flex-wrap gap-y-2 justify-between text-xs font-medium">
@@ -148,33 +170,16 @@ export function SectionCards() {
                             </div>
                         </div>
                     </div>
-                    <div className="f/lex flex-col gap-y-1 mt-2 hidden">
-                        <div className="flex flex-row gap-x-2 items-center">
-                            <div className="rounded-md">
-                                <CircleDollarSign className="text-yellow-500 size-4" />
-                            </div>
-                            <CardTitle className="text-sm text-muted-foreground font-medium tabular-nums">
-                                Montant total
-                            </CardTitle>
-                        </div>
-                        <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-                            {Math.round(data?.total_montant_achat ?? 0)
-                                .toString()
-                                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-                            <span className="text-xs font-normal text-muted-foreground">
-                                FBU
-                            </span>
-                        </CardTitle>
-                    </div>
+
                 </CardHeader>
             </Card>
             <Card className="@container/card col-span-4 @5xl/main:col-span-2 relative">
                 <CardHeader>
                     <CardDescription className="text-lg  font-semibold tabular-nums  ">GAP</CardDescription>
                     <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums text-destructive">
-                        {data?.total_cerise_achat >= 1000 ? (
+                        {data?.gap_total >= 1000 ? (
                             <>
-                                {(data?.total_cerise_achat / 1000).toLocaleString("fr-FR", {
+                                {(data?.gap_total / 1000).toLocaleString("fr-FR", {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
                                 })}{" "}
@@ -182,7 +187,7 @@ export function SectionCards() {
                             </>
                         ) : (
                             <>
-                                {data?.total_cerise_achat?.toLocaleString("fr-FR") || 0}{" "}
+                                {data?.gap_total?.toLocaleString("fr-FR") || 0}{" "}
                                 <span className="text-sm">Kg</span>
                             </>
                         )}
@@ -190,7 +195,7 @@ export function SectionCards() {
                     {/* <CardAction>
                         <Badge variant="destructive">
                             <IconTrendingDown />
-                            -20%
+                            {data?.pourcentage_total_gap?.toFixed(1)}%
                         </Badge>
                     </CardAction> */}
                 </CardHeader>
@@ -205,9 +210,9 @@ export function SectionCards() {
                                 </CardTitle>
                             </div>
                             <CardDescription className="font-semibold text-accent-foreground text-lg">
-                                {data?.total_cerise_a_achat >= 1000 ? (
+                                {data?.total_gap_ca >= 1000 ? (
                                     <>
-                                        {(data?.total_cerise_a_achat / 1000).toLocaleString(
+                                        {(data?.total_gap_ca / 1000).toLocaleString(
                                             "fr-FR",
                                             {
                                                 minimumFractionDigits: 2,
@@ -218,7 +223,7 @@ export function SectionCards() {
                                     </>
                                 ) : (
                                     <>
-                                        {data?.total_cerise_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                                        {data?.total_gap_ca?.toLocaleString("fr-FR") || 0}{" "}
                                         <span className="text-sm">Kg</span>
                                     </>
                                 )}
@@ -241,9 +246,9 @@ export function SectionCards() {
                                 </CardTitle>
                             </div>
                             <CardDescription className="font-semibold text-accent-foreground text-lg">
-                                {data?.total_cerise_b_achat >= 1000 ? (
+                                {data?.total_gap_cb >= 1000 ? (
                                     <>
-                                        {(data?.total_cerise_b_achat / 1000).toLocaleString(
+                                        {(data?.total_gap_cb / 1000).toLocaleString(
                                             "fr-FR",
                                             {
                                                 minimumFractionDigits: 2,
@@ -254,7 +259,7 @@ export function SectionCards() {
                                     </>
                                 ) : (
                                     <>
-                                        {data?.total_cerise_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                                        {data?.total_gap_cb?.toLocaleString("fr-FR") || 0}{" "}
                                         <span className="text-sm">Kg</span>
                                     </>
                                 )}
@@ -267,10 +272,10 @@ export function SectionCards() {
                 </CardContent>
                 <CardFooter className="flex-col items-start gap-1.5 text-sm">
                     <div className="line-clamp-1 flex gap-2 font-medium">
-                        Gap de 20% <IconTrendingDown className="size-4" />
+                        Gap de {data?.pourcentage_total_gap?.toFixed(2)}% <IconTrendingDown className="size-4" />
                     </div>
                     <div className="text-muted-foreground">
-                        Par rapport au quantite collectee
+                        {data?.message}
                     </div>
                 </CardFooter>
             </Card>
