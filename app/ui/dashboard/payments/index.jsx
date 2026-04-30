@@ -154,9 +154,9 @@ export default function PaymentsPage() {
               </div>
             </div>
           </div>
-          <div className="border-border bg-card hidden w-96 border-l p-6 xl:block">
+          {/* <div className="border-border bg-card hidden w-96 border-l p-6 xl:block">
             <PaymentStats />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

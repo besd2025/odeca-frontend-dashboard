@@ -53,25 +53,6 @@ export function SectionCards() {
                                 </>
                             )}
                         </CardTitle>
-                        {newQtyToday > 0 && (
-                            <Badge
-                                variant="secondary"
-                                className="bg-green-100 dark:bg-green-600/60 text-green-700 dark:text-green-100 px-1 py-0 h-5 ml-4"
-                            >
-                                <IconTrendingUp size={12} className="mr-0.5" />+
-                                {newQtyToday >= 1000 ? (
-                                    <>
-                                        {(newQtyToday / 1000).toLocaleString("fr-FR", {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                        })}{" "}
-                                        T
-                                    </>
-                                ) : (
-                                    <>{newQtyToday.toLocaleString("fr-FR")} Kg</>
-                                )}
-                            </Badge>
-                        )}
                     </div>
                     <CardTitle className="text-lg font-semibold tabular-nums  ">
                         Qte rapportee (CAB)
@@ -206,12 +187,12 @@ export function SectionCards() {
                             </>
                         )}
                     </CardTitle>
-                    <CardAction>
+                    {/* <CardAction>
                         <Badge variant="destructive">
                             <IconTrendingDown />
                             -20%
                         </Badge>
-                    </CardAction>
+                    </CardAction> */}
                 </CardHeader>
                 <CardContent className="">
                     <div className="flex flex-wrap gap-y-2 justify-between text-xs font-medium">
