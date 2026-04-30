@@ -35,7 +35,7 @@ function AchatsData() {
             <List />
             <span>Liste</span>
           </TabsTrigger>
-          {(user?.session?.category === "Admin" || user?.session?.category === "Cafe_ODECA") && (
+          {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
             <TabsTrigger value="details">
               <Edit />
               <span>
