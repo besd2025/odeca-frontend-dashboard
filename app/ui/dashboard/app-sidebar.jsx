@@ -250,12 +250,12 @@ const menuItems = {
         {
           title: "Rapports",
           url: "/odeca-dashboard/reports",
-          roles: ["Admin", "superviseur_regional", "Cafe_Chef_societe"],
+          roles: ["Admin", "General", "Cafe_ODECA"],
         },
         {
           title: "Soumettre",
           url: "/odeca-dashboard/reports/history",
-          roles: ["Admin", "General", "Cafe_ODECA"],
+          roles: ["Admin", "superviseur_regional", "Cafe_Chef_societe"],
         },
       ],
       keyword: "reports",
@@ -271,7 +271,7 @@ const menuItems = {
         {
           title: "Edition",
           url: "/odeca-dashboard/maps/edit-localisation",
-          roles: ["Admin", "Superviseur",],
+          roles: ["Admin", "Superviseur"],
         },
       ],
       url: "/odeca-dashboard/maps",
