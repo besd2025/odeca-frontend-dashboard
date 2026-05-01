@@ -65,7 +65,7 @@ export default function Edit({
   const [payment_phone, setPaymentPhone] = useState("");
   const [proprietaire, setProprietaire] = useState("");
   const [collector_code, setCollectorCode] = useState("");
-
+  const [ouvert_a_pai, setOuvertAPai] = useState("");
   // Load initial data
   useEffect(() => {
     async function loadProvinces() {
@@ -117,12 +117,14 @@ export default function Edit({
         setProprietaire(response?.cultivator_account_owner || "");
         setCollectorCode(response?.collector?.unique_code || "");
         setColline(response?.cultivator_adress?.colline_code || "");
+        setAdressCode(response?.cultivator_adress?.code || "");
+        setOuvertAPai(response?.cultivator_bank_opened)
       } catch (error) {
         console.error("Error loading cultivator data:", error);
       }
     }
     loadCultivatorData();
-  }, [cultivator, sdl_ct, society, localite, champs]);
+  }, [cultivator]);
 
   // Handle province change
   const handleProvinceChange = async (e) => {
@@ -234,6 +236,7 @@ export default function Edit({
       cultivator_payment_type: payment_mode,
       cultivator_bank_name: bank_name,
       cultivator_bank_account: bank_account,
+      cultivator_bank_opened: ouvert_a_pai,
       cultivator_mobile_payment_account: payment_phone,
       cultivator_account_owner: proprietaire,
       cultivator_adress_code: colline,
@@ -254,6 +257,7 @@ export default function Edit({
           }
         );
         if (results.status === 200 || results.id) {
+
           resolve({ code });
         } else {
           reject(new Error("Erreur lors de la modification"));
@@ -266,6 +270,30 @@ export default function Edit({
     toast.promise(promise, {
       loading: "Modification en cours...",
       success: (data) => {
+        setCode("");
+        setFirstName("");
+        setLastName("");
+        setImageUrl("");
+        setDateNaissance("");
+        setPhone("");
+        setCni("");
+        setSdl("");
+        setSoc("");
+        setNumFiche("");
+        setProvince("");
+        setCommune("");
+        setZone("");
+        setColline("");
+        setNbChamps(0);
+        setPaymentMode("");
+        setBankName("");
+        setBankAccount("");
+        setPaymentPhone("");
+        setProprietaire("");
+        setCollectorCode("");
+        setColline("");
+        setAdressCode("");
+        setOuvertAPai("")
         setOpen(false);
         setTimeout(() => setOpen(false), 1000);
         return `${data.code} a été modifié avec succès`;
@@ -511,6 +539,14 @@ export default function Edit({
                     type="text"
                     value={bank_account}
                     onChange={(e) => setBankAccount(e.target.value)}
+                  />
+                </div>
+                <div className="col-span-2 lg:col-span-1 space-y-2">
+                  <Label>Ouvert à </Label>
+                  <Input
+                    type="text"
+                    value={ouvert_a_pai}
+                    onChange={(e) => setOuvertAPai(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
