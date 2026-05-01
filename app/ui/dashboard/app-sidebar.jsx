@@ -255,7 +255,7 @@ const menuItems = {
         {
           title: "Soumettre",
           url: "/odeca-dashboard/reports/history",
-          roles: ["Admin", "superviseur_regional", "Cafe_Chef_societe"],
+          roles: ["Admin", "Superviseur_Regional", "Cafe_Chef_societe"],
         },
       ],
       keyword: "reports",

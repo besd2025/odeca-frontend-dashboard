@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { toast } from "sonner";
-
 export default function Edit({
   cultivator,
   sdl_ct = "",
