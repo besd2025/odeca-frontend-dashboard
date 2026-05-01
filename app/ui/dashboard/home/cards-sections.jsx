@@ -238,7 +238,7 @@ export function SectionCards() {
                 <></>
               )}
             </CardTitle>
-            {newQtyToday > 0 && (
+            {/* {newQtyToday > 0 && (
               <Badge
                 variant="secondary"
                 className="bg-green-100 dark:bg-green-600/60 text-green-700 dark:text-green-100 px-1 py-0 h-5 ml-4"
@@ -256,7 +256,7 @@ export function SectionCards() {
                   <>{newQtyToday.toLocaleString("fr-FR")} Kg</>
                 )}
               </Badge>
-            )}
+            )} */}
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
             Qte collectee (CAB)
@@ -543,14 +543,14 @@ export function SectionCards() {
               <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
                 {totalCultivators?.toLocaleString("fr-FR")}
               </CardTitle>
-              {newToday > 0 && (
+              {/* {newToday > 0 && (
                 <Badge
                   variant="secondary"
                   className="bg-green-100 dark:bg-green-600/60 text-green-700 dark:text-green-100 px-1 py-0 h-5 ml-1"
                 >
                   <IconTrendingUp size={12} className="mr-0.5" />+{newToday}
                 </Badge>
-              )}
+              )} */}
             </div>
             <CardTitle className="text-base font-normal ml-2 mt-1 ">
               Total caféiculteurs
