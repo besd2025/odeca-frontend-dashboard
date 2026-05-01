@@ -101,25 +101,25 @@ export function SectionCards() {
           },
         );
 
-        const dailyStats = await fetchData(
-          "get",
-          `/cafe/stationslavage/cultivateurs_statistiques_par_temps?period=day`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          },
-        );
+        // const dailyStats = await fetchData(
+        //   "get",
+        //   `/cafe/stationslavage/cultivateurs_statistiques_par_temps?period=day`,
+        //   {
+        //     params: {},
+        //     additionalHeaders: {},
+        //     body: {},
+        //   },
+        // );
 
-        const dailyPurchaseStats = await fetchData(
-          "get",
-          `/cafe/stationslavage/get_recent_total_7_cultivators_per_days_or_weeks_or_months_for_line_chart?period=day`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          },
-        );
+        // const dailyPurchaseStats = await fetchData(
+        //   "get",
+        //   `/cafe/stationslavage/get_recent_total_7_cultivators_per_days_or_weeks_or_months_for_line_chart?period=day`,
+        //   {
+        //     params: {},
+        //     additionalHeaders: {},
+        //     body: {},
+        //   },
+        // );
 
         const udps = await fetchData(
           "get",
@@ -140,8 +140,6 @@ export function SectionCards() {
             body: {},
           },
         );
-
-        console.log("dailyPurchaseStats", dailyPurchaseStats);
         setData(response);
         setRendement(rendement);
         setCafeVertProduit(cafe_vert);
@@ -151,17 +149,17 @@ export function SectionCards() {
         setTotalUdps(udps?.total_usine_deparchage || 0);
         setTotalSocieties(societies?.count || 0);
 
-        if (Array.isArray(dailyStats) && dailyStats.length > 0) {
-          // On récupère le nombre de cultivateurs du jour le plus récent
-          setNewToday(dailyStats[dailyStats.length - 1].nombre || 0);
-        }
+        // if (Array.isArray(dailyStats) && dailyStats.length > 0) {
+        //   // On récupère le nombre de cultivateurs du jour le plus récent
+        //   setNewToday(dailyStats[dailyStats.length - 1].nombre || 0);
+        // }
 
-        if (Array.isArray(dailyPurchaseStats) && dailyPurchaseStats.length > 0) {
-          // On récupère la quantité de cerise du jour le plus récent
-          setNewQtyToday(
-            dailyPurchaseStats[dailyPurchaseStats.length - 1].quantite_total || 0,
-          );
-        }
+        // if (Array.isArray(dailyPurchaseStats) && dailyPurchaseStats.length > 0) {
+        //   // On récupère la quantité de cerise du jour le plus récent
+        //   setNewQtyToday(
+        //     dailyPurchaseStats[dailyPurchaseStats.length - 1].quantite_total || 0,
+        //   );
+        // }
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
