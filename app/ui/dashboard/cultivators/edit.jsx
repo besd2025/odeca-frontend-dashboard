@@ -92,6 +92,7 @@ export default function Edit({
           additionalHeaders: {},
           body: {},
         });
+        console.log("response ", response)
         setCode(response.cultivator_code || "");
         setFirstName(response?.cultivator_first_name || "");
         setLastName(response?.cultivator_last_name || "");
@@ -526,12 +527,12 @@ export default function Edit({
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Nom de Banque</Label>
-                  {/* <Input
+                  <Input
                     type="text"
                     value={bank_name}
                     onChange={(e) => setBankName(e.target.value)}
-                  /> */}
-                  <select
+                  />
+                  {/* <select
                     value={bank_name}
                     onChange={(e) => setBankName(e.target.value)}
                     disabled={!commune}
@@ -543,7 +544,7 @@ export default function Edit({
                         {item.label}
                       </option>
                     ))}
-                  </select>
+                  </select> */}
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>No compte bancaire</Label>
