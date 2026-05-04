@@ -311,7 +311,7 @@ export default function IndividualCultivatorsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" ? (
+                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
                   <div>
                     <Edit
                       cultivator={result?.id}

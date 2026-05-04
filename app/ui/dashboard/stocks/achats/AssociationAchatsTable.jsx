@@ -310,7 +310,7 @@ export default function AssociationAchatsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" ? (
+                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
                   <div>
                     <EditAssociationAchats
                       id={cultivator?.id}

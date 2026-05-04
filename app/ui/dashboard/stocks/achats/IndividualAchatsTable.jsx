@@ -192,7 +192,6 @@ export default function IndividualAchatsTable({
         params: { report_id: reportId },
         isBlob: true,
       });
-      console.log("downloard", response);
       // Créer le blob avec le bon type MIME
       const blob = new Blob([response.data], {
         type:
@@ -310,7 +309,7 @@ export default function IndividualAchatsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" ? (
+                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
                   <div>
                     <EditIndividualAchats
                       id={cultivator?.id}
