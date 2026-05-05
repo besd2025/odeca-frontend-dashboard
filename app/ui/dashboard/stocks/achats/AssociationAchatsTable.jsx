@@ -129,6 +129,18 @@ export default function AssociationAchatsTable({
           ca: achat?.quantite_cerise_a || 0,
           cb: achat?.quantite_cerise_b || 0,
           date: achat?.date_achat || "N/A",
+          date_creation: achat?.created_at
+            ? new Date(achat.created_at).toLocaleString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })
+            : null
+
+
         }));
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
@@ -500,6 +512,15 @@ export default function AssociationAchatsTable({
         cell: ({ row }) => (
           <div className="text-center font-semibold">
             {row.getValue("date")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "date_creation",
+        header: "Date Creation",
+        cell: ({ row }) => (
+          <div className="text-center font-semibold">
+            {row.getValue("date_creation")}
           </div>
         ),
       },

@@ -92,7 +92,6 @@ export default function Edit({
           additionalHeaders: {},
           body: {},
         });
-        console.log("response ", response)
         setCode(response.cultivator_code || "");
         setFirstName(response?.cultivator_first_name || "");
         setLastName(response?.cultivator_last_name || "");
