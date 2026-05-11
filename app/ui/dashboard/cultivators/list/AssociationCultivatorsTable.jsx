@@ -38,7 +38,7 @@ import {
 import ExportButton from "@/components/ui/export_button";
 import AssociationFilter from "../AssociationFilter";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
-import Edit from "../edit";
+import EditAssociation from "../profile/EditAssociation";
 import Link from "next/link";
 import PaginationContent from "@/components/ui/pagination-content";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
@@ -314,7 +314,7 @@ export default function AssociationCultivatorsTable({
                 </Link>
                 {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
                   <div>
-                    <Edit
+                    <EditAssociation
                       cultivator={result?.id}
                       sdl_ct={result?.sdl_ct}
                       society={result?.society}
