@@ -95,7 +95,6 @@ export default function IndividualAchatsTable({
             search: searchvalue,
           },
         });
-        console.log(response.results[0])
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
           responsable_id: achat?.responsable?.unique_code,
@@ -320,7 +319,7 @@ export default function IndividualAchatsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+                {/* {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
                   <div>
                     <EditIndividualAchats
                       id={cultivator?.id}
@@ -343,7 +342,7 @@ export default function IndividualAchatsTable({
                   </div>
                 ) : (
                   " "
-                )}
+                )} */}
               </DropdownMenuContent>
             </DropdownMenu>
           );

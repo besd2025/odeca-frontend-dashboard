@@ -312,7 +312,7 @@ export default function AssociationCultivatorsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+                {/* {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
                   <div>
                     <EditAssociation
                       cultivator={result?.id}
@@ -330,7 +330,7 @@ export default function AssociationCultivatorsTable({
                   </div>
                 ) : (
                   " "
-                )}
+                )} */}
 
               </DropdownMenuContent>
             </DropdownMenu>
