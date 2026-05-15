@@ -38,10 +38,12 @@ import { Badge } from "@/components/ui/badge";
 import PaginationControls from "@/components/ui/pagination-controls";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
+import EditRapport from "./edit_rapport";
 import { useState, useContext } from "react";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 import { ROLES } from "@/lib/permissions";
+import { toast } from "sonner";
 export default function SdlsListTableReports({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -81,7 +83,6 @@ export default function SdlsListTableReports({ isLoading: externalLoading }) {
           body: {},
         });
         const results = response?.results;
-        console.log(results);
         if (!Array.isArray(results)) {
           setData([]);
           setTotalCount(0);
@@ -175,7 +176,6 @@ export default function SdlsListTableReports({ isLoading: externalLoading }) {
         setLoadingEportBtn(false);
         return;
       }
-
       const response = await fetchData("get", `cafe/rapportages_sdl_ct/get_sdl_rapport/`, {
         params: { limit: total },
       });
@@ -183,6 +183,7 @@ export default function SdlsListTableReports({ isLoading: externalLoading }) {
       const allData = response.results || [];
       const formattedData = allData.map((item) => {
         const row = {
+          id: item?.id,
           Province:
             item.sdl_ct?.sdl_ct?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
               ?.province_name || "",
@@ -253,6 +254,42 @@ export default function SdlsListTableReports({ isLoading: externalLoading }) {
     setActivedownloadBtn(false);
     setExportBlob(null);
   };
+
+  const HandleDelete = async (id) => {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const results = await fetchData("delete", `/cafe/rapportages_sdl_ct/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+        });
+        if (results) {
+          resolve({ id });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "Suppression...",
+      success: (data) => {
+        setTimeout(() => window.location.reload(), 500);
+        return `Le rapport a été supprimé avec succès`;
+      },
+      error: "Erreur lors de la suppression",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       id: "actions",
@@ -282,6 +319,14 @@ export default function SdlsListTableReports({ isLoading: externalLoading }) {
               <Link href={`/odeca-dashboard/sdl/details/?id=${sdl?.sdl?.sdl_id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
+              {(user?.session?.category === "Admin" || user?.session?.category === "Cafe_ODECA") && (
+                <EditRapport id={sdl?.id} />
+              )}
+              {(user?.session?.category === "Admin" || user?.session?.category === "Cafe_ODECA") && (
+                <DropdownMenuItem onClick={() => HandleDelete(sdl?.id)} className="text-destructive" asChild>
+                  <Button variant="ghost" className="text-destructive text-sm justify-start font-normal">Supprimer</Button>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );

@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDownIcon, MoreHorizontal, Phone, Search } from "lucide-react";
 import * as React from "react";
-
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -37,6 +37,7 @@ import { TableRowsSkeleton } from "@/components/ui/skeletons";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
 import { useState, useContext } from "react";
+import EditRapport from "./edit_rapport";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 import { ROLES } from "@/lib/permissions";
@@ -240,6 +241,41 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
     setActivedownloadBtn(false);
     setExportBlob(null);
   };
+
+  const HandleDelete = async (id) => {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const results = await fetchData("delete", `/cafe/rapportages_sdl_ct/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+        });
+        if (results) {
+          resolve({ id });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "Suppression...",
+      success: (data) => {
+        setTimeout(() => window.location.reload(), 500);
+        return `Le rapport a été supprimé avec succès`;
+      },
+      error: "Erreur lors de la suppression",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const columns = [
     {
       id: "actions",
@@ -268,7 +304,14 @@ export default function CtsListTableReports({ isLoading: externalLoading }) {
               <Link href={`/odeca-dashboard/ct/details/?id=${ct.ct.ct_id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-
+              {(user?.session?.category === "Admin" || user?.session?.category === "Cafe_ODECA") && (
+                <EditRapport id={ct?.id} />
+              )}
+              {(user?.session?.category === "Admin" || user?.session?.category === "Cafe_ODECA") && (
+                <DropdownMenuItem onClick={() => HandleDelete(ct?.id)} className="text-destructive" asChild>
+                  <Button variant="ghost" className="text-destructive text-sm justify-start font-normal">Supprimer</Button>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );
