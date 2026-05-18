@@ -104,6 +104,7 @@ function DetailsContent({ id }) {
       console.log("results", results);
       const formatData = (achats) => ({
         id: achats?.id,
+        in_payment: achats?.in_payment,
         cultivator: {
           cultivator_id: achats?.cafeiculteur?.id,
           cultivator_code: achats?.cafeiculteur?.cultivator_code,
@@ -167,6 +168,7 @@ function DetailsContent({ id }) {
           image_url: cultivator?.cultivator_photo,
           telephone: cultivator?.cultivator_telephone,
         },
+        in_payment: cultivator?.in_payment,
         cni: cultivator?.cultivator_cni,
         cni_image_url: cultivator?.cultivator_cni_photo,
         localite: {
@@ -197,6 +199,7 @@ function DetailsContent({ id }) {
         },
       );
       const results = response?.results;
+
       const cultivatorsData = results?.map((cultivator) => ({
         id: cultivator?.id,
         cultivator: {
@@ -210,6 +213,7 @@ function DetailsContent({ id }) {
             cultivator?.cultivator_assoc_numero_fiche,
           cultivator_assoc_name: cultivator?.cultivator_assoc_name,
           cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,
+          in_payment: cultivator?.in_payment,
         },
         localite: {
           province:
@@ -220,6 +224,7 @@ function DetailsContent({ id }) {
               ?.commune_name,
         },
         champs: cultivator?.nombre_champs,
+
       }));
       setAssociationCultivatorsData(cultivatorsData);
       console.log("associationCultivatorsData", cultivatorsData);

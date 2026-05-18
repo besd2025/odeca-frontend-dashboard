@@ -92,7 +92,6 @@ export default function Edit({
           additionalHeaders: {},
           body: {},
         });
-        console.log(response)
         setCode(response.cultivator_code || "");
         setFirstName(response?.cultivator_first_name || cultivator_assoc_name);
         setLastName(response?.cultivator_last_name || "");
@@ -239,8 +238,7 @@ export default function Edit({
       cultivator_mobile_payment_account: payment_phone,
       cultivator_account_owner: proprietaire,
       cultivator_adress_code: colline,
-      collector_code: collector_code,
-
+      collector_code: collector_code
     };
     console.log("form data ", formData)
     setLoading(true);

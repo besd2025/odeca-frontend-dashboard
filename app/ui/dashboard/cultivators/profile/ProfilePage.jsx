@@ -1,26 +1,51 @@
 "use client";
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import ProfileCard from "./ProfileCard";
 import StatsCard from "./StatsCard";
 import ActivityList from "./profile-content";
 import Edit from "../edit";
 import { useSearchParams } from "next/navigation";
 import { UserContext } from "@/app/ui/context/User_Context";
+import { fetchData } from "@/app/_utils/api";
 import AvancePayment from "../payment/avance";
 function ProfilePage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const user = useContext(UserContext)
-  console.log("user", user)
+  const [data, setData] = useState([])
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const response = await fetchData("get", `/cultivators/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+        setData(response)
+        console.log("data", response)
+      } catch (error) {
+        console.error("Error loading cultivator data:", error);
+      }
+    }
+    loadData();
+  }, [id]);
   return (
     <div className=" space-y-6">
 
       <div className="flex justify-end gap-2">
-        {user?.session?.category === "Admin" ? (
+        {data?.in_payment ? (
+          <></>
+        ) : (
           <>
-            <Edit cultivator={id} />
+            {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+
+              <Edit cultivator={id} />
+            ) : (
+              <></>
+            )}
           </>
-        ) : ""}
+        )}
+
         {user?.session?.category === "Admin" || user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
           <>
             <AvancePayment cultivator={id} />

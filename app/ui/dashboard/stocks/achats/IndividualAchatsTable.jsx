@@ -120,6 +120,7 @@ export default function IndividualAchatsTable({
               achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
                 ?.commune_name || "N/A",
           },
+          in_payment: achat?.in_payment,
           num_fiche: achat?.cafeiculteur?.cultivator_assoc_numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
           num_page: achat?.numero_page || "N/A",
@@ -319,30 +320,33 @@ export default function IndividualAchatsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {/* {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
-                  <div>
-                    <EditIndividualAchats
-                      id={cultivator?.id}
-                      cultivator={cultivator.cultivator}
-                      num_fiche={cultivator.num_fiche}
-                      num_recu={cultivator.num_recu}
-                      num_page={cultivator.num_page}
-                      ca={cultivator.ca}
-                      cb={cultivator.cb}
-                      date={cultivator.date}
-                      photo_fiche={cultivator.photo_fiche}
-                      responsable_id={cultivator?.responsable_id}
-                    />
-                    <DropdownMenuItem
-                      onSelect={() => HandleDelete(cultivator?.id, cultivator?.cultivator?.cultivator_code)}
-                      className="text-destructive"
-                    >
-                      <ArchiveX className="text-destructive" /> Delete
-                    </DropdownMenuItem>
-                  </div>
-                ) : (
+                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+                  cultivator?.in_payment ? (
+                    " "
+                  ) : (
+                    <div>
+                      <EditIndividualAchats
+                        id={cultivator?.id}
+                        cultivator={cultivator.cultivator}
+                        num_fiche={cultivator.num_fiche}
+                        num_recu={cultivator.num_recu}
+                        num_page={cultivator.num_page}
+                        ca={cultivator.ca}
+                        cb={cultivator.cb}
+                        date={cultivator.date}
+                        photo_fiche={cultivator.photo_fiche}
+                        responsable_id={cultivator?.responsable_id}
+                      />
+                      <DropdownMenuItem
+                        onSelect={() => HandleDelete(cultivator?.id, cultivator?.cultivator?.cultivator_code)}
+                        className="text-destructive"
+                      >
+                        <ArchiveX className="text-destructive" /> Delete
+                      </DropdownMenuItem>
+                    </div>
+                  )) : (
                   " "
-                )} */}
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           );
