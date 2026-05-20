@@ -35,7 +35,7 @@ function AchatsData() {
             <List />
             <span>Liste</span>
           </TabsTrigger>
-          {(user?.session?.category === "Admin" || user?.session?.category === "Cafe_ODECA") && (
+          {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
             <TabsTrigger value="details">
               <Edit />
               <span>
@@ -46,7 +46,6 @@ function AchatsData() {
         </TabsList>
         <TabsContent value="list">
           <h1 className="text-2xl font-semibold m-2">Liste des achats</h1>
-
           <AchatsListTable isCultivatorsPage={true} />
         </TabsContent>
         <TabsContent value="details">

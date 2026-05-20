@@ -28,9 +28,42 @@ export default function Edit({ id }) {
   const [soc, setSoc] = React.useState("");
   const [province, setProvince] = React.useState("");
   const [commune, setCommune] = React.useState("");
+  const [zone, setZone] = React.useState("");
+  const [colline, setColline] = React.useState("");
   const [societtecode, setSocietteCode] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
+
+  const [provinceOptions, setProvinceOptions] = React.useState([]);
+  const [communeOptions, setCommuneOptions] = React.useState([]);
+  const [zoneOptions, setZoneOptions] = React.useState([]);
+  const [collineOptions, setCollineOptions] = React.useState([]);
+  const [societeOptions, setSocieteOptions] = React.useState([]);
+
+  React.useEffect(() => {
+    async function loadInitialData() {
+      try {
+        const [provData, socData] = await Promise.all([
+          fetchData("get", `adress/province/`, { params: { offset: 0, limit: 100 } }),
+          fetchData("get", `cafe/societes/`, { params: { offset: 0, limit: 150 } })
+        ]);
+        setProvinceOptions(provData?.results?.map(p => ({
+          value: p.province_name,
+          label: p.province_name
+        })) || []);
+
+        setSocieteOptions(socData?.results?.map(s => ({
+          value: s.id,
+          label: s.nom_societe
+        })) || []);
+      } catch (err) {
+        console.error("Error loading initial data:", err);
+      }
+    }
+    if (open) {
+      loadInitialData();
+    }
+  }, [open]);
 
   React.useEffect(() => {
     const getSdls = async () => {
@@ -47,7 +80,7 @@ export default function Edit({ id }) {
         setCode(response?.ct_code || "");
         setCtName(response?.ct_nom || "");
         setSoc(response?.sdl?.societe?.nom_societe || "");
-        setSocietteCode(response?.societe?.code_societe || "");
+        setSocietteCode(response?.societe?.id || "");
 
         setFirstName(response?.ct_responsable?.user?.first_name || "");
         setLastName(response?.ct_responsable?.user?.last_name || "");
@@ -56,9 +89,23 @@ export default function Edit({ id }) {
           response?.ct_adress?.zone_code?.commune_code?.province_code
             ?.province_name || "",
         );
-        setCommune(
-          response?.ct_adress?.zone_code?.commune_code?.commune_name || "",
-        );
+        const fetchedCommune = response?.ct_adress?.zone_code?.commune_code?.commune_name || "";
+        setCommune(fetchedCommune);
+        const fetchedZone = response?.ct_adress?.zone_code?.zone_name || "";
+        setZone(fetchedZone);
+        const fetchedColline = response?.ct_adress?.id;
+        setColline(fetchedColline);
+        // Pre-fill options so they render correctly on initial load
+        if (fetchedCommune) {
+          setCommuneOptions([{ value: fetchedCommune, label: fetchedCommune }]);
+        }
+        if (fetchedZone) {
+          setZoneOptions([{ value: fetchedZone, label: fetchedZone }]);
+        }
+        if (fetchedColline) {
+          const collineName = response?.ct_adress?.colline_name || fetchedColline;
+          setCollineOptions([{ value: fetchedColline, label: collineName }]);
+        }
       } catch (error) {
         console.error("Error fetching station data:", error);
       }
@@ -67,11 +114,81 @@ export default function Edit({ id }) {
     getSdls();
   }, [id]);
 
+  const handleProvinceChange = async (e) => {
+    const value = e.target.value;
+    setProvince(value);
+    setCommune("");
+    setZone("");
+    setColline("");
+    setCommuneOptions([]);
+    setZoneOptions([]);
+    setCollineOptions([]);
+
+    if (!value) return;
+
+    try {
+      const data = await fetchData("get", `adress/commune/get_communes_by_province`, {
+        params: { province: value }
+      });
+      setCommuneOptions(data?.map(c => ({
+        value: c.commune_name,
+        label: c.commune_name
+      })) || []);
+    } catch (err) {
+      console.error("Error fetching communes:", err);
+    }
+  };
+
+  const handleCommuneChange = async (e) => {
+    const value = e.target.value;
+    setCommune(value);
+    setZone("");
+    setColline("");
+    setZoneOptions([]);
+    setCollineOptions([]);
+
+    if (!value) return;
+
+    try {
+      const data = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
+        params: { commune: value }
+      });
+      setZoneOptions(data?.map(z => ({
+        value: z.zone_name,
+        label: z.zone_name
+      })) || []);
+    } catch (err) {
+      console.error("Error fetching zones:", err);
+    }
+  };
+
+  const handleZoneChange = async (e) => {
+    const value = e.target.value;
+    setZone(value);
+    setColline("");
+    setCollineOptions([]);
+
+    if (!value) return;
+
+    try {
+      const data = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
+        params: { zone: value }
+      });
+      setCollineOptions(data?.map(c => ({
+        value: c.id,
+        label: c.colline_name
+      })) || []);
+    } catch (err) {
+      console.error("Error fetching collines:", err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     const formData = {
       ct_nom: ctName,
+      ct_adress: parseInt(colline),
     };
 
     const promise = new Promise(async (resolve, reject) => {
@@ -161,11 +278,18 @@ export default function Edit({ id }) {
 
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Société</Label>
-                  <Input
-                    type="text"
-                    value={soc}
-                    onChange={(e) => setSoc(e.target.value)}
-                  />
+                  <select
+                    value={societtecode}
+                    onChange={(e) => setSocietteCode(e.target.value)}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">Choisir une société</option>
+                    {societeOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
@@ -207,19 +331,68 @@ export default function Edit({ id }) {
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Province</Label>
-                  <Input
-                    type="text"
+                  <select
                     value={province}
-                    onChange={(e) => setProvince(e.target.value)}
-                  />
+                    onChange={handleProvinceChange}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">Choisir une province</option>
+                    {provinceOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>Commune</Label>
-                  <Input
-                    type="text"
+                  <select
                     value={commune}
-                    onChange={(e) => setCommune(e.target.value)}
-                  />
+                    onChange={handleCommuneChange}
+                    disabled={!province}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                  >
+                    <option value="">Choisir une commune</option>
+                    {communeOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2 mt-5">
+                <div className="col-span-2 lg:col-span-1 space-y-2">
+                  <Label>Zone</Label>
+                  <select
+                    value={zone}
+                    onChange={handleZoneChange}
+                    disabled={!commune}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                  >
+                    <option value="">Choisir une zone</option>
+                    {zoneOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-2 lg:col-span-1 space-y-2">
+                  <Label>Colline</Label>
+                  <select
+                    value={colline}
+                    onChange={(e) => setColline(e.target.value)}
+                    disabled={!zone}
+                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                  >
+                    <option value="">Choisir une colline</option>
+                    {collineOptions.map((opt, index) => (
+                      <option key={`${opt.value}-${index}`} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>

@@ -30,7 +30,6 @@ export function SectionCards() {
         const fetchReport = async () => {
             try {
                 const response = await fetchData("get", `cafe/rapportages_sdl_ct/get_details/`);
-                console.log("response", response);
                 setData({
                     total_cerise_achat: response?.total_cerise_rapport,
                     total_cerise_a_achat: response?.total_cerise_a_rapport,
@@ -128,7 +127,7 @@ export function SectionCards() {
                                         </>
                                     )}
                                     <span className="text-xs font-normal text-muted-foreground ml-2">
-                                        ({percentageA.toFixed(1)}%)
+                                        ({data?.percentage_a?.toFixed(1)}%)
                                     </span>
                                 </CardDescription>
                             </div>
@@ -164,7 +163,7 @@ export function SectionCards() {
                                         </>
                                     )}
                                     <span className="text-xs font-normal text-muted-foreground ml-2">
-                                        ({percentageB.toFixed(1)}%)
+                                        ({data?.percentage_b?.toFixed(1)}%)
                                     </span>
                                 </CardDescription>
                             </div>

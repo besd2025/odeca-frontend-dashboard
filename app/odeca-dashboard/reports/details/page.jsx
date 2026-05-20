@@ -5,7 +5,7 @@ import { ROLES } from '@/lib/permissions'
 export const dynamic = "force-dynamic";
 export default function page() {
     return (
-        <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE, ROLES.SUPERVISEUR_REGIONAL, ROLES.SUPERVISEUR]}>
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SOCIETE, ROLES.SUPERVISEUR_REGIONAL]}>
             <DetailsReports />
         </ProtectedRoute>
     )

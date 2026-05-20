@@ -35,6 +35,8 @@ import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Link from "next/link";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { fetchData } from "@/app/_utils/api";
+import { Check } from "lucide-react";
+import { UserContext } from "@/app/ui/context/User_Context";
 const RHData = [
   {
     id: "cultivator_001",
@@ -53,7 +55,7 @@ const RHData = [
     total_price: 457,
   },
 ];
-
+import { toast } from "sonner";
 export default function Rejected() {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -64,7 +66,7 @@ export default function Rejected() {
     pageSize: 10,
   });
   const [filterData, setFilterData] = React.useState({});
-
+  const user = React.useContext(UserContext)
   const [data, setData] = React.useState([]);
   const [totalCount, setTotalCount] = React.useState(0);
   const [searchValue, setSearchValue] = React.useState("");
@@ -90,13 +92,13 @@ export default function Rejected() {
           ...filterData
         }
       });
-      console.log("response :", response);
       const mappedData = response?.results?.map((item) => {
         const cafeiculteur = item?.achat?.cafeiculteur;
         const isPersonne = cafeiculteur?.cultivator_entity_type === "personne";
         return {
           id: item?.id,
           cultivator: {
+            cultivator_id: cafeiculteur?.id,
             cultivator_code: cafeiculteur?.code,
             first_name: isPersonne
               ? cafeiculteur?.cultivator_first_name
@@ -128,6 +130,41 @@ export default function Rejected() {
     setFilterData(data);
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
+
+  const HandleValidate = async (id, cultivator_code) => {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+
+        const response = await fetchData("patch", `/cafe/cafe_payments/${id}/`, {
+          body: { validation_state: "VALIDATED" },
+        });
+
+        if (response.status === 200 || response.status === 201) {
+          resolve({ id });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "VALIDATION...",
+      success: (datass) => {
+        return `${cultivator_code} a été validé avec succès `;
+      },
+      error: "Donnée non validée",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      //setLoading(false);
+    }
+  }
 
   React.useEffect(() => {
     fetchDatas();
@@ -162,9 +199,16 @@ export default function Rejected() {
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href="/odeca-dashboard/cultivators/profile">
+              <Link href={`/odeca-dashboard/cultivators/profile?id=${cultivator?.cultivator?.cultivator_id}`}>
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
+                <DropdownMenuItem>
+                  <Button onClick={() => HandleValidate(cultivator?.id, cultivator.cultivator.cultivator_code)} variant="secondary" className="w-full  hover:text-secondary">
+                    Valider
+                  </Button>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );

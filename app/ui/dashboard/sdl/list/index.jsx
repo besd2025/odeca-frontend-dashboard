@@ -108,7 +108,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
               sdl?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
           },
         }));
-        // console.log(response);
+        console.log(response);
         setData(sdlData);
         setTotalCount(response?.count);
       } catch (error) {

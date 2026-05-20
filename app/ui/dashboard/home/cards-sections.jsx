@@ -101,25 +101,25 @@ export function SectionCards() {
           },
         );
 
-        const dailyStats = await fetchData(
-          "get",
-          `/cafe/stationslavage/cultivateurs_statistiques_par_temps?period=day`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          },
-        );
+        // const dailyStats = await fetchData(
+        //   "get",
+        //   `/cafe/stationslavage/cultivateurs_statistiques_par_temps?period=day`,
+        //   {
+        //     params: {},
+        //     additionalHeaders: {},
+        //     body: {},
+        //   },
+        // );
 
-        const dailyPurchaseStats = await fetchData(
-          "get",
-          `/cafe/stationslavage/get_recent_total_7_cultivators_per_days_or_weeks_or_months_for_line_chart?period=day`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          },
-        );
+        // const dailyPurchaseStats = await fetchData(
+        //   "get",
+        //   `/cafe/stationslavage/get_recent_total_7_cultivators_per_days_or_weeks_or_months_for_line_chart?period=day`,
+        //   {
+        //     params: {},
+        //     additionalHeaders: {},
+        //     body: {},
+        //   },
+        // );
 
         const udps = await fetchData(
           "get",
@@ -140,8 +140,6 @@ export function SectionCards() {
             body: {},
           },
         );
-
-        console.log("dailyPurchaseStats", dailyPurchaseStats);
         setData(response);
         setRendement(rendement);
         setCafeVertProduit(cafe_vert);
@@ -151,17 +149,17 @@ export function SectionCards() {
         setTotalUdps(udps?.total_usine_deparchage || 0);
         setTotalSocieties(societies?.count || 0);
 
-        if (Array.isArray(dailyStats) && dailyStats.length > 0) {
-          // On récupère le nombre de cultivateurs du jour le plus récent
-          setNewToday(dailyStats[dailyStats.length - 1].nombre || 0);
-        }
+        // if (Array.isArray(dailyStats) && dailyStats.length > 0) {
+        //   // On récupère le nombre de cultivateurs du jour le plus récent
+        //   setNewToday(dailyStats[dailyStats.length - 1].nombre || 0);
+        // }
 
-        if (Array.isArray(dailyPurchaseStats) && dailyPurchaseStats.length > 0) {
-          // On récupère la quantité de cerise du jour le plus récent
-          setNewQtyToday(
-            dailyPurchaseStats[dailyPurchaseStats.length - 1].quantite_total || 0,
-          );
-        }
+        // if (Array.isArray(dailyPurchaseStats) && dailyPurchaseStats.length > 0) {
+        //   // On récupère la quantité de cerise du jour le plus récent
+        //   setNewQtyToday(
+        //     dailyPurchaseStats[dailyPurchaseStats.length - 1].quantite_total || 0,
+        //   );
+        // }
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -238,7 +236,7 @@ export function SectionCards() {
                 <></>
               )}
             </CardTitle>
-            {newQtyToday > 0 && (
+            {/* {newQtyToday > 0 && (
               <Badge
                 variant="secondary"
                 className="bg-green-100 dark:bg-green-600/60 text-green-700 dark:text-green-100 px-1 py-0 h-5 ml-4"
@@ -256,7 +254,7 @@ export function SectionCards() {
                   <>{newQtyToday.toLocaleString("fr-FR")} Kg</>
                 )}
               </Badge>
-            )}
+            )} */}
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
             Qte collectee (CAB)
@@ -543,14 +541,14 @@ export function SectionCards() {
               <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
                 {totalCultivators?.toLocaleString("fr-FR")}
               </CardTitle>
-              {newToday > 0 && (
+              {/* {newToday > 0 && (
                 <Badge
                   variant="secondary"
                   className="bg-green-100 dark:bg-green-600/60 text-green-700 dark:text-green-100 px-1 py-0 h-5 ml-1"
                 >
                   <IconTrendingUp size={12} className="mr-0.5" />+{newToday}
                 </Badge>
-              )}
+              )} */}
             </div>
             <CardTitle className="text-base font-normal ml-2 mt-1 ">
               Total caféiculteurs

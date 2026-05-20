@@ -132,7 +132,8 @@ export default function AddUserDialog() {
                   <SelectItem value="Cafe_Chef_societe">CHEF SOCIETE</SelectItem>
                   <SelectItem value="Cafe_Responsable">CAFE RESPONSABLE</SelectItem>
                   <SelectItem value="Superviseur_Regional">SUPERVISEUR REGIONAL</SelectItem>
-                  <SelectItem value="Cafe_Superviseur">SUPERVISEUR ODECA-CAFE</SelectItem>
+                  <SelectItem value="Superviseur">SUPERVISEUR
+                  </SelectItem>
 
                 </SelectContent>
               </Select>

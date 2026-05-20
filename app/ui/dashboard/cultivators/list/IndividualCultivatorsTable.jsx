@@ -116,6 +116,7 @@ export default function IndividualCultivatorsTable({
             telephone: cultivator?.cultivator_telephone,
           },
           cni: cultivator?.cultivator_cni,
+          in_payment: cultivator?.in_payment,
           cni_image_url: cultivator?.cultivator_cni_photo,
           sdl_ct: cultivator?.ct_sdl_name,
           society: cultivator?.societe_name,
@@ -132,6 +133,7 @@ export default function IndividualCultivatorsTable({
 
 
         setData(formattedData);
+        console.log("formattedData", response);
         setTotalCount(response.count);
       } catch (error) {
         console.error("Error fetching individual cultivators:", error);
@@ -311,23 +313,26 @@ export default function IndividualCultivatorsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" ? (
-                  <div>
-                    <Edit
-                      cultivator={result?.id}
-                      sdl_ct={result?.sdl_ct}
-                      society={result?.society}
-                      localite={result?.localite}
-                      champs={result?.champs}
-                    />
-                    <DropdownMenuItem
-                      onSelect={() => HandleDelete(result?.id, cultivator?.cultivator_code)}
-                      className="text-destructive"
-                    >
-                      <UserX className="text-destructive" /> Delete
-                    </DropdownMenuItem>
-                  </div>
-                ) : (
+                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+                  result?.in_payment ? (
+                    " "
+                  ) : (
+                    <div>
+                      <Edit
+                        cultivator={result?.id}
+                        sdl_ct={result?.sdl_ct}
+                        society={result?.society}
+                        localite={result?.localite}
+                        champs={result?.champs}
+                      />
+                      <DropdownMenuItem
+                        onSelect={() => HandleDelete(result?.id, cultivator?.cultivator_code)}
+                        className="text-destructive"
+                      >
+                        <UserX className="text-destructive" /> Delete
+                      </DropdownMenuItem>
+                    </div>
+                  )) : (
                   " "
                 )}
               </DropdownMenuContent>

@@ -97,6 +97,7 @@ export default function IndividualAchatsTableEdition({
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
           achat_id: achat?.achat?.id,
+          in_payment: achat?.achat?.in_payment,
           responsable_id: achat?.achat?.responsable?.unique_code,
           cultivator: {
             cultivator_id: achat?.achat?.cafeiculteur?.id,
@@ -128,6 +129,7 @@ export default function IndividualAchatsTableEdition({
           cb: achat?.quantite_cerise_b || 0,
           date: achat?.achat?.date_achat || "N/A",
         }));
+
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
       } catch (error) {
@@ -505,15 +507,20 @@ export default function IndividualAchatsTableEdition({
                 <Check size={12} /> Traité
               </span>
             ) : (
-              <>
-                <Button onClick={() => HandleApprove(row.original.id, row.original.achat_id, row.original.num_recu, row.original?.num_page, row.original?.ca, row.original?.cb, row?.original?.responsable_id, row?.original?.cultivator?.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-green-500/20">
-                  <Check className="text-green-500" size={20} />
-                </Button>
+              row.original?.in_payment ? (
                 <Button onClick={() => HandleReject(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-red-500/20">
                   <X className="text-red-500" size={20} />
                 </Button>
-              </>
-            )}
+              ) : (
+                <>
+                  <Button onClick={() => HandleApprove(row.original.id, row.original.achat_id, row.original.num_recu, row.original?.num_page, row.original?.ca, row.original?.cb, row?.original?.responsable_id, row?.original?.cultivator?.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-green-500/20">
+                    <Check className="text-green-500" size={20} />
+                  </Button>
+                  <Button onClick={() => HandleReject(row.original.id, row.original.cultivator.cultivator_code)} variant="ghost" className="h-8 w-8 p-0 hover:bg-red-500/20">
+                    <X className="text-red-500" size={20} />
+                  </Button>
+                </>
+              ))}
           </div>
         ),
       },

@@ -95,7 +95,6 @@ export default function IndividualAchatsTable({
             search: searchvalue,
           },
         });
-
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
           responsable_id: achat?.responsable?.unique_code,
@@ -121,6 +120,7 @@ export default function IndividualAchatsTable({
               achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
                 ?.commune_name || "N/A",
           },
+          in_payment: achat?.in_payment,
           num_fiche: achat?.cafeiculteur?.cultivator_assoc_numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
           num_page: achat?.numero_page || "N/A",
@@ -128,9 +128,20 @@ export default function IndividualAchatsTable({
           ca: achat?.quantite_cerise_a || 0,
           cb: achat?.quantite_cerise_b || 0,
           date: achat?.date_achat || "N/A",
+          date_creation: achat?.created_at
+            ? new Date(achat.created_at).toLocaleString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })
+            : null
+
+
         }));
         setData(formattedData || []);
-        console.log(formattedData)
         setTotalCount(response?.count || 0);
       } catch (error) {
         console.error("Error fetching individual achats:", error);
@@ -192,7 +203,6 @@ export default function IndividualAchatsTable({
         params: { report_id: reportId },
         isBlob: true,
       });
-      console.log("downloard", response);
       // Créer le blob avec le bon type MIME
       const blob = new Blob([response.data], {
         type:
@@ -310,28 +320,31 @@ export default function IndividualAchatsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" ? (
-                  <div>
-                    <EditIndividualAchats
-                      id={cultivator?.id}
-                      cultivator={cultivator.cultivator}
-                      num_fiche={cultivator.num_fiche}
-                      num_recu={cultivator.num_recu}
-                      num_page={cultivator.num_page}
-                      ca={cultivator.ca}
-                      cb={cultivator.cb}
-                      date={cultivator.date}
-                      photo_fiche={cultivator.photo_fiche}
-                      responsable_id={cultivator?.responsable_id}
-                    />
-                    <DropdownMenuItem
-                      onSelect={() => HandleDelete(cultivator?.id, cultivator?.cultivator?.cultivator_code)}
-                      className="text-destructive"
-                    >
-                      <ArchiveX className="text-destructive" /> Delete
-                    </DropdownMenuItem>
-                  </div>
-                ) : (
+                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+                  cultivator?.in_payment ? (
+                    " "
+                  ) : (
+                    <div>
+                      <EditIndividualAchats
+                        id={cultivator?.id}
+                        cultivator={cultivator.cultivator}
+                        num_fiche={cultivator.num_fiche}
+                        num_recu={cultivator.num_recu}
+                        num_page={cultivator.num_page}
+                        ca={cultivator.ca}
+                        cb={cultivator.cb}
+                        date={cultivator.date}
+                        photo_fiche={cultivator.photo_fiche}
+                        responsable_id={cultivator?.responsable_id}
+                      />
+                      <DropdownMenuItem
+                        onSelect={() => HandleDelete(cultivator?.id, cultivator?.cultivator?.cultivator_code)}
+                        className="text-destructive"
+                      >
+                        <ArchiveX className="text-destructive" /> Delete
+                      </DropdownMenuItem>
+                    </div>
+                  )) : (
                   " "
                 )}
               </DropdownMenuContent>
@@ -501,6 +514,15 @@ export default function IndividualAchatsTable({
         cell: ({ row }) => (
           <div className="text-center font-semibold">
             {row.getValue("date")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "date_creation",
+        header: "Date Creation",
+        cell: ({ row }) => (
+          <div className="text-center font-semibold">
+            {row.getValue("date_creation")}
           </div>
         ),
       },

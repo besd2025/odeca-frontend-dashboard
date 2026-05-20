@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { toast } from "sonner";
-
 export default function Edit({
   cultivator,
   sdl_ct = "",
@@ -66,38 +65,35 @@ export default function Edit({
   const [payment_phone, setPaymentPhone] = useState("");
   const [proprietaire, setProprietaire] = useState("");
   const [collector_code, setCollectorCode] = useState("");
-
+  const [ouvert_a_pai, setOuvertAPai] = useState("");
+  const [institution_financieres, setInstitutionFinancieres] = useState([]);
   // Load initial data
   useEffect(() => {
-    async function loadProvinces() {
+    async function loadData() {
       try {
         const data = await fetchData("get", `adress/province/`, {
           params: { offset: 0, limit: 100 },
         });
+        const institution_financieres = await fetchData("get", `cafe/institution_financiers/`, {
+          params: { offset: 0, limit: 100 },
+        });
+        const institution_financieres_options = institution_financieres?.results?.map((item) => ({
+          value: item.institution_financier_name,
+          label: item.institution_financier_name,
+        })) || [];
         const options = data?.results?.map((item) => ({
           value: item.province_name,
           label: item.province_name,
         })) || [];
         setProvinceOptions(options);
-      } catch (error) {
-        setError(error);
-        console.error("Error loading provinces:", error);
-      }
-    }
-    loadProvinces();
-  }, []);
-
-  // Load cultivator data
-  useEffect(() => {
-    async function loadCultivatorData() {
-      try {
+        setInstitutionFinancieres(institution_financieres_options)
         const response = await fetchData("get", `/cultivators/${cultivator}/`, {
           params: {},
           additionalHeaders: {},
           body: {},
         });
         setCode(response.cultivator_code || "");
-        setFirstName(response?.cultivator_first_name || "");
+        setFirstName(response?.cultivator_first_name || cultivator_assoc_name);
         setLastName(response?.cultivator_last_name || "");
         setImageUrl(response?.cultivator_photo || "");
         setDateNaissance(response?.date_naissance || "");
@@ -118,12 +114,15 @@ export default function Edit({
         setProprietaire(response?.cultivator_account_owner || "");
         setCollectorCode(response?.collector?.unique_code || "");
         setColline(response?.cultivator_adress?.colline_code || "");
+        setAdressCode(response?.cultivator_adress?.code || "");
+        setOuvertAPai(response?.cultivator_bank_opened)
+        setBankName(response?.cultivator_bank_name)
       } catch (error) {
         console.error("Error loading cultivator data:", error);
       }
     }
-    loadCultivatorData();
-  }, [cultivator, sdl_ct, society, localite, champs]);
+    loadData();
+  }, [cultivator]);
 
   // Handle province change
   const handleProvinceChange = async (e) => {
@@ -235,12 +234,13 @@ export default function Edit({
       cultivator_payment_type: payment_mode,
       cultivator_bank_name: bank_name,
       cultivator_bank_account: bank_account,
+      cultivator_bank_opened: ouvert_a_pai,
       cultivator_mobile_payment_account: payment_phone,
       cultivator_account_owner: proprietaire,
       cultivator_adress_code: colline,
-      collector_code: collector_code,
+      collector_code: collector_code
     };
-
+    console.log("form data ", formData)
     setLoading(true);
 
     const promise = new Promise(async (resolve, reject) => {
@@ -255,6 +255,7 @@ export default function Edit({
           }
         );
         if (results.status === 200 || results.id) {
+
           resolve({ code });
         } else {
           reject(new Error("Erreur lors de la modification"));
@@ -267,6 +268,30 @@ export default function Edit({
     toast.promise(promise, {
       loading: "Modification en cours...",
       success: (data) => {
+        setCode("");
+        setFirstName("");
+        setLastName("");
+        setImageUrl("");
+        setDateNaissance("");
+        setPhone("");
+        setCni("");
+        setSdl("");
+        setSoc("");
+        setNumFiche("");
+        setProvince("");
+        setCommune("");
+        setZone("");
+        setColline("");
+        setNbChamps(0);
+        setPaymentMode("");
+        setBankName("");
+        setBankAccount("");
+        setPaymentPhone("");
+        setProprietaire("");
+        setCollectorCode("");
+        setColline("");
+        setAdressCode("");
+        setOuvertAPai("")
         setOpen(false);
         setTimeout(() => setOpen(false), 1000);
         return `${data.code} a été modifié avec succès`;
@@ -505,6 +530,19 @@ export default function Edit({
                     value={bank_name}
                     onChange={(e) => setBankName(e.target.value)}
                   />
+                  {/* <select
+                    value={bank_name}
+                    onChange={(e) => setBankName(e.target.value)}
+                    disabled={!commune}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Sélectionner une zone</option>
+                    {institution_financieres.map((item, index) => (
+                      <option key={`${item.value}-${index}`} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select> */}
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">
                   <Label>No compte bancaire</Label>
@@ -512,6 +550,14 @@ export default function Edit({
                     type="text"
                     value={bank_account}
                     onChange={(e) => setBankAccount(e.target.value)}
+                  />
+                </div>
+                <div className="col-span-2 lg:col-span-1 space-y-2">
+                  <Label>Ouvert à </Label>
+                  <Input
+                    type="text"
+                    value={ouvert_a_pai}
+                    onChange={(e) => setOuvertAPai(e.target.value)}
                   />
                 </div>
                 <div className="col-span-2 lg:col-span-1 space-y-2">

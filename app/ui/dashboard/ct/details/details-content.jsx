@@ -69,7 +69,7 @@ function DetailsContent({ id }) {
   const [isAchatsLoading, setIsAchatsLoading] = useState(false);
 
   const getAchatsHangars = async () => {
-    console.log("Fetching achats with filter data:", filterAchatData);
+
     try {
       const type =
         achatCultivateur_type === "achat_cultivator_individual"
@@ -88,7 +88,6 @@ function DetailsContent({ id }) {
           },
         },
       );
-      console.log("response", response);
       const mappedData =
         response?.results?.map((achats) => ({
           id: achats?.id,
@@ -112,6 +111,7 @@ function DetailsContent({ id }) {
               achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
                 ?.commune_name,
           },
+          in_payment: achats?.in_payment,
           num_fiche: achats?.cafeiculteur?.cultivator_assoc_numero_fiche || "",
           num_recu: achats?.numero_recu,
           photo_fiche: achats?.photo_fiche,
@@ -122,7 +122,6 @@ function DetailsContent({ id }) {
         })) || [];
 
       setTotalCountAchat(response?.count || 0);
-      console.log("mappedData", mappedData);
 
       if (type == "personne") {
         setIndividualAchatsData(mappedData);
@@ -162,6 +161,7 @@ function DetailsContent({ id }) {
           image_url: cultivator?.cultivator_photo,
           telephone: cultivator?.cultivator_telephone,
         },
+        in_payment: cultivator?.in_payment,
         cni: cultivator?.cultivator_cni,
         cni_image_url: cultivator?.cultivator_cni_photo,
         localite: {
@@ -194,6 +194,7 @@ function DetailsContent({ id }) {
       const results = response?.results;
       const cultivatorsData = results?.map((cultivator) => ({
         id: cultivator?.id,
+        in_payment: cultivator?.in_payment,
         cultivator: {
           cultivator_code: cultivator?.cultivator_code,
           first_name: cultivator?.cultivator_first_name,
@@ -389,6 +390,7 @@ function DetailsContent({ id }) {
           Prénom: item.cultivator_last_name || "",
           Genre: item.cultivator_gender || "",
           CNI: item.cultivator_cni || "",
+          in_payment: cultivator?.in_payment,
           // association: item.cultivator_assoc_name || "",
           // Représentant_de_lassociation: item.cultivator_assoc_rep_name || "",
           // numero_fiche: item.cultivator_assoc_numero_fiche || "",
