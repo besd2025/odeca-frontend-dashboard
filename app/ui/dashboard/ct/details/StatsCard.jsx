@@ -13,6 +13,7 @@ import {
   Grape,
   Landmark,
   Mars,
+  TruckElectric,
   Users,
   Venus,
 } from "lucide-react";
@@ -64,6 +65,8 @@ function StatsCard({ id }) {
   const percentageB =
     total > 0 ? ((data?.qte_achete?.cerise_b || 0) / total) * 100 : 0;
 
+  const [avance, setAvance] = React.useState(false);
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -75,8 +78,8 @@ function StatsCard({ id }) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
-      <Card className="@container/card col-span-1 lg:col-span-5 relative">
+    <div className="grid grid-cols-1 lg:grid-cols-13 gap-1">
+      <Card className="@container/card col-span-1 lg:col-span-6 relative">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-primary p-2 rounded-md">
@@ -217,16 +220,129 @@ function StatsCard({ id }) {
         </CardHeader>
       </Card>
       <Card className="@container/card lg:col-span-3">
+        <CardHeader className="flex flex-col">
+          <div className="flex flex-row gap-x-2 items-center">
+            <div className="bg-secondary p-2 rounded-md">
+              <TruckElectric className="text-white" />
+            </div>
+            <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
+              {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                <>
+                  {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  <span className="text-base">T</span>
+                </>
+              ) : (
+                <>
+                  {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                  <span className="text-sm">Kg</span>
+                </>
+              )}
+            </CardTitle>
+            {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+              </span>
+            ) : (
+              <></>
+            )}
+          </div>
+          <CardTitle className="text-lg font-semibold tabular-nums  ">
+            Qte transférée
+          </CardTitle>
+          <Separator />
+          <div className="flex flex-col h-full gap-y-3 justify-between text-xs font-medium">
+            <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg w-max">
+              <span className="text-primary flex items-center gap-1">●</span>
+              <div className="flex flex-row gap-x-1 items-center">
+                <Grape className="text-primary size-5" />
+                <CardTitle className="text-md font-semibold text-primary">
+                  CA :
+                </CardTitle>
+              </div>
+              <CardDescription className="font-semibold text-accent-foreground text-lg">
+                {data?.qte_achete?.cerise_a >= 1000 ? (
+                  <>
+                    {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      },
+                    )}{" "}
+                    <span className="text-sm">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
+
+                {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                  ""
+                ) : (
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
+                  </span>
+                )}
+
+              </CardDescription>
+            </div>
+            <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg">
+              <span className="text-secondary flex items-center gap-1">
+                ●
+              </span>
+              <div className="flex flex-row gap-x-1 items-center">
+                <Grape className="text-secondary size-5" />
+                <CardTitle className="text-md font-semibold text-secondary">
+                  CB :
+                </CardTitle>
+              </div>
+              <CardDescription className="font-semibold text-accent-foreground text-lg">
+                {data?.qte_achete?.cerise_b >= 1000 ? (
+                  <>
+                    {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      },
+                    )}
+                    <span className="text-sm">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
+                {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                  ""
+                ) : (
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
+                  </span>
+                )}
+
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+      <Card className="@container/card lg:col-span-2 overflow-hidden">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-yellow-500 p-2 rounded-md">
               <CircleDollarSign className="text-white" />
             </div>
-            <CardTitle className="text-lg text-muted-foreground font-medium tabular-nums  ">
+            <CardTitle className="text-md text-muted-foreground font-medium tabular-nums  ">
               Montant
             </CardTitle>
           </div>
-          <CardTitle className="text-3xl @[250px]/card:text-2xl font-semibold tracking-tight tabular-nums">
+          <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
             {(
               data?.qte_achete?.montant_cerise_a +
               data?.qte_achete?.montant_cerise_b ?? 0
@@ -237,48 +353,49 @@ function StatsCard({ id }) {
           </CardTitle>
           <Separator />
           <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-x-4 items-center">
+            <div className="flex flex-wrap gap-x-2 items-center justify-center">
               <div className="flex flex-row gap-x-1 items-center">
                 <Banknote className="text-secondary" />
-
                 <CardTitle className="text-muted-foreground font-normal text-sm  ">
                   Tranche 1
                 </CardTitle>
               </div>
-              <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
-                0 <span className="text-base">FBU</span>
+              <CardTitle className="text-base font-semibold tracking-tight tabular-nums">
+                0 <span className="text-xs">FBU</span>
               </CardTitle>
             </div>
             <Separator />
-            <div className="flex flex-row gap-x-4 items-center">
-              <div className="flex flex-row gap-x-1 items-center">
+            <div className="flex flex-wrap gap-x-2 items-center justify-center">
+              <div className="flex flex-row gap-x-0.5 items-center">
                 <Banknote className="text-secondary" />
-
                 <CardTitle className="text-muted-foreground font-normal text-sm  ">
                   Tranche 2
                 </CardTitle>
               </div>
-              <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
-                0 <span className="text-base">FBU</span>
+              <CardTitle className="text-base font-semibold tracking-tight tabular-nums">
+                0 <span className="text-xs">FBU</span>
               </CardTitle>
             </div>
-            <Separator />
-            <div className="flex flex-row gap-x-4 items-center">
-              <div className="flex flex-row gap-x-1 items-center">
-                <Banknote className="text-secondary" />
-
-                <CardTitle className="text-muted-foreground font-normal text-sm  ">
-                  Avance
-                </CardTitle>
-              </div>
-              <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
-                0 <span className="text-base">FBU</span>
-              </CardTitle>
-            </div>
+            {avance && (
+              <>
+                <Separator />
+                <div className="flex flex-wrap gap-x-2 items-center justify-center">
+                  <div className="flex flex-row gap-x-1 items-center">
+                    <Banknote className="text-secondary" />
+                    <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                      Avance
+                    </CardTitle>
+                  </div>
+                  <CardTitle className="text-base font-semibold tracking-tight tabular-nums">
+                    0 <span className="text-xs">FBU</span>
+                  </CardTitle>
+                </div>
+              </>
+            )}
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card col-span-2 p-2">
+      <Card className="@container/card col-span-2 p-2 h-max overflow-hidden">
         <CardHeader className="p-2">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-full">
@@ -294,26 +411,26 @@ function StatsCard({ id }) {
               </span>
             </CardTitle>
           </div>
-          <div className="flex flex-col gap-y-2 mt-4 rounded-md  p-2">
+          <div className="flex flex-col gap-y-2 mt-4">
             <div className="flex flex-row ">
-              <div className="text-muted-foreground flex gap-x-1 ">
-                <span className="bg-background p-1 rounded">
+              <div className="text-muted-foreground flex gap-x-0.5">
+                <span className="bg-backgrou/nd rounded">
                   <Mars />
                 </span>
                 Homme :
               </div>
-              <div className="font-medium  ml-4">
+              <div className="font-medium  ml-2">
                 {data?.nombre_cultivateurs?.hommes}
               </div>
             </div>
             <div className="flex flex-row ">
-              <div className="text-muted-foreground flex gap-x-1">
-                <span className="bg-background p-1 rounded">
+              <div className="text-muted-foreground flex gap-x-0.5 ">
+                <span className="">
                   <Venus />
                 </span>
                 Femme :
               </div>
-              <div className="font-medium  ml-4">
+              <div className="font-medium  ml-2">
                 {data?.nombre_cultivateurs?.femmes || 0}
               </div>
             </div>
