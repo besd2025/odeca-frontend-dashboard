@@ -169,18 +169,24 @@ export default function SdlsListTableReports({ isLoading: externalLoading }) {
     setLoadingEportBtn(true);
     try {
       const initResponse = await fetchData("get", `cafe/rapportages_sdl_ct/get_sdl_rapport/`, {
-        params: { limit: 1 },
+        params: { limit: 1, ...filterData, search: search },
       });
       const total = initResponse?.count || 0;
       if (total === 0) {
         setLoadingEportBtn(false);
         return;
       }
-      const response = await fetchData("get", `cafe/rapportages_sdl_ct/get_sdl_rapport/`, {
-        params: { limit: total },
-      });
 
-      const allData = response.results || [];
+      let allData = [];
+      const batchSize = 5;
+      for (let offset = 0; offset < total; offset += batchSize) {
+        const response = await fetchData("get", `cafe/rapportages_sdl_ct/get_sdl_rapport/`, {
+          params: { limit: batchSize, offset: offset, ...filterData, search: search },
+        });
+        if (response.results) {
+          allData = [...allData, ...response.results];
+        }
+      }
       const formattedData = allData.map((item) => {
         const row = {
           id: item?.id,
