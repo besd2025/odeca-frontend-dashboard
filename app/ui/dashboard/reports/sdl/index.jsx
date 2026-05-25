@@ -165,101 +165,98 @@ export default function SdlsListTableReports({ isLoading: externalLoading }) {
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };
-  const handleExportSDLs = async () => {
+  const exportRapportsSDLToExcel = async () => {
+
     setLoadingEportBtn(true);
     try {
-      const initResponse = await fetchData("get", `cafe/rapportages_sdl_ct/get_sdl_rapport/`, {
-        params: { limit: 1, ...filterData, search: search },
-      });
-      const total = initResponse?.count || 0;
-      if (total === 0) {
-        setLoadingEportBtn(false);
-        return;
-      }
-
-      let allData = [];
-      const batchSize = 5;
-      for (let offset = 0; offset < total; offset += batchSize) {
-        const response = await fetchData("get", `cafe/rapportages_sdl_ct/get_sdl_rapport/`, {
-          params: { limit: batchSize, offset: offset, ...filterData, search: search },
-        });
-        if (response.results) {
-          allData = [...allData, ...response.results];
+      // Étape 1 : Récupérer le nombre total d'enregistrements
+      const initial_export = await fetchData(
+        "get",
+        "/cafe/rapportages_sdl_ct/start_sdl_export/",
+        {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        },
+      );
+      if (initial_export?.message == "Export lancé") {
+        const task_id = initial_export?.task_id;
+        let isDone = false;
+        while (!isDone) {
+          const export_excel = await fetchData(
+            "get",
+            "cafe/rapportages_sdl_ct/check_sdl_export",
+            {
+              params: { task_id: task_id },
+            },
+          );
+          if (export_excel.export_status === "SUCCESS") {
+            setActivedownloadBtn(true);
+            setReportId(task_id);
+            isDone = true;
+          } else {
+            // Attendre 2 secondes avant la prochaine vérification
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
         }
       }
-      const formattedData = allData.map((item) => {
-        const row = {
-          id: item?.id,
-          Province:
-            item.sdl_ct?.sdl_ct?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
-              ?.province_name || "",
-          Commune: item.sdl_ct?.sdl_ct?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
-          Zone: item.sdl_ct?.sdl_ct?.sdl?.sdl_adress?.zone_code?.zone_name || "",
-          Colline: item.sdl_ct?.sdl_ct?.sdl?.sdl_adress?.colline_name || "",
-          NON_SDL: item?.sdl_ct?.sdl_ct?.sdl?.sdl_nom || "",
-          SOCIETE: item?.sdl_ct?.sdl_ct?.sdl?.societe?.nom_societe || "",
-          NOM_RESPONSABLE: item?.sdl_ct?.sdl_ct?.responsable?.user?.last_name || "",
-          PRENOM_RESPONSABLE: item?.sdl_ct?.sdl_ct?.responsable?.user?.first_name || "",
-          TELEPHONE_RESPONSABLE: item?.sdl_ct?.sdl_ct?.responsable?.user?.phone || "",
-          QUANTITE_A_RAPPORTEE: item?.quantite_cerise_a_rapport,
-          QUANTITE_B_RAPPORTEE: item?.quantite_cerise_b_rapport,
-          QUANTITE_A_COLLECTEE: item?.quantite_cerise_a_from_mobile,
-          QUANTITE_B_COLLECTEE: item?.quantite_cerise_b_from_mobile,
-          TOTAL_GAP_CELISE: (item?.quantite_cerise_a_from_mobile + item?.quantite_cerise_b_from_mobile) > (item?.quantite_cerise_a_rapport + item?.quantite_cerise_b_rapport) ? (item?.quantite_cerise_a_from_mobile + item?.quantite_cerise_b_from_mobile) - (item?.quantite_cerise_a_rapport + item?.quantite_cerise_b_rapport) : (item?.quantite_cerise_a_rapport + item?.quantite_cerise_b_rapport) - (item?.quantite_cerise_a_from_mobile + item?.quantite_cerise_b_from_mobile) || "",
-          TOTAL_GAP_CA: item?.quantite_cerise_a_from_mobile > item?.quantite_cerise_a_rapport ? item?.quantite_cerise_a_from_mobile - item?.quantite_cerise_a_rapport : item?.quantite_cerise_a_rapport - item?.quantite_cerise_a_from_mobile || "",
-          TOTAL_GAP_CB: item?.quantite_cerise_b_from_mobile > item?.quantite_cerise_b_rapport ? item?.quantite_cerise_b_from_mobile - item?.quantite_cerise_b_rapport : item?.quantite_cerise_b_rapport - item?.quantite_cerise_b_from_mobile || "",
-
-          DATE_CREATION: item?.created_at
-            ? new Date(item?.created_at).toLocaleString('fr-FR', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-            })
-            : null
-        }
-        if (user?.session?.category === ROLES.ADMIN) {
-          row.CODE_SDL = item?.sdl_ct?.sdl_ct?.sdl?.sdl_code || "";
-        }
-
-        return row;
-
-      });
-
-      const worksheet = XLSX.utils.json_to_sheet(formattedData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "SDL");
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-      const blob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
-      });
-
-      setExportBlob(blob);
-      setActivedownloadBtn(true);
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
     } finally {
       setLoadingEportBtn(false);
     }
   };
+  const DownloadRapportsSDLToExcel = async () => {
+    try {
+      const response = await fetchData("get", "/cafe/rapportages_sdl_ct/download_sdl_export", {
+        params: { task_id: reportId },
+        isBlob: true,
+      });
+      // Créer le blob avec le bon type MIME
+      const blob = new Blob([response.data], {
+        type:
+          response.headers["content-type"] ||
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
 
-  const DownloadSDLsToExcel = () => {
-    if (!exportBlob) return;
-    const now = new Date();
-    const date = now.toISOString().split("T")[0];
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
-    const time = `${hours}_${minutes}_${seconds}`;
-    saveAs(exportBlob, `liste_sdls_et_les_responsables_${date}_${time}.xlsx`);
-    setActivedownloadBtn(false);
-    setExportBlob(null);
+      const url = window.URL.createObjectURL(blob);
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+
+      const timestamp = `${day}_${month}_${year}_${hours}_${minutes}_${seconds}`;
+      // Nom du fichier par défaut
+      let filename = `Rapport_sdl_${timestamp}.xlsx`;
+
+      const contentDisposition = response.headers["content-disposition"];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match && match[1]) filename = match[1];
+      }
+
+      // Création du <a> temporaire
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+
+      // Nettoyage
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      setActivedownloadBtn(false);
+    } catch (error) {
+      console.error("Erreur lors de l'exportation Excel :", error);
+    } finally {
+      setLoadingEportBtn(false);
+    }
   };
+
 
   const HandleDelete = async (id) => {
     const promise = new Promise(async (resolve, reject) => {
@@ -755,11 +752,19 @@ export default function SdlsListTableReports({ isLoading: externalLoading }) {
             <div className="flex items-center gap-3 text-gray-700">
 
               <ExportButton
-                handleExportSDLs={handleExportSDLs}
+                handleExportSDLs={async () => {
+                  setLoadingEportBtn(true);
+                  setActivedownloadBtn(false);
+                  try {
+                    await exportRapportsSDLToExcel();
+                  } finally {
+                    setLoadingEportBtn(false);
+                  }
+                }}
                 exportType="sdl_data"
                 loading={LoadingEportBtn}
                 activedownloadBtn={ActivedownloadBtn}
-                onClickDownloadButton={DownloadSDLsToExcel}
+                onClickDownloadButton={DownloadRapportsSDLToExcel}
               />
             </div>
           </div>

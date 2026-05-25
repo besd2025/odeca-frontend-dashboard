@@ -526,7 +526,7 @@ export default function IndividualCultivatorsTable({
           <div className="flex items-center gap-3">
             <IndividualFilter handleFilter={setFilterData} />
           </div>
-          {(user?.session?.category !== "Superviseur" && user?.session?.category !== "Superviseur_Regional") && (
+          {/* {(user?.session?.category !== "Superviseur" && user?.session?.category !== "Superviseur_Regional") && (
             <div className="flex items-center gap-3 text-gray-700">
               <ExportButton
                 exportType="cultivator_individual"
@@ -548,7 +548,7 @@ export default function IndividualCultivatorsTable({
                 onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
               />
             </div>
-          )}
+          )} */}
         </div>
       </div>
       <div className="grid w-full [&>div]:border [&>div]:rounded-md">
