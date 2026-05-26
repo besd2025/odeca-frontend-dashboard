@@ -330,6 +330,13 @@ function StatsCard({ id }) {
               </CardDescription>
             </div>
           </div>
+          <div>
+            <Separator />
+            <CardTitle className="text-xs font-semibold tabular-nums text-muted-foreground my-2">
+              CT source:
+            </CardTitle>
+            <div className="text-sm font-normal flex flex-col"><span>CT Gatwe</span><span>CT Gatwe</span></div>
+          </div>
         </CardHeader>
 
       </Card>
