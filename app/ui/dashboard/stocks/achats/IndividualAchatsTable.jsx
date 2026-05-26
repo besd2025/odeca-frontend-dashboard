@@ -601,7 +601,7 @@ export default function IndividualAchatsTable({
           <div className="flex items-center gap-3">
             <IndividualAchatsFilter handleFilter={handleFilter} />
           </div>
-          {(user?.session?.category !== "Superviseur" && user?.session?.category !== "Superviseur_Regional") && (
+          {/* {(user?.session?.category !== "Superviseur" && user?.session?.category !== "Superviseur_Regional") && (
             <div className="flex items-center gap-3 text-gray-700">
               <ExportButton
                 exportType="achats_individual"
@@ -623,7 +623,7 @@ export default function IndividualAchatsTable({
                 onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
               />
             </div>
-          )}
+          )} */}
         </div>
       </div>
       <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">

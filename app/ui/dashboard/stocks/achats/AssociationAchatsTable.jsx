@@ -604,7 +604,7 @@ export default function AssociationAchatsTable({
           <div className="flex items-center gap-3">
             <AssociationAchatsFilter handleFilter={handleFilter} />
           </div>
-          {(users?.session?.category !== "Superviseur" && users?.session?.category !== "Superviseur_Regional") && (
+          {/* {(users?.session?.category !== "Superviseur" && users?.session?.category !== "Superviseur_Regional") && (
             <div className="flex items-center gap-3 text-gray-700">
               <ExportButton
                 exportType="achats_association"
@@ -626,7 +626,7 @@ export default function AssociationAchatsTable({
                 onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
               />
             </div>
-          )}
+          )} */}
         </div>
       </div>
       <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">
