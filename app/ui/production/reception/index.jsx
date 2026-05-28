@@ -1,7 +1,7 @@
 import React from 'react'
 import ProtectedRoute from '../../protection/ProtectedRoute';
 import { ROLES } from "@/lib/permissions";
-import { Inbox, CheckCircle2, Clock, MoreHorizontal } from 'lucide-react';
+import { Inbox, CheckCircle2, Clock, MoreHorizontal, PlusCircle } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import {
     Pagination,
@@ -34,36 +34,31 @@ import Link from 'next/link';
 
 const receptions = [
     {
-        id: "LOT-001",
-        societe: "KIREMA",
-        sdls: ["SDL Ngozi", "SDL Kayanza"],
-        dateReception: "2025-05-20",
-        poidsNet: 7080.00,
-        status: "confirmé",
-    },
-    {
-        id: "LOT-002",
-        societe: "KIRYAMA",
-        sdls: ["SDL Gitega"],
-        dateReception: "2025-05-21",
-        poidsNet: 5605.00,
+        id: "LOT-2026-001",
+        societe: "SOGESTAL Ngozi",
+        sdls: ["SDL Ngozi", "SDL Gitega"],
+        dateTransfert: "2026-05-14",
+        dateReception: "2026-05-15",
+        poidsNet: 15000.00,
         status: "confirmé",
     },
     {
         id: "LOT-003",
         societe: "COCOCA",
         sdls: ["SDL Muramvya", "SDL Karusi"],
-        dateReception: "2025-05-22",
+        dateTransfert: "2025-05-22",
+        dateReception: "-",
         poidsNet: 8850.00,
         status: "en attente",
     },
     {
         id: "LOT-004",
-        societe: "SOGESTAL Mumirwa",
+        societe: "SOGESTAL Kayanza",
         sdls: ["SDL Muramvya"],
-        dateReception: "2025-05-23",
+        dateTransfert: "2025-05-23",
+        dateReception: "2025-05-24",
         poidsNet: 4720.00,
-        status: "en attente",
+        status: "confirmé",
     },
 ]
 
@@ -83,7 +78,6 @@ export default function ReceptionPage() {
                             Enregistrement et pesée des nouveaux lots de café déparché en provenance des Stations de Lavage (SDL).
                         </p>
                     </div>
-
                 </div>
 
                 <div className="w-full bg-card rounded-md p-2">
@@ -93,6 +87,7 @@ export default function ReceptionPage() {
                                 <TableRow>
                                     <TableHead className="pl-4">Actions</TableHead>
                                     <TableHead>Société</TableHead>
+                                    <TableHead>Date Transfert</TableHead>
                                     <TableHead>Date Réception</TableHead>
                                     <TableHead className="text-right">Poids Net (kg)</TableHead>
                                     <TableHead className="text-center">Statut</TableHead>
@@ -109,7 +104,7 @@ export default function ReceptionPage() {
                                                             <MoreHorizontal className="h-4 w-4" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent>
+                                                    <DropdownMenuContent align='start'>
                                                         <Link href={`/odeca-production/usine/reception/confirmation/?id=${lot.id}&societe=${encodeURIComponent(lot.societe)}&sdls=${encodeURIComponent(lot.sdls.join(","))}&poidsNet=${lot.poidsNet}&date=${lot.dateReception}`}>
                                                             <DropdownMenuItem className="cursor-pointer">Confirmer</DropdownMenuItem>
                                                         </Link>
@@ -119,7 +114,7 @@ export default function ReceptionPage() {
                                             </div>
                                         </TableCell>
                                         <TableCell className="font-semibold">{lot.societe}</TableCell>
-
+                                        <TableCell>{lot.dateTransfert}</TableCell>
                                         <TableCell>{lot.dateReception}</TableCell>
                                         <TableCell className="text-right font-semibold">{lot.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</TableCell>
                                         <TableCell className="text-center lowercase">
