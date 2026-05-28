@@ -43,6 +43,7 @@ export default function TransferCtDep({
   data = [],
   fethTransfertbtnLoading,
   datapagination,
+  search,
 }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -142,6 +143,8 @@ export default function TransferCtDep({
               {user?.session?.category === "Admin" ? (
                 <div>
                   <EditTransfers
+                    transfer_sdl_ct_code={transfer?.transfer_sdl_ct_code}
+                    id={transfer?.id}
                     from_ct={transfer.from_ct}
                     to_depulpeur_name={transfer.to_depulpeur_name}
                     society={transfer.society}
@@ -340,10 +343,11 @@ export default function TransferCtDep({
           <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
           <Input
             placeholder="Rechercher..."
-            value={table.getColumn("from_ct")?.getFilterValue() ?? ""}
-            onChange={(event) =>
-              table.getColumn("from_ct")?.setFilterValue(event.target.value)
-            }
+            // value={table.getColumn("from_ct")?.getFilterValue() ?? ""}
+            onChange={(event) => {
+              // table.getColumn("from_ct")?.setFilterValue(event.target.value)
+              search(event.target.value)
+            }}
             className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
           />
         </div>

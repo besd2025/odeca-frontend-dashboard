@@ -16,8 +16,11 @@ import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import { toast } from "sonner";
+import { fetchData } from "@/app/_utils/api";
 
 export default function EditTransfers({
+  id,
+  transfer_sdl_ct_code,
   from_ct = "",
   to_depulpeur_name = "",
   society = "",
@@ -37,6 +40,8 @@ export default function EditTransfers({
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
+
+
     setFromCt(from_ct || "");
     setToDepulpeur(to_depulpeur_name || "");
     setSoc(society || "");
@@ -55,7 +60,6 @@ export default function EditTransfers({
   ]);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
     setLoading(true);
 
     const payload = {
@@ -63,22 +67,39 @@ export default function EditTransfers({
       to_depulpeur_name: toDepulpeur,
       society: soc,
       localite: { province, commune },
-      qte_tranferer: { ca: caValue, cb: cbValue },
+      quantite_cerise_b: cbValue,
+      quantite_cerise_a: caValue,
+      transfer_ct_sdl_code: transfer_sdl_ct_code,
       photo_fiche: photoFicheUrl,
     };
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const results = await fetchData(
+          "patch",
+          `/cafe/transfer_ct_sdl/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: payload,
+          }
+        );
+        if (results.status === 200 || results.id) {
 
-    const promise = new Promise((resolve) => {
-      setTimeout(() => {
-        console.log("Submitting cultivator update", payload);
-        resolve({ code: "Transfert" });
-      }, 1000);
+          resolve({ id });
+        } else {
+          reject(new Error("Erreur lors de la modification"));
+        }
+      } catch (error) {
+        reject(error);
+      }
     });
+
 
     toast.promise(promise, {
       loading: "Modification...",
       success: (data) => {
         setTimeout(() => setOpen(false), 500);
-        return `${data.code} a été modifié avec succès `;
+        return `Le transfert depuis le CT "${fromCt}" vers la SDL "${toDepulpeur}"a été modifié avec succès `;
       },
       error: "Donnée non modifiée",
     });
@@ -227,7 +248,11 @@ export default function EditTransfers({
             <DialogClose asChild>
               <Button variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" disabled={loading}>
+            <Button
+              type="submit"
+              disabled={loading}
+              onClick={() => handleSubmit()}
+            >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Enregistrer
             </Button>
