@@ -71,7 +71,7 @@ export default function StockedList({ lots, onViewDetails }) {
                           <Badge
                             key={grade}
                             variant="secondary"
-                            className="text-xs font-semibold"
+                            className="text-xs bg-secondary/10 text-secondary dark:bg-secondary/30 dark:text-secondary dark:border-secondary/30"
                           >
                             {grade}
                           </Badge>

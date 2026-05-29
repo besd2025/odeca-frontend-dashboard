@@ -11,8 +11,12 @@ import {
   PackageCheck,
   Play,
   Tag,
+  MoreHorizontal,
+  Layers,
 } from "lucide-react";
 import PaginationContent from "@/components/ui/pagination-content";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Status helpers
 const STATUS_CONFIG = {
@@ -41,22 +45,22 @@ const STATUS_CONFIG = {
       </Badge>
     ),
   },
-  "Étiqueté & Stocké": {
+  "Trié & Stocké": {
     badge: (
       <Badge
         variant="outline"
-        className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 flex items-center gap-1 whitespace-nowrap"
+        className="border-secondary/20 bg-secondary/10 text-secondary dark:bg-secondary/30 dark:text-secondary dark:border-secondary/30 flex items-center gap-1 whitespace-nowrap"
       >
         <CheckCircle2 className="h-3.5 w-3.5" />
-        Étiqueté & Stocké
+        Trié & Stocké
       </Badge>
     ),
   },
-  "Étiqueté & Stocké (Direct)": {
+  "Trié & Stocké (Direct)": {
     badge: (
       <Badge
         variant="outline"
-        className="border-violet-200 bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400 dark:border-violet-800 flex items-center gap-1 whitespace-nowrap"
+        className="border-secondary/20 bg-secondary/10 text-secondary dark:bg-secondary/30 dark:text-secondary dark:border-secondary/30 flex items-center gap-1 whitespace-nowrap"
       >
         <PackageCheck className="h-3.5 w-3.5" />
         Stocké (Direct)
@@ -66,8 +70,15 @@ const STATUS_CONFIG = {
 };
 
 export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinalize, onViewDetails }) {
+  const [activeTab, setActiveTab] = React.useState("all");
+
+  const filteredLots = lots.filter((lot) => {
+    if (activeTab === "all") return true;
+    return lot.status.toLowerCase() === activeTab.toLowerCase();
+  });
+
   const isStocked = (lot) =>
-    lot.status === "Étiqueté & Stocké" || lot.status === "Étiqueté & Stocké (Direct)";
+    lot.status === "Trié & Stocké" || lot.status === "Trié & Stocké (Direct)";
   const isInProgress = (lot) => lot.status === "En cours de triage";
   const isReady = (lot) => lot.status === "Prêt à trier";
 
@@ -81,12 +92,46 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
           Liste des lots prêts à trier, en cours de triage et étiquetés/stockés.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {lots.length > 0 && (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="flex w-full overflow-x-auto justify-start h-10 p-1 bg-slate-100 dark:bg-slate-900 select-none mb-4 gap-1">
+              <TabsTrigger value="all" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
+                <Layers className="h-3.5 w-3.5 text-slate-500" />
+                <span>Tous ({lots.length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="Prêt à trier" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
+                <ClipboardList className="h-3.5 w-3.5 text-blue-500" />
+                <span>Prêt à trier ({lots.filter(l => l.status === "Prêt à trier").length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="En cours de triage" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
+                <Play className="h-3.5 w-3.5 text-amber-500" />
+                <span>En cours de triage ({lots.filter(l => l.status === "En cours de triage").length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="Trié & Stocké" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
+                <CheckCircle2 className="h-3.5 w-3.5 text-indigo-500" />
+                <span>Trié & Stocké ({lots.filter(l => l.status === "Trié & Stocké").length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="Trié & Stocké (Direct)" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
+                <PackageCheck className="h-3.5 w-3.5 text-violet-500" />
+                <span>Stocké (Direct) ({lots.filter(l => l.status === "Trié & Stocké (Direct)").length})</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
+
         {lots.length === 0 ? (
           <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
             <AlertCircle className="h-8 w-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
             <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
               Aucun lot à trier pour le moment. Les lots finalisés en usinage apparaissent ici.
+            </p>
+          </div>
+        ) : filteredLots.length === 0 ? (
+          <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
+            <AlertCircle className="h-8 w-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              Aucun lot avec le statut "{activeTab === "Trié & Stocké (Direct)" ? "Stocké (Direct)" : activeTab}" pour le moment.
             </p>
           </div>
         ) : (
@@ -105,7 +150,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
               </TableRow>
             </TableHeader>
             <TableBody>
-              {lots.map((lot) => (
+              {filteredLots.map((lot) => (
                 <TableRow key={lot.id}>
                   {/* Code Lot */}
                   <TableCell className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
@@ -164,42 +209,65 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
 
                   {/* Actions */}
                   <TableCell className="text-right sticky right-0 bg-background shadow-2xl border-l border-slate-200 dark:border-slate-800">
-                    {isStocked(lot) ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onViewDetails(lot)}
-                        className="h-8 text-xs flex items-center gap-1.5 ml-auto bg-sidebar"
-                      >
-                        <Eye className="h-3.5 w-3.5" /> Détails
-                      </Button>
-                    ) : isInProgress(lot) ? (
-                      <Button
-                        size="sm"
-                        onClick={() => onFinalize(lot)}
-                        className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white flex items-center gap-1.5 ml-auto"
-                      >
-                        <CheckCircle2 className="h-3.5 w-3.5" /> Finaliser le triage
-                      </Button>
-                    ) : isReady(lot) ? (
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => onStartTriage(lot)}
-                          className="h-8 text-xs bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-500 text-white flex items-center gap-1.5"
-                        >
-                          <Play className="h-3.5 w-3.5" /> Trier
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal />
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onLabelDirect(lot)}
-                          className="h-8 text-xs flex items-center gap-1.5 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800 hover:bg-violet-50 dark:hover:bg-violet-950/30"
-                        >
-                          <Tag className="h-3.5 w-3.5" /> Étiqueter / Stocker
-                        </Button>
-                      </div>
-                    ) : null}
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel className="text-muted-foreground font-normal text-xs">
+                          Actions
+                        </DropdownMenuLabel>
+                        {isStocked(lot) ? (
+                          <DropdownMenuItem>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onViewDetails(lot)}
+                              className="h-8 text-xs flex items-center gap-1.5 w-full"
+                            >
+                              <Eye className="h-3.5 w-3.5" /> Détails
+                            </Button>
+                          </DropdownMenuItem>
+                        ) : isInProgress(lot) ? (
+                          <DropdownMenuItem>
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => onFinalize(lot)}
+                              className="h-8 text-xs  flex items-center gap-1.5 w-full"
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5 text-white" /> Finaliser le triage
+                            </Button>
+                          </DropdownMenuItem>
+                        ) : isReady(lot) ? (
+                          <DropdownMenuItem>
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                size="sm"
+                                variant="default"
+                                onClick={() => onStartTriage(lot)}
+                                className="h-8 text-xs flex items-center gap-1.5"
+                              >
+                                <Play className="h-3.5 w-3.5 text-white" /> Trier
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onLabelDirect(lot)}
+                                className="h-8 text-xs flex items-center gap-1.5"
+                              >
+                                <Tag className="h-3.5 w-3.5" /> Étiqueter / Stocker
+                              </Button>
+                            </div>
+                          </DropdownMenuItem>
+                        ) : null}
+
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}

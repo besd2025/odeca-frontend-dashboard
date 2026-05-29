@@ -213,7 +213,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
       {/* Header Info */}
       <div className="p-3.5 bg-primary/5 border border-primary/10 rounded-lg text-sm text-slate-700 dark:text-slate-300 space-y-1">
         <div className="flex justify-between items-center">
-          <span className="font-semibold text-primary">Lot ID: {lot?.id}</span>
+          <span className="font-semibold text-primary">USID: {lot?.id}</span>
           <span className="text-xs bg-primary/10 px-2.5 py-0.5 rounded-full font-semibold">{lot?.societe}</span>
         </div>
         <div className="text-xs text-slate-500">

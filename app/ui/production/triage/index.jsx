@@ -12,17 +12,17 @@ import TriageDialog from "./TriageDialog";
 // Sample lots from usinage outputs, ready for triage
 const INITIAL_LOTS = [
   {
-    id: "LOT-2026-001",
+    id: "TRI-2026-001",
     societe: "SOGESTAL Ngozi",
     sdls: ["SDL Ngozi", "SDL Gitega"],
     grades: { "FW NGOMA MILD-SDL": 120, "FW AA": 80, "W ABC": 20 },
     dateEntree: "2026-05-18",
     dateSortie: "2026-05-20",
-    status: "Étiqueté & Stocké",
+    status: "Trié & Stocké",
     taxationQuantities: { "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
   },
   {
-    id: "LOT-2026-002",
+    id: "TRI-2026-002",
     societe: "SOGESTAL Kayanza",
     sdls: ["SDL Kayanza"],
     grades: { "FW AA": 40, "15+": 20 },
@@ -31,7 +31,7 @@ const INITIAL_LOTS = [
     status: "En cours de triage",
   },
   {
-    id: "LOT-2026-003",
+    id: "TRI-2026-003",
     societe: "COCOCA",
     sdls: ["SDL Gitega", "SDL Karusi"],
     grades: { "ROBUSTA NATURAL CLEAN SUPER": 58 },
@@ -40,7 +40,7 @@ const INITIAL_LOTS = [
     status: "Prêt à trier",
   },
   {
-    id: "LOT-2026-004",
+    id: "TRI-2026-004",
     societe: "SOGESTAL Mumirwa",
     sdls: ["SDL Muramvya"],
     grades: { "GRADE 1": 18 },
@@ -49,13 +49,13 @@ const INITIAL_LOTS = [
     status: "Prêt à trier",
   },
   {
-    id: "LOT-2026-005",
+    id: "TRI-2026-005",
     societe: "SOGESTAL Ngozi",
     sdls: ["SDL Gitega"],
     grades: { "W ABC": 3 },
     dateEntree: "2026-05-28",
     dateSortie: "2026-05-28",
-    status: "Étiqueté & Stocké (Direct)",
+    status: "Trié & Stocké (Direct)",
   },
 ];
 
@@ -82,7 +82,7 @@ export default function TriagePage() {
     setLots((prev) =>
       prev.map((l) =>
         l.id === lot.id
-          ? { ...l, status: "Étiqueté & Stocké (Direct)", dateEntree: today, dateSortie: today }
+          ? { ...l, status: "Trié & Stocké (Direct)", dateEntree: today, dateSortie: today }
           : l
       )
     );
@@ -108,7 +108,7 @@ export default function TriagePage() {
     );
     setIsFinalizing(false);
     setActiveLot(null);
-    toast.success("Triage validé et lot étiqueté & stocké !");
+    toast.success("Triage validé et lot Trié & Stocké !");
   };
 
   return (

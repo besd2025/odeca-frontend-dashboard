@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Layers, Building2, Trash2, Plus, X } from "lucide-react";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +20,22 @@ const SOCIETE_LIST = ["SOGESTAL Kirundo-Muyinga", "SOGESTAL Kayanza", "SOGESTAL 
 const SDL_LIST = ["SDL Ngozi", "SDL Kayanza", "SDL Gitega", "SDL Muramvya", "SDL Karusi"];
 const USINAGE_GRADES = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "COQUE", "CAFE NATUREL", "CAFE Miel", "Anaerobic", "Robusta"];
 
+const SDL_GRADES_MAP = {
+  "SDL Ngozi": ["A1", "A2", "COQUE"],
+  "SDL Kayanza": ["A1", "A3", "CAFE NATUREL"],
+  "SDL Gitega": ["B1", "B2", "B3"],
+  "SDL Muramvya": ["B2", "B3", "COQUE"],
+  "SDL Karusi": ["A2", "B2", "CAFE Miel"],
+};
+
 export default function InputForm({ onAddLot }) {
+  const searchParams = useSearchParams();
+  const queryReceptionId = searchParams?.get("receptionId") || "";
+
+  const [open, setOpen] = useState(false);
+  const [confirmedReceptions, setConfirmedReceptions] = useState([]);
+  const [selectedReceptionId, setSelectedReceptionId] = useState("");
+
   const [societe, setSociete] = useState("");
   const [selectedSDLs, setSelectedSDLs] = useState([]);
   const [dateUsinage, setDateUsinage] = useState(new Date().toISOString().split("T")[0]);
@@ -27,6 +43,77 @@ export default function InputForm({ onAddLot }) {
   const [quantities, setQuantities] = useState(
     USINAGE_GRADES.reduce((acc, grade) => ({ ...acc, [grade]: "" }), {})
   );
+  const [gradeSacs, setGradeSacs] = useState(
+    USINAGE_GRADES.reduce((acc, grade) => ({ ...acc, [grade]: "" }), {})
+  );
+  const [gradeSDLs, setGradeSDLs] = useState({});
+
+  // Load confirmed receptions from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("odeca_receptions");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setConfirmedReceptions(parsed.filter((r) => r.status === "confirmé"));
+    }
+  }, [open]);
+
+  // Open dialog and select reception if passed in URL
+  useEffect(() => {
+    if (queryReceptionId) {
+      setOpen(true);
+      setSelectedReceptionId(queryReceptionId);
+      const stored = localStorage.getItem("odeca_receptions");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const found = parsed.find(r => r.id === queryReceptionId && r.status === "confirmé");
+        if (found) {
+          setSociete(found.societe);
+          setSelectedSDLs(found.sdls);
+        }
+      }
+    }
+  }, [queryReceptionId]);
+
+  // Load grades dynamically based on selected SDLs
+  useEffect(() => {
+    if (selectedSDLs.length > 0) {
+      const gradesSet = new Set();
+      const tempGradeSDLs = { ...gradeSDLs };
+      selectedSDLs.forEach((sdl) => {
+        const grades = SDL_GRADES_MAP[sdl] || ["A1", "A2"];
+        grades.forEach((grade) => {
+          gradesSet.add(grade);
+          if (!tempGradeSDLs[grade] || !selectedSDLs.includes(tempGradeSDLs[grade]) || !(SDL_GRADES_MAP[tempGradeSDLs[grade]] || []).includes(grade)) {
+            tempGradeSDLs[grade] = sdl;
+          }
+        });
+      });
+      setActiveGrades(Array.from(gradesSet));
+      setGradeSDLs(
+        Array.from(gradesSet).reduce((acc, grade) => {
+          acc[grade] = tempGradeSDLs[grade] || "";
+          return acc;
+        }, {})
+      );
+    } else {
+      setActiveGrades([]);
+      setGradeSDLs({});
+    }
+  }, [selectedSDLs]);
+
+  const handleReceptionSelect = (val) => {
+    setSelectedReceptionId(val);
+    if (val && val !== "none") {
+      const found = confirmedReceptions.find(r => r.id === val);
+      if (found) {
+        setSociete(found.societe);
+        setSelectedSDLs(found.sdls);
+      }
+    } else {
+      setSociete("");
+      setSelectedSDLs([]);
+    }
+  };
 
   const handleSDLSelect = (val) => {
     if (val && !selectedSDLs.includes(val)) {
@@ -47,10 +134,15 @@ export default function InputForm({ onAddLot }) {
   const handleGradeRemove = (grade) => {
     setActiveGrades(prev => prev.filter(g => g !== grade));
     setQuantities(prev => ({ ...prev, [grade]: "" }));
+    setGradeSacs(prev => ({ ...prev, [grade]: "" }));
   };
 
   const handleQtyChange = (grade, value) => {
     setQuantities(prev => ({ ...prev, [grade]: value }));
+  };
+
+  const handleSacsChange = (grade, value) => {
+    setGradeSacs(prev => ({ ...prev, [grade]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -84,11 +176,21 @@ export default function InputForm({ onAddLot }) {
       return;
     }
 
+    const enteredSacs = {};
+    activeGrades.forEach(grade => {
+      const s = gradeSacs[grade];
+      if (s) {
+        enteredSacs[grade] = parseInt(s) || 0;
+      }
+    });
+
     const newLot = {
       societe,
       selectedSDLs,
       dateUsinage,
       usinageQuantities: enteredQuantities,
+      usinageSacs: enteredSacs,
+      receptionId: selectedReceptionId !== "none" ? selectedReceptionId : null
     };
 
     onAddLot(newLot);
@@ -99,14 +201,17 @@ export default function InputForm({ onAddLot }) {
     setDateUsinage(new Date().toISOString().split("T")[0]);
     setActiveGrades([]);
     setQuantities(USINAGE_GRADES.reduce((acc, grade) => ({ ...acc, [grade]: "" }), {}));
+    setGradeSacs(USINAGE_GRADES.reduce((acc, grade) => ({ ...acc, [grade]: "" }), {}));
+    setSelectedReceptionId("");
+    setOpen(false);
     toast.success("Lot ajouté en cours d'usinage !");
   };
 
   return (
-    <Dialog>
-      <DialogTrigger className="rounded-full">
-        <Button variant="default">
-          <Plus /> Nouveau lot
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="default" className="rounded-full shadow-md font-semibold">
+          <Plus className="mr-2 h-4 w-4" /> Nouveau
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-4xl md:max-w-2xl lg:max-w-[90vw] bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
@@ -121,12 +226,33 @@ export default function InputForm({ onAddLot }) {
                 <CardDescription>Sélection de la société de gestion et des stations de lavage concernées.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+
+                {/* Réception selection */}
+                <div className="space-y-2">
+                  <Label htmlFor="receptionId" className="font-semibold text-slate-700 dark:text-slate-300">
+                    Réception Confirmée
+                  </Label>
+                  <Select onValueChange={handleReceptionSelect} value={selectedReceptionId || "none"}>
+                    <SelectTrigger id="receptionId" className="w-full">
+                      <SelectValue placeholder="Saisie manuelle (Aucune)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Saisie manuelle (Aucune)</SelectItem>
+                      {confirmedReceptions.map((r) => (
+                        <SelectItem key={r.id} value={r.id}>
+                          {r.id} — {r.societe} ({r.sdls.join(", ")})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="societe" className="font-semibold text-slate-700 dark:text-slate-300">
                       Société / Propriétaire
                     </Label>
-                    <Select onValueChange={setSociete} value={societe}>
+                    <Select onValueChange={setSociete} value={societe} disabled={!!selectedReceptionId && selectedReceptionId !== "none"}>
                       <SelectTrigger id="societe" className="w-full">
                         <SelectValue placeholder="Sélectionner une société" />
                       </SelectTrigger>
@@ -163,9 +289,9 @@ export default function InputForm({ onAddLot }) {
                     Stations de Lavage (SDL) Concernées
                   </Label>
                   <div className="w-full sm:w-80">
-                    <Select onValueChange={handleSDLSelect} value="">
+                    <Select onValueChange={handleSDLSelect} value="" disabled={!!selectedReceptionId && selectedReceptionId !== "none"}>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Ajouter une station (SDL)..." />
+                        <SelectValue placeholder={selectedReceptionId && selectedReceptionId !== "none" ? "Incluses dans la réception" : "Ajouter une station (SDL)..."} />
                       </SelectTrigger>
                       <SelectContent>
                         {SDL_LIST.filter((sdl) => !selectedSDLs.includes(sdl)).map((sdl) => (
@@ -184,13 +310,15 @@ export default function InputForm({ onAddLot }) {
                           className="bg-primary/10 border border-primary/20 dark:bg-primary/20 text-slate-800 dark:text-slate-200 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5"
                         >
                           {sdl}
-                          <button
-                            type="button"
-                            onClick={() => handleSDLRemove(sdl)}
-                            className="text-primary hover:text-red-500 dark:hover:text-red-400 focus:outline-hidden transition-colors"
-                          >
-                            <X className="h-3.5 w-3.5 stroke-[2.5]" />
-                          </button>
+                          {(!selectedReceptionId || selectedReceptionId === "none") && (
+                            <button
+                              type="button"
+                              onClick={() => handleSDLRemove(sdl)}
+                              className="text-primary hover:text-red-500 dark:hover:text-red-400 focus:outline-hidden transition-colors"
+                            >
+                              <X className="h-3.5 w-3.5 stroke-[2.5]" />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -208,29 +336,31 @@ export default function InputForm({ onAddLot }) {
                   <CardTitle className="text-lg font-semibold flex items-center gap-2">
                     <Layers className="h-5 w-5 text-primary" /> Quantités Usinées par Grade
                   </CardTitle>
-                  <CardDescription>Sélection des grades de café en entrée et leurs volumes bruts.</CardDescription>
+                  <CardDescription>Saisie des volumes pour les grades de café envoyés automatiquement par les SDL d'origine.</CardDescription>
                 </div>
-                <div className="w-full sm:w-48">
-                  <Select onValueChange={handleGradeAdd} value="">
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Ajouter un grade..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {USINAGE_GRADES.filter((grade) => !activeGrades.includes(grade)).map((grade) => (
-                        <SelectItem key={grade} value={grade}>
-                          {grade}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                {(!selectedReceptionId || selectedReceptionId === "none") && (
+                  <div className="w-full sm:w-48">
+                    <Select onValueChange={handleGradeAdd} value="">
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Ajouter un grade..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {USINAGE_GRADES.filter((grade) => !activeGrades.includes(grade)).map((grade) => (
+                          <SelectItem key={grade} value={grade}>
+                            {grade}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </CardHeader>
               <CardContent className="flex-1">
                 {activeGrades.length === 0 ? (
                   <div className="h-full min-h-[140px] flex flex-col items-center justify-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-6 text-center bg-slate-50/50 dark:bg-slate-900/30">
                     <Plus className="h-8 w-8 text-slate-300 dark:text-slate-700 mb-2" />
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Aucun grade sélectionné. Utilisez le sélecteur ci-dessus pour ajouter des grades en entrée.
+                      Aucune station de lavage sélectionnée pour charger automatiquement les grades de café.
                     </p>
                   </div>
                 ) : (
@@ -244,13 +374,15 @@ export default function InputForm({ onAddLot }) {
                           <Label htmlFor={`input-${grade}`} className="text-xs font-bold text-slate-600 dark:text-slate-400">
                             {grade}
                           </Label>
-                          <button
-                            type="button"
-                            onClick={() => handleGradeRemove(grade)}
-                            className="text-slate-400 hover:text-red-500 dark:hover:text-red-400"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          {(!selectedReceptionId || selectedReceptionId === "none") && (
+                            <button
+                              type="button"
+                              onClick={() => handleGradeRemove(grade)}
+                              className="text-slate-400 hover:text-red-500 dark:hover:text-red-400"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          )}
                         </div>
                         <Input
                           type="number"
@@ -264,31 +396,19 @@ export default function InputForm({ onAddLot }) {
                           required
                         />
                         <div className="space-y-2">
-                          {/* <Label htmlFor="sacsCount" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                                                      Nombre de Sacs <Archive className="h-3 w-3 text-slate-400" />
-                                                    </Label> */}
                           <Input
                             type="number"
                             step="1"
                             min="0"
-                            id="sacsCount"
+                            id={`sacsCount-${grade}`}
                             name="sacsCount"
                             placeholder="Nombre de Sacs Ex: 320"
+                            value={gradeSacs[grade] || ""}
+                            onChange={(e) => handleSacsChange(grade, e.target.value)}
                             required
                           />
+                          <p className="text-xs font-semibold text-primary mt-1">Origine : {gradeSDLs[grade] || ""}</p>
                         </div>
-                        <Select>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="SDL d'origine" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {SDL_LIST.filter((sdl) => !selectedSDLs.includes(sdl)).map((sdl) => (
-                              <SelectItem key={sdl} value={sdl}>
-                                {sdl}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
                       </div>
                     ))}
                   </div>

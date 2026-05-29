@@ -69,7 +69,7 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
     const finalizedData = {
       dateEntree,
       dateSortie,
-      status: "Étiqueté & Stocké",
+      status: "Trié & Stocké",
       taxationQuantities: activeGrades.reduce((acc, g) => ({
         ...acc,
         [g]: parseFloat(quantities[g]) || 0,

@@ -61,17 +61,17 @@ const menuItems = {
       title: "Usine",
       items: [
         {
-          title: "Réception des Lots",
+          title: "Réception",
           url: "/odeca-production/usine/reception",
           icon: Inbox,
         },
         {
-          title: "Usinage & Sorties",
+          title: "Usinage",
           url: "/odeca-production/usine/usinage",
           icon: Settings,
         },
         {
-          title: "Processus de Triage",
+          title: "Triage",
           url: "/odeca-production/usine/triage",
           icon: Search,
         },
@@ -81,7 +81,7 @@ const menuItems = {
           icon: Beaker,
         },
         {
-          title: "Retour & Stockage",
+          title: "Stockage & Retour",
           url: "/odeca-production/usine/stockage",
           icon: Package,
         },

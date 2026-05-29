@@ -13,7 +13,7 @@ import RetourList from "./RetourList";
 
 const STOCKED_LOTS = [
     {
-        id: "LOT-2026-001",
+        id: "STOCK-2026-001",
         societe: "SOGESTAL Ngozi",
         sdls: ["SDL Ngozi", "SDL Gitega"],
         grades: { "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
@@ -21,7 +21,7 @@ const STOCKED_LOTS = [
         dateStockage: "2026-05-20",
     },
     {
-        id: "LOT-2026-002",
+        id: "STOCK-2026-002",
         societe: "SOGESTAL Kayanza",
         sdls: ["SDL Kayanza"],
         grades: { "FW AA": 40, "15+": 20 },
@@ -29,7 +29,7 @@ const STOCKED_LOTS = [
         dateStockage: "2026-05-24",
     },
     {
-        id: "LOT-2026-003",
+        id: "STOCK-2026-003",
         societe: "COCOCA",
         sdls: ["SDL Gitega", "SDL Karusi"],
         grades: { "ROBUSTA NATURAL CLEAN SUPER": 58 },
@@ -37,7 +37,7 @@ const STOCKED_LOTS = [
         dateStockage: "2026-05-26",
     },
     {
-        id: "LOT-2026-004",
+        id: "STOCK-2026-004",
         societe: "SOGESTAL Mumirwa",
         sdls: ["SDL Muramvya"],
         grades: { "GRADE 1": 18 },
@@ -45,7 +45,7 @@ const STOCKED_LOTS = [
         dateStockage: "2026-05-28",
     },
     {
-        id: "LOT-2026-005",
+        id: "STOCK-2026-005",
         societe: "SOGESTAL Ngozi",
         sdls: ["SDL Gitega"],
         grades: { "W ABC": 3 },
@@ -56,7 +56,7 @@ const STOCKED_LOTS = [
 
 const RETOUR_LOTS = [
     {
-        id: "LOT-2026-R01",
+        id: "STOCK-2026-R01",
         societe: "SOGESTAL Kayanza",
         sdls: ["SDL Kayanza"],
         grades: { "W TT": 12 },
@@ -65,7 +65,7 @@ const RETOUR_LOTS = [
         status: "En réusinage",
     },
     {
-        id: "LOT-2026-R02",
+        id: "STOCK-2026-R02",
         societe: "COCOCA",
         sdls: ["SDL Karusi"],
         grades: { "COQUE": 8 },
@@ -105,11 +105,11 @@ export default function StockagePage() {
                     <TabsList className="w-full sm:w-auto h-10">
                         <TabsTrigger value="stockes" className="flex items-center gap-1.5">
                             <PackageCheck className="h-4 w-4" />
-                            <span>Lots Stockés</span>
+                            <span>Qualité Stockés</span>
                         </TabsTrigger>
                         <TabsTrigger value="retours" className="flex items-center gap-1.5">
                             <RotateCcw className="h-4 w-4" />
-                            <span>Retours pour Réusinage</span>
+                            <span>Qualité Retour</span>
                         </TabsTrigger>
                     </TabsList>
 

@@ -19,12 +19,12 @@ import {
 
 const PaginationContent = ({
   datapaginationlimit,
-  currentPage,
-  totalPages,
-  onPageChange,
-  pointer,
-  totalCount,
-  onLimitChange, // Nouvelle prop pour gérer le changement de limite
+  currentPage = 1,
+  totalPages = 1,
+  onPageChange = () => { },
+  pointer = 0,
+  totalCount = 0,
+  onLimitChange = () => { }, // Nouvelle prop pour gérer le changement de limite
   limit: initialLimit = 5, // Prop pour la limite initiale
   className,
 }) => {
@@ -34,10 +34,16 @@ const PaginationContent = ({
     setLimit(initialLimit);
   }, [initialLimit]);
 
+  const currentPageNumber = Number.isFinite(Number(currentPage)) ? Number(currentPage) : 1;
+  const totalPagesNumber = Number.isFinite(Number(totalPages)) ? Math.max(1, Number(totalPages)) : 1;
+  const pointerNumber = Number.isFinite(Number(pointer)) ? Number(pointer) : 0;
+  const countNumber = Number.isFinite(Number(totalCount)) ? Number(totalCount) : 0;
+  const actualLimit = Number.isFinite(Number(limit)) ? Number(limit) : 5;
+
   // Calcul des pages à afficher
   const pagesToShow = [];
-  const startPage = Math.max(1, currentPage - 1);
-  const endPage = Math.min(totalPages, startPage + 2);
+  const startPage = Math.max(1, currentPageNumber - 1);
+  const endPage = Math.min(totalPagesNumber, startPage + 2);
   for (let i = startPage; i <= endPage; i++) {
     pagesToShow.push(i);
   }
@@ -51,8 +57,7 @@ const PaginationContent = ({
     onPageChange(1); // Réinitialise à la première page
   };
 
-  const actualPointer = Number(pointer);
-  const actualLimit = Number(limit);
+  const actualPointer = pointerNumber;
 
   React.useEffect(() => {
     if (typeof datapaginationlimit === "function") {
@@ -60,8 +65,8 @@ const PaginationContent = ({
     }
   }, [limit]);
 
-  const canGoToPrevious = currentPage > 1;
-  const canGoToNext = currentPage < totalPages;
+  const canGoToPrevious = currentPageNumber > 1;
+  const canGoToNext = currentPageNumber < totalPagesNumber;
 
   return (
     <div
@@ -73,13 +78,13 @@ const PaginationContent = ({
       <div className="flex-1 text-sm text-muted-foreground">
         Affichage de{" "}
         <span className="font-medium">
-          {totalCount === 0 ? 0 : pointer + 1}
+          {countNumber === 0 ? 0 : pointerNumber + 1}
         </span>{" "}
         à{" "}
         <span className="font-medium">
-          {Math.min(actualPointer + actualLimit, totalCount)}
+          {Math.min(actualPointer + actualLimit, countNumber)}
         </span>{" "}
-        sur <span className="font-medium">{totalCount}</span> résultats
+        sur <span className="font-medium">{countNumber}</span> résultats
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
@@ -116,7 +121,7 @@ const PaginationContent = ({
                 onClick={(event) => {
                   event.preventDefault();
                   if (canGoToPrevious) {
-                    onPageChange(currentPage - 1);
+                    onPageChange(currentPageNumber - 1);
                   }
                 }}
               />
@@ -126,7 +131,7 @@ const PaginationContent = ({
               <PaginationItem key={page}>
                 <PaginationLink
                   href="#"
-                  isActive={page === currentPage}
+                  isActive={page === currentPageNumber}
                   onClick={(event) => {
                     event.preventDefault();
                     onPageChange(page);
@@ -145,7 +150,7 @@ const PaginationContent = ({
                 onClick={(event) => {
                   event.preventDefault();
                   if (canGoToNext) {
-                    onPageChange(currentPage + 1);
+                    onPageChange(currentPageNumber + 1);
                   }
                 }}
               />

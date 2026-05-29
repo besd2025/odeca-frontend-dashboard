@@ -42,14 +42,6 @@ const INITIAL_LOTS = [
         usinageQuantities: { "B1": 2500, "B2": 1200 },
         status: "En cours"
     },
-    {
-        id: "LOT-2026-003",
-        societe: "COCOCA",
-        selectedSDLs: ["SDL Gitega", "SDL Karusi"],
-        dateUsinage: "2026-05-28",
-        usinageQuantities: { "Robusta": 3500 },
-        status: "En cours"
-    }
 ];
 
 
@@ -61,7 +53,7 @@ export default function UsinagePage() {
 
     const handleAddLot = (newLot) => {
         // Generate a unique sequential ID
-        const lotId = `USINAGE-2026-${String(lots.length + 1).padStart(3, "0")}`;
+        const lotId = `USID-2026-${String(lots.length + 1).padStart(3, "0")}`;
         const lotWithId = {
             id: lotId,
             ...newLot,
@@ -106,7 +98,7 @@ export default function UsinagePage() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
                     <div className="space-y-1">
                         <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Settings className="h-8 w-8 text-primary" /> Usinage & Sorties
+                            <Settings className="h-8 w-8 text-primary" /> Usinage
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">
                             Saisie des quantités de café déparché entrées en usinage, suivi en temps réel et ventilation des grades obtenus en sortie.
