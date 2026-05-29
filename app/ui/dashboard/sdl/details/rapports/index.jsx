@@ -59,7 +59,7 @@ export default function Rapports() {
           <RBSdl />
         </TabsContent> */}
         <TabsContent value="rapportC" className="relative">
-          <ComingSoonOverlay transparent={true} />
+          {/* <ComingSoonOverlay transparent={true} /> */}
           <RedementC />
         </TabsContent>
         {/* <TabsContent value="rapportG">

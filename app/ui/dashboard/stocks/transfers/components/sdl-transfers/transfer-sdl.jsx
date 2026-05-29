@@ -46,7 +46,7 @@ export default function TransferSdlDep({
   const [rowSelection, setRowSelection] = React.useState({});
   const [loading, setLoading] = useState(false);
   const user = React.useContext(UserContext);
-  
+
   // Local state as fallback
   const [currentPage, setCurrentPage] = useState(1);
   const [pointer, setPointer] = useState(0);
@@ -126,7 +126,7 @@ export default function TransferSdlDep({
           <ArrowUpDownIcon />
         </Button>
       ),
-      cell: ({ row }) => <div className="font-medium">{row.getValue("usine")}</div>,
+      cell: ({ row }) => <div className="font-medium">{row.getValue("usine")?.name}</div>,
     },
     {
       accessorKey: "society",
@@ -169,7 +169,7 @@ export default function TransferSdlDep({
     {
       id: "date",
       header: "Date transfert",
-      cell: ({ row }) => <div className="text-center font-semibold">{row.original.date ?? "-"}</div>,
+      cell: ({ row }) => <div className="text-center font-semibold">{row.original.date_transfert ?? "-"}</div>,
     },
   ];
 
@@ -205,9 +205,9 @@ export default function TransferSdlDep({
             className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
           />
         </div>
-        <div className="flex flex-row justify-between gap-x-3">
+        {/* <div className="flex flex-row justify-between gap-x-3">
           <ExportButton />
-        </div>
+        </div> */}
       </div>
       <div className="grid w-full [&>div]:border [&>div]:rounded-md">
         <Table>

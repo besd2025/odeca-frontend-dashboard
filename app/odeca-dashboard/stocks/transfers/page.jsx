@@ -42,7 +42,7 @@ export default function TransfersPage() {
             qte_tranferer: {
               ca: transfer?.total_parche,
             },
-            photo_fiche: transfer.photo_fiche,
+            photo_fiche: transfer.photo_bordereau,
             localite: {
               province:
                 transfer.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
@@ -162,7 +162,7 @@ export default function TransfersPage() {
                 <TransferSdlDep data={sdlTransfers} datapagination={datapagination} />
               )}
             </div>
-            <ComingSoonOverlay transparent={true} />
+            {/* <ComingSoonOverlay transparent={true} /> */}
           </TabsContent>
 
           <TabsContent value="ct" className="space-y-4">
