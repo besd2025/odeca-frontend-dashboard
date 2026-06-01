@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import React, { useState } from "react";
@@ -6,53 +8,8 @@ import { ROLES } from "@/lib/permissions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PackageCheck, RotateCcw, Warehouse } from "lucide-react";
-import StockedList from "./StockedList";
-import RetourList from "../echantillonnage/retours/RetourList";
+import RetourList from "./RetourList";
 
-// ---------- Mock data ----------
-
-const STOCKED_LOTS = [
-    {
-        id: "STOCK-2026-001",
-        societe: "SOGESTAL Ngozi",
-        sdls: ["SDL Ngozi", "SDL Gitega"],
-        grades: { "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
-        nombreSacs: 216,
-        dateStockage: "2026-05-20",
-    },
-    {
-        id: "STOCK-2026-002",
-        societe: "SOGESTAL Kayanza",
-        sdls: ["SDL Kayanza"],
-        grades: { "FW AA": 40, "15+": 20 },
-        nombreSacs: 60,
-        dateStockage: "2026-05-24",
-    },
-    {
-        id: "STOCK-2026-003",
-        societe: "COCOCA",
-        sdls: ["SDL Gitega", "SDL Karusi"],
-        grades: { "ROBUSTA NATURAL CLEAN SUPER": 58 },
-        nombreSacs: 58,
-        dateStockage: "2026-05-26",
-    },
-    {
-        id: "STOCK-2026-004",
-        societe: "SOGESTAL Mumirwa",
-        sdls: ["SDL Muramvya"],
-        grades: { "GRADE 1": 18 },
-        nombreSacs: 18,
-        dateStockage: "2026-05-28",
-    },
-    {
-        id: "STOCK-2026-005",
-        societe: "SOGESTAL Ngozi",
-        sdls: ["SDL Gitega"],
-        grades: { "W ABC": 3 },
-        nombreSacs: 3,
-        dateStockage: "2026-05-28",
-    },
-];
 
 const RETOUR_LOTS = [
     {
@@ -75,7 +32,7 @@ const RETOUR_LOTS = [
     },
 ];
 
-export default function StockagePage() {
+export default function RetoursEchantillonnage() {
     const [selectedLot, setSelectedLot] = useState(null);
     const [isViewingDetails, setIsViewingDetails] = useState(false);
 
@@ -92,15 +49,14 @@ export default function StockagePage() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
                     <div className="space-y-1">
                         <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Warehouse className="h-8 w-8 text-primary" /> Stockage & Retours
+                            <Warehouse className="h-8 w-8 text-primary" /> Retours
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">
-                            Suivi des lots de café stockés en entrepôt et des lots retournés pour un cycle de réusinage.
+                            Suivi des lots de café retournés pour un cycle de réusinage.
                         </p>
                     </div>
                 </div>
-                <StockedList lots={STOCKED_LOTS} onViewDetails={handleViewDetails} />
-
+                <RetourList lots={RETOUR_LOTS} onViewDetails={handleViewDetails} />
 
                 {/* Details Dialog */}
                 <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>

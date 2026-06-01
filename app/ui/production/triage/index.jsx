@@ -8,6 +8,7 @@ import { Search } from "lucide-react";
 import { toast } from "sonner";
 import TriageList from "./TriageList";
 import TriageDialog from "./TriageDialog";
+import StartTriageForm from "./StartTriageForm";
 
 // Sample lots from usinage outputs, ready for triage
 const INITIAL_LOTS = [
@@ -34,7 +35,7 @@ const INITIAL_LOTS = [
     id: "TRI-2026-003",
     societe: "COCOCA",
     sdls: ["SDL Gitega", "SDL Karusi"],
-    grades: { "ROBUSTA NATURAL CLEAN SUPER": 58 },
+    grades: { "ROBUSTA NATURAL CLEAN SUPER": 58, "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
     dateEntree: null,
     dateSortie: null,
     status: "Prêt à trier",
@@ -62,17 +63,46 @@ const INITIAL_LOTS = [
 export default function TriagePage() {
   const [lots, setLots] = useState(INITIAL_LOTS);
   const [activeLot, setActiveLot] = useState(null);
+  const [isStartingTriage, setIsStartingTriage] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [isViewingDetails, setIsViewingDetails] = useState(false);
 
-  // Start triage: status transitions to "En cours de triage"
+  // Open start triage dialog to configure sorted grades vs direct store
   const handleStartTriage = (lot) => {
-    const today = new Date().toISOString().split("T")[0];
+    setActiveLot(lot);
+    setIsStartingTriage(true);
+  };
+
+  // Confirm start triage selection and update lot status and quantities
+  const handleConfirmStartTriage = (lot, gradesATrier, gradesStockesDirect, dateEntree) => {
+    if (!lot?.id) {
+      toast.error("Impossible de démarrer le triage : lot non défini.");
+      return;
+    }
+
     setLots((prev) =>
-      prev.map((l) =>
-        l.id === lot.id ? { ...l, status: "En cours de triage", dateEntree: today } : l
-      )
+      prev.map((l) => {
+        if (l.id === lot.id) {
+          const taxationQuantities = { ...l.taxationQuantities };
+          // Pre-fill initial quantities for grades stored directly
+          gradesStockesDirect.forEach((grade) => {
+            taxationQuantities[grade] = l.grades[grade];
+          });
+
+          return {
+            ...l,
+            status: "En cours de triage",
+            dateEntree,
+            gradesATrier,
+            gradesStockesDirect,
+            taxationQuantities,
+          };
+        }
+        return l;
+      })
     );
+    setIsStartingTriage(false);
+    setActiveLot(null);
     toast.success(`Triage lancé pour le lot ${lot.id}`);
   };
 
@@ -174,6 +204,30 @@ export default function TriagePage() {
                 lot={activeLot}
                 onCancel={() => { setIsViewingDetails(false); setActiveLot(null); }}
                 readOnly={true}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Component 2c: Start triage configuration dialog */}
+        <Dialog open={isStartingTriage} onOpenChange={setIsStartingTriage}>
+          <DialogContent className="sm:max-w-2xl max-h-[95vh] overflow-y-auto bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
+                Démarrer le Triage - Configuration du Lot
+              </DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400">
+                Sélectionnez les grades à trier pour le lot {activeLot?.id}. Les autres grades seront stockés directement.
+              </DialogDescription>
+            </DialogHeader>
+            {activeLot && (
+              <StartTriageForm
+                lot={activeLot}
+                onConfirm={handleConfirmStartTriage}
+                onCancel={() => {
+                  setIsStartingTriage(false);
+                  setActiveLot(null);
+                }}
               />
             )}
           </DialogContent>

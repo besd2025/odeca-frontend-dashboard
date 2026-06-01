@@ -11,7 +11,7 @@ export default function StockedList({ lots, onViewDetails }) {
     <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
       <CardHeader>
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <PackageCheck className="h-5 w-5 text-primary" /> Lots Stockés & Étiquetés
+          <PackageCheck className="h-5 w-5 text-primary" /> Lots Stockés
         </CardTitle>
         <CardDescription>
           Liste des lots de café finalisés, étiquetés et disponibles en entrepôt.
