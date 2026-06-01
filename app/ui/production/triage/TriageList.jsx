@@ -260,7 +260,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                                 onClick={() => onLabelDirect(lot)}
                                 className="h-8 text-xs flex items-center gap-1.5"
                               >
-                                <Tag className="h-3.5 w-3.5" /> Étiqueter / Stocker
+                                <Tag className="h-3.5 w-3.5" /> Stocker(Direct)
                               </Button>
                             </div>
                           </DropdownMenuItem>

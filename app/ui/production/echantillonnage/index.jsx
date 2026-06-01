@@ -139,21 +139,7 @@ export default function EchantillonnagePage() {
                                     className="pl-9 h-9 text-sm"
                                 />
                             </div>
-                            <div className="w-full sm:w-48">
-                                <Select value={qualityFilter} onValueChange={setQualityFilter}>
-                                    <SelectTrigger className="h-9 text-sm w-full">
-                                        <SelectValue placeholder="Filtrer par Qualité..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="ALL">Toutes les qualités</SelectItem>
-                                        {COFFEE_QUALITIES.map((q) => (
-                                            <SelectItem key={q} value={q}>
-                                                {q}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+
                         </div>
                     </CardHeader>
                     <CardContent>

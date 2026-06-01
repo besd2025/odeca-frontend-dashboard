@@ -8,30 +8,10 @@ import { Calendar, FileText, Coffee, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 const OUTPUT_CONFIG = {
-  outputFW: {
-    label: "Fully Washed (FW)",
-    grades: ["FW NGOMA MILD-SDL", "FW AA", "15+", "PB", "FW TT"]
+  outputQ: {
+    label: "Qualités",
+    grades: ["FW NGOMA MILD-SDL", "FW AA", "15+", "PB", "FW TT", "W ABC", "W TT", "W STOCK LOT", "GRADE 1", "GRADE 2", "ROBUSTA NATURAL CLEAN SUPER", "COQUE"]
   },
-  outputW: {
-    label: "Washed (W)",
-    grades: ["W ABC", "W TT", "W STOCK LOT"]
-  },
-  outputNaturel: {
-    label: "Naturel",
-    grades: ["GRADE 1", "PB", "GRADE 2"]
-  },
-  outputMiel: {
-    label: "Miel",
-    grades: ["GRADE 1", "GRADE 2"]
-  },
-  outputRobusta: {
-    label: "Robusta",
-    grades: ["ROBUSTA NATURAL CLEAN SUPER"]
-  },
-  outputAnaerobic: {
-    label: "Anaerobic",
-    grades: ["GRADE 1", "PB", "GRADE 2"]
-  }
 };
 
 export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) {
@@ -41,22 +21,12 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
 
   // Categories states
   const [outputs, setOutputs] = useState({
-    outputFW: {},
-    outputW: {},
-    outputNaturel: {},
-    outputMiel: {},
-    outputRobusta: {},
-    outputAnaerobic: {}
+    outputQ: {},
   });
 
   // Active grades per category
   const [activeGrades, setActiveGrades] = useState({
-    outputFW: [],
-    outputW: [],
-    outputNaturel: [],
-    outputMiel: [],
-    outputRobusta: [],
-    outputAnaerobic: []
+    outputQ: [],
   });
 
   useEffect(() => {
@@ -66,12 +36,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
 
       // Setup initial output structures
       const newOutputs = {
-        outputFW: { ...lot.outputFW },
-        outputW: { ...lot.outputW },
-        outputNaturel: { ...lot.outputNaturel },
-        outputMiel: { ...lot.outputMiel },
-        outputRobusta: { ...lot.outputRobusta },
-        outputAnaerobic: { ...lot.outputAnaerobic }
+        outputQ: { ...lot.outputQ },
       };
 
       // Set active grades based on what exists

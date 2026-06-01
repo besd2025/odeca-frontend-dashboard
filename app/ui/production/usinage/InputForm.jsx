@@ -227,25 +227,6 @@ export default function InputForm({ onAddLot }) {
               </CardHeader>
               <CardContent className="space-y-6">
 
-                {/* Réception selection */}
-                <div className="space-y-2">
-                  <Label htmlFor="receptionId" className="font-semibold text-slate-700 dark:text-slate-300">
-                    Réception Confirmée
-                  </Label>
-                  <Select onValueChange={handleReceptionSelect} value={selectedReceptionId || "none"}>
-                    <SelectTrigger id="receptionId" className="w-full">
-                      <SelectValue placeholder="Saisie manuelle (Aucune)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Saisie manuelle (Aucune)</SelectItem>
-                      {confirmedReceptions.map((r) => (
-                        <SelectItem key={r.id} value={r.id}>
-                          {r.id} — {r.societe} ({r.sdls.join(", ")})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -374,15 +355,15 @@ export default function InputForm({ onAddLot }) {
                           <Label htmlFor={`input-${grade}`} className="text-xs font-bold text-slate-600 dark:text-slate-400">
                             {grade}
                           </Label>
-                          {(!selectedReceptionId || selectedReceptionId === "none") && (
-                            <button
-                              type="button"
-                              onClick={() => handleGradeRemove(grade)}
-                              className="text-slate-400 hover:text-red-500 dark:hover:text-red-400"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleGradeRemove(grade)}
+                            className="text-slate-400 hover:text-red-500 dark:hover:text-red-400"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+
                         </div>
                         <Input
                           type="number"
