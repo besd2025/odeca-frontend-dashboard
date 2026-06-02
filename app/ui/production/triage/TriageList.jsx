@@ -17,6 +17,7 @@ import {
 import PaginationContent from "@/components/ui/pagination-content";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StockageForm from "../stockage/StockageForm";
 
 // Status helpers
 const STATUS_CONFIG = {
@@ -91,6 +92,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
         <CardDescription>
           Liste des lots prêts à trier, en cours de triage et étiquetés/stockés.
         </CardDescription>
+        {/* <StockageForm /> */}
       </CardHeader>
       <CardContent className="space-y-4">
         {lots.length > 0 && (
@@ -110,7 +112,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
               </TabsTrigger>
               <TabsTrigger value="Trié & Stocké" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <CheckCircle2 className="h-3.5 w-3.5 text-indigo-500" />
-                <span>Trié & Stocké ({lots.filter(l => l.status === "Trié & Stocké").length})</span>
+                <span>Trié ({lots.filter(l => l.status === "Trié & Stocké").length})</span>
               </TabsTrigger>
               <TabsTrigger value="Trié & Stocké (Direct)" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <PackageCheck className="h-3.5 w-3.5 text-violet-500" />

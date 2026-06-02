@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { PackageCheck, RotateCcw, Warehouse } from "lucide-react";
 import StockedList from "./StockedList";
 import RetourList from "../echantillonnage/retours/RetourList";
+import StockageForm from "./StockageForm";
+import { Button } from "@/components/ui/button";
 
 // ---------- Mock data ----------
 
@@ -78,6 +80,8 @@ const RETOUR_LOTS = [
 export default function StockagePage() {
     const [selectedLot, setSelectedLot] = useState(null);
     const [isViewingDetails, setIsViewingDetails] = useState(false);
+    const [stockedLots, setStockedLots] = useState(STOCKED_LOTS);
+    const [isCreatingStock, setIsCreatingStock] = useState(false);
 
     const handleViewDetails = (lot) => {
         setSelectedLot(lot);
@@ -98,9 +102,18 @@ export default function StockagePage() {
                             Suivi des lots de café stockés en entrepôt et des lots retournés pour un cycle de réusinage.
                         </p>
                     </div>
+                    <div className="flex items-center gap-2">
+                        <Button size="sm" onClick={() => setIsCreatingStock(true)}>Nouveau Stockage</Button>
+                    </div>
                 </div>
-                <StockedList lots={STOCKED_LOTS} onViewDetails={handleViewDetails} />
+                <StockedList lots={stockedLots} onViewDetails={handleViewDetails} />
 
+                <Dialog open={isCreatingStock} onOpenChange={setIsCreatingStock}>
+                    <DialogContent className="sm:max-w-2xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto ">
+
+                        <StockageForm selectedLot={selectedLot} onCancel={() => setIsCreatingStock(false)} />
+                    </DialogContent>
+                </Dialog>
 
                 {/* Details Dialog */}
                 <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
