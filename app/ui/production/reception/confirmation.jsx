@@ -343,6 +343,25 @@ export default function ConfirmationPage() {
                           <Label htmlFor={`grade-${grade}`} className="text-sm ">
                             {grade}
                           </Label>
+
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => handleGradeRemove(grade)}
+                              className="text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors text-xs"
+                            >
+                              Rejetter
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() => handleGradeRemove(grade)}
+                              className=" transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+
                         </div>
                         <div className="flex flex-col gap-2">
                           <Input
