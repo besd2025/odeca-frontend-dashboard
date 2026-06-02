@@ -77,18 +77,18 @@ export default function ConfirmationPage() {
         const [allData] = await Promise.all([
           fetchData("get", `cafe/transfert_sdl_usine/group_by_societe_and_udp/${lotId}/`, { params: { offset: 0, limit: 150 } })
         ]);
-        console.log(allData?.societe?.nom)
+        console.log(allData?.transferts?.details)
         setFormData(pre => ({
           ...pre,
           societe: allData?.societe?.nom || "",
-          selectedSDLs: allData?.results?.sdls_list || [],
+          selectedSDLs: allData?.transferts || [],
           humidite: allData?.humidite || "",
           rendement: allData?.rendement || "",
           sacsCount: allData?.sacs_count || "",
           poidsBrut: allData?.poids_brut || "",
           poidsTare: allData?.poids_tare || "",
           dateReception: allData?.date_reception || "",
-          grades: allData?.grades || {},
+          grades: allData?.transferts?.details || {},
           gradeSDLs: allData?.gradeSDLs || {}
         }))
 
@@ -98,6 +98,7 @@ export default function ConfirmationPage() {
       }
     }
     loadInitialData()
+
     const gradesSet = new Set();
     const gradeSDLs = { ...formData.gradeSDLs };
 
@@ -295,15 +296,18 @@ export default function ConfirmationPage() {
 
                   {formData?.selectedSDLs?.length > 0 && (
                     <div className="flex flex-wrap gap-2 pt-2 animate-in fade-in duration-200">
-                      {formData.selectedSDLs.map((sdl) => (
+                      {formData?.selectedSDLs?.filter((sdl, index, self) =>
+                        // On trouve le premier index qui possède ce nom
+                        self.findIndex(s => s.sdl_origine?.nom === sdl.sdl_origine?.nom) === index
+                      )?.map((sdl) => (
                         <div
-                          key={sdl}
+                          key={sdl?.id}
                           className="bg-primary/10 border border-primary/20 dark:bg-primary/20 text-slate-800 dark:text-slate-200 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 animate-in zoom-in-95 duration-200"
                         >
-                          {sdl}
+                          {sdl?.sdl_origine?.nom}
                           <button
                             type="button"
-                            onClick={() => handleRemoveSDL(sdl)}
+                            onClick={() => handleRemoveSDL(sdl?.sdl_origine?.nom)}
                             className="text-primary hover:text-red-500 dark:hover:text-red-400 focus:outline-none transition-colors"
                           >
                             <X className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -325,7 +329,7 @@ export default function ConfirmationPage() {
                 <CardDescription>Saisie des volumes pour les grades de café envoyés automatiquement par les SDL d'origine.</CardDescription>
               </CardHeader>
               <CardContent>
-                {activeGrades?.length === 0 ? (
+                {formData.grades?.length === 0 ? (
                   <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
                     <Plus className="h-8 w-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -334,15 +338,16 @@ export default function ConfirmationPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in duration-200">
-                    {activeGrades?.map((grade) => (
+                    {activeGrades?.grades?.map((grade) => (
+                      console.log(grade),
                       <div
-                        key={grade}
+                        key={grade.id}
                         className="bg-slate-50/50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5 relative group animate-in zoom-in-95 duration-200"
                       >
                         <div className="flex justify-between items-center pb-1">
-                          <Label htmlFor={`grade-${grade}`} className="text-sm ">
-                            {grade}
-                          </Label>
+                          {/* <Label htmlFor={`grade-${grade?.grade?.name}`} className="text-sm ">
+                            {grade?.grade?.name}
+                          </Label> */}
 
                           <div className="flex gap-2">
                             <Button
