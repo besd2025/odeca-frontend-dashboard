@@ -448,6 +448,11 @@ export default function ConfirmationPage() {
                   </div>
                 )}
               </CardContent>
+              <CardFooter className="pt-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+                <Button type="submit" className="w-1/2 h-11 text-base font-semibold shadow-xs">
+                  Enregistrer la Réception
+                </Button>
+              </CardFooter>
             </Card>
           </div>
 
