@@ -11,8 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Inbox, Scale, Calendar, Percent, Layers, Archive, RefreshCw, Trash2, Plus, X, Building2, Trash } from "lucide-react";
-
+import { Inbox, Scale, Calendar, Percent, Layers, Archive, RefreshCw, Trash2, Plus, X, Building2 } from "lucide-react";
+import { fetchData } from "@/app/_utils/api";
 const GRADES = [
   "A1", "A2", "A3", "A4",
   "B1", "B2", "B3", "COQUE",
@@ -53,7 +53,9 @@ export default function ConfirmationPage() {
   const initialSociete = searchParams?.get("societe") || "";
   const initialSdls = searchParams?.get("sdls") ? searchParams.get("sdls").split(",") : [];
   const initialDate = searchParams?.get("date") || new Date().toISOString().split("T")[0];
-
+  const [loading, setLoading] = useState(false);
+  const [societeOptions, setSocieteOptions] = useState([]);
+  const [provinceOptions, setProvinceOptions] = useState([]);
   const [formData, setFormData] = useState({
     societe: initialSociete,
     selectedSDLs: initialSdls,
@@ -68,9 +70,34 @@ export default function ConfirmationPage() {
   });
 
   const [activeGrades, setActiveGrades] = useState([]);
-
   // Synchronize active grades automatically with the selected SDLs
   useEffect(() => {
+    async function loadInitialData() {
+      try {
+        const [allData] = await Promise.all([
+          fetchData("get", `cafe/transfert_sdl_usine/group_by_societe_and_udp/${lotId}/`, { params: { offset: 0, limit: 150 } })
+        ]);
+        console.log(allData?.societe?.nom)
+        setFormData(pre => ({
+          ...pre,
+          societe: allData?.societe?.nom || "",
+          selectedSDLs: allData?.results?.sdls_list || [],
+          humidite: allData?.humidite || "",
+          rendement: allData?.rendement || "",
+          sacsCount: allData?.sacs_count || "",
+          poidsBrut: allData?.poids_brut || "",
+          poidsTare: allData?.poids_tare || "",
+          dateReception: allData?.date_reception || "",
+          grades: allData?.grades || {},
+          gradeSDLs: allData?.gradeSDLs || {}
+        }))
+
+
+      } catch (err) {
+        console.error("Error loading initial data:", err);
+      }
+    }
+    loadInitialData()
     const gradesSet = new Set();
     const gradeSDLs = { ...formData.gradeSDLs };
 
@@ -92,7 +119,7 @@ export default function ConfirmationPage() {
         return acc;
       }, {})
     }));
-  }, [formData.selectedSDLs]);
+  }, [lotId]);
 
   // Calculate weights on the fly to avoid cascading state renders
   const brut = parseFloat(formData.poidsBrut) || 0;
@@ -165,7 +192,7 @@ export default function ConfirmationPage() {
       toast.error("Veuillez sélectionner la société.");
       return;
     }
-    if (formData.selectedSDLs.length === 0) {
+    if (formData.selectedSDLs?.length === 0) {
       toast.error("Veuillez sélectionner au moins une Station de Lavage (SDL) d'origine.");
       return;
     }
@@ -177,9 +204,6 @@ export default function ConfirmationPage() {
     toast.success("Lot reçu et enregistré avec succès !");
   };
   const availableSDLs = formData.societe ? (SOCIETE_SDL_MAP[formData.societe] || []) : [];
-  const handleGradeRemove = (grade) => {
-    setActiveGrades((prev) => prev.filter((g) => g !== grade));
-  };
 
   return (
     <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
@@ -219,7 +243,7 @@ export default function ConfirmationPage() {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Main Info Card */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
             <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -269,7 +293,7 @@ export default function ConfirmationPage() {
                     Stations de Lavage (SDL) d&apos;origine transférées
                   </Label>
 
-                  {formData.selectedSDLs.length > 0 && (
+                  {formData?.selectedSDLs?.length > 0 && (
                     <div className="flex flex-wrap gap-2 pt-2 animate-in fade-in duration-200">
                       {formData.selectedSDLs.map((sdl) => (
                         <div
@@ -301,7 +325,7 @@ export default function ConfirmationPage() {
                 <CardDescription>Saisie des volumes pour les grades de café envoyés automatiquement par les SDL d'origine.</CardDescription>
               </CardHeader>
               <CardContent>
-                {activeGrades.length === 0 ? (
+                {activeGrades?.length === 0 ? (
                   <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
                     <Plus className="h-8 w-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -310,33 +334,27 @@ export default function ConfirmationPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in duration-200">
-                    {activeGrades.map((grade) => (
+                    {activeGrades?.map((grade) => (
                       <div
                         key={grade}
                         className="bg-slate-50/50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5 relative group animate-in zoom-in-95 duration-200"
                       >
-                        <div className="flex justify-between items-center">
-                          <Label htmlFor={`grade-${grade}`} className="text-md font-bold ">
+                        <div className="flex justify-between items-center pb-1">
+                          <Label htmlFor={`grade-${grade}`} className="text-sm ">
                             {grade}
                           </Label>
-                          <button
-                            type="button"
-                            onClick={() => handleGradeRemove(grade)}
-                            className="text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
                         </div>
                         <div className="flex flex-col gap-2">
-
-                          <div className="space-y-2 mb-4">
-
-                            <p className="text-xs font-semibold text-primary mt-1">Origine : {formData.gradeSDLs[grade] || ""}</p>
-                          </div>
+                          <Input
+                            type="number"
+                            min="0"
+                            id={`grade-${grade}`}
+                            value={formData.grades[grade]}
+                            onChange={(e) => handleGradeChange(grade, e.target.value)}
+                            placeholder="Qte en kg"
+                            className="h-8 text-sm"
+                          />
                           <div className="space-y-2">
-                            <Label htmlFor="sacsCount" className="font-semibold text-slate-700 dark:text-slate-300">
-                              Nombre de Sacs
-                            </Label>
                             <Input
                               type="number"
                               step="1"
@@ -345,91 +363,10 @@ export default function ConfirmationPage() {
                               name="sacsCount"
                               value={formData.sacsCount}
                               onChange={handleChange}
-                              placeholder="Ex: 320"
+                              placeholder="Nombre de Sacs Ex: 320"
                               required
                             />
-                          </div>
-
-
-                          <div className="space-y-2">
-                            <Label htmlFor="poidsBrut" className="font-semibold text-slate-700 dark:text-slate-300">
-                              Poids Brut (kg)
-                            </Label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              id="poidsBrut"
-                              name="poidsBrut"
-                              value={formData.poidsBrut}
-                              onChange={handleChange}
-                              placeholder="Ex: 7200.00"
-                              required
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="poidsTare" className="font-semibold text-slate-700 dark:text-slate-300">
-                              Poids Tare (kg)
-                            </Label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              id="poidsTare"
-                              name="poidsTare"
-                              value={formData.poidsTare}
-                              onChange={handleChange}
-                              placeholder="Ex: 320.00"
-                              required
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="humidite" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                              Humidité <Percent className="h-3 w-3 text-slate-400" />
-                            </Label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              max="100"
-                              id="humidite"
-                              name="humidite"
-                              value={formData.humidite}
-                              onChange={handleChange}
-                              placeholder="Ex: 11.50 %"
-                              required
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="rendement" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                              Rendement <Percent className="h-3 w-3 text-slate-400" />
-                            </Label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              max="100"
-                              id="rendement"
-                              name="rendement"
-                              value={formData.rendement}
-                              onChange={handleChange}
-                              placeholder="Ex: 82.50 %"
-                              required
-                            />
-                          </div>
-
-                          <div className="mt-2">
-                            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg flex flex-col justify-between">
-                              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">
-                                Poids Net Calculé
-                              </span>
-                              <span className="text-lg font-bold text-primary pt-1">
-                                {poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} <span className="text-xs font-medium text-slate-500">kg</span>
-                              </span>
-                            </div>
+                            <p className="text-xs font-semibold text-primary mt-1">Origine : {formData.gradeSDLs[grade] || ""}</p>
                           </div>
                         </div>
 
@@ -441,6 +378,108 @@ export default function ConfirmationPage() {
             </Card>
           </div>
 
+          {/* Weighing & Submit Card */}
+          <div className="space-y-6">
+            <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800 h-full flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <Scale className="h-5 w-5 text-primary" /> Pesée & Calcul
+                </CardTitle>
+                <CardDescription>Rendement,Poids bruts, tare et calcul automatique du net.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 flex-1">
+
+
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-4 pt-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="humidite" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                      Humidité <Percent className="h-3 w-3 text-slate-400" />
+                    </Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      id="humidite"
+                      name="humidite"
+                      value={formData.humidite}
+                      onChange={handleChange}
+                      placeholder="Ex: 11.50 %"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="rendement" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                      Rendement <Percent className="h-3 w-3 text-slate-400" />
+                    </Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      id="rendement"
+                      name="rendement"
+                      value={formData.rendement}
+                      onChange={handleChange}
+                      placeholder="Ex: 82.50 %"
+                      required
+                    />
+                  </div>
+
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="poidsBrut" className="font-semibold text-slate-700 dark:text-slate-300">
+                    Poids Brut (kg)
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    id="poidsBrut"
+                    name="poidsBrut"
+                    value={formData.poidsBrut}
+                    onChange={handleChange}
+                    placeholder="Ex: 7200.00"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="poidsTare" className="font-semibold text-slate-700 dark:text-slate-300">
+                    Poids Tare (kg)
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    id="poidsTare"
+                    name="poidsTare"
+                    value={formData.poidsTare}
+                    onChange={handleChange}
+                    placeholder="Ex: 320.00"
+                    required
+                  />
+                </div>
+
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-4 mt-2">
+                  <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg flex flex-col justify-between border border-slate-100 dark:border-slate-800">
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                      Poids Net Calculé
+                    </span>
+                    <span className="text-3xl font-extrabold text-primary pt-1">
+                      {poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} <span className="text-lg font-medium text-slate-500">kg</span>
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="pt-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+                <Button type="submit" className="w-full h-11 text-base font-semibold shadow-xs">
+                  Enregistrer la Réception
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
 
         </form>
       </div>
