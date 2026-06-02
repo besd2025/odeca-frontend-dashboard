@@ -106,10 +106,6 @@ export default function UsinagePage() {
                     </div>
 
                 </div>
-
-                {/* Component 1: Input Form for New Lots */}
-                <InputForm onAddLot={handleAddLot} />
-
                 {/* Component 2: List of active and completed lots */}
                 <ProcessingList
                     lots={lots}
