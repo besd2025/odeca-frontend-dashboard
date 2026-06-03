@@ -79,17 +79,17 @@ export default function ReceptionPage() {
         try {
             if (tab === "all") {
                 const [pendingRes, confirmedRes] = await Promise.all([
-                    fetchData("get", `/cafe/transfert_sdl_usine/group_by_societe_and_udp/`, { params: { offset: 0, limit: 10 } }),
+                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { offset: 0, limit: 10 } }),
                     fetchData("get", `cafe/usinages/quantites_usinage/`, { params: { offset: 0, limit: 10 } })
                 ]);
                 console.log(pendingRes)
                 const pendingMapped = pendingRes?.results?.map((item) => ({
-                    id: item?.societe,
-                    societe: item?.transferts_sdls?.[0]?.societe_origine?.nom || "Inconnu",
-                    sdls: item?.transferts_sdls || [],
-                    dateTransfert: item?.date_dernier_transfert || "-",
+                    id: item?.id,
+                    societe: item?.sdl?.societe?.nom_societe || "Inconnu",
+                    sdls: item?.sdl?.sdl_nom || [],
+                    dateTransfert: item?.transfer_date || "-",
                     dateReception: "-",
-                    poidsNet: item?.quantity_total || 0,
+                    poidsNet: item?.total_parche || 0,
                     status: "en attente",
                 })) || [];
 
@@ -239,20 +239,14 @@ export default function ReceptionPage() {
                                                     {lot.societe}
                                                 </span>
                                                 <div className="flex flex-wrap gap-1">
-                                                    {lot.sdls
-                                                        ?.filter((sdl, index, self) =>
-                                                            // On trouve le premier index qui possède ce nom
-                                                            self.findIndex(s => s.sdl_origine?.nom === sdl.sdl_origine?.nom) === index
-                                                        )
-                                                        ?.map((sdl) => (
-                                                            <span
-                                                                key={sdl.id}
-                                                                className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
-                                                            >
-                                                                {sdl.sdl_origine?.nom || "-"}
-                                                            </span>
-                                                        ))
-                                                    }
+
+                                                    <span
+                                                        key={sdl.id}
+                                                        className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
+                                                    >
+                                                        {sdl.sdl_origine?.nom || "-"}
+                                                    </span>
+
                                                 </div>
                                             </div></TableCell>
                                             <TableCell>{lot.dateTransfert}</TableCell>

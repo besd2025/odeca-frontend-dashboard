@@ -67,33 +67,73 @@ const initialSamples = [
     },
 ];
 
+const normalizeQualite = (qualite) => {
+    if (Array.isArray(qualite)) return qualite;
+    if (typeof qualite === "string") {
+        return qualite
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+    return [];
+};
+
+const normalizeSamples = (samples) =>
+    samples.map((sample) => ({
+        ...sample,
+        qualite: normalizeQualite(sample.qualite)
+    }));
+
 export default function EchantillonnagePage() {
-    const [samples, setSamples] = useState(initialSamples);
+    const [samples, setSamples] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [qualityFilter, setQualityFilter] = useState("ALL");
 
-
+    // Load from localStorage on mount (client-side only)
+    useEffect(() => {
+        const stored = localStorage.getItem("odeca_samples");
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                const normalized = normalizeSamples(parsed);
+                setSamples(normalized);
+                localStorage.setItem("odeca_samples", JSON.stringify(normalized));
+            } catch (e) {
+                setSamples(initialSamples);
+            }
+        } else {
+            setSamples(initialSamples);
+            localStorage.setItem("odeca_samples", JSON.stringify(initialSamples));
+        }
+    }, []);
 
     const handleAddSample = (newSampleData) => {
         const newSample = {
             id: `ECH-2026-0${samples.length + 1}`,
-            ...newSampleData
+            ...newSampleData,
+            qualite: normalizeQualite(newSampleData.qualite)
         };
-        setSamples((prev) => [newSample, ...prev]);
+        const updated = [newSample, ...samples];
+        setSamples(updated);
+        localStorage.setItem("odeca_samples", JSON.stringify(updated));
     };
 
     const handleDeleteSample = (id) => {
-        setSamples((prev) => prev.filter((s) => s.id !== id));
+        const updated = samples.filter((s) => s.id !== id);
+        setSamples(updated);
+        localStorage.setItem("odeca_samples", JSON.stringify(updated));
         toast.success("Échantillon supprimé");
     };
 
     const filteredSamples = samples.filter((sample) => {
+        const sampleQualities = normalizeQualite(sample.qualite);
         const matchesSearch =
             sample.lotNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
             sample.societe.toLowerCase().includes(searchQuery.toLowerCase()) ||
             sample.echantillonneur.toLowerCase().includes(searchQuery.toLowerCase());
 
-        const matchesQuality = qualityFilter === "ALL" || sample.qualite === qualityFilter;
+        const matchesQuality =
+            qualityFilter === "ALL" || sampleQualities.includes(qualityFilter);
 
         return matchesSearch && matchesQuality;
     });
@@ -191,7 +231,7 @@ export default function EchantillonnagePage() {
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex flex-wrap gap-1">
-                                                        {sample.qualite.map((q) => (
+                                                        {normalizeQualite(sample.qualite).map((q) => (
                                                             <Badge key={q} variant="outline" className="bg-primary/5 text-primary border-primary/20 hover:bg-primary/10">
                                                                 {q}
                                                             </Badge>
