@@ -142,38 +142,38 @@ const menuItems = {
       icon: Package,
       keyword: "odeca-production/usine/stockage",
     },
-    // {
-    //   title: "Laboratoire",
-    //   items: [
-    //     {
-    //       title: "Réception & Codage",
-    //       url: "/odeca-production/laboratoire/reception",
-    //       icon: Tag,
-    //     },
-    //     {
-    //       title: "Analyse Granulométrique",
-    //       url: "/odeca-production/laboratoire/granulometrie",
-    //       icon: BarChart3,
-    //     },
-    //     {
-    //       title: "Triage Manuel",
-    //       url: "/odeca-production/laboratoire/triage",
-    //       icon: Sliders,
-    //     },
-    //     {
-    //       title: "Torréfaction & Cupping",
-    //       url: "/odeca-production/laboratoire/cupping",
-    //       icon: Coffee,
-    //     },
-    //     {
-    //       title: "Décisions & Rapports",
-    //       url: "/odeca-production/laboratoire/rapports",
-    //       icon: Scroll,
-    //     },
-    //   ],
-    //   icon: Microscope,
-    //   keyword: "odeca-production/laboratoire",
-    // },
+    {
+      title: "Laboratoire",
+      items: [
+        {
+          title: "Réception & Codage",
+          url: "/odeca-production/laboratoire/reception",
+          icon: Tag,
+        },
+        {
+          title: "Analyse Granulométrique",
+          url: "/odeca-production/laboratoire/granulometrie",
+          icon: BarChart3,
+        },
+        {
+          title: "Triage Manuel",
+          url: "/odeca-production/laboratoire/triage",
+          icon: Sliders,
+        },
+        {
+          title: "Torréfaction & Cupping",
+          url: "/odeca-production/laboratoire/cupping",
+          icon: Coffee,
+        },
+        {
+          title: "Décisions & Rapports",
+          url: "/odeca-production/laboratoire/rapports",
+          icon: Scroll,
+        },
+      ],
+      icon: Microscope,
+      keyword: "odeca-production/laboratoire",
+    },
   ],
   user: {
     name: "admin",

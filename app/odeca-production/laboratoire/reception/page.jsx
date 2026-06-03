@@ -2,6 +2,8 @@
 import React from "react";
 import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
 import { ROLES } from "@/lib/permissions";
+import ReceptionComponent from "@/app/ui/production/laboratoire/reception/ReceptionComponent";
+import ReceptionPage from "@/app/ui/production/laboratoire/reception";
 
 export default function Page() {
   return (
@@ -15,11 +17,8 @@ export default function Page() {
             Enregistrement, réception et codage anonyme des échantillons au laboratoire.
           </p>
         </div>
-        <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-12 text-center bg-slate-50/50 dark:bg-slate-900/50">
-          <p className="text-slate-600 dark:text-slate-400 font-medium">
-            Le module de Réception & Codage est en cours de développement.
-          </p>
-        </div>
+        {/* <ReceptionComponent /> */}
+        <ReceptionPage />
       </div>
     </ProtectedRoute>
   );

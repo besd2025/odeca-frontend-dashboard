@@ -2,6 +2,7 @@
 import React from "react";
 import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
 import { ROLES } from "@/lib/permissions";
+import CuppingComponent from "@/app/ui/production/laboratoire/CuppingComponent";
 
 export default function Page() {
   return (
@@ -15,11 +16,7 @@ export default function Page() {
             Évaluation organoleptique et fiches de dégustation (cupping) du café torréfié.
           </p>
         </div>
-        <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-12 text-center bg-slate-50/50 dark:bg-slate-900/50">
-          <p className="text-slate-600 dark:text-slate-400 font-medium">
-            Le module de Torréfaction & Cupping est en cours de développement.
-          </p>
-        </div>
+        <CuppingComponent />
       </div>
     </ProtectedRoute>
   );
