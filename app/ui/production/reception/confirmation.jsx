@@ -13,6 +13,9 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Inbox, Scale, Calendar, Percent, Layers, Archive, RefreshCw, Trash2, Plus, X, Building2, Trash } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
+import Transferts from "./transfert";
+
+
 const GRADES = [
   "A1", "A2", "A3", "A4",
   "B1", "B2", "B3", "COQUE",
@@ -319,9 +322,9 @@ export default function ConfirmationPage() {
                 </div>
               </CardContent>
             </Card>
-
+            <Transferts />
             {/* Grades Grid Card */}
-            <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+            <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800 hidden">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <Layers className="h-5 w-5 text-primary" /> Quantités par Grade

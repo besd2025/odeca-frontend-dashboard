@@ -82,7 +82,7 @@ export default function ReceptionPage() {
                     fetchData("get", `/cafe/transfert_sdl_usine/group_by_societe_and_udp/`, { params: { offset: 0, limit: 10 } }),
                     fetchData("get", `cafe/usinages/quantites_usinage/`, { params: { offset: 0, limit: 10 } })
                 ]);
-
+                console.log(pendingRes)
                 const pendingMapped = pendingRes?.results?.map((item) => ({
                     id: item?.societe,
                     societe: item?.transferts_sdls?.[0]?.societe_origine?.nom || "Inconnu",
