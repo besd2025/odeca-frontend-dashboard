@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Inbox, Scale, Calendar, Percent, Layers, Archive, RefreshCw, Trash2, Plus, X, Building2, Trash } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import Transferts from "./transfert";
+import Grades from "./grades";
 
 
 const GRADES = [
@@ -269,6 +270,19 @@ export default function ConfirmationPage() {
                       disabled
                     />
                   </div>
+                  {/* SDL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="sdl" className="font-semibold text-slate-700 dark:text-slate-300">
+                      Station de Lavage
+                    </Label>
+                    <Input
+                      type="text"
+                      id="sdl"
+                      name="sdl"
+                      value={formData.sdl}
+                      disabled
+                    />
+                  </div>
 
                   {/* Date de Réception */}
                   <div className="space-y-2">
@@ -290,35 +304,10 @@ export default function ConfirmationPage() {
                   </div>
                 </div>
 
-                {/* Stations de Lavage (SDL) d'origine */}
-                <div className="space-y-3">
-                  <Label className="font-semibold text-slate-700 dark:text-slate-300">
-                    Stations de Lavage (SDL) d&apos;origine transférées
-                  </Label>
 
-                  {formData.selectedSDLs.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pt-2 animate-in fade-in duration-200">
-                      {formData.selectedSDLs.map((sdl) => (
-                        <div
-                          key={sdl}
-                          className="bg-primary/10 border border-primary/20 dark:bg-primary/20 text-slate-800 dark:text-slate-200 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 animate-in zoom-in-95 duration-200"
-                        >
-                          {sdl}
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveSDL(sdl)}
-                            className="text-primary hover:text-red-500 dark:hover:text-red-400 focus:outline-none transition-colors"
-                          >
-                            <X className="h-3.5 w-3.5 stroke-[2.5]" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </CardContent>
             </Card>
-            <Transferts />
+            <Grades />
           </div>
 
 
