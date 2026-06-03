@@ -26,6 +26,7 @@ import { CheckCircle2, Clock, Layers, MoreHorizontal, Settings, Trash2, Percent,
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 export default function Grades() {
     const [isFinalizing, setIsFinalizing] = useState(false);
     const [formData, setFormData] = useState({
@@ -52,6 +53,7 @@ export default function Grades() {
         },
     ]
 
+    const TRIAGE_GRADES = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "COQUE", "CAFE NATUREL", "CAFE MIEL", "ANAEROBIC", "ROBUSTA"];
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -64,7 +66,7 @@ export default function Grades() {
 
 
     return (
-        <div className="w-full bg-card rounded-md p-2">
+        <div className="w-full bg-card rounded-md p-2 flex flex-col gap-2">
 
             <div className="w-full overflow-x-auto mt-2">
                 <Table>
@@ -156,10 +158,22 @@ export default function Grades() {
                                         className="bg-slate-50/50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5 relative group animate-in zoom-in-95 duration-200"
                                     >
                                         <div className="flex justify-between items-center">
-                                            <Label htmlFor={`grade-${grade.grade}`} className="text-md font-bold ">
-                                                {grade.grade}
-                                            </Label>
-
+                                            <div className="w-full">
+                                                <Select
+                                                    defaultValue={grade.grade}
+                                                >
+                                                    <SelectTrigger className="w-full sm:w-64 cursor-pointer">
+                                                        <SelectValue placeholder="Ajouter un grade..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {TRIAGE_GRADES.map((g) => (
+                                                            <SelectItem key={g} value={g}>
+                                                                {g}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
                                         </div>
                                         <div className="flex flex-col gap-2">
 
