@@ -372,11 +372,6 @@ export default function InputForm({ onAddSample }) {
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-                <Button type="submit" className="w-full sm:w-auto px-6 h-10 font-semibold shadow-xs">
-                  <Plus className="mr-2 h-4 w-4" /> Enregistrer en Entrée
-                </Button>
-              </CardFooter>
             </Card>
 
             {/* Checkbox settings */}
