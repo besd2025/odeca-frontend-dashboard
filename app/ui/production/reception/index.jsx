@@ -218,7 +218,8 @@ export default function ReceptionPage() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align='start'>
                                                             {lot.status === "en attente" ? (
-                                                                <Link href={`/odeca-production/usine/reception/confirmation/?id=${lot.id}`}>
+
+                                                                <Link href={`/odeca-production/usine/reception/confirmation/?id=${lot.id}&societe=${encodeURIComponent(lot.societe)}&sdls=${encodeURIComponent(lot.sdls.join(","))}&poidsNet=${lot.poidsNet}&date=${lot.dateReception}`}>
                                                                     <DropdownMenuItem className="cursor-pointer">Confirmer</DropdownMenuItem>
                                                                 </Link>
                                                             ) : (

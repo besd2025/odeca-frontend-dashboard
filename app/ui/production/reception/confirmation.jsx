@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Inbox, Scale, Calendar, Percent, Layers, Archive, RefreshCw, Trash2, Plus, X, Building2 } from "lucide-react";
+import { Inbox, Scale, Calendar, Percent, Layers, Archive, RefreshCw, Trash2, Plus, X, Building2, Trash } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 const GRADES = [
   "A1", "A2", "A3", "A4",
@@ -53,9 +53,7 @@ export default function ConfirmationPage() {
   const initialSociete = searchParams?.get("societe") || "";
   const initialSdls = searchParams?.get("sdls") ? searchParams.get("sdls").split(",") : [];
   const initialDate = searchParams?.get("date") || new Date().toISOString().split("T")[0];
-  const [loading, setLoading] = useState(false);
-  const [societeOptions, setSocieteOptions] = useState([]);
-  const [provinceOptions, setProvinceOptions] = useState([]);
+
   const [formData, setFormData] = useState({
     societe: initialSociete,
     selectedSDLs: initialSdls,
@@ -70,6 +68,7 @@ export default function ConfirmationPage() {
   });
 
   const [activeGrades, setActiveGrades] = useState([]);
+
   // Synchronize active grades automatically with the selected SDLs
   useEffect(() => {
     async function loadInitialData() {
@@ -77,18 +76,18 @@ export default function ConfirmationPage() {
         const [allData] = await Promise.all([
           fetchData("get", `cafe/transfert_sdl_usine/group_by_societe_and_udp/${lotId}/`, { params: { offset: 0, limit: 150 } })
         ]);
-        console.log(allData?.transferts?.details)
+        console.log(allData?.transferts)
         setFormData(pre => ({
           ...pre,
           societe: allData?.societe?.nom || "",
-          selectedSDLs: allData?.transferts || [],
+          selectedSDLs: allData?.results?.sdls_list || [],
           humidite: allData?.humidite || "",
           rendement: allData?.rendement || "",
           sacsCount: allData?.sacs_count || "",
           poidsBrut: allData?.poids_brut || "",
           poidsTare: allData?.poids_tare || "",
           dateReception: allData?.date_reception || "",
-          grades: allData?.transferts?.details || {},
+          grades: allData?.transferts?.[0]?.details[0] || {},
           gradeSDLs: allData?.gradeSDLs || {}
         }))
 
@@ -98,7 +97,6 @@ export default function ConfirmationPage() {
       }
     }
     loadInitialData()
-
     const gradesSet = new Set();
     const gradeSDLs = { ...formData.gradeSDLs };
 
@@ -110,6 +108,7 @@ export default function ConfirmationPage() {
           gradeSDLs[grade] = sdl;
         }
       });
+
     });
 
     setActiveGrades(Array.from(gradesSet));
@@ -120,6 +119,7 @@ export default function ConfirmationPage() {
         return acc;
       }, {})
     }));
+    console.log(formData)
   }, [lotId]);
 
   // Calculate weights on the fly to avoid cascading state renders
@@ -193,7 +193,7 @@ export default function ConfirmationPage() {
       toast.error("Veuillez sélectionner la société.");
       return;
     }
-    if (formData.selectedSDLs?.length === 0) {
+    if (formData.selectedSDLs.length === 0) {
       toast.error("Veuillez sélectionner au moins une Station de Lavage (SDL) d'origine.");
       return;
     }
@@ -205,6 +205,9 @@ export default function ConfirmationPage() {
     toast.success("Lot reçu et enregistré avec succès !");
   };
   const availableSDLs = formData.societe ? (SOCIETE_SDL_MAP[formData.societe] || []) : [];
+  const handleGradeRemove = (grade) => {
+    setActiveGrades((prev) => prev.filter((g) => g !== grade));
+  };
 
   return (
     <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
@@ -244,7 +247,7 @@ export default function ConfirmationPage() {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Main Info Card */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-3 space-y-6">
             <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -294,20 +297,17 @@ export default function ConfirmationPage() {
                     Stations de Lavage (SDL) d&apos;origine transférées
                   </Label>
 
-                  {formData?.selectedSDLs?.length > 0 && (
+                  {formData.selectedSDLs.length > 0 && (
                     <div className="flex flex-wrap gap-2 pt-2 animate-in fade-in duration-200">
-                      {formData?.selectedSDLs?.filter((sdl, index, self) =>
-                        // On trouve le premier index qui possède ce nom
-                        self.findIndex(s => s.sdl_origine?.nom === sdl.sdl_origine?.nom) === index
-                      )?.map((sdl) => (
+                      {formData.selectedSDLs.map((sdl) => (
                         <div
-                          key={sdl?.id}
+                          key={sdl}
                           className="bg-primary/10 border border-primary/20 dark:bg-primary/20 text-slate-800 dark:text-slate-200 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 animate-in zoom-in-95 duration-200"
                         >
-                          {sdl?.sdl_origine?.nom}
+                          {sdl}
                           <button
                             type="button"
-                            onClick={() => handleRemoveSDL(sdl?.sdl_origine?.nom)}
+                            onClick={() => handleRemoveSDL(sdl)}
                             className="text-primary hover:text-red-500 dark:hover:text-red-400 focus:outline-none transition-colors"
                           >
                             <X className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -329,7 +329,7 @@ export default function ConfirmationPage() {
                 <CardDescription>Saisie des volumes pour les grades de café envoyés automatiquement par les SDL d'origine.</CardDescription>
               </CardHeader>
               <CardContent>
-                {formData.grades?.length === 0 ? (
+                {activeGrades.length === 0 ? (
                   <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
                     <Plus className="h-8 w-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -338,17 +338,15 @@ export default function ConfirmationPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in duration-200">
-                    {activeGrades?.grades?.map((grade) => (
-                      console.log(grade),
+                    {activeGrades.map((grade) => (
                       <div
-                        key={grade.id}
+                        key={grade}
                         className="bg-slate-50/50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5 relative group animate-in zoom-in-95 duration-200"
                       >
-                        <div className="flex justify-between items-center pb-1">
-                          {/* <Label htmlFor={`grade-${grade?.grade?.name}`} className="text-sm ">
-                            {grade?.grade?.name}
-                          </Label> */}
-
+                        <div className="flex justify-between items-center">
+                          <Label htmlFor={`grade-${grade}`} className="text-md font-bold ">
+                            {grade}
+                          </Label>
                           <div className="flex gap-2">
                             <Button
                               type="button"
@@ -366,19 +364,17 @@ export default function ConfirmationPage() {
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
-
                         </div>
                         <div className="flex flex-col gap-2">
-                          <Input
-                            type="number"
-                            min="0"
-                            id={`grade-${grade}`}
-                            value={formData.grades[grade]}
-                            onChange={(e) => handleGradeChange(grade, e.target.value)}
-                            placeholder="Qte en kg"
-                            className="h-8 text-sm"
-                          />
+
+                          <div className="space-y-2 mb-4">
+
+                            <p className="text-xs font-semibold text-primary mt-1">Origine : {formData.gradeSDLs[grade] || ""}</p>
+                          </div>
                           <div className="space-y-2">
+                            <Label htmlFor="sacsCount" className="font-semibold text-slate-700 dark:text-slate-300">
+                              Nombre de Sacs
+                            </Label>
                             <Input
                               type="number"
                               step="1"
@@ -387,10 +383,91 @@ export default function ConfirmationPage() {
                               name="sacsCount"
                               value={formData.sacsCount}
                               onChange={handleChange}
-                              placeholder="Nombre de Sacs Ex: 320"
+                              placeholder="Ex: 320"
                               required
                             />
-                            <p className="text-xs font-semibold text-primary mt-1">Origine : {formData.gradeSDLs[grade] || ""}</p>
+                          </div>
+
+
+                          <div className="space-y-2">
+                            <Label htmlFor="poidsBrut" className="font-semibold text-slate-700 dark:text-slate-300">
+                              Poids Brut (kg)
+                            </Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              id="poidsBrut"
+                              name="poidsBrut"
+                              value={formData.poidsBrut}
+                              onChange={handleChange}
+                              placeholder="Ex: 7200.00"
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="poidsTare" className="font-semibold text-slate-700 dark:text-slate-300">
+                              Poids Tare (kg)
+                            </Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              id="poidsTare"
+                              name="poidsTare"
+                              value={formData.poidsTare}
+                              onChange={handleChange}
+                              placeholder="Ex: 320.00"
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="humidite" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                              Humidité <Percent className="h-3 w-3 text-slate-400" />
+                            </Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              max="100"
+                              id="humidite"
+                              name="humidite"
+                              value={formData.humidite}
+                              onChange={handleChange}
+                              placeholder="Ex: 11.50 %"
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="rendement" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                              Rendement <Percent className="h-3 w-3 text-slate-400" />
+                            </Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              max="100"
+                              id="rendement"
+                              name="rendement"
+                              value={formData.rendement}
+                              onChange={handleChange}
+                              placeholder="Ex: 82.50 %"
+                              required
+                            />
+                          </div>
+
+                          <div className="mt-2">
+                            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg flex flex-col justify-between">
+                              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">
+                                Poids Net Calculé
+                              </span>
+                              <span className="text-lg font-bold text-primary pt-1">
+                                {poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} <span className="text-xs font-medium text-slate-500">kg</span>
+                              </span>
+                            </div>
                           </div>
                         </div>
 
@@ -406,7 +483,6 @@ export default function ConfirmationPage() {
               </CardFooter>
             </Card>
           </div>
-
 
 
         </form>
