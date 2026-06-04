@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Layers, Building2, Trash2, Plus, X } from "lucide-react";
+import { Calendar, Layers, Building2, Trash2, Plus, X, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import {
@@ -15,17 +15,56 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox";
 const SOCIETE_LIST = ["SOGESTAL Kirundo-Muyinga", "SOGESTAL Kayanza", "SOGESTAL Ngozi", "COCOCA", "SOGESTAL Mumirwa"];
 const SDL_LIST = ["SDL Ngozi", "SDL Kayanza", "SDL Gitega", "SDL Muramvya", "SDL Karusi"];
 const USINAGE_GRADES = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "COQUE", "CAFE NATUREL", "CAFE Miel", "Anaerobic", "Robusta"];
 
 const SDL_GRADES_MAP = {
-  "SDL Ngozi": ["A1", "A2", "COQUE"],
-  "SDL Kayanza": ["A1", "A3", "CAFE NATUREL"],
-  "SDL Gitega": ["B1", "B2", "B3"],
-  "SDL Muramvya": ["B2", "B3", "COQUE"],
-  "SDL Karusi": ["A2", "B2", "CAFE Miel"],
+  "SDL Ngozi": [
+    {
+      grade: "A1",
+      quantite: "565",
+      nombreDeSacs: "6"
+    }, {
+      grade: "A2",
+      quantite: "4760",
+      nombreDeSacs: "75"
+    }, {
+      grade: "COQUE",
+      quantite: "840",
+      nombreDeSacs: "12"
+    }
+  ],
+  "SDL Kayanza": [
+    { grade: "A1", quantite: "555", nombreDeSacs: "77" },
+    { grade: "A3", quantite: "444", nombreDeSacs: "66" },
+    { grade: "CAFE NATUREL", quantite: "333", nombreDeSacs: "55" }
+  ],
+  "SDL Gitega": [
+    { grade: "B1", quantite: "222", nombreDeSacs: "44" },
+    { grade: "B2", quantite: "222", nombreDeSacs: "44" },
+    { grade: "B3", quantite: "222", nombreDeSacs: "44" }
+  ],
+  "SDL Muramvya": [
+    { grade: "B2", quantite: "222", nombreDeSacs: "44" },
+    { grade: "B3", quantite: "222", nombreDeSacs: "44" },
+    { grade: "COQUE", quantite: "222", nombreDeSacs: "44" }
+  ],
+  "SDL Karusi": [
+    { grade: "A2", quantite: "222", nombreDeSacs: "44" },
+    { grade: "B2", quantite: "222", nombreDeSacs: "44" },
+    { grade: "CAFE Miel", quantite: "222", nombreDeSacs: "44" }
+  ],
 };
 
 export default function InputForm({ onAddLot }) {
@@ -47,7 +86,20 @@ export default function InputForm({ onAddLot }) {
     USINAGE_GRADES.reduce((acc, grade) => ({ ...acc, [grade]: "" }), {})
   );
   const [gradeSDLs, setGradeSDLs] = useState({});
+  const [checkedGrades, setCheckedGrades] = useState({});
 
+  const handleCheckGrade = (grade) => {
+    setCheckedGrades(prev => ({
+      ...prev,
+      [grade]: !prev[grade]
+    }));
+  };
+
+  const getGradeInfo = (sdl, grade) => {
+    const sdlData = SDL_GRADES_MAP[sdl] || [];
+    const gradeData = sdlData.find(item => item.grade === grade);
+    return gradeData ? { quantite: gradeData.quantite, nombreDeSacs: gradeData.nombreDeSacs } : null;
+  };
   // Load confirmed receptions from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("odeca_receptions");
@@ -81,10 +133,12 @@ export default function InputForm({ onAddLot }) {
       const tempGradeSDLs = { ...gradeSDLs };
       selectedSDLs.forEach((sdl) => {
         const grades = SDL_GRADES_MAP[sdl] || ["A1", "A2"];
-        grades.forEach((grade) => {
-          gradesSet.add(grade);
-          if (!tempGradeSDLs[grade] || !selectedSDLs.includes(tempGradeSDLs[grade]) || !(SDL_GRADES_MAP[tempGradeSDLs[grade]] || []).includes(grade)) {
-            tempGradeSDLs[grade] = sdl;
+        grades.forEach((gradeItem) => {
+          // Extract grade string from either a string or object
+          const gradeString = typeof gradeItem === 'string' ? gradeItem : gradeItem.grade;
+          gradesSet.add(gradeString);
+          if (!tempGradeSDLs[gradeString] || !selectedSDLs.includes(tempGradeSDLs[gradeString]) || !(SDL_GRADES_MAP[tempGradeSDLs[gradeString]] || []).includes(gradeString)) {
+            tempGradeSDLs[gradeString] = sdl;
           }
         });
       });
@@ -100,21 +154,6 @@ export default function InputForm({ onAddLot }) {
       setGradeSDLs({});
     }
   }, [selectedSDLs]);
-
-  const handleReceptionSelect = (val) => {
-    setSelectedReceptionId(val);
-    if (val && val !== "none") {
-      const found = confirmedReceptions.find(r => r.id === val);
-      if (found) {
-        setSociete(found.societe);
-        setSelectedSDLs(found.sdls);
-      }
-    } else {
-      setSociete("");
-      setSelectedSDLs([]);
-    }
-  };
-
   const handleSDLSelect = (val) => {
     if (val && !selectedSDLs.includes(val)) {
       setSelectedSDLs(prev => [...prev, val]);
@@ -125,18 +164,6 @@ export default function InputForm({ onAddLot }) {
     setSelectedSDLs(prev => prev.filter(item => item !== sdl));
   };
 
-  const handleGradeAdd = (val) => {
-    if (val && !activeGrades.includes(val)) {
-      setActiveGrades(prev => [...prev, val]);
-    }
-  };
-
-  const handleGradeRemove = (grade) => {
-    setActiveGrades(prev => prev.filter(g => g !== grade));
-    setQuantities(prev => ({ ...prev, [grade]: "" }));
-    setGradeSacs(prev => ({ ...prev, [grade]: "" }));
-  };
-
   const handleQtyChange = (grade, value) => {
     setQuantities(prev => ({ ...prev, [grade]: value }));
   };
@@ -144,6 +171,8 @@ export default function InputForm({ onAddLot }) {
   const handleSacsChange = (grade, value) => {
     setGradeSacs(prev => ({ ...prev, [grade]: value }));
   };
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -210,13 +239,14 @@ export default function InputForm({ onAddLot }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="rounded-full shadow-md font-semibold">
-          <Plus className="mr-2 h-4 w-4" /> Nouveau
+        <Button variant="default" className="">
+          <Settings className="mr-2 h-4 w-4" /> Usiner
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-4xl md:max-w-2xl lg:max-w-[90vw] bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
+        <DialogTitle className="sr-only">Ajouter un Lot en Usinage</DialogTitle>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             {/* Informations Générales Card */}
             <Card className="shadow-none dark:bg-slate-950 border-slate-200 dark:border-slate-800">
               <CardHeader>
@@ -319,86 +349,60 @@ export default function InputForm({ onAddLot }) {
                   </CardTitle>
                   <CardDescription>Saisie des volumes pour les grades de café envoyés automatiquement par les SDL d'origine.</CardDescription>
                 </div>
-                {(!selectedReceptionId || selectedReceptionId === "none") && (
-                  <div className="w-full sm:w-48">
-                    <Select onValueChange={handleGradeAdd} value="">
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Ajouter un grade..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {USINAGE_GRADES.filter((grade) => !activeGrades.includes(grade)).map((grade) => (
-                          <SelectItem key={grade} value={grade}>
-                            {grade}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
               </CardHeader>
               <CardContent className="flex-1">
-                {activeGrades.length === 0 ? (
-                  <div className="h-full min-h-[140px] flex flex-col items-center justify-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-6 text-center bg-slate-50/50 dark:bg-slate-900/30">
-                    <Plus className="h-8 w-8 text-slate-300 dark:text-slate-700 mb-2" />
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Aucune station de lavage sélectionnée pour charger automatiquement les grades de café.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3 max-h-max overflow-y-auto pr-1">
-                    {activeGrades.map((grade) => (
-                      <div
-                        key={grade}
-                        className="bg-slate-50/50 dark:bg-slate-900/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5 relative"
-                      >
-                        <div className="flex justify-between items-center">
-                          <Label htmlFor={`input-${grade}`} className="text-xs font-bold text-slate-600 dark:text-slate-400">
-                            {grade}
-                          </Label>
-
-                          <button
-                            type="button"
-                            onClick={() => handleGradeRemove(grade)}
-                            className="text-slate-400 hover:text-red-500 dark:hover:text-red-400"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-
+                {selectedSDLs.length > 0 && (
+                  <div className="space-y-4">
+                    {selectedSDLs.map((sdl) => {
+                      const sdlGrades = activeGrades.filter(grade => gradeSDLs[grade] === sdl);
+                      return sdlGrades.length > 0 ? (
+                        <div key={sdl} className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+                          <Table>
+                            <TableCaption className="bg-slate-100 dark:bg-slate-900 p-2 text-left  text-slate-700 dark:text-slate-300">
+                              SDL d'origine : <span className="text-primary text-md font-semibold">{sdl}</span>
+                            </TableCaption>
+                            <TableHeader>
+                              <TableRow className="bg-slate-50 dark:bg-slate-900">
+                                <TableHead className="w-[150px]">Grade</TableHead>
+                                <TableHead>Quantité (Kg)</TableHead>
+                                <TableHead>Nombre de Sacs</TableHead>
+                                <TableHead>Combiner</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {sdlGrades.map((grade) => {
+                                const gradeInfo = getGradeInfo(sdl, grade);
+                                return (
+                                  <TableRow key={grade}>
+                                    <TableCell className="font-medium text-slate-800 dark:text-slate-200">{grade}</TableCell>
+                                    <TableCell className="text-slate-700 dark:text-slate-300">{gradeInfo?.quantite || "-"} Kg</TableCell>
+                                    <TableCell className="text-slate-700 dark:text-slate-300">{gradeInfo?.nombreDeSacs || "-"} Sacs</TableCell>
+                                    <TableCell>
+                                      <Checkbox
+                                        checked={checkedGrades[grade] || false}
+                                        onCheckedChange={() => handleCheckGrade(grade)}
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
                         </div>
-                        <Input
-                          type="number"
-                          min="0"
-                          step="any"
-                          id={`input-${grade}`}
-                          value={quantities[grade]}
-                          onChange={(e) => handleQtyChange(grade, e.target.value)}
-                          placeholder="Qté en Kg"
-                          className="h-8 text-xs"
-                          required
-                        />
-                        <div className="space-y-2">
-                          <Input
-                            type="number"
-                            step="1"
-                            min="0"
-                            id={`sacsCount-${grade}`}
-                            name="sacsCount"
-                            placeholder="Nombre de Sacs Ex: 320"
-                            value={gradeSacs[grade] || ""}
-                            onChange={(e) => handleSacsChange(grade, e.target.value)}
-                            required
-                          />
-                          <p className="text-xs font-semibold text-primary mt-1">Origine : {gradeSDLs[grade] || ""}</p>
-                        </div>
-                      </div>
-                    ))}
+                      ) : null;
+                    })}
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-                <Button type="submit" className="w-full sm:w-auto px-6 h-10 font-semibold shadow-xs">
-                  <Plus className="mr-2 h-4 w-4" /> Enregistrer en Entrée
+
+              <CardFooter className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                <Button className="w-full sm:w-auto px-6 h-10 font-semibold shadow-xs" variant="outline" onClick={() => setOpen(false)}>
+                  Annuler
                 </Button>
+                <Button type="submit" className="w-full sm:w-auto px-6 h-10 font-semibold shadow-xs">
+                  <Settings className="mr-2 h-4 w-4" /> Usiner
+                </Button>
+
               </CardFooter>
             </Card>
           </div>

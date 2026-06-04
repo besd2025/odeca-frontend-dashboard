@@ -40,7 +40,17 @@ const INITIAL_LOTS = [
         selectedSDLs: ["SDL Kayanza"],
         dateUsinage: "2026-05-27",
         usinageQuantities: { "B1": 2500, "B2": 1200 },
+        usinageQuantitiesTotal: 3700,
         status: "En cours"
+    },
+    {
+        id: "LOT-2026-003",
+        societe: "SOGESTAL Muramvya",
+        selectedSDLs: ["SDL Muramvya", "SDL Bururi"],
+        dateUsinage: "2026-05-27",
+        usinageQuantities: { "C1": 2500, "C2": 1200 },
+        usinageQuantitiesTotal: 3700,
+        status: "Reception"
     },
 ];
 
