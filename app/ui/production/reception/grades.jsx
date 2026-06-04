@@ -24,7 +24,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { fetchData } from "@/app/_utils/api";
-
 export default function Grades() {
     const [isFinalizing, setIsFinalizing] = useState(false);
     const [activeTab, setActiveTab] = useState("all");
@@ -60,6 +59,7 @@ export default function Grades() {
         },
     ]
 
+
     // Pagination state
     const [totalCount, setTotalCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -72,13 +72,16 @@ export default function Grades() {
         setPointer(0);
         setCurrentPage(1);
     };
+
+    const TRIAGE_GRADES = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "COQUE", "CAFE NATUREL", "CAFE MIEL", "ANAEROBIC", "ROBUSTA"];
+
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleGradeChange = (e) => {
-        const { value } = e.target;
+    const handleGradeChange = (value) => {
         setFormData((prev) => ({ ...prev, gradeId: value }));
     };
 
@@ -173,63 +176,72 @@ export default function Grades() {
             quantite_confirme_tare: formData.poidsTare,
             nombre_sac: formData.sacsCount,
             comfiramtion_status: "CONFIRMEE"
-
         }
-
-        const promise = new Promise(async (resolve, reject) => {
-            try {
-                const results = await fetchData(
-                    "post",
-                    `/cafe/transfert_sdl_usine_detail_comfimation/`,
-                    {
-                        params: {},
-                        additionalHeaders: {},
-                        body: dataform,
-                    }
-                );
-                if (results.status === 201) {
-
-                    resolve({ idGrade });
-                } else {
-                    reject(new Error("Erreur lors de la modification"));
-                }
-            } catch (error) {
-                reject(error);
-            }
-        });
-
-        toast.promise(promise, {
-            loading: "Modification en cours...",
-            success: (data) => {
-                setIsFinalizing(false);
-                setFormData((prev) => ({
-                    ...prev,
-                    humidite: "",
-                    gradeId: "",
-                    poidsBrut: "",
-                    poidsTare: "",
-                    sacsCount: "",
-                    dateReception: "",
-                }));
-                loadGradesData(activeTab);
-                return `Donnée enregistrée avec succès`;
-            },
-            error: "Donnée non enregistrée",
-        });
-
-        try {
-            await promise;
-        } catch (error) {
-            console.error(error);
-            setError(error.message || "Une erreur est survenue");
-        } finally {
+        if (!formData.gradeId || !formData.humidite || !formData.poidsBrut || !formData.poidsTare || !formData.sacsCount || !formData.dateReception) {
+            toast.error("Veuillez remplir tous les champs");
             setLoading(false);
+
         }
+        else {
+            const promise = new Promise(async (resolve, reject) => {
+                try {
+
+
+                    const results = await fetchData(
+                        "post",
+                        `/cafe/transfert_sdl_usine_detail_comfimation/`,
+                        {
+                            params: {},
+                            additionalHeaders: {},
+                            body: dataform,
+                        }
+                    );
+                    if (results.status === 201) {
+
+                        resolve({ idGrade });
+                    } else {
+                        reject(new Error("Erreur lors de la modification"));
+                    }
+
+                } catch (error) {
+                    reject(error);
+                }
+            });
+
+            toast.promise(promise, {
+                loading: "Modification en cours...",
+                success: (data) => {
+                    setIsFinalizing(false);
+                    setFormData((prev) => ({
+                        ...prev,
+                        humidite: "",
+                        gradeId: "",
+                        poidsBrut: "",
+                        poidsTare: "",
+                        sacsCount: "",
+                        dateReception: "",
+                    }));
+                    loadGradesData(activeTab);
+                    return `Donnée enregistrée avec succès`;
+                },
+                error: "Donnée non enregistrée",
+            });
+
+            try {
+                await promise;
+            } catch (error) {
+                console.error(error);
+                setError(error.message || "Une erreur est survenue");
+            } finally {
+                setLoading(false);
+            }
+        }
+
     };
 
 
     return (
-        <div className="w-full bg-card rounded-md p-2">
+        <div className="w-full bg-card rounded-md p-2 flex flex-col gap-2">
 
             <div className="w-full overflow-x-auto mt-2">
                 <Table>
@@ -321,10 +333,10 @@ export default function Grades() {
                                         className="bg-slate-50/50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5 relative group animate-in zoom-in-95 duration-200"
                                     >
                                         <div className="flex justify-between items-center">
+
                                             <Label htmlFor={`grade-${gradedetail}`} className="text-md font-bold ">
                                                 {gradedetail}
                                             </Label>
-
                                         </div>
                                         <div className="flex flex-col gap-2">
 
@@ -336,18 +348,25 @@ export default function Grades() {
                                                 <Label htmlFor="gradeId" className="font-semibold text-slate-700 dark:text-slate-300">
                                                     Grade
                                                 </Label>
-                                                <select
-                                                    value={formData.gradeId}
-                                                    onChange={handleGradeChange}
-                                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                >
-                                                    <option value="">Sélectionner une le Grade</option>
-                                                    {gradeOptions.map((item, index) => (
-                                                        <option key={`${item.value}-${index}`} value={item.value}>
-                                                            {item.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
+
+                                                <div className="w-full">
+                                                    <Select
+                                                        //defaultValue={grade.grade}
+                                                        defaultValue={formData.gradeId}
+                                                        onValueChange={handleGradeChange}
+                                                    >
+                                                        <SelectTrigger className="w-full cursor-pointer">
+                                                            <SelectValue placeholder="Ajouter un grade..." />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {gradeOptions.map((item, index) => (
+                                                                <SelectItem key={`${item.value}-${index}`} value={item.value}>
+                                                                    {item.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="sacsCount" className="font-semibold text-slate-700 dark:text-slate-300">

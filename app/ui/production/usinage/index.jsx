@@ -50,7 +50,19 @@ export default function UsinagePage() {
     const [activeLot, setActiveLot] = useState(null);
     const [isFinalizing, setIsFinalizing] = useState(false);
     const [isViewingDetails, setIsViewingDetails] = useState(false);
-
+    const [formData, setFormData] = useState({
+        id: "",
+        societe: "",
+        selectedSDLs: [],
+        humidite: "",
+        rendement: "",
+        sacsCount: "",
+        poidsBrut: "",
+        poidsTare: "",
+        dateReception: "",
+        grades: {},
+        gradeSDLs: {}
+    });
     const handleAddLot = (newLot) => {
         // Generate a unique sequential ID
         const lotId = `USID-2026-${String(lots.length + 1).padStart(3, "0")}`;
