@@ -11,24 +11,32 @@ import {
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, Layers, MoreHorizontal, Settings, Trash2, Percent, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from 'next/link';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
+import { fetchData } from "@/app/_utils/api";
+
 export default function Grades() {
     const [isFinalizing, setIsFinalizing] = useState(false);
+    const [activeTab, setActiveTab] = useState("all");
+    const [loading, setLoading] = useState(false);
+    const [gradesList, setGradesList] = useState([]);
+    const searchParams = useSearchParams();
+    const lotId = searchParams?.get("id") || "";
+    const sdl = searchParams?.get("sdls") || "";
+    const [open, setOpen] = useState(false);
+    const [error, setError] = useState("");
     const [formData, setFormData] = useState({
+        gradeId: "",
         societe: "",
         selectedSDLs: [],
         humidite: "",
@@ -52,15 +60,172 @@ export default function Grades() {
         },
     ]
 
-
+    // Pagination state
+    const [totalCount, setTotalCount] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(5);
+    const [pointer, setPointer] = useState(0);
+    const [gradedetail, setGradedetail] = useState("");
+    const [gradeOptions, setGradeOptions] = useState([]);
+    const handleTabChange = (val) => {
+        setActiveTab(val);
+        setPointer(0);
+        setCurrentPage(1);
+    };
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleGradeChange = (e) => {
+        const { value } = e.target;
+        setFormData((prev) => ({ ...prev, gradeId: value }));
+    };
+
+    const loadGradesData = async (tab) => {
+        setLoading(true);
+
+        try {
+
+            // Fetch all grades
+            const res = await fetchData("get", `cafe/transfert_sdl_usine/${lotId}/get_transfert_detail/`, {
+                params: { offset: pointer, limit },
+            });
+            const mapped = res?.results?.map((item) => ({
+                id: item?.id,
+                grade: item?.grade?.grade_name,
+                poidsNet: item?.quantite,
+                dateReception: item?.date_reception,
+                status: item?.comfirmation_status,
+            })) || [];
+
+            setGradesList(mapped);
+            console.log("mapped: ", mapped)
+            setTotalCount(res?.count || 0);
+
+
+        } catch (error) {
+            console.error(`Error fetching grades data for tab ${tab}:`, error);
+            setGradesList([]);
+            setTotalCount(0);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const onPageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        setPointer((pageNumber - 1) * limit);
+    };
+
+    const onLimitChange = (newLimit) => {
+        setLimit(newLimit);
+        setPointer(0);
+        setCurrentPage(1);
+    };
+
+    React.useEffect(() => {
+        if (activeTab) {
+            loadGradesData(activeTab);
+        }
+    }, [activeTab, pointer, limit]);
+
     const brut = parseFloat(formData.poidsBrut) || 0;
     const tare = parseFloat(formData.poidsTare) || 0;
     const poidsNet = Math.max(0, brut - tare);
+    const [idGrade, setIdGrade] = useState("");
+    const activegradedetails = async (id_grade, grade) => {
+        setGradedetail(grade)
+        setIsFinalizing(true)
+        // Fetch all grades
+        const res = await fetchData("get", `cafe/transfert_sdl_usine_detail/${id_grade}/`, {
+            params: { offset: pointer, limit },
+        });
+        const fetchedGrades = await fetchData("get", `cafe/grades/get_all_grades/`);
+        setFormData((prev) => ({
+            ...prev,
+            societe: res.transfer?.sdl?.societe?.nom_societe,
+            selectedSDLs: [],
+            humidite: "",
+            rendement: "",
+            sacsCount: "",
+            poidsBrut: "",
+            poidsTare: "",
+            dateReception: "",
+            grades: {},
+            gradeSDLs: {}
+        }));
+        const options = fetchedGrades?.map((item) => ({
+            value: item.id,
+            label: item.grade_name,
+        })) || [];
+        setGradeOptions(options);
+        setIdGrade(id_grade);
+    }
+
+    const confirmationGrade = async () => {
+        const dataform = {
+            transfert_detail: idGrade,
+            humidity: formData.humidite,
+            grade: formData.gradeId,
+            quantite_confirme_brut: formData.poidsBrut,
+            quantite_confirme_tare: formData.poidsTare,
+            nombre_sac: formData.sacsCount,
+            comfiramtion_status: "CONFIRMEE"
+
+        }
+
+        const promise = new Promise(async (resolve, reject) => {
+            try {
+                const results = await fetchData(
+                    "post",
+                    `/cafe/transfert_sdl_usine_detail_comfimation/`,
+                    {
+                        params: {},
+                        additionalHeaders: {},
+                        body: dataform,
+                    }
+                );
+                if (results.status === 201) {
+
+                    resolve({ idGrade });
+                } else {
+                    reject(new Error("Erreur lors de la modification"));
+                }
+            } catch (error) {
+                reject(error);
+            }
+        });
+
+        toast.promise(promise, {
+            loading: "Modification en cours...",
+            success: (data) => {
+                setIsFinalizing(false);
+                setFormData((prev) => ({
+                    ...prev,
+                    humidite: "",
+                    gradeId: "",
+                    poidsBrut: "",
+                    poidsTare: "",
+                    sacsCount: "",
+                    dateReception: "",
+                }));
+                loadGradesData(activeTab);
+                return `Donnée enregistrée avec succès`;
+            },
+            error: "Donnée non enregistrée",
+        });
+
+        try {
+            await promise;
+        } catch (error) {
+            console.error(error);
+            setError(error.message || "Une erreur est survenue");
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
     return (
@@ -77,14 +242,14 @@ export default function Grades() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {gradesBySDL.length === 0 ? (
+                        {gradesList.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={6} className="text-center py-8 text-slate-500 dark:text-slate-400 font-medium">
                                     Aucun grades trouvé.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            gradesBySDL.map((grade) => (
+                            gradesList.map((grade) => (
                                 <TableRow className="odd:bg-muted/50" key={grade.id}>
                                     <TableCell className="pl-4 font-medium">
                                         <div className="flex items-center gap-2">
@@ -95,13 +260,13 @@ export default function Grades() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align='start'>
-                                                    {grade.status === "en attente" && (
+                                                    {grade.status === "EN_ATTENTE" && (
 
-                                                        <DropdownMenuItem className="cursor-pointer" onClick={() => setIsFinalizing(true)}>Confirmer</DropdownMenuItem>
+                                                        <DropdownMenuItem className="cursor-pointer" onClick={() => activegradedetails(grade.id, grade.grade)}>Confirmer</DropdownMenuItem>
 
 
                                                     )}
-                                                    <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem>
+                                                    {/* <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem> */}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
@@ -114,7 +279,7 @@ export default function Grades() {
                                     </div></TableCell>
                                     <TableCell className="text-right font-semibold">{grade.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</TableCell>
                                     <TableCell className="text-center lowercase">
-                                        {grade.status === "confirmé" ? (
+                                        {grade.status === "CONFIRMEE" ? (
                                             <div className='gap-2 flex items-center justify-center'>
                                                 <Badge variant="default" className="gap-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
                                                     <CheckCircle2 size={24} />
@@ -156,8 +321,8 @@ export default function Grades() {
                                         className="bg-slate-50/50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5 relative group animate-in zoom-in-95 duration-200"
                                     >
                                         <div className="flex justify-between items-center">
-                                            <Label htmlFor={`grade-${grade.grade}`} className="text-md font-bold ">
-                                                {grade.grade}
+                                            <Label htmlFor={`grade-${gradedetail}`} className="text-md font-bold ">
+                                                {gradedetail}
                                             </Label>
 
                                         </div>
@@ -165,7 +330,24 @@ export default function Grades() {
 
                                             <div className="space-y-2 mb-4">
 
-                                                <p className="text-xs font-semibold text-primary mt-1">Origine : {grade.origin}</p>
+                                                <p className="text-xs font-semibold text-primary mt-1">Origine :{formData.societe}/{sdl}</p>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="gradeId" className="font-semibold text-slate-700 dark:text-slate-300">
+                                                    Grade
+                                                </Label>
+                                                <select
+                                                    value={formData.gradeId}
+                                                    onChange={handleGradeChange}
+                                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                >
+                                                    <option value="">Sélectionner une le Grade</option>
+                                                    {gradeOptions.map((item, index) => (
+                                                        <option key={`${item.value}-${index}`} value={item.value}>
+                                                            {item.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="sacsCount" className="font-semibold text-slate-700 dark:text-slate-300">
@@ -273,15 +455,15 @@ export default function Grades() {
 
                         </div>
                         <div className="pt-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 flex gap-x-2">
-                            <Button
+                            {/* <Button
                                 type="button"
                                 variant="outline"
                                 onClick={() => setIsFinalizing(false)}
                                 className="text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors w-1/2 h-11 text-base font-semibold shadow-xs"
                             >
                                 Rejeter
-                            </Button>
-                            <Button type="submit" className="w-1/2 h-11 text-base font-semibold shadow-xs" onClick={() => setIsFinalizing(false)} >
+                            </Button> */}
+                            <Button type="submit" className="w-1/2 h-11 text-base font-semibold shadow-xs" onClick={confirmationGrade} >
                                 Enregistrer la Réception
                             </Button>
 

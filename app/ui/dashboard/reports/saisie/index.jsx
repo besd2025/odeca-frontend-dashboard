@@ -164,7 +164,6 @@ export default function Saisie() {
       );
 
       const responses = await Promise.all(promises);
-      console.log("response: ", promises);
       const failures = responses.filter(
         (res) => res.status !== 201 && res.status !== 200
       );

@@ -72,20 +72,7 @@ export default function Transferts() {
             const [allData] = await Promise.all([
                 fetchData("get", `cafe/transfert_sdl_usine/`, { params: { offset: 0, limit: 150 } })
             ]);
-            console.log("sdls list", allData)
-            // setFormData(pre => ({
-            //     ...pre,
-            //     societe: allData?.societe?.nom || "",
-            //     selectedSDLs: allData?.results?.sdls_list || [],
-            //     humidite: allData?.humidite || "",
-            //     rendement: allData?.rendement || "",
-            //     sacsCount: allData?.sacs_count || "",
-            //     poidsBrut: allData?.poids_brut || "",
-            //     poidsTare: allData?.poids_tare || "",
-            //     dateReception: allData?.date_reception || "",
-            //     grades: allData?.transferts?.[0]?.details[0] || {},
-            //     gradeSDLs: allData?.gradeSDLs || {}
-            // }))
+            CONST
 
 
         } catch (err) {
@@ -151,7 +138,7 @@ export default function Transferts() {
 
                                                         </Link>
                                                     )}
-                                                    <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem>
+                                                    {/* <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem> */}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>

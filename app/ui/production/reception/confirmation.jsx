@@ -55,9 +55,8 @@ export default function ConfirmationPage() {
   const searchParams = useSearchParams();
   const lotId = searchParams?.get("id") || "";
   const initialSociete = searchParams?.get("societe") || "";
-  const initialSdls = searchParams?.get("sdls") ? searchParams.get("sdls").split(",") : [];
+  const initialSdls = searchParams?.get("sdls");
   const initialDate = searchParams?.get("date") || new Date().toISOString().split("T")[0];
-
   const [formData, setFormData] = useState({
     societe: initialSociete,
     selectedSDLs: initialSdls,
@@ -75,46 +74,9 @@ export default function ConfirmationPage() {
 
   // Synchronize active grades automatically with the selected SDLs
   useEffect(() => {
-    async function loadInitialData() {
-      try {
-        const [allData] = await Promise.all([
-          fetchData("get", `cafe/transfert_sdl_usine/group_by_societe_and_udp/${lotId}/`, { params: { offset: 0, limit: 150 } })
-        ]);
-        console.log(allData?.transferts)
-        setFormData(pre => ({
-          ...pre,
-          societe: allData?.societe?.nom || "",
-          selectedSDLs: allData?.results?.sdls_list || [],
-          humidite: allData?.humidite || "",
-          rendement: allData?.rendement || "",
-          sacsCount: allData?.sacs_count || "",
-          poidsBrut: allData?.poids_brut || "",
-          poidsTare: allData?.poids_tare || "",
-          dateReception: allData?.date_reception || "",
-          grades: allData?.transferts?.[0]?.details[0] || {},
-          gradeSDLs: allData?.gradeSDLs || {}
-        }))
 
-
-      } catch (err) {
-        console.error("Error loading initial data:", err);
-      }
-    }
-    loadInitialData()
     const gradesSet = new Set();
     const gradeSDLs = { ...formData.gradeSDLs };
-
-    formData.selectedSDLs.forEach((sdl) => {
-      const grades = SDL_GRADES_MAP[sdl] || ["A1", "A2"];
-      grades.forEach((grade) => {
-        gradesSet.add(grade);
-        if (!gradeSDLs[grade] || !formData.selectedSDLs.includes(gradeSDLs[grade]) || !(SDL_GRADES_MAP[gradeSDLs[grade]] || []).includes(grade)) {
-          gradeSDLs[grade] = sdl;
-        }
-      });
-
-    });
-
     setActiveGrades(Array.from(gradesSet));
     setFormData((prev) => ({
       ...prev,
@@ -134,61 +96,6 @@ export default function ConfirmationPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleGradeChange = (grade, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      grades: { ...prev.grades, [grade]: value }
-    }));
-  };
-
-  const handleGradeSDLChange = (grade, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      gradeSDLs: { ...prev.gradeSDLs, [grade]: value }
-    }));
-  };
-
-  const handleSelectSociete = (value) => {
-    setFormData((prev) => ({
-      ...prev,
-      societe: value,
-      selectedSDLs: [] // Reset selected SDLs when société changes
-    }));
-  };
-
-  const handleAddSDL = (value) => {
-    if (value && !formData.selectedSDLs.includes(value)) {
-      setFormData((prev) => ({
-        ...prev,
-        selectedSDLs: [...prev.selectedSDLs, value]
-      }));
-    }
-  };
-
-  const handleRemoveSDL = (sdlName) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedSDLs: prev.selectedSDLs.filter((item) => item !== sdlName)
-    }));
-  };
-
-  const handleReset = () => {
-    setFormData({
-      societe: "",
-      selectedSDLs: [],
-      humidite: "",
-      rendement: "",
-      sacsCount: "",
-      poidsBrut: "",
-      poidsTare: "",
-      dateReception: new Date().toISOString().split("T")[0],
-      grades: GRADES.reduce((acc, grade) => ({ ...acc, [grade]: "" }), {}),
-      gradeSDLs: GRADES.reduce((acc, grade) => ({ ...acc, [grade]: "" }), {})
-    });
-    setActiveGrades([]);
-    toast.info("Formulaire réinitialisé");
   };
 
   const handleSubmit = (e) => {
@@ -279,7 +186,7 @@ export default function ConfirmationPage() {
                       type="text"
                       id="sdl"
                       name="sdl"
-                      value={formData.sdl}
+                      value={initialSdls}
                       disabled
                     />
                   </div>
