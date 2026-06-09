@@ -10,7 +10,7 @@ import StockedList from "./StockedList";
 import RetourList from "../echantillonnage/retours/RetourList";
 import StockageForm from "./StockageForm";
 import { Button } from "@/components/ui/button";
-
+import { fetchData } from "@/lib/api";
 // ---------- Mock data ----------
 
 const STOCKED_LOTS = [
@@ -82,16 +82,42 @@ export default function StockagePage() {
     const [isViewingDetails, setIsViewingDetails] = useState(false);
     const [stockedLots, setStockedLots] = useState(STOCKED_LOTS);
     const [isCreatingStock, setIsCreatingStock] = useState(false);
-
+    const code_societe = React.searchParams.get("id")
+    console.log("this is code", "code_societe")
     const handleViewDetails = (lot) => {
         setSelectedLot(lot);
         setIsViewingDetails(true);
     };
 
-    const handleStore = (newLot) => {
-        setStockedLots((prev) => [newLot, ...prev]);
-    };
 
+    async function loadInitialData() {
+        try {
+            const [allData] = await Promise.all([
+                fetchData("get", `cafe/usinages/quantites_usinage/`, { params: { offset: 0, limit: 150 } })
+            ]);
+            console.log(allData)
+            setFormData(pre => ({
+                ...pre,
+                societe: allData?.societe?.nom || "",
+                selectedSDLs: allData?.results?.sdls_list || [],
+                humidite: allData?.humidite || "",
+                rendement: allData?.rendement || "",
+                sacsCount: allData?.sacs_count || "",
+                poidsBrut: allData?.poids_brut || "",
+                poidsTare: allData?.poids_tare || "",
+                dateReception: allData?.date_reception || "",
+                grades: allData?.transferts?.[0]?.details[0] || {},
+                gradeSDLs: allData?.gradeSDLs || {}
+            }))
+
+
+        } catch (err) {
+            console.error("Error loading initial data:", err);
+        }
+    }
+    useEffect(() => {
+        loadInitialData();
+    }, []);
     return (
         <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
             <div className="p-6 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">

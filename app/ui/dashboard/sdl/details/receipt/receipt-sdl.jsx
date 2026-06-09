@@ -67,10 +67,10 @@ export default function ReceiptSdlCt({ data }) {
               <DropdownMenuSeparator />
 
               <div>
-                <DetailsReceipt />
+                <DetailsReceipt data={transfer} />
               </div>
 
-              <div>
+              {/* <div>
                 <EditReceipts
                   from_sdl={transfer.from_sdl}
                   to_sdl_destination_name={transfer.to_sdl_destination_name}
@@ -79,7 +79,7 @@ export default function ReceiptSdlCt({ data }) {
                   qte_tranferer={transfer.qte_tranferer}
                   photo_fiche={transfer.photo_fiche}
                 />
-              </div>
+              </div> */}
             </DropdownMenuContent>
           </DropdownMenu>
         );

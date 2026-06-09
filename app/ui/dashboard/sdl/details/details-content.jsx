@@ -38,23 +38,23 @@ import Rapports from "./rapports";
 import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
 
 function DetailsContent({ id }) {
-  const transferData = [
-    {
-      id: "cultivator_001",
-      from_sdl: "Ngome",
-      to_depulpeur_name: "NGANE",
-      society: "ODECA",
-      qte_tranferer: {
-        ca: 78452,
-        cb: 741,
-      },
-      photo_fiche: "/images/logo_1.jpg",
-      localite: {
-        province: "Buja",
-        commune: "Ntahangwa",
-      },
-    },
-  ];
+  // const transferData = [
+  //   {
+  //     id: "cultivator_001",
+  //     from_sdl: "Ngome",
+  //     to_depulpeur_name: "NGANE",
+  //     society: "ODECA",
+  //     qte_tranferer: {
+  //       ca: 78452,
+  //       cb: 741,
+  //     },
+  //     photo_fiche: "/images/logo_1.jpg",
+  //     localite: {
+  //       province: "Buja",
+  //       commune: "Ntahangwa",
+  //     },
+  //   },
+  // ];
 
   const [tab, setTab] = useState("cultivators");
 
@@ -65,7 +65,8 @@ function DetailsContent({ id }) {
     React.useState([]);
   const [associationCultivatorsData, setAssociationCultivatorsData] =
     React.useState([]);
-
+  const [transferData, setTransferData] = React.useState([]);
+  const [receptionSdl, setReceptionSdl] = React.useState([]);
   // Cultivators Pagination
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
@@ -101,7 +102,6 @@ function DetailsContent({ id }) {
         },
       );
       const results = response?.results;
-      console.log("results", results);
       const formatData = (achats) => ({
         id: achats?.id,
         in_payment: achats?.in_payment,
@@ -227,7 +227,6 @@ function DetailsContent({ id }) {
 
       }));
       setAssociationCultivatorsData(cultivatorsData);
-      console.log("associationCultivatorsData", cultivatorsData);
 
       setTotalCount(response?.count);
     } catch (error) {
@@ -241,15 +240,74 @@ function DetailsContent({ id }) {
         "get",
         `cafe/stationslavage/${id}/get_transferts/`,
         {
-          params: { limit: 1000, offset: 0 },
+          params: {},
         },
       );
-      // Transfer logic placeholder
+      const results = response?.results
+      console.log("results", results);
+      const transferData = results?.map((transfer) => ({
+        id: transfer?.id,
+        code: transfer?.transfer?.sdl?.sdl_code,
+        date_transfert: transfer?.transfer?.transfer_date,
+        from_sdl: transfer?.transfer?.sdl?.sdl_nom,
+        society: transfer?.transfer?.sdl?.societe?.nom_societe,
+        qte_total_tranferer: transfer?.quantite,
+        qte_tranferer: {
+          ca: transfer?.quantite,
+          cb: transfer?.quantite_cerise_b,
+        },
+        photo_fiche: transfer?.transfer?.photo_bordereau,
+        localite: {
+          province:
+            transfer?.transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
+              ?.province_name,
+          commune:
+            transfer?.transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
+        },
+        usine: {
+          name: transfer?.transfer?.usine_deparchage?.usine_name,
+        },
+      }));
+      setTransferData(transferData);
     } catch (error) {
       console.error("Error fetching transfers data:", error);
     }
   };
-
+  const getReceptionSdl = async () => {
+    try {
+      const response = await fetchData(
+        "get",
+        `cafe/stationslavage/${id}/get_transferts_recus/`,
+        {
+          params: {},
+        },
+      );
+      const results = response?.results;
+      const transferData = results?.map((transfer) => ({
+        id: transfer?.id,
+        code: transfer?.ct?.ct_code,
+        from_sdl: transfer?.ct?.ct_nom,
+        society: transfer?.ct?.sdl?.societe?.nom_societe,
+        date_transfert: transfer?.enregitrement_date,
+        qte_total_tranferer: transfer?.qte_total_tranferer,
+        qte_tranferer: {
+          ca: transfer?.quantite_cerise_a,
+          cb: transfer?.quantite_cerise_b,
+        },
+        photo_fiche: transfer.photo_bordereau,
+        localite: {
+          province:
+            transfer.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
+              ?.province_name,
+          commune:
+            transfer.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
+        },
+      }));
+      setReceptionSdl(transferData);
+    } catch (error) {
+      console.error("Error fetching transfers data:", error);
+    }
+  };
   // ── Export functions filtrées par SDL ──────────────────────────────────────
   const buildXlsx = (rows, sheetName, filename) => {
     const ws = XLSX.utils.json_to_sheet(rows);
@@ -360,6 +418,9 @@ function DetailsContent({ id }) {
     }
     if (tab === "transferSdl") {
       getTransfers();
+    }
+    if (tab === "receptionSdl") {
+      getReceptionSdl();
     }
   }, [cultivateur_type, limit, pointer, tab]);
   const totalPages = Math.ceil(totalCount / limit);
@@ -631,19 +692,19 @@ function DetailsContent({ id }) {
                 },
               ]}
             />
-            <ComingSoonOverlay transparent={true} />
+            {/* <ComingSoonOverlay transparent={true} /> */}
           </div>
         </TabsContent>
         <TabsContent value="transferSdl">
           <div className="relative w-full h-full overflow-hidden">
             <TransferSdlDep data={transferData} />
-            <ComingSoonOverlay transparent={true} />
+            {/* <ComingSoonOverlay transparent={true} /> */}
           </div>
         </TabsContent>
         <TabsContent value="receptionSdl">
           <div className="relative w-full h-full overflow-hidden">
-            <ReceiptSdlCt data={transferData} />
-            <ComingSoonOverlay transparent={true} />
+            <ReceiptSdlCt data={receptionSdl} />
+            {/* <ComingSoonOverlay transparent={true} /> */}
           </div>
         </TabsContent>
 

@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowRightLeft, Building2, Factory } from "lucide-react";
+import { ArrowRightLeft, Building2, Factory, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import TransferSdlDep from "@/app/ui/dashboard/stocks/transfers/components/sdl-transfers/transfer-sdl";
 import TransferCtDep from "@/app/ui/dashboard/stocks/transfers/components/ct-transfers/transfer-ct";
 import { fetchData } from "@/app/_utils/api";
@@ -15,6 +16,7 @@ export default function TransfersPage() {
   const [ctTransfers, setCtTransfers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("sdl");
+  const [searchvalue, setSearchValue] = useState("");
 
   // Shared Pagination states
   const [limit, setLimit] = useState(10);
@@ -28,7 +30,7 @@ export default function TransfersPage() {
       try {
         if (activeTab === "sdl") {
           const response = await fetchData("get", "cafe/transfert_sdl_usine/", {
-            params: { limit: limit, offset: pointer },
+            params: { limit: limit, offset: pointer, search: searchvalue },
           });
           const results = response?.results || [];
           const mappedSdlTransfers = results.map((transfer) => ({
@@ -40,7 +42,7 @@ export default function TransfersPage() {
             qte_tranferer: {
               ca: transfer?.total_parche,
             },
-            photo_fiche: transfer.photo_fiche,
+            photo_fiche: transfer.photo_bordereau,
             localite: {
               province:
                 transfer.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
@@ -53,11 +55,12 @@ export default function TransfersPage() {
           setTotalCount(response?.count || 0);
         } else {
           const response_ct_sdl = await fetchData("get", "cafe/transfer_ct_sdl/", {
-            params: { limit: limit, offset: pointer },
+            params: { limit: limit, offset: pointer, search: searchvalue },
           });
           const results2 = response_ct_sdl.results || [];
           const mappedCtTransfers = results2.map((transfer) => ({
             id: transfer.id,
+            transfer_sdl_ct_code: transfer?.transfer_ct_sdl_code,
             from_ct: transfer.ct?.ct_nom || "Inconnu",
             to_depulpeur_name: transfer.sdl?.sdl_nom || "Inconnu",
             society: transfer.sdl?.societe?.nom_societe,
@@ -87,7 +90,7 @@ export default function TransfersPage() {
     };
 
     fetchDataForActiveTab();
-  }, [activeTab, limit, pointer]);
+  }, [activeTab, limit, pointer, searchvalue]);
 
   const datapagination = {
     totalCount: totalCount,
@@ -114,10 +117,19 @@ export default function TransfersPage() {
     setTotalCount(0);
   };
 
+  useEffect(() => {
+    setPointer(0);
+    setCurrentPage(1);
+  }, [searchvalue]);
+
+  const handleSearch = (value) => {
+    setSearchValue(value);
+  };
+
   return (
     <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE, ROLES.SUPERVISEUR_REGIONAL, ROLES.SUPERVISEUR]}>
       <div className="p-4 space-y-4 relative">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <h1 className="text-2xl font-bold">Gestion des Transferts</h1>
         </div>
 
@@ -150,7 +162,7 @@ export default function TransfersPage() {
                 <TransferSdlDep data={sdlTransfers} datapagination={datapagination} />
               )}
             </div>
-            <ComingSoonOverlay transparent={true} />
+            {/* <ComingSoonOverlay transparent={true} /> */}
           </TabsContent>
 
           <TabsContent value="ct" className="space-y-4">
@@ -166,7 +178,7 @@ export default function TransfersPage() {
               {loading ? (
                 <TableSkeleton rows={5} columns={5} />
               ) : (
-                <TransferCtDep data={ctTransfers} datapagination={datapagination} />
+                <TransferCtDep data={ctTransfers} datapagination={datapagination} search={handleSearch} />
               )}
             </div>
           </TabsContent>

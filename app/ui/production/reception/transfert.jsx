@@ -25,6 +25,7 @@ import { CheckCircle2, Clock, Layers, MoreHorizontal, Settings, Trash2, Percent,
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
+import { fetchData } from "@/app/_utils/api";
 export default function Transferts() {
     const [activeTab, setActiveTab] = useState("all");
     const [isFinalizing, setIsFinalizing] = useState(false);
@@ -66,6 +67,21 @@ export default function Transferts() {
         "SDL Karusi": ["A2", "B2", "CAFE Miel"],
     };
     const [activeGrades, setActiveGrades] = useState(Array.from(new Set(Object.values(gradesBySDL).flat())));
+    async function loadInitialData() {
+        try {
+            const [allData] = await Promise.all([
+                fetchData("get", `cafe/transfert_sdl_usine/`, { params: { offset: 0, limit: 150 } })
+            ]);
+            CONST
+
+
+        } catch (err) {
+            console.error("Error loading initial data:", err);
+        }
+    }
+    React.useEffect(() => {
+        loadInitialData();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -122,7 +138,7 @@ export default function Transferts() {
 
                                                         </Link>
                                                     )}
-                                                    <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem>
+                                                    {/* <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem> */}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>

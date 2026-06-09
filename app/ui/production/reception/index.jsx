@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from 'react'
 import ProtectedRoute from '../../protection/ProtectedRoute';
 import { ROLES } from "@/lib/permissions";
-import { Inbox, CheckCircle2, Clock, MoreHorizontal, PlusCircle, Layers, Settings } from 'lucide-react';
+import { Inbox, CheckCircle2, Clock, MoreHorizontal, PlusCircle, Layers, Settings, Search } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetchData } from '@/app/_utils/api';
+import { TableRowsSkeleton } from "@/components/ui/skeletons";
 import {
     Pagination,
     PaginationEllipsis,
@@ -67,22 +69,110 @@ const DEFAULT_RECEPTIONS = [
 
 export default function ReceptionPage() {
     const [activeTab, setActiveTab] = useState("all");
-    const [receptionsList, setReceptionsList] = useState([]);
+    const [receptionsEnAttenteList, setReceptionsEnAttenteList] = useState([]);
+    const [receptionsConfirmeList, setReceptionsConfirmeList] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [showDateReception, setShowDateReception] = useState("");
+
+    // Pagination state
+    const [totalCount, setTotalCount] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(5);
+    const [pointer, setPointer] = useState(0);
+
+    const handleTabChange = (val) => {
+        setActiveTab(val);
+        setPointer(0);
+        setCurrentPage(1);
+    };
+
+    const loadDataForTab = async (tab) => {
+        setLoading(true);
+        try {
+            if (tab === "all") {
+                const [pendingRes, confirmedRes] = await Promise.all([
+                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit } }),
+                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit } })
+                ]);
+                console.log(pendingRes)
+                const pendingMapped = pendingRes?.results?.map((item) => ({
+                    id: item?.id,
+                    societe: item?.sdl?.societe?.nom_societe || "Inconnu",
+                    sdls: item?.sdl?.sdl_nom || [],
+                    dateTransfert: item?.transfer_date || "-",
+                    dateReception: "-",
+                    poidsNet: item?.total_parche || 0,
+                    status: "en attente",
+                })) || [];
+
+                const confirmedMapped = confirmedRes?.results?.map((item) => ({
+                    id: item?.id,
+                    societe: item?.sdl?.societe?.nom_societe || "Inconnu",
+                    sdls: item?.sdl?.sdl_nom || [],
+                    dateTransfert: item?.transfer_date || "-",
+                    dateReception: item?.date_reception ? new Date(item.date_reception).toISOString().split('T')[0] : "-",
+                    poidsNet: item?.total_parche || 0,
+                    status: "confirmé",
+                })) || [];
+
+                setReceptionsEnAttenteList(pendingMapped);
+                setReceptionsConfirmeList(confirmedMapped);
+                console.log(confirmedRes)
+                setTotalCount((pendingRes?.count || 0) + (confirmedRes?.count || 0));
+            } else if (tab === "en attente") {
+                const pendingRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit } });
+                const pendingMapped = pendingRes?.results?.map((item) => ({
+                    id: item?.id,
+                    societe: item?.sdl?.societe?.nom_societe || "Inconnu",
+                    sdls: item?.sdl?.sdl_nom || [],
+                    dateTransfert: item?.transfer_date || "-",
+                    dateReception: "-",
+                    poidsNet: item?.total_parche || 0,
+                    status: "en attente",
+                })) || [];
+                setReceptionsEnAttenteList(pendingMapped);
+                setTotalCount(pendingRes?.count || 0);
+            } else if (tab === "confirmé") {
+                const confirmedRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit } });
+                const confirmedMapped = confirmedRes?.results?.map((item) => ({
+                    id: item?.id,
+                    societe: item?.sdl?.societe?.nom_societe || "Inconnu",
+                    sdls: item?.sdl?.sdl_nom || [],
+                    dateTransfert: item?.transfer_date || "-",
+                    dateReception: item?.date_reception ? new Date(item.date_reception).toISOString().split('T')[0] : "-",
+                    poidsNet: item?.total_parche || 0,
+                    status: "confirmé",
+                })) || [];
+                setReceptionsConfirmeList(confirmedMapped);
+                setTotalCount(confirmedRes?.count || 0);
+            }
+        } catch (error) {
+            console.error(`Error fetching data for tab ${tab}:`, error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const stored = localStorage.getItem("odeca_receptions");
-        if (stored) {
-            setReceptionsList(JSON.parse(stored));
-        } else {
-            setReceptionsList(DEFAULT_RECEPTIONS);
-            localStorage.setItem("odeca_receptions", JSON.stringify(DEFAULT_RECEPTIONS));
-        }
-    }, []);
+        loadDataForTab(activeTab);
+    }, [activeTab, pointer, limit]);
 
-    const filteredReceptions = receptionsList.filter((lot) => {
-        if (activeTab === "all") return true;
-        return lot.status.toLowerCase() === activeTab.toLowerCase();
-    });
+    const onPageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        setPointer((pageNumber - 1) * limit);
+    };
+
+    const onLimitChange = (newLimit) => {
+        setLimit(newLimit);
+        setPointer(0);
+        setCurrentPage(1);
+    };
+
+    const filteredReceptions = activeTab === "all"
+        ? [...receptionsEnAttenteList, ...receptionsConfirmeList]
+        : activeTab === "en attente"
+            ? receptionsEnAttenteList
+            : receptionsConfirmeList;
 
     return (
         <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
@@ -101,27 +191,36 @@ export default function ReceptionPage() {
                 </div>
 
                 <div className="w-full bg-card rounded-md p-2">
-                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                         <TabsList className="flex w-full overflow-x-auto justify-start h-10 p-1 bg-slate-100 dark:bg-slate-900 select-none mb-4 gap-1">
                             <TabsTrigger value="all" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer">
                                 <Layers className="h-3.5 w-3.5 text-slate-500" />
-                                <span>Tous ({receptionsList.length})</span>
+                                <span>Tous ({receptionsEnAttenteList.length + receptionsConfirmeList.length})</span>
                             </TabsTrigger>
                             <TabsTrigger value="en attente" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer">
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                                 </span>
-                                <span>En attente ({receptionsList.filter(r => r.status === "en attente").length})</span>
+                                <span>En attente ({receptionsEnAttenteList.length})</span>
                             </TabsTrigger>
                             <TabsTrigger value="confirmé" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer">
                                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                                <span>Confirmé ({receptionsList.filter(r => r.status === "confirmé").length})</span>
+                                <span>Confirmé ({receptionsConfirmeList.length})</span>
                             </TabsTrigger>
                         </TabsList>
                     </Tabs>
 
-                    <div className="w-full overflow-x-auto mt-2">
+                    <div className="w-full overflow-x-auto mt-1.5">
+                        <div className="relative mb-2 ml-2">
+                            <Search className="h-4 w-4 absolute inset-y-0 my-auto left-2.5 " />
+                            <input
+                                placeholder="Rechercher..."
+                                // value={search}
+                                // onChange={handleSearch}
+                                className="pl-9 h-9 text-sm flex-1 shadow-none w-[300px] lg:w-[350px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
+                            />
+                        </div>
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -134,15 +233,17 @@ export default function ReceptionPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredReceptions.length === 0 ? (
+                                {loading ? (
+                                    <TableRowsSkeleton columns={6} rows={5} />
+                                ) : filteredReceptions.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={6} className="text-center py-8 text-slate-500 dark:text-slate-400 font-medium">
                                             Aucun lot trouvé avec ce statut.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    filteredReceptions.map((lot) => (
-                                        <TableRow className="odd:bg-muted/50" key={lot.id}>
+                                    filteredReceptions.map((lot, index = 0) => (
+                                        <TableRow className="odd:bg-muted/50" key={index + 1}>
                                             <TableCell className="pl-4 font-medium">
                                                 <div className="flex items-center gap-2">
                                                     <DropdownMenu>
@@ -153,7 +254,8 @@ export default function ReceptionPage() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align='start'>
                                                             {lot.status === "en attente" ? (
-                                                                <Link href={`/odeca-production/usine/reception/confirmation/?id=${lot.id}&societe=${encodeURIComponent(lot.societe)}&sdls=${encodeURIComponent(lot.sdls.join(","))}&poidsNet=${lot.poidsNet}&date=${lot.dateReception}`}>
+
+                                                                <Link href={`/odeca-production/usine/reception/confirmation/?id=${lot.id}&societe=${encodeURIComponent(lot.societe)}&sdls=${encodeURIComponent(lot.sdls)}&poidsNet=${lot.poidsNet}&date=${lot.dateReception}`}>
                                                                     <DropdownMenuItem className="cursor-pointer">Confirmer</DropdownMenuItem>
                                                                 </Link>
                                                             ) : (
@@ -163,7 +265,7 @@ export default function ReceptionPage() {
                                                                     </Button>
                                                                 </Link>
                                                             )}
-                                                            <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem>
+                                                            {/* <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem> */}
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </div>
@@ -173,14 +275,14 @@ export default function ReceptionPage() {
                                                     {lot.societe}
                                                 </span>
                                                 <div className="flex flex-wrap gap-1">
-                                                    {lot.sdls.map((sdl) => (
-                                                        <span
-                                                            key={sdl}
-                                                            className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
-                                                        >
-                                                            {sdl}
-                                                        </span>
-                                                    ))}
+
+                                                    <span
+                                                        key={lot.id}
+                                                        className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
+                                                    >
+                                                        {lot.sdls || "-"}
+                                                    </span>
+
                                                 </div>
                                             </div></TableCell>
                                             <TableCell>{lot.dateTransfert}</TableCell>
@@ -236,14 +338,14 @@ export default function ReceptionPage() {
                     </Pagination> */}
 
                     <PaginationContent
-                    // datapaginationlimit={() => { }}
-                    // currentPage={datapagination.currentPage}
-                    // totalPages={datapagination.totalPages}
-                    // onPageChange={datapagination.onPageChange}
-                    // pointer={datapagination.pointer}
-                    // totalCount={datapagination.totalCount}
-                    // onLimitChange={datapagination.onLimitChange}
-                    // limit={datapagination.limit}
+                        datapaginationlimit={() => { }}
+                        currentPage={currentPage}
+                        totalPages={Math.ceil(totalCount / limit)}
+                        onPageChange={onPageChange}
+                        pointer={pointer}
+                        totalCount={totalCount}
+                        onLimitChange={onLimitChange}
+                        limit={limit}
                     />
                 </div>
             </div>

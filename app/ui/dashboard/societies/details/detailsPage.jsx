@@ -30,7 +30,7 @@ function DetailsPage() {
           <DetailsContent id={id} />
         </div>
       </div>
-      <ComingSoonOverlay transparent={true} />
+      {/* <ComingSoonOverlay transparent={true} /> */}
     </div>
   );
 }

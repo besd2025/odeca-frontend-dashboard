@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import OutputForm from "./OutputForm";
 import ProcessingList from "./ProcessingList";
 import InputForm from "./InputForm";
-
+import { fetchData } from "@/app/_utils/api";
 const INITIAL_LOTS = [
     {
         id: "LOT-2026-001",
@@ -60,7 +60,19 @@ export default function UsinagePage() {
     const [activeLot, setActiveLot] = useState(null);
     const [isFinalizing, setIsFinalizing] = useState(false);
     const [isViewingDetails, setIsViewingDetails] = useState(false);
-
+    const [formData, setFormData] = useState({
+        id: "",
+        societe: "",
+        selectedSDLs: [],
+        humidite: "",
+        rendement: "",
+        sacsCount: "",
+        poidsBrut: "",
+        poidsTare: "",
+        dateReception: "",
+        grades: {},
+        gradeSDLs: {}
+    });
     const handleAddLot = (newLot) => {
         // Generate a unique sequential ID
         const lotId = `USID-2026-${String(lots.length + 1).padStart(3, "0")}`;
@@ -71,6 +83,36 @@ export default function UsinagePage() {
         };
         setLots((prev) => [lotWithId, ...prev]);
     };
+
+
+    async function loadInitialData() {
+        try {
+            const [allData] = await Promise.all([
+                fetchData("get", `cafe/usinages/quantites_usinage/`, { params: { offset: 0, limit: 150 } })
+            ]);
+            console.log(allData)
+            setFormData(pre => ({
+                ...pre,
+                societe: allData?.societe?.nom || "",
+                selectedSDLs: allData?.results?.sdls_list || [],
+                humidite: allData?.humidite || "",
+                rendement: allData?.rendement || "",
+                sacsCount: allData?.sacs_count || "",
+                poidsBrut: allData?.poids_brut || "",
+                poidsTare: allData?.poids_tare || "",
+                dateReception: allData?.date_reception || "",
+                grades: allData?.transferts?.[0]?.details[0] || {},
+                gradeSDLs: allData?.gradeSDLs || {}
+            }))
+
+
+        } catch (err) {
+            console.error("Error loading initial data:", err);
+        }
+    }
+    React.useEffect(() => {
+        loadInitialData();
+    }, []);
 
     const handleFinalizeLot = (lot) => {
         setActiveLot(lot);
