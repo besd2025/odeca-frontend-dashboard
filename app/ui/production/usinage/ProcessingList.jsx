@@ -265,6 +265,7 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
                         <InputForm
                           id={lot.id}
                           code_societe={lot.code_societe}
+                          societe={lot.societe}
                         />
                       )}
                     </TableCell>

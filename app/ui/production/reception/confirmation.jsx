@@ -85,7 +85,7 @@ export default function ConfirmationPage() {
         return acc;
       }, {})
     }));
-    console.log(formData)
+
   }, [lotId]);
 
   // Calculate weights on the fly to avoid cascading state renders
