@@ -177,7 +177,6 @@ export default function Grades() {
             nombre_sac: formData.sacsCount,
             comfiramtion_status: "CONFIRMEE"
         }
-        console.log(dataform)
         if (!formData.gradeId || !formData.humidite || !formData.poidsBrut || !formData.poidsTare || !formData.sacsCount) {
             toast.error("Veuillez remplir tous les champs");
             setLoading(false);
