@@ -28,6 +28,7 @@ const initialLabAnalyses = [
     sampleId: "ECH-2026-001",
     transfertEchantillon: "Par coursier Ngozi",
     lotNumber: "LOT-2026-001",
+    qualite: "15+",
     qteEchantillon: 15.0,
     sacsCount: 150,
     societe: "COCOCA",
@@ -42,6 +43,7 @@ const initialLabAnalyses = [
     sampleId: "ECH-2026-002",
     transfertEchantillon: "Chauffeur ODECA",
     lotNumber: "LOT-2026-002",
+    qualite: "FWTT",
     qteEchantillon: 24.5,
     sacsCount: 200,
     societe: "KAWASE COFFEE",
@@ -66,6 +68,7 @@ const initialLabAnalyses = [
     sampleId: "ECH-2026-003",
     transfertEchantillon: "Coursier Kayanza",
     lotNumber: "LOT-2026-003",
+    qualite: "TT",
     qteEchantillon: 8.5,
     sacsCount: 85,
     societe: "KIBIRA COFFEE",
@@ -311,6 +314,7 @@ export default function GranulometrieComponent() {
                         <TableHead>Code Étiquette</TableHead>
                         <TableHead>Numéro de Lot</TableHead>
                         <TableHead>Société</TableHead>
+                        <TableHead>Qualité</TableHead>
                         <TableHead className="text-right">Quantité (kg)</TableHead>
                         <TableHead>Date Réception</TableHead>
                         <TableHead>Réceptionniste</TableHead>
@@ -340,6 +344,7 @@ export default function GranulometrieComponent() {
                           <TableCell className="font-mono font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">{item.codeEtiquette}</TableCell>
                           <TableCell className="font-bold text-slate-700 dark:text-slate-300">{item.lotNumber}</TableCell>
                           <TableCell>{item.societe}</TableCell>
+                          <TableCell>{item.qualite}</TableCell>
                           <TableCell className="text-right font-semibold">{item.qteEchantillon.toFixed(2)} kg</TableCell>
                           <TableCell className="text-xs text-slate-500">{item.dateReception}</TableCell>
                           <TableCell className="text-xs">{item.receptionniste}</TableCell>
@@ -456,7 +461,7 @@ export default function GranulometrieComponent() {
 
           {selectedAnalysis && (
             <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-              
+
               {/* Prefilled Analysis Info */}
               <div className="grid grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
                 <div>
@@ -470,6 +475,10 @@ export default function GranulometrieComponent() {
                 <div>
                   <span className="text-slate-400 block font-semibold uppercase">Société</span>
                   <span className="font-semibold">{selectedAnalysis.societe}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block font-semibold uppercase">Qualité</span>
+                  <span className="font-semibold">{selectedAnalysis.qualite}</span>
                 </div>
                 <div>
                   <span className="text-slate-400 block font-semibold uppercase">Quantité reçue</span>
