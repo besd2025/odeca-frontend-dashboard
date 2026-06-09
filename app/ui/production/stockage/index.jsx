@@ -88,6 +88,10 @@ export default function StockagePage() {
         setIsViewingDetails(true);
     };
 
+    const handleStore = (newLot) => {
+        setStockedLots((prev) => [newLot, ...prev]);
+    };
+
     return (
         <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
             <div className="p-6 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
@@ -111,7 +115,7 @@ export default function StockagePage() {
                 <Dialog open={isCreatingStock} onOpenChange={setIsCreatingStock}>
                     <DialogContent className="sm:max-w-2xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto ">
 
-                        <StockageForm selectedLot={selectedLot} onCancel={() => setIsCreatingStock(false)} />
+                        <StockageForm onCancel={() => setIsCreatingStock(false)} onStore={handleStore} />
                     </DialogContent>
                 </Dialog>
 
