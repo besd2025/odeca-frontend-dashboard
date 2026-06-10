@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
 import { ROLES } from "@/lib/permissions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,7 +11,7 @@ import StockedList from "./StockedList";
 import RetourList from "../echantillonnage/retours/RetourList";
 import StockageForm from "./StockageForm";
 import { Button } from "@/components/ui/button";
-import { fetchData } from "@/lib/api";
+import { fetchData } from "@/app/_utils/api";
 // ---------- Mock data ----------
 
 const STOCKED_LOTS = [
@@ -78,15 +79,23 @@ const RETOUR_LOTS = [
 ];
 
 export default function StockagePage() {
+    const searchParams = useSearchParams();
     const [selectedLot, setSelectedLot] = useState(null);
     const [isViewingDetails, setIsViewingDetails] = useState(false);
     const [stockedLots, setStockedLots] = useState(STOCKED_LOTS);
     const [isCreatingStock, setIsCreatingStock] = useState(false);
-    const code_societe = React.searchParams.get("id")
-    console.log("this is code", "code_societe")
+    const [formData, setFormData] = useState({});
+    const code_societe = searchParams.get("id");
+    console.log("this is code", code_societe);
+
     const handleViewDetails = (lot) => {
         setSelectedLot(lot);
         setIsViewingDetails(true);
+    };
+
+    const handleStore = () => {
+        // Add store logic here
+        setIsCreatingStock(false);
     };
 
 

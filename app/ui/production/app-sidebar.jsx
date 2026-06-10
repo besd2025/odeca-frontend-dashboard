@@ -161,7 +161,7 @@ const menuItems = {
           icon: Sliders,
         },
         {
-          title: "Torréfaction & Cupping",
+          title: "Torréfaction & Degustation",
           url: "/odeca-production/laboratoire/cupping",
           icon: Coffee,
         },

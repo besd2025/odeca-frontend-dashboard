@@ -277,8 +277,8 @@ export default function GranulometrieComponent() {
 
       <Tabs defaultValue="pending" className="">
         <TabsList className="grid grid-cols-2 w-full">
-          <TabsTrigger value="pending">En attente d'analyse</TabsTrigger>
-          <TabsTrigger value="history">Historique</TabsTrigger>
+          <TabsTrigger value="pending">Pret pour l'analyse</TabsTrigger>
+          <TabsTrigger value="history">Status des analyses</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending">
@@ -331,11 +331,11 @@ export default function GranulometrieComponent() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='start'>
-                                <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => handleOpenModal(item)}>
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenModal(item)}>
                                   Saisir Granulométrie
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 font-semibold" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
+                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
                                   Rejeter
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
@@ -364,7 +364,7 @@ export default function GranulometrieComponent() {
             <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 p-6">
               <div>
                 <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                  <Clipboard className="h-5 w-5 text-primary" /> 📋 Analyses Granulométriques Archivées
+                  <Clipboard className="h-5 w-5 text-primary" /> Analyses Granulométriques
                 </CardTitle>
                 <CardDescription className="text-slate-500 dark:text-slate-400">
                   Historique des calibres physiques calculés par échantillon anonyme.
@@ -389,6 +389,8 @@ export default function GranulometrieComponent() {
                       <TableRow>
                         <TableHead className="pl-6 w-16">Action</TableHead>
                         <TableHead>Code Étiquette</TableHead>
+                        <TableHead>Qualite</TableHead>
+                        <TableHead>Société</TableHead>
                         <TableHead>Poids (g)</TableHead>
                         <TableHead>7.1 mm</TableHead>
                         <TableHead>6.3 mm</TableHead>
@@ -411,16 +413,24 @@ export default function GranulometrieComponent() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='start'>
-                                <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => {
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => {
                                   setSelectedDetailItem(item);
                                   setIsDetailModalOpen(true);
                                 }}>
                                   Détails
                                 </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                {item.status === "granulometrie_complete" && (
+                                  <DropdownMenuItem className="cursor-pointer text-primary" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
+                                    Triage manuel
+                                  </DropdownMenuItem>
+                                )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
                           <TableCell className="font-mono font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">{item.codeEtiquette}</TableCell>
+                          <TableCell className={`text-destructive`}>{item.qualite}</TableCell>
+                          <TableCell>{item.societe}</TableCell>
                           <TableCell className="font-medium">{item.granulometrie.quantite} g</TableCell>
                           <TableCell className="text-slate-600 dark:text-slate-400">{item.granulometrie.sieve_7_1.toFixed(2)} %</TableCell>
                           <TableCell className="text-slate-600 dark:text-slate-400">{item.granulometrie.sieve_6_3.toFixed(2)} %</TableCell>
@@ -431,9 +441,9 @@ export default function GranulometrieComponent() {
                           <TableCell className="text-xs text-slate-500 whitespace-nowrap">{item.granulometrie.date}</TableCell>
                           <TableCell className="pr-6">
                             {item.status === "granulometrie_complete" ? (
-                              <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[10px]">En attente Triage</Badge>
+                              <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[10px]">Analyse terminée</Badge>
                             ) : (
-                              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[10px]">Triage Effectué</Badge>
+                              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[10px]">Analyse en cours</Badge>
                             )}
                           </TableCell>
                         </TableRow>
@@ -579,6 +589,10 @@ export default function GranulometrieComponent() {
                   <span className="font-semibold">{selectedDetailItem.societe}</span>
                 </div>
                 <div>
+                  <span className="text-slate-400 block font-uppercase font-semibold">Qualité</span>
+                  <span className=" text-secondary text-lg">{selectedDetailItem.qualite}</span>
+                </div>
+                <div>
                   <span className="text-slate-400 block font-uppercase font-semibold">Quantité reçue</span>
                   <span className="font-semibold">{selectedDetailItem.qteEchantillon.toFixed(2)} kg</span>
                 </div>
@@ -610,7 +624,7 @@ export default function GranulometrieComponent() {
                   ].map((sieve) => (
                     <div key={sieve.label} className="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-900 text-center">
                       <span className="text-[10px] text-slate-400 block font-semibold uppercase">{sieve.label}</span>
-                      <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200">{sieve.value.toFixed(2)} %</span>
+                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{sieve.value.toFixed(2)} %</span>
                     </div>
                   ))}
                 </div>
@@ -626,9 +640,9 @@ export default function GranulometrieComponent() {
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400">Statut suivant</span>
                 {selectedDetailItem.status === "granulometrie_complete" ? (
-                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">En attente Triage</Badge>
+                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">Analyse terminée</Badge>
                 ) : (
-                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Triage Effectué</Badge>
+                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Analyse en cours</Badge>
                 )}
               </div>
 

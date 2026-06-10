@@ -21,6 +21,7 @@ const INITIAL_LOTS = [
     dateSortie: "2026-05-20",
     status: "Trié & Stocké",
     taxationQuantities: { "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
+    remainingQuantities: { "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
   },
   {
     id: "TRI-2026-002",
@@ -57,6 +58,7 @@ const INITIAL_LOTS = [
     dateEntree: "2026-05-28",
     dateSortie: "2026-05-28",
     status: "Trié & Stocké (Direct)",
+    remainingQuantities: { "W ABC": 3 },
   },
 ];
 
@@ -112,11 +114,17 @@ export default function TriagePage() {
     setLots((prev) =>
       prev.map((l) =>
         l.id === lot.id
-          ? { ...l, status: "Trié & Stocké (Direct)", dateEntree: today, dateSortie: today }
+          ? {
+              ...l,
+              status: "Trié & Stocké (Direct)",
+              dateEntree: today,
+              dateSortie: today,
+              remainingQuantities: { ...l.grades },
+            }
           : l
       )
     );
-    toast.success(`Lot ${lot.id} étiqueté et stocké directement.`);
+    toast.success(`Lot ${lot.id} étiqueté et disponible pour stockage direct.`);
   };
 
   // Open finalize dialog
@@ -134,11 +142,41 @@ export default function TriagePage() {
   // Save finalized triage data
   const handleSaveTriage = (lotId, outputData) => {
     setLots((prev) =>
-      prev.map((l) => (l.id === lotId ? { ...l, ...outputData } : l))
+      prev.map((l) => {
+        if (l.id === lotId) {
+          const updatedLot = { ...l, ...outputData };
+          // Initialize remainingQuantities from the taxationQuantities that were input
+          updatedLot.remainingQuantities = { ...outputData.taxationQuantities };
+          return updatedLot;
+        }
+        return l;
+      })
     );
     setIsFinalizing(false);
     setActiveLot(null);
-    toast.success("Triage validé et lot Trié & Stocké !");
+    toast.success("Triage validé et lot disponible pour stockage !");
+  };
+
+  // Handle stocking a grade
+  const handleStockGrade = (lotId, grade, bagsToStore, lotNumbers) => {
+    setLots((prevLots) =>
+      prevLots.map((l) => {
+        if (l.id === lotId) {
+          const sourceQuantities = l.status === "Trié & Stocké" ? l.taxationQuantities : l.grades;
+          const currentRemaining = l.remainingQuantities !== undefined ? l.remainingQuantities : { ...sourceQuantities };
+          const updatedRemaining = {
+            ...currentRemaining,
+            [grade]: Math.max(0, (currentRemaining[grade] || 0) - bagsToStore),
+          };
+          return {
+            ...l,
+            remainingQuantities: updatedRemaining,
+          };
+        }
+        return l;
+      })
+    );
+    toast.success(`Grade ${grade} enregistré en stockage sous le(s) numéro(s) de lot: ${lotNumbers.join(", ")}`);
   };
 
   return (
@@ -164,7 +202,9 @@ export default function TriagePage() {
           onLabelDirect={handleLabelDirect}
           onFinalize={handleFinalize}
           onViewDetails={handleViewDetails}
+          onStockGrade={handleStockGrade}
         />
+
 
         {/* Component 2a: Finalize triage dialog */}
         <Dialog open={isFinalizing} onOpenChange={setIsFinalizing}>
