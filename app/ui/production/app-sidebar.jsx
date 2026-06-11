@@ -174,6 +174,12 @@ const menuItems = {
       icon: Microscope,
       keyword: "odeca-production/laboratoire",
     },
+    {
+      title: "Commercialisation",
+      url: "/odeca-production/commercialisation",
+      icon: Package,
+      keyword: "odeca-production/commercialisation",
+    },
   ],
   user: {
     name: "admin",

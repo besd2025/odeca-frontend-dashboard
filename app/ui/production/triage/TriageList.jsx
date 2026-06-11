@@ -62,14 +62,14 @@ const STATUS_CONFIG = {
       </Badge>
     ),
   },
-  "Trié & Stocké (Direct)": {
+  "Trié & Tri non requis": {
     badge: (
       <Badge
         variant="outline"
         className="border-secondary/20 bg-secondary/10 text-secondary dark:bg-secondary/30 dark:text-secondary dark:border-secondary/30 flex items-center gap-1 whitespace-nowrap"
       >
         <PackageCheck className="h-3.5 w-3.5" />
-        Stocké (Direct)
+        Tri non requis
       </Badge>
     ),
   },
@@ -84,10 +84,10 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
   const getPretAStockerGrades = (lotsList) => {
     const list = [];
     lotsList.forEach((lot) => {
-      if (lot.status === "Trié & Stocké" || lot.status === "Trié & Stocké (Direct)") {
+      if (lot.status === "Trié & Stocké" || lot.status === "Trié & Tri non requis") {
         const sourceQuantities = lot.status === "Trié & Stocké" ? lot.taxationQuantities : lot.grades;
         const remaining = lot.remainingQuantities !== undefined ? lot.remainingQuantities : { ...sourceQuantities };
-        
+
         if (remaining) {
           Object.entries(remaining).forEach(([grade, qty]) => {
             const bags = parseInt(qty) || 0;
@@ -167,7 +167,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
   });
 
   const isStocked = (lot) =>
-    lot.status === "Trié & Stocké" || lot.status === "Trié & Stocké (Direct)";
+    lot.status === "Trié & Stocké" || lot.status === "Trié & Tri non requis";
   const isInProgress = (lot) => lot.status === "En cours de triage";
   const isReady = (lot) => lot.status === "Prêt à trier";
 
@@ -202,9 +202,9 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                 <CheckCircle2 className="h-3.5 w-3.5 text-indigo-500" />
                 <span>Trié ({lots.filter(l => l.status === "Trié & Stocké").length})</span>
               </TabsTrigger>
-              <TabsTrigger value="Trié & Stocké (Direct)" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
+              <TabsTrigger value="Trié & Tri non requis" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <PackageCheck className="h-3.5 w-3.5 text-violet-500" />
-                <span>Stocké (Direct) ({lots.filter(l => l.status === "Trié & Stocké (Direct)").length})</span>
+                <span>Tri non requis ({lots.filter(l => l.status === "Trié & Tri non requis").length})</span>
               </TabsTrigger>
               <TabsTrigger value="pret_a_stocker" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <PackageCheck className="h-3.5 w-3.5 text-violet-500" />
@@ -413,7 +413,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                                 onClick={() => onLabelDirect(lot)}
                                 className="h-8 text-xs flex items-center gap-1.5"
                               >
-                                <Tag className="h-3.5 w-3.5" /> Stocker(Direct)
+                                <Tag className="h-3.5 w-3.5" /> Tri non requis
                               </Button>
                             </div>
                           </DropdownMenuItem>
@@ -431,7 +431,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
       </CardContent>
 
       <Dialog open={!!stockingGrade} onOpenChange={(open) => !open && setStockingGrade(null)}>
-        <DialogContent className="sm:max-w-md bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
+        <DialogContent className="sm:max-w-xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <PackageCheck className="h-5 w-5 text-primary" /> Stocker le Grade
@@ -440,10 +440,10 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
               Définir les numéros de lot et les sacs pour le stockage. 1 lot = 320 sacs.
             </DialogDescription>
           </DialogHeader>
-          
+
           {stockingGrade && (
             <form onSubmit={handleConfirmStocking} className="space-y-4">
-              <div className="p-3 bg-primary/5 border border-primary/10 rounded-lg text-xs space-y-1">
+              <div className="p-3 bg-primary/5 border border-primary/10 rounded-lg text-sm space-y-1">
                 <div><span className="font-semibold text-primary">Lot d'origine:</span> {stockingGrade.lotId}</div>
                 <div><span className="font-semibold text-primary">Société:</span> {stockingGrade.societe}</div>
                 <div><span className="font-semibold text-primary">Grade:</span> {stockingGrade.grade}</div>
@@ -470,14 +470,14 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                   return (
                     <div key={i} className="space-y-1.5 border border-slate-100 dark:border-slate-800 p-2.5 rounded-lg bg-slate-50/50 dark:bg-slate-900/20">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                           Lot #{i + 1} ({bagsForThisLot} sacs)
                         </span>
                         <Badge variant="outline" className={isComplete ? "border-emerald-200 bg-emerald-50 text-emerald-700 text-[10px]" : "border-amber-200 bg-amber-50 text-amber-700 text-[10px]"}>
                           {isComplete ? "Complet" : "Incomplet"}
                         </Badge>
                       </div>
-                      <Label htmlFor={`lot-num-${i}`} className="text-[11px] text-slate-500">Numéro de Lot</Label>
+                      <Label htmlFor={`lot-num-${i}`} className="text-xs text-slate-500">Numéro de Lot</Label>
                       <Input
                         id={`lot-num-${i}`}
                         value={lotNumbers[i] || ""}

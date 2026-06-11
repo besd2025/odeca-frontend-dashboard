@@ -59,7 +59,7 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
           <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
             <AlertCircle className="h-8 w-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
             <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-              Aucun lot avec le statut "{activeTab === "Trié & Stocké (Direct)" ? "Stocké (Direct)" : activeTab}" pour le moment.
+              Aucun lot avec le statut "{activeTab === "Trié & Tri non requis" ? "Tri non requis" : activeTab}" pour le moment.
             </p>
           </div>
         ) : (

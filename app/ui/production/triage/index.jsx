@@ -20,8 +20,8 @@ const INITIAL_LOTS = [
     dateEntree: "2026-05-18",
     dateSortie: "2026-05-20",
     status: "Trié & Stocké",
-    taxationQuantities: { "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
-    remainingQuantities: { "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
+    taxationQuantities: { "FW NGOMA MILD-SDL": 420, "FW AA": 78, "W ABC": 20 },
+    remainingQuantities: { "FW NGOMA MILD-SDL": 420, "FW AA": 78, "W ABC": 20 },
   },
   {
     id: "TRI-2026-002",
@@ -36,7 +36,7 @@ const INITIAL_LOTS = [
     id: "TRI-2026-003",
     societe: "COCOCA",
     sdls: ["SDL Gitega", "SDL Karusi"],
-    grades: { "ROBUSTA NATURAL CLEAN SUPER": 58, "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
+    grades: { "ROBUSTA NATURAL CLEAN SUPER": 58, "FW NGOMA MILD-SDL": 420, "FW AA": 78, "W ABC": 20 },
     dateEntree: null,
     dateSortie: null,
     status: "Prêt à trier",
@@ -57,7 +57,7 @@ const INITIAL_LOTS = [
     grades: { "W ABC": 3 },
     dateEntree: "2026-05-28",
     dateSortie: "2026-05-28",
-    status: "Trié & Stocké (Direct)",
+    status: "Trié & Tri non requis",
     remainingQuantities: { "W ABC": 3 },
   },
 ];
@@ -115,12 +115,12 @@ export default function TriagePage() {
       prev.map((l) =>
         l.id === lot.id
           ? {
-              ...l,
-              status: "Trié & Stocké (Direct)",
-              dateEntree: today,
-              dateSortie: today,
-              remainingQuantities: { ...l.grades },
-            }
+            ...l,
+            status: "Trié & Tri non requis",
+            dateEntree: today,
+            dateSortie: today,
+            remainingQuantities: { ...l.grades },
+          }
           : l
       )
     );
