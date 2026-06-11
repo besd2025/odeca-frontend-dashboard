@@ -12,6 +12,7 @@ import RetourList from "../echantillonnage/retours/RetourList";
 import StockageForm from "./StockageForm";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
+import { searchParams } from "next/navigation";
 // ---------- Mock data ----------
 
 const STOCKED_LOTS = [
@@ -84,23 +85,34 @@ export default function StockagePage() {
     const [isViewingDetails, setIsViewingDetails] = useState(false);
     const [stockedLots, setStockedLots] = useState(STOCKED_LOTS);
     const [isCreatingStock, setIsCreatingStock] = useState(false);
-    const [formData, setFormData] = useState({});
-    const code_societe = searchParams.get("id");
-    console.log("this is code", code_societe);
+    const [formData, setFormData] = useState({
+        id: "",
+        societe: "",
+        sdls: [],
+        humidite: "",
+        rendement: "",
+        sacsCount: "",
+        poidsBrut: "",
+        poidsTare: "",
+        dateReception: "",
+        grades: {},
+        gradeSDLs: {}
+    })
+    const handleStore = () => {
+        setIsCreatingStock(false);
+    }
 
+    // const code_societe = React.searchParams.get("id")
+    // console.log("this is code", "code_societe")
     const handleViewDetails = (lot) => {
         setSelectedLot(lot);
         setIsViewingDetails(true);
     };
 
-    const handleStore = () => {
-        // Add store logic here
-        setIsCreatingStock(false);
-    };
-
 
     async function loadInitialData() {
         try {
+
             const [allData] = await Promise.all([
                 fetchData("get", `cafe/usinages/quantites_usinage/`, { params: { offset: 0, limit: 150 } })
             ]);
@@ -124,7 +136,7 @@ export default function StockagePage() {
             console.error("Error loading initial data:", err);
         }
     }
-    useEffect(() => {
+    React.useEffect(() => {
         loadInitialData();
     }, []);
     return (

@@ -192,7 +192,7 @@ export default function ConfirmationPage() {
                   </div>
 
                   {/* Date de Réception */}
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <Label htmlFor="dateReception" className="font-semibold text-slate-700 dark:text-slate-300">
                       Date de Réception
                     </Label>
@@ -208,7 +208,7 @@ export default function ConfirmationPage() {
                       />
                       <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     </div>
-                  </div>
+                  </div> */}
                 </div>
 
 

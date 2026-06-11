@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, FileText, Coffee, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import { fetchData } from "@/app/_utils/api";
 
 const OUTPUT_CONFIG = {
   outputQ: {
     label: "Qualités",
-    grades: ["FW NGOMA MILD-SDL", "FW AA", "15+", "PB", "FW TT", "W ABC", "W TT", "W STOCK LOT", "GRADE 1", "GRADE 2", "ROBUSTA NATURAL CLEAN SUPER", "COQUE"]
   },
 };
 
@@ -29,7 +29,28 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
     outputQ: [],
   });
 
+  const [apiGrades, setApiGrades] = useState([]);
+  const [fullApiGrades, setFullApiGrades] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [open, setOpen] = useState(false);
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchData("get", `cafe/qualite_cafe/`);
+        const gradesData = data.results || data || [];
+        setFullApiGrades(gradesData);
+        const newGrades = Array.isArray(gradesData)
+          ? gradesData.map(item => typeof item === 'object' ? (item.nom || item.designation || item.name || item.code) : item).filter(Boolean)
+          : [];
+        if (newGrades.length > 0) {
+          setApiGrades(newGrades);
+        }
+      } catch (error) {
+        console.error("Error fetching grades:", error);
+      }
+    };
+    loadData();
     if (lot) {
       setDateSortie(lot.dateSortie || new Date().toISOString().split("T")[0]);
       setObservation(lot.observation || "");
@@ -108,30 +129,95 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
     // Filter outputs to only active ones
     Object.keys(OUTPUT_CONFIG).forEach(category => {
       finalizedData[category] = {};
-      activeGrades[category].forEach(grade => {
+      (activeGrades[category] || []).forEach(grade => {
         const val = outputs[category][grade];
         if (val !== undefined && val !== null) {
+          const gradeObj = fullApiGrades.find(item =>
+            item && typeof item === 'object' &&
+            (item.nom || item.designation || item.name || item.code) === grade
+          );
+          const gradeId = gradeObj?.id || grade;
+
           if (typeof val === "object") {
-            finalizedData[category][grade] = {
-              kg: parseFloat(val.kg) || 0,
-              sacs: parseInt(val.sacs) || 0
-            };
-          } else {
-            finalizedData[category][grade] = {
-              kg: parseFloat(val) || 0,
-              sacs: Math.round(parseFloat(val) / 60) || 0
-            };
+
+            const formData = new FormData();
+            formData.append("usinage", lot.id);
+            formData.append("observation", observation);
+            formData.append("quantite_sortie", val.kg);
+            formData.append("nombre_sacs", val.sacs);
+            formData.append("qualite", gradeId);
+
+
+            const promise = new Promise(async (resolve, reject) => {
+              try {
+                const results = await fetchData(
+                  "post",
+                  `/cafe/production_apres_usinage/`,
+                  {
+                    params: {},
+                    additionalHeaders: {},
+                    body: formData,
+                  },
+                );
+
+                if (results.status == 200 || results.status == 201) {
+                  const result2 = await fetchData(
+                    "patch",
+                    `/cafe/usinages/${lot.id}/`,
+                    {
+                      params: {},
+                      additionalHeaders: {},
+                      body: {
+                        processing_status: 'TERMINE',
+                        date_fin: dateSortie,
+                        observation: observation
+                      },
+                    },
+                  );
+                  if (result2.status == 200 || result2.status == 201) {
+                    resolve({ lot: lot.id });
+                  } else {
+                    reject(new Error("Erreur"));
+                  }
+                } else {
+                  reject(new Error("Erreur"));
+                }
+              } catch (error) {
+                reject(error);
+              }
+            });
+
+            toast.promise(promise, {
+              loading: "Modification...",
+              success: (data) => {
+                onSave(data.lot, finalizedData);
+                setTimeout(() => setOpen(false), 500);
+                return `Données Enregistrées avec succès `;
+              },
+              error: "Donnée non enregistrée!!!",
+            });
+
+            try {
+              promise;
+            } catch (error) {
+              console.error(error);
+              setError(error);
+            } finally {
+              setLoading(false);
+            }
           }
+
         }
       });
     });
 
     onSave(lot.id, finalizedData);
+
   };
 
   // Render a read-only list of outputs
   const renderReadOnlyOutputs = () => {
-    const hasOutputs = Object.keys(OUTPUT_CONFIG).some(category => activeGrades[category].length > 0);
+    const hasOutputs = Object.keys(activeGrades).some(category => activeGrades[category].length > 0);
 
     if (!hasOutputs) {
       return (
@@ -182,7 +268,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
           <span className="text-xs bg-primary/10 px-2.5 py-0.5 rounded-full font-semibold">{lot?.societe}</span>
         </div>
         <div className="text-xs text-slate-500">
-          Usinage débuté le {lot?.dateUsinage} • Stations concernées: {lot?.selectedSDLs.join(", ")}
+          Usinage débuté le {lot?.dateUsinage}
         </div>
       </div>
 
@@ -255,8 +341,8 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
                 <div className="space-y-4 overflow-y-auto pr-1">
                   {Object.entries(OUTPUT_CONFIG).map(([category, config]) => {
                     const active = activeGrades[category] || [];
-                    const availableGrades = config.grades.filter(g => !active.includes(g));
-
+                    const availableGrades = apiGrades.filter(g => !active.includes(g));
+                    console.log("availableGrades", activeGrades);
                     return (
                       <div key={category} className="p-3 bg-slate-50/50 dark:bg-slate-900/20 rounded-xl border border-slate-100 dark:border-slate-800 space-y-2.5">
                         <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-900 pb-1.5">

@@ -15,6 +15,95 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
     return lot.status.toLowerCase() === activeTab.toLowerCase();
   });
 
+  const [pointer, setPointer] = React.useState(0);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [limit, setLimit] = React.useState(10);
+  const [receptionsEnAttenteList, setReceptionsEnAttenteList] = React.useState([]);
+  const [receptionsConfirmeList, setReceptionsConfirmeList] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [totalCount, setTotalCount] = React.useState(0);
+  const [receptionsAllList, setReceptionsAllList] = React.useState([]);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
+  const handleTabChange = (val) => {
+    setActiveTab(val);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
+  const loadDataForTab = async (tab) => {
+    setLoading(true);
+    try {
+      if (tab === "Reception") {
+        const pendingRes = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/`, { params: { etat_selection: "PRET_USINE", limit, offset: pointer } });
+        const pendingMapped = pendingRes?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe || "",
+          societe: item?.nom_societe || "",
+          //sdls: item?.transfert_details_comfirmation?.transfert_details_comfirmation?.transfer?.sdl?.sdl_nom || [],
+          sdls: item?.transfert_details_comfirmation || [],
+          dateTransfert: item?.transfer_date || "-",
+          dateReception: "-",
+          usinageQuantitiesTotal: item?.total_quantite_confirme || 0,
+          status: item?.pret_usine || "",
+        })) || [];
+
+
+        setReceptionsAllList(pendingMapped);
+
+        setTotalCount((pendingRes?.count || 0));
+      } else if (tab === "En cours") {
+        const pendingRes = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/`, { params: { etat_selection: "EN_COURS", limit, offset: pointer } });
+        const pendingMapped = pendingRes?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe || "",
+          societe: item?.nom_societe || "",
+          //sdls: item?.transfert_details_comfirmation?.transfert_details_comfirmation?.transfer?.sdl?.sdl_nom || [],
+          sdls: item?.transfert_details_comfirmation || [],
+          dateTransfert: item?.transfer_date || "-",
+          dateReception: "-",
+          usinageQuantitiesTotal: item?.total_quantite_confirme || 0,
+          status: item?.pret_usine || "",
+        })) || [];
+        setReceptionsAllList(pendingMapped);
+        setTotalCount(pendingRes?.count || 0);
+      } else if (tab === "Finalisé") {
+        const confirmedRes = await fetchData("get", `cafe/usinages/`, { params: { processing_status: "TERMINE", limit, offset: pointer } });
+        const confirmedMapped = confirmedRes?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.societe || "",
+          societe: item?.nom_societe || "",
+          //sdls: item?.transfert_details_comfirmation?.transfert_details_comfirmation?.transfer?.sdl?.sdl_nom || [],
+          sdls: item?.transfert_details_comfirmation || [],
+          dateSortie: new Date(item?.date_fin).toLocaleDateString() || "-",
+          dateUsinage: new Date(item?.date_debut).toLocaleDateString() || "-",
+          usinageQuantitiesTotal: item?.quantite_total || 0,
+          status: item?.processing_status || "",
+        })) || [];
+        setReceptionsAllList(confirmedMapped);
+        setTotalCount(confirmedRes?.count || 0);
+      }
+    } catch (error) {
+      console.error(`Error fetching data for tab ${tab}:`, error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadDataForTab(activeTab);
+  }, [activeTab, pointer, limit]);
+
   return (
     <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
       <CardHeader>
@@ -42,7 +131,8 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
               </TabsTrigger>
               <TabsTrigger value="Finalisé" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                <span>Finalisé ({lots.filter(l => l.status === "Finalisé").length})</span>
+
+                <span>Finalisé ({receptionsAllList.filter(l => l.status === "TERMINE").length})</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -76,8 +166,11 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredLots.map((lot) => {
-                const isFinished = lot.status === "Finalisé";
+
+              {receptionsAllList.map((lot) => {
+                const isFinished = lot.status === "TERMINE";
+                const isReadyForUsinage = lot.status === "PRET_USINE";
+                const isInProcess = lot.status === "EN_COURS";
                 return (
                   <TableRow key={lot.id}>
                     <TableCell className="font-bold text-slate-900 dark:text-white">
