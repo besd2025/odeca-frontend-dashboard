@@ -314,7 +314,7 @@ export default function Grades() {
                 </Table>
             </div>
             <Dialog open={isFinalizing} onOpenChange={setIsFinalizing}>
-                <DialogContent className=" bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
+                <DialogContent className="border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
                             Quantités par Grade
@@ -323,14 +323,14 @@ export default function Grades() {
                             Saisie des volumes pour les grades de café envoyés automatiquement par les SDL d'origine.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+                    <div className="">
 
                         <div>
                             <div className="gap-4 animate-in fade-in duration-200">
                                 {gradesBySDL.map((grade) => (
                                     <div
                                         key={grade.id}
-                                        className="bg-slate-50/50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5 relative group animate-in zoom-in-95 duration-200"
+                                        className="p-3 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5 relative group animate-in zoom-in-95 duration-200"
                                     >
                                         <div className="flex justify-between items-center">
 
@@ -342,7 +342,7 @@ export default function Grades() {
 
                                             <div className="space-y-2 mb-4">
 
-                                                <p className="text-xs font-semibold text-primary mt-1">Origine :{formData.societe}/{sdl}</p>
+                                                <p className="text-sm font-semibold text-primary mt-1">Origine : {formData.societe}/{sdl}</p>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="gradeId" className="font-semibold text-slate-700 dark:text-slate-300">

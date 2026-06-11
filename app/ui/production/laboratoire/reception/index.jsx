@@ -446,7 +446,6 @@ export default function ReceptionPage() {
                           </TableCell>
                           <TableCell className="font-semibold text-slate-700 dark:text-slate-300">{item.lotNumber}</TableCell>
                           <TableCell>{item.societe}</TableCell>
-
                           <TableCell className="text-right font-semibold">{item.qualite}</TableCell>
                           <TableCell className="text-right font-semibold">{item.qteEchantillon.toFixed(2)} kg</TableCell>
                           <TableCell className="text-xs">{item.receptionniste}</TableCell>
@@ -482,7 +481,7 @@ export default function ReceptionPage() {
           {selectedSample && (
             <form onSubmit={handleSubmit} className="space-y-6 pt-4 text-slate-950 dark:text-white">
               {/* Prefilled Factory Metadata */}
-              <div className="grid grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
+              <div className="grid grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-sm">
                 <div>
                   <span className="text-slate-400 block uppercase">ID Prélèvement</span>
                   <span className="font-bold">{selectedSample.id}</span>
@@ -501,12 +500,16 @@ export default function ReceptionPage() {
                 </div>
                 <div className="col-span-2 border-t border-slate-100 dark:border-slate-800/80 pt-2 grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-slate-400 block font-uppercase">Volume total représenté</span>
+                    <span className="text-slate-400 block ">Volume total représenté</span>
                     <span>{selectedSample.sacsCount} sacs</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block font-semibold uppercase">Échantillonneur</span>
+                    <span className="text-slate-400 block font-semibold">Échantillonneur</span>
                     <span>{selectedSample.echantillonneur}</span>
+                  </div>
+                  <div>
+                    <span className=" font-semibold uppercase flex items-center gap-1"><Tag className="h-4 w-4 text-secondary" /> Qualité de l'échantillon</span>
+                    <span className="text-secondary font-semibold text-xl ml-5">{selectedSample.qualite}</span>
                   </div>
                 </div>
               </div>

@@ -79,17 +79,17 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
         setReceptionsAllList(pendingMapped);
         setTotalCount(pendingRes?.count || 0);
       } else if (tab === "Finalisé") {
-        const confirmedRes = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/`, { params: { etat_selection: "DEJA_USINE", limit, offset: pointer } });
+        const confirmedRes = await fetchData("get", `cafe/usinages/`, { params: { processing_status: "TERMINE", limit, offset: pointer } });
         const confirmedMapped = confirmedRes?.results?.map((item) => ({
           id: item?.id,
-          code_societe: item?.code_societe || "",
+          code_societe: item?.societe || "",
           societe: item?.nom_societe || "",
           //sdls: item?.transfert_details_comfirmation?.transfert_details_comfirmation?.transfer?.sdl?.sdl_nom || [],
           sdls: item?.transfert_details_comfirmation || [],
-          dateTransfert: item?.transfer_date || "-",
-          dateReception: "-",
-          usinageQuantitiesTotal: item?.total_quantite_confirme || 0,
-          status: item?.pret_usine || "",
+          dateSortie: new Date(item?.date_fin).toLocaleDateString() || "-",
+          dateUsinage: new Date(item?.date_debut).toLocaleDateString() || "-",
+          usinageQuantitiesTotal: item?.quantite_total || 0,
+          status: item?.processing_status || "",
         })) || [];
         setReceptionsAllList(confirmedMapped);
         setTotalCount(confirmedRes?.count || 0);
@@ -133,7 +133,7 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
               </TabsTrigger>
               <TabsTrigger value="Finalisé" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                <span>Finalisé ({receptionsAllList.filter(l => l.status === "DEJA_USINE").length})</span>
+                <span>Finalisé ({receptionsAllList.filter(l => l.status === "TERMINE").length})</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -172,7 +172,7 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
             </TableHeader>
             <TableBody>
               {receptionsAllList.map((lot) => {
-                const isFinished = lot.status === "DEJA_USINE";
+                const isFinished = lot.status === "TERMINE";
                 const isReadyForUsinage = lot.status === "PRET_USINE";
                 const isInProcess = lot.status === "EN_COURS";
                 return (

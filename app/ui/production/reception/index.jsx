@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import ProtectedRoute from '../../protection/ProtectedRoute';
 import { ROLES } from "@/lib/permissions";
-import { Inbox, CheckCircle2, Clock, MoreHorizontal, PlusCircle, Layers, Settings } from 'lucide-react';
+import { Inbox, CheckCircle2, Clock, MoreHorizontal, PlusCircle, Layers, Settings, Search } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchData } from '@/app/_utils/api';
@@ -211,7 +211,16 @@ export default function ReceptionPage() {
                         </TabsList>
                     </Tabs>
 
-                    <div className="w-full overflow-x-auto mt-2">
+                    <div className="w-full overflow-x-auto mt-1.5">
+                        <div className="relative mb-2 ml-2">
+                            <Search className="h-4 w-4 absolute inset-y-0 my-auto left-2.5 " />
+                            <input
+                                placeholder="Rechercher..."
+                                // value={search}
+                                // onChange={handleSearch}
+                                className="pl-9 h-9 text-sm flex-1 shadow-none w-[300px] lg:w-[350px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
+                            />
+                        </div>
                         <Table>
                             <TableHeader>
                                 <TableRow>

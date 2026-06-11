@@ -110,32 +110,32 @@ const menuItems = {
       icon: Search,
       keyword: "odeca-production/usine/triage",
     },
-    {
-      title: "Échantillonnage",
-      // url: "/odeca-production/usine/echantillonnage",
-      items: [
-        {
-          title: "Prélèvement",
-          url: "/odeca-production/usine/echantillonnage",
-          icon: FlaskConical,
-          keyword: "odeca-production/usine/echantillonnage",
-        },
-        {
-          title: "Retours",
-          url: "/odeca-production/usine/echantillonnage/retours",
-          icon: Undo2,
-          keyword: "odeca-production/usine/echantillonnage/retours",
-        },
-        {
-          title: "Resultats",
-          url: "/odeca-production/usine/echantillonnage/resultats",
-          icon: FileCheck,
-          keyword: "odeca-production/usine/echantillonnage/resultats",
-        },
-      ],
-      icon: Beaker,
-      keyword: "odeca-production/usine/echantillonnage",
-    },
+    // {
+    //   title: "Échantillonnage",
+    //   // url: "/odeca-production/usine/echantillonnage",
+    //   items: [
+    //     {
+    //       title: "Prélèvement",
+    //       url: "/odeca-production/usine/echantillonnage",
+    //       icon: FlaskConical,
+    //       keyword: "odeca-production/usine/echantillonnage",
+    //     },
+    //     {
+    //       title: "Retours",
+    //       url: "/odeca-production/usine/echantillonnage/retours",
+    //       icon: Undo2,
+    //       keyword: "odeca-production/usine/echantillonnage/retours",
+    //     },
+    //     {
+    //       title: "Resultats",
+    //       url: "/odeca-production/usine/echantillonnage/resultats",
+    //       icon: FileCheck,
+    //       keyword: "odeca-production/usine/echantillonnage/resultats",
+    //     },
+    //   ],
+    //   icon: Beaker,
+    //   keyword: "odeca-production/usine/echantillonnage",
+    // },
     {
       title: "Stockage",
       url: "/odeca-production/usine/stockage",

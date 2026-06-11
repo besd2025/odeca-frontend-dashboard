@@ -85,34 +85,34 @@ export default function UsinagePage() {
     };
 
 
-    async function loadInitialData() {
-        try {
-            const [allData] = await Promise.all([
-                fetchData("get", `cafe/usinages/quantites_usinage/`, { params: { offset: 0, limit: 150 } })
-            ]);
-            console.log(allData)
-            setFormData(pre => ({
-                ...pre,
-                societe: allData?.societe?.nom || "",
-                selectedSDLs: allData?.results?.sdls_list || [],
-                humidite: allData?.humidite || "",
-                rendement: allData?.rendement || "",
-                sacsCount: allData?.sacs_count || "",
-                poidsBrut: allData?.poids_brut || "",
-                poidsTare: allData?.poids_tare || "",
-                dateReception: allData?.date_reception || "",
-                grades: allData?.transferts?.[0]?.details[0] || {},
-                gradeSDLs: allData?.gradeSDLs || {}
-            }))
+    // async function loadInitialData() {
+    //     try {
+    //         const [allData] = await Promise.all([
+    //             fetchData("get", `cafe/usinages/quantites_usinage/`, { params: { offset: 0, limit: 150 } })
+    //         ]);
+    //         console.log(allData)
+    //         setFormData(pre => ({
+    //             ...pre,
+    //             societe: allData?.societe?.nom || "",
+    //             selectedSDLs: allData?.results?.sdls_list || [],
+    //             humidite: allData?.humidite || "",
+    //             rendement: allData?.rendement || "",
+    //             sacsCount: allData?.sacs_count || "",
+    //             poidsBrut: allData?.poids_brut || "",
+    //             poidsTare: allData?.poids_tare || "",
+    //             dateReception: allData?.date_reception || "",
+    //             grades: allData?.transferts?.[0]?.details[0] || {},
+    //             gradeSDLs: allData?.gradeSDLs || {}
+    //         }))
 
 
-        } catch (err) {
-            console.error("Error loading initial data:", err);
-        }
-    }
-    React.useEffect(() => {
-        loadInitialData();
-    }, []);
+    //     } catch (err) {
+    //         console.error("Error loading initial data:", err);
+    //     }
+    // }
+    // React.useEffect(() => {
+    //     loadInitialData();
+    // }, []);
 
     const handleFinalizeLot = (lot) => {
         setActiveLot(lot);
@@ -191,7 +191,7 @@ export default function UsinagePage() {
                 </Dialog>
 
                 {/* Dialog for viewing lot details */}
-                <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
+                <Dialog open={true} onOpenChange={setIsViewingDetails}>
                     <DialogContent className="sm:max-w-4xl md:max-w-2xl lg:max-w-[90vw] bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
                         <DialogHeader>
                             <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">

@@ -126,20 +126,21 @@ export default function InputForm({ onAddLot, id, code_societe, societe }) {
       checkedGradeIds: checkedIds,
       receptionId: null,
     };
-    console.log(checkedIds)
     if (code_societe && checkedIds.length > 0) {
 
       const promise = new Promise(async (resolve, reject) => {
         try {
           const results = await fetchData(
-            "patch",
-            `/cafe/rapportages_sdl_ct/${id}/`,
+            "post",
+            `/cafe/usinages/selectionner_quantites_a_usiner/`,
             {
               params: {},
               additionalHeaders: {},
               body: {
                 societe_code: code_societe,
                 confirmation_ids: checkedIds,
+                date_debut: dateUsinage,
+
               },
             },
           );
@@ -158,9 +159,9 @@ export default function InputForm({ onAddLot, id, code_societe, societe }) {
         loading: "Modification...",
         success: (data) => {
           setTimeout(() => setOpen(false), 500);
-          return `le rapport du CT ${code_societe} a été modifié avec succès `;
+          return `Données Enregistrées avec succès `;
         },
-        error: "Donnée non modifiée",
+        error: "Donnée non enregistrée!!!",
       });
 
       try {

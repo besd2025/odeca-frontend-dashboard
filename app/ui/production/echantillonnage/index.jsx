@@ -78,34 +78,10 @@ const normalizeQualite = (qualite) => {
     return [];
 };
 
-const normalizeSamples = (samples) =>
-    samples.map((sample) => ({
-        ...sample,
-        qualite: normalizeQualite(sample.qualite)
-    }));
-
 export default function EchantillonnagePage() {
-    const [samples, setSamples] = useState([]);
+    const [samples, setSamples] = useState(initialSamples);
     const [searchQuery, setSearchQuery] = useState("");
     const [qualityFilter, setQualityFilter] = useState("ALL");
-
-    // Load from localStorage on mount (client-side only)
-    useEffect(() => {
-        const stored = localStorage.getItem("odeca_samples");
-        if (stored) {
-            try {
-                const parsed = JSON.parse(stored);
-                const normalized = normalizeSamples(parsed);
-                setSamples(normalized);
-                localStorage.setItem("odeca_samples", JSON.stringify(normalized));
-            } catch (e) {
-                setSamples(initialSamples);
-            }
-        } else {
-            setSamples(initialSamples);
-            localStorage.setItem("odeca_samples", JSON.stringify(initialSamples));
-        }
-    }, []);
 
     const handleAddSample = (newSampleData) => {
         const newSample = {
@@ -113,15 +89,11 @@ export default function EchantillonnagePage() {
             ...newSampleData,
             qualite: normalizeQualite(newSampleData.qualite)
         };
-        const updated = [newSample, ...samples];
-        setSamples(updated);
-        localStorage.setItem("odeca_samples", JSON.stringify(updated));
+        setSamples([newSample, ...samples]);
     };
 
     const handleDeleteSample = (id) => {
-        const updated = samples.filter((s) => s.id !== id);
-        setSamples(updated);
-        localStorage.setItem("odeca_samples", JSON.stringify(updated));
+        setSamples(samples.filter((s) => s.id !== id));
         toast.success("Échantillon supprimé");
     };
 
