@@ -191,7 +191,7 @@ export default function UsinagePage() {
                 </Dialog>
 
                 {/* Dialog for viewing lot details */}
-                <Dialog open={true} onOpenChange={setIsViewingDetails}>
+                <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
                     <DialogContent className="sm:max-w-4xl md:max-w-2xl lg:max-w-[90vw] bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
                         <DialogHeader>
                             <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
