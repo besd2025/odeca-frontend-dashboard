@@ -345,10 +345,10 @@ export default function ReceptionPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='start'>
-                                <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => handleOpenConfirmModal(sample)}>
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenConfirmModal(sample)}>
                                   Confirmer Réception
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 font-semibold" onClick={() => toast.info(`Prélèvement ${sample.id} rejeté (démo)`)}>
+                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => toast.info(`Prélèvement ${sample.id} rejeté (démo)`)}>
                                   Rejeter
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
