@@ -110,70 +110,76 @@ const menuItems = {
       icon: Search,
       keyword: "odeca-production/usine/triage",
     },
-    // {
-    //   title: "Échantillonnage",
-    //   // url: "/odeca-production/usine/echantillonnage",
-    //   items: [
-    //     {
-    //       title: "Prélèvement",
-    //       url: "/odeca-production/usine/echantillonnage",
-    //       icon: FlaskConical,
-    //       keyword: "odeca-production/usine/echantillonnage",
-    //     },
-    //     {
-    //       title: "Retours",
-    //       url: "/odeca-production/usine/echantillonnage/retours",
-    //       icon: Undo2,
-    //       keyword: "odeca-production/usine/echantillonnage/retours",
-    //     },
-    //     {
-    //       title: "Resultats",
-    //       url: "/odeca-production/usine/echantillonnage/resultats",
-    //       icon: FileCheck,
-    //       keyword: "odeca-production/usine/echantillonnage/resultats",
-    //     },
-    //   ],
-    //   icon: Beaker,
-    //   keyword: "odeca-production/usine/echantillonnage",
-    // },
+    {
+      title: "Échantillonnage",
+      // url: "/odeca-production/usine/echantillonnage",
+      items: [
+        {
+          title: "Prélèvement",
+          url: "/odeca-production/usine/echantillonnage",
+          icon: FlaskConical,
+          keyword: "odeca-production/usine/echantillonnage",
+        },
+        {
+          title: "Retours",
+          url: "/odeca-production/usine/echantillonnage/retours",
+          icon: Undo2,
+          keyword: "odeca-production/usine/echantillonnage/retours",
+        },
+        {
+          title: "Resultats",
+          url: "/odeca-production/usine/echantillonnage/resultats",
+          icon: FileCheck,
+          keyword: "odeca-production/usine/echantillonnage/resultats",
+        },
+      ],
+      icon: Beaker,
+      keyword: "odeca-production/usine/echantillonnage",
+    },
     {
       title: "Stockage",
       url: "/odeca-production/usine/stockage",
       icon: Package,
       keyword: "odeca-production/usine/stockage",
     },
-    {
-      title: "Laboratoire",
-      items: [
-        {
-          title: "Réception & Codage",
-          url: "/odeca-production/laboratoire/reception",
-          icon: Tag,
-        },
-        {
-          title: "Analyse Granulométrique",
-          url: "/odeca-production/laboratoire/granulometrie",
-          icon: BarChart3,
-        },
-        {
-          title: "Triage Manuel",
-          url: "/odeca-production/laboratoire/triage",
-          icon: Sliders,
-        },
-        {
-          title: "Torréfaction & Cupping",
-          url: "/odeca-production/laboratoire/cupping",
-          icon: Coffee,
-        },
-        {
-          title: "Décisions & Rapports",
-          url: "/odeca-production/laboratoire/rapports",
-          icon: Scroll,
-        },
-      ],
-      icon: Microscope,
-      keyword: "odeca-production/laboratoire",
-    },
+    // {
+    //   title: "Laboratoire",
+    //   items: [
+    //     {
+    //       title: "Réception & Codage",
+    //       url: "/odeca-production/laboratoire/reception",
+    //       icon: Tag,
+    //     },
+    //     {
+    //       title: "Analyse Granulométrique",
+    //       url: "/odeca-production/laboratoire/granulometrie",
+    //       icon: BarChart3,
+    //     },
+    //     {
+    //       title: "Triage Manuel",
+    //       url: "/odeca-production/laboratoire/triage",
+    //       icon: Sliders,
+    //     },
+    //     {
+    //       title: "Torréfaction & Degustation",
+    //       url: "/odeca-production/laboratoire/cupping",
+    //       icon: Coffee,
+    //     },
+    //     {
+    //       title: "Décisions & Rapports",
+    //       url: "/odeca-production/laboratoire/rapports",
+    //       icon: Scroll,
+    //     },
+    //   ],
+    //   icon: Microscope,
+    //   keyword: "odeca-production/laboratoire",
+    // },
+    // {
+    //   title: "Commercialisation",
+    //   url: "/odeca-production/commercialisation",
+    //   icon: Package,
+    //   keyword: "odeca-production/commercialisation",
+    // },
   ],
   user: {
     name: "admin",

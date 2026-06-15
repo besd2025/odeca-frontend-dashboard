@@ -66,6 +66,7 @@ const initialLabAnalyses = [
     sampleId: "ECH-2026-003",
     transfertEchantillon: "Coursier Kayanza",
     lotNumber: "LOT-2026-003",
+    qualite: "15+",
     qteEchantillon: 8.5,
     sacsCount: 85,
     societe: "KIBIRA COFFEE",
@@ -99,7 +100,7 @@ const initialLabAnalyses = [
       observation: "Notes fruitées intenses, très bel équilibre, acidité vive.",
       nbDegustateurs: 3,
       moyenne: 85.0,
-      qualite: "Qualité",
+      qualite: "15+",
       dateDegustation: "2026-05-31"
     }
   },
@@ -141,7 +142,7 @@ const initialLabAnalyses = [
       observation: "Excellent corps, notes florales et agrumes bien prononcées.",
       nbDegustateurs: 3,
       moyenne: 84.5,
-      qualite: "Qualité",
+      qualite: "15+",
       dateDegustation: "2026-05-29"
     },
     finalizedAt: "2026-05-29T15:00:00.000Z",
@@ -229,7 +230,7 @@ export default function RapportsComponent() {
     });
 
     setLabAnalyses(updatedAnalyses);
-    
+
     // Set for active report print preview
     setActiveAnalysis({
       ...item,
@@ -350,8 +351,7 @@ export default function RapportsComponent() {
                         <TableHead>Code Étiquette</TableHead>
                         <TableHead>Numéro de Lot</TableHead>
                         <TableHead>Société</TableHead>
-                        <TableHead>Progrès</TableHead>
-                        <TableHead>Note Cupping</TableHead>
+                        <TableHead>Note</TableHead>
                         <TableHead>Qualité</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -366,17 +366,18 @@ export default function RapportsComponent() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='start'>
-                                <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => {
+                                <DropdownMenuItem className="cursor-pointer " onClick={() => {
                                   setSelectedDetailItem(item);
                                   setIsDetailModalOpen(true);
                                 }}>
                                   Fiche Synthèse
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="cursor-pointer font-semibold text-emerald-600 dark:text-emerald-400" onClick={() => handleGenerateTaxationReport(item)}>
+                                <DropdownMenuItem className="cursor-pointer " onClick={() => handleGenerateTaxationReport(item)}>
                                   Rapport Taxation
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 font-semibold" onClick={() => handleReturnToFactory(item)}>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="cursor-pointer " onClick={() => handleReturnToFactory(item)}>
                                   Retour Usine
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
@@ -385,19 +386,13 @@ export default function RapportsComponent() {
                           <TableCell className="font-mono font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">{item.codeEtiquette}</TableCell>
                           <TableCell className="font-semibold">{item.lotNumber}</TableCell>
                           <TableCell className="text-xs">{item.societe}</TableCell>
-                          <TableCell>
-                            <div className="flex flex-wrap gap-1">
-                              <Badge variant="outline" className={`text-[10px] ${item.granulometrie ? "bg-emerald-500/10 text-emerald-600" : "bg-slate-100"}`}>Granulo</Badge>
-                              <Badge variant="outline" className={`text-[10px] ${item.triage ? "bg-emerald-500/10 text-emerald-600" : "bg-slate-100"}`}>Triage</Badge>
-                              <Badge variant="outline" className={`text-[10px] ${item.degustation ? "bg-emerald-500/10 text-emerald-600" : "bg-slate-100"}`}>Cupping</Badge>
-                            </div>
-                          </TableCell>
+
                           <TableCell className="font-bold text-amber-600">
                             {item.degustation ? `${item.degustation.moyenne.toFixed(2)}/100` : "—"}
                           </TableCell>
                           <TableCell>
                             {item.degustation ? (
-                              <Badge className={item.degustation.qualite === "Qualité" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"}>
+                              <Badge className={"bg-secondary/10 text-secondary border-secondary/20"}>
                                 {item.degustation.qualite}
                               </Badge>
                             ) : (
@@ -464,7 +459,7 @@ export default function RapportsComponent() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='start'>
-                                <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => {
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => {
                                   setSelectedDetailItem(item);
                                   setIsDetailModalOpen(true);
                                 }}>
@@ -473,7 +468,7 @@ export default function RapportsComponent() {
                                 {item.status === "finalise_taxe" && (
                                   <>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => {
+                                    <DropdownMenuItem className="cursor-pointer" onClick={() => {
                                       setActiveAnalysis(item);
                                       setIsReportOpen(true);
                                     }}>
@@ -520,19 +515,19 @@ export default function RapportsComponent() {
 
       {/* 3. Fiche Synthèse Detail Modal */}
       <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
-        <DialogContent className="sm:max-w-2xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
+        <DialogContent className="sm:max-w-4xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
               <FileText className="h-6 w-6 text-primary" /> Fiche Synthèse de Laboratoire
             </DialogTitle>
             <DialogDescription className="text-slate-500 dark:text-slate-400">
-              Détail complet des examens physiques et organoleptiques cumulés.
+              Détail complet des examens physiques
             </DialogDescription>
           </DialogHeader>
 
           {selectedDetailItem && (
             <div className="space-y-6 pt-4 text-slate-950 dark:text-white text-sm">
-              
+
               {/* Badge with code */}
               <div className="flex items-center gap-2">
                 <Badge className="bg-emerald-50 text-emerald-600 font-mono tracking-widest dark:bg-emerald-950/30 dark:text-emerald-400">{selectedDetailItem.codeEtiquette}</Badge>
@@ -541,59 +536,63 @@ export default function RapportsComponent() {
               {/* Phase 1: Reception Metadata */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50/50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-900 text-xs">
                 <div>
-                  <span className="text-[10px] font-semibold text-slate-400 block uppercase">Lot usine</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{selectedDetailItem.lotNumber}</span>
+                  <span className="font-semibold text-slate-400 block uppercase">Lot usine</span>
+                  <span className="font-bold">{selectedDetailItem.lotNumber}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-semibold text-slate-400 block uppercase">Propriétaire</span>
-                  <span className="font-semibold text-slate-700 dark:text-slate-300">{selectedDetailItem.societe}</span>
+                  <span className="font-semibold text-slate-400 block uppercase">Propriétaire</span>
+                  <span className="font-semibold ">{selectedDetailItem.societe}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-semibold text-slate-400 block uppercase">Déparcheur</span>
-                  <span className="text-xs text-slate-600 dark:text-slate-400">{selectedDetailItem.deparcheur}</span>
+                  <span className="font-semibold text-slate-400 block uppercase">Déparcheur</span>
+                  <span className="">{selectedDetailItem.deparcheur}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-semibold text-slate-400 block uppercase">Sacs et quantité</span>
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{selectedDetailItem.sacsCount} sacs ({selectedDetailItem.qteEchantillon.toFixed(2)} kg)</span>
+                  <span className="font-semibold text-slate-400 block uppercase">Sacs et quantité</span>
+                  <span className="font-semibold ">{selectedDetailItem.sacsCount} sacs ({selectedDetailItem.qteEchantillon.toFixed(2)} kg)</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-slate-400 block uppercase">Qualité</span>
+                  <span className="font-semibold ">{selectedDetailItem.qualite}</span>
                 </div>
                 <div className="border-t border-slate-100 dark:border-slate-800/80 pt-2 mt-2 col-span-2 md:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <span className="text-[10px] font-semibold text-slate-400 block uppercase">Échantillonneur</span>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">{selectedDetailItem.echantillonneur || "—"}</span>
+                    <span className="font-semibold text-slate-400 block uppercase">Échantillonneur</span>
+                    <span className="">{selectedDetailItem.echantillonneur || "—"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-semibold text-slate-400 block uppercase">Réceptionniste</span>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">{selectedDetailItem.receptionniste}</span>
+                    <span className="font-semibold text-slate-400 block uppercase">Réceptionniste</span>
+                    <span className="">{selectedDetailItem.receptionniste}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-semibold text-slate-400 block uppercase">Transfert</span>
-                    <span className="text-xs text-slate-500">{selectedDetailItem.transfertEchantillon}</span>
+                    <span className="font-semibold text-slate-400 block uppercase">Transfert</span>
+                    <span className="">{selectedDetailItem.transfertEchantillon}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-semibold text-slate-400 block uppercase">Date Réception</span>
-                    <span className="text-xs text-slate-500">{selectedDetailItem.dateReception}</span>
+                    <span className="font-semibold text-slate-400 block uppercase">Date Réception</span>
+                    <span className="">{selectedDetailItem.dateReception}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                 {/* Phase 2: Granulométrie summary */}
                 <div className="space-y-2.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                  <h4 className="text-xs font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
+                  <h4 className="font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
                     <Scale className="h-3.5 w-3.5 text-primary" /> Analyse Physique
                   </h4>
                   {selectedDetailItem.granulometrie ? (
-                    <div className="space-y-1 text-[11px]">
-                      <div className="flex justify-between"><span className="text-slate-400">Date</span><span className="font-semibold">{selectedDetailItem.granulometrie.date}</span></div>
-                      <div className="flex justify-between"><span className="text-slate-400">Entrée tamis</span><span className="font-semibold">{selectedDetailItem.granulometrie.quantite} g</span></div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between"><span className="text-slate-600">Date</span><span className="font-semibold">{selectedDetailItem.granulometrie.date}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-600">Entrée tamis</span><span className="font-semibold">{selectedDetailItem.granulometrie.quantite} g</span></div>
                       <div className="border-t pt-1 mt-1 space-y-0.5">
-                        <div className="flex justify-between"><span className="text-slate-400">7.1 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_7_1}%</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">6.3 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_6_3}%</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">5.5 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_5_5}%</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">4 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_4_0}%</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">3 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_3_0}%</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Fond:</span><span className="font-bold">{selectedDetailItem.granulometrie.fond}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">7.1 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_7_1}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">6.3 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_6_3}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">5.5 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_5_5}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">4 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_4_0}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">3 mm:</span><span className="font-bold">{selectedDetailItem.granulometrie.sieve_3_0}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">Fond:</span><span className="font-bold">{selectedDetailItem.granulometrie.fond}%</span></div>
                       </div>
                     </div>
                   ) : (
@@ -603,19 +602,19 @@ export default function RapportsComponent() {
 
                 {/* Phase 3: Triage summary */}
                 <div className="space-y-2.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                  <h4 className="text-xs font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
+                  <h4 className="font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
                     <FileText className="h-3.5 w-3.5 text-primary" /> Défauts Physiques
                   </h4>
                   {selectedDetailItem.triage ? (
-                    <div className="space-y-1 text-[11px]">
-                      <div className="flex justify-between"><span className="text-slate-400">Date triage</span><span className="font-semibold">{selectedDetailItem.triage.date}</span></div>
-                      <div className="flex justify-between"><span className="text-slate-400">Taux total</span><span className="font-extrabold text-red-500">{selectedDetailItem.triage.totalDefectPct.toFixed(2)} %</span></div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between"><span className="text-slate-600">Date triage</span><span className="font-semibold">{selectedDetailItem.triage.date}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-600">Taux total</span><span className="font-extrabold text-red-500">{selectedDetailItem.triage.totalDefectPct.toFixed(2)} %</span></div>
                       <div className="border-t pt-1 mt-1 space-y-0.5">
-                        <div className="flex justify-between"><span className="text-slate-400">Vrais défauts:</span><span className="font-bold">{selectedDetailItem.triage.vraisDefauts}%</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Défectueux:</span><span className="font-bold">{selectedDetailItem.triage.defectueux}%</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Brisure:</span><span className="font-bold">{selectedDetailItem.triage.brisure}%</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">N et Rat:</span><span className="font-bold">{selectedDetailItem.triage.nEtRat}%</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Corps étr.:</span><span className="font-bold">{selectedDetailItem.triage.corpsEtrangers}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">Vrais défauts:</span><span className="font-bold">{selectedDetailItem.triage.vraisDefauts}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">Défectueux:</span><span className="font-bold">{selectedDetailItem.triage.defectueux}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">Brisure:</span><span className="font-bold">{selectedDetailItem.triage.brisure}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">N et Rat:</span><span className="font-bold">{selectedDetailItem.triage.nEtRat}%</span></div>
+                        <div className="flex justify-between"><span className="text-slate-600">Corps étr.:</span><span className="font-bold">{selectedDetailItem.triage.corpsEtrangers}%</span></div>
                       </div>
                     </div>
                   ) : (
@@ -625,21 +624,21 @@ export default function RapportsComponent() {
 
                 {/* Phase 4: Cupping summary */}
                 <div className="space-y-2.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                  <h4 className="text-xs font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
+                  <h4 className=" font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
                     <Award className="h-3.5 w-3.5 text-amber-500" /> Analyse Sensorielle
                   </h4>
                   {selectedDetailItem.degustation ? (
-                    <div className="space-y-1 text-[11px]">
-                      <div className="flex justify-between"><span className="text-slate-400">Note de tasse</span><span className="font-extrabold text-amber-600">{selectedDetailItem.degustation.moyenne.toFixed(2)} / 100</span></div>
-                      <div className="flex justify-between"><span className="text-slate-400">Dégustateurs</span><span className="font-semibold">{selectedDetailItem.degustation.nbDegustateurs} experts</span></div>
-                      <div className="flex justify-between items-center"><span className="text-slate-400">Classification</span>
-                        <Badge className={`text-[10px] ${selectedDetailItem.degustation.qualite === "Qualité" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"}`}>
+                    <div className="space-y-1">
+                      <div className="flex justify-between"><span className="text-slate-600">Note de tasse</span><span className="font-extrabold text-amber-600">{selectedDetailItem.degustation.moyenne.toFixed(2)} / 100</span></div>
+                      <div className="flex justify-between"><span className="text-slate-600">Dégustateurs</span><span className="font-semibold">{selectedDetailItem.degustation.nbDegustateurs} experts</span></div>
+                      <div className="flex justify-between items-center"><span className="text-slate-600">Classification</span>
+                        <Badge className={` ${selectedDetailItem.degustation.qualite === "Qualité" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"}`}>
                           {selectedDetailItem.degustation.qualite}
                         </Badge>
                       </div>
                       <div className="border-t pt-1 mt-1">
-                        <span className="text-[10px] text-slate-400 font-bold block">Observations:</span>
-                        <p className="text-[11px] text-slate-500 italic leading-relaxed mt-0.5 line-clamp-3" title={selectedDetailItem.degustation.observation}>
+                        <span className="text-slate-600 font-bold block">Observations:</span>
+                        <p className="text-slate-500 italic leading-relaxed mt-0.5 line-clamp-3" title={selectedDetailItem.degustation.observation}>
                           "{selectedDetailItem.degustation.observation}"
                         </p>
                       </div>
@@ -671,10 +670,10 @@ export default function RapportsComponent() {
                 </Button>
                 {selectedDetailItem.status === "degustation_complete" && (
                   <>
-                    <Button size="sm" onClick={() => { setIsDetailModalOpen(false); handleGenerateTaxationReport(selectedDetailItem); }} className="bg-emerald-600 hover:bg-emerald-700 font-bold">
+                    <Button size="sm" onClick={() => { setIsDetailModalOpen(false); handleGenerateTaxationReport(selectedDetailItem); }} className="bg-secondary font-bold">
                       Générer Rapport Taxation
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => { setIsDetailModalOpen(false); handleReturnToFactory(selectedDetailItem); }} className="text-red-500 hover:bg-red-50 hover:text-red-600 font-bold border-red-200">
+                    <Button size="sm" variant="outline" onClick={() => { setIsDetailModalOpen(false); handleReturnToFactory(selectedDetailItem); }} className="text-destructive font-bold border-red-200">
                       Retour Usine
                     </Button>
                   </>
@@ -700,7 +699,7 @@ export default function RapportsComponent() {
 
           {activeAnalysis && (
             <div id="print-area" className="py-6 space-y-6 text-sm text-slate-800 leading-relaxed font-sans">
-              
+
               {/* Header Title */}
               <div className="text-center border-b-2 border-slate-900 pb-4">
                 <h1 className="text-2xl font-black tracking-wider uppercase text-slate-900">CERTIFICAT DE QUALITÉ ET DE TAXATION</h1>

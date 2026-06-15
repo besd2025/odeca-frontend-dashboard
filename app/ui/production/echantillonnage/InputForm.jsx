@@ -62,6 +62,44 @@ const DEPARCHEUR_LIST = [
   "Usine Mumirwa SOGESTAL"
 ];
 
+const MOCK_STOCKED_BATCHES = [
+  {
+    id: "STOCK-2026-001",
+    societe: "SOGESTAL Ngozi",
+    grades: ["FW NGOMA MILD-SDL", "FW AA", "W ABC"],
+    sacsCount: 216,
+    deparcheur: "Usine Ngozi SOGESTAL"
+  },
+  {
+    id: "STOCK-2026-002",
+    societe: "SOGESTAL Kayanza",
+    grades: ["FW AA", "15+"],
+    sacsCount: 60,
+    deparcheur: "Usine Kayanza SOGESTAL"
+  },
+  {
+    id: "STOCK-2026-003",
+    societe: "COCOCA",
+    grades: ["ROBUSTA"],
+    sacsCount: 58,
+    deparcheur: "Usine Gitega SOGESTAL"
+  },
+  {
+    id: "STOCK-2026-004",
+    societe: "SOGESTAL Mumirwa",
+    grades: ["GRADE 1"],
+    sacsCount: 18,
+    deparcheur: "Usine Mumirwa SOGESTAL"
+  },
+  {
+    id: "STOCK-2026-005",
+    societe: "SOGESTAL Ngozi",
+    grades: ["W ABC"],
+    sacsCount: 3,
+    deparcheur: "Usine Ngozi SOGESTAL"
+  }
+];
+
 export default function InputForm({ onAddSample }) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -105,6 +143,35 @@ export default function InputForm({ onAddSample }) {
   const [quantities, setQuantities] = useState(
     COFFEE_QUALITIES.reduce((acc, g) => ({ ...acc, [g]: "" }), {})
   );
+
+  const handleLotSelect = (selectedLotId) => {
+    const batch = MOCK_STOCKED_BATCHES.find((b) => b.id === selectedLotId);
+    if (batch) {
+      setFormData((prev) => ({
+        ...prev,
+        lotNumber: batch.id,
+        sacsCount: batch.sacsCount.toString(),
+        proprieteSociete: batch.societe,
+        deparcheur: batch.deparcheur,
+        qualite: batch.grades.join(", "),
+      }));
+      setActiveGrades(batch.grades);
+      
+      const newQuantities = COFFEE_QUALITIES.reduce((acc, g) => ({ ...acc, [g]: "" }), {});
+      batch.grades.forEach(g => {
+        newQuantities[g] = Math.ceil(batch.sacsCount * 0.1).toString();
+      });
+      setQuantities(newQuantities);
+      
+      toast.success(`Lot ${batch.id} sélectionné. Les informations ont été pré-remplies.`);
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        lotNumber: selectedLotId,
+      }));
+    }
+  };
+
 
   const handleGradeAdd = (val) => {
     if (val && !activeGrades.includes(val)) {
@@ -224,17 +291,23 @@ export default function InputForm({ onAddSample }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="lotNumber" className="font-semibold text-slate-700 dark:text-slate-300">
-                      Numéro de Lot
+                      Numéro de Lot (Stocké)
                     </Label>
-                    <Input
-                      type="text"
-                      id="lotNumber"
-                      name="lotNumber"
+                    <Select
                       value={formData.lotNumber}
-                      onChange={handleChange}
-                      placeholder="Ex: LOT-2026-004A"
-                      required
-                    />
+                      onValueChange={handleLotSelect}
+                    >
+                      <SelectTrigger id="lotNumber" className="w-full">
+                        <SelectValue placeholder="Choisir un lot stocké" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MOCK_STOCKED_BATCHES.map((b) => (
+                          <SelectItem key={b.id} value={b.id} className="text-xs">
+                            {b.id} ({b.societe} — {b.sacsCount} sacs)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">

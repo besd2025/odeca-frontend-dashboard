@@ -428,11 +428,15 @@ export default function ReceptionPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='start'>
-                                <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => {
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => {
                                   setSelectedDetailItem(item);
                                   setIsDetailModalOpen(true);
                                 }}>
                                   Détails
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem >
+                                  Analyser
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 font-semibold" onClick={() => handleDeleteAnalysis(item.id)}>
@@ -547,7 +551,7 @@ export default function ReceptionPage() {
                       name="receptionniste"
                       value={formData.receptionniste}
                       onChange={handleChange}
-                      placeholder="Nom de l'agent de garde"
+                      placeholder="Nom"
                       className="pl-10 text-slate-950 dark:text-white"
                       required
                     />

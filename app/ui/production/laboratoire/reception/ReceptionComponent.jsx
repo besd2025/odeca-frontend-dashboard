@@ -530,7 +530,7 @@ export default function ReceptionComponent() {
                       name="receptionniste"
                       value={formData.receptionniste}
                       onChange={handleChange}
-                      placeholder="Nom de l'agent de garde"
+                      placeholder="Nom"
                       className="pl-10 text-slate-950 dark:text-white"
                       required
                     />

@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InputForm from "./InputForm";
 import { fetchData } from "@/app/_utils/api";
 
-export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
+export default function ProcessingList({ lots, onFinalize, onViewDetails, onIdChange }) {
   const [activeTab, setActiveTab] = React.useState("Reception");
 
   const filteredLots = lots.filter((lot) => {
@@ -245,7 +245,7 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => onViewDetails(lot)}
+                          onClick={() => onViewDetails(lot?.id)}
                           className="h-8 text-xs flex items-center gap-1.5 ml-auto bg-sidebar"
                         >
                           <Eye className="h-3.5 w-3.5" /> Détails

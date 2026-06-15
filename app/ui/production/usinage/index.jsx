@@ -12,6 +12,7 @@ import OutputForm from "./OutputForm";
 import ProcessingList from "./ProcessingList";
 import InputForm from "./InputForm";
 import { fetchData } from "@/app/_utils/api";
+import UsinageDetails from "./details";
 const INITIAL_LOTS = [
     {
         id: "LOT-2026-001",
@@ -60,6 +61,7 @@ export default function UsinagePage() {
     const [activeLot, setActiveLot] = useState(null);
     const [isFinalizing, setIsFinalizing] = useState(false);
     const [isViewingDetails, setIsViewingDetails] = useState(false);
+    const [id, setId] = useState("");
     const [formData, setFormData] = useState({
         id: "",
         societe: "",
@@ -141,7 +143,9 @@ export default function UsinagePage() {
         setActiveLot(null);
     };
 
-
+    const handlerIdChange = (value) => {
+        setId(value);
+    }
     return (
         <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
             <div className="p-6 max-w-6xl mx-auto space-y-6 animate-in fade-in duration-300">
@@ -163,6 +167,7 @@ export default function UsinagePage() {
                     lots={lots}
                     onFinalize={handleFinalizeLot}
                     onViewDetails={handleViewDetails}
+                    onIdChange={handlerIdChange}
                 />
 
                 {/* Component 3 (Modal): Output form to finalize a lot */}
@@ -190,6 +195,7 @@ export default function UsinagePage() {
                     </DialogContent>
                 </Dialog>
 
+
                 {/* Dialog for viewing lot details */}
                 <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
                     <DialogContent className="sm:max-w-4xl md:max-w-2xl lg:max-w-[90vw] bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
@@ -201,16 +207,16 @@ export default function UsinagePage() {
                                 Détail complet des intrants, extrants et métadonnées d'usinage associés à ce lot.
                             </DialogDescription>
                         </DialogHeader>
-                        {activeLot && (
-                            <OutputForm
-                                lot={activeLot}
-                                onCancel={() => {
-                                    setIsViewingDetails(false);
-                                    setActiveLot(null);
-                                }}
-                                readOnly={true}
-                            />
-                        )}
+
+                        <UsinageDetails
+                            lot={activeLot}
+                            onCancel={() => {
+                                setIsViewingDetails(false);
+                                setActiveLot(null);
+                            }}
+                            readOnly={true}
+                        />
+
                     </DialogContent>
                 </Dialog>
 

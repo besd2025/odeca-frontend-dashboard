@@ -31,6 +31,7 @@ const initialLabAnalyses = [
     qteEchantillon: 24.5,
     sacsCount: 200,
     societe: "KAWASE COFFEE",
+    qualite: "Washed",
     deparcheur: "Usine Gitega SOGESTAL",
     receptionniste: "Jean-Marie Vianney",
     codeEtiquette: "LAB-ETQ-26-002-3941",
@@ -55,6 +56,7 @@ const initialLabAnalyses = [
     qteEchantillon: 8.5,
     sacsCount: 85,
     societe: "KIBIRA COFFEE",
+    qualite: "Natural",
     deparcheur: "Usine Kayanza SOGESTAL",
     receptionniste: "Marc Ndayishimiye",
     codeEtiquette: "LAB-ETQ-26-003-8812",
@@ -247,8 +249,8 @@ export default function TriageComponent() {
 
       <Tabs defaultValue="pending" className="">
         <TabsList className="grid grid-cols-2 w-full">
-          <TabsTrigger value="pending">En attente de triage</TabsTrigger>
-          <TabsTrigger value="history">Historique</TabsTrigger>
+          <TabsTrigger value="pending">Pret pour le triage</TabsTrigger>
+          <TabsTrigger value="history">Status des triages</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending">
@@ -300,11 +302,11 @@ export default function TriageComponent() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='start'>
-                                <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => handleOpenModal(item)}>
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenModal(item)}>
                                   Saisir Triage
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 font-semibold" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
+                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
                                   Rejeter
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
@@ -334,7 +336,7 @@ export default function TriageComponent() {
             <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 p-6">
               <div>
                 <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                  <Clipboard className="h-5 w-5 text-primary" /> 📋 Fiches de Triage Manuel Validées
+                  <Clipboard className="h-5 w-5 text-primary" /> Fiches de Triage Manuel Validées
                 </CardTitle>
                 <CardDescription className="text-slate-500 dark:text-slate-400">
                   Historique complet des fiches de triages validées en aveugle.
@@ -359,7 +361,9 @@ export default function TriageComponent() {
                       <TableRow>
                         <TableHead className="pl-6 w-16">Action</TableHead>
                         <TableHead>Code Étiquette</TableHead>
-                        <TableHead>Tonnage</TableHead>
+                        <TableHead>Societe</TableHead>
+                        <TableHead>Qualite</TableHead>
+                        <TableHead>Quantite</TableHead>
                         <TableHead>Vrais Défauts</TableHead>
                         <TableHead>Défectueux</TableHead>
                         <TableHead>Brisure</TableHead>
@@ -367,7 +371,7 @@ export default function TriageComponent() {
                         <TableHead>Corps Étr.</TableHead>
                         <TableHead className="text-right">Taux Total</TableHead>
                         <TableHead>Date</TableHead>
-                        <TableHead className="pr-6">Suivant</TableHead>
+                        <TableHead className="pr-6">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -381,17 +385,22 @@ export default function TriageComponent() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='start'>
-                                <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => {
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => {
                                   setSelectedDetailItem(item);
                                   setIsDetailModalOpen(true);
                                 }}>
                                   Détails
                                 </DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer " >
+                                  Torrefier
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
                           <TableCell className="font-mono font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">{item.codeEtiquette}</TableCell>
-                          <TableCell>{item.triage.qteTrier} g</TableCell>
+                          <TableCell className="font-bold">{item.societe}</TableCell>
+                          <TableCell className="font-bold">{item.qualite} </TableCell>
+                          <TableCell className="font-bold ">{item.qteEchantillon} g</TableCell>
                           <TableCell className="text-xs text-slate-500">{item.triage.vraisDefauts.toFixed(2)} %</TableCell>
                           <TableCell className="text-xs text-slate-500">{item.triage.defectueux.toFixed(2)} %</TableCell>
                           <TableCell className="text-xs text-slate-500">{item.triage.brisure.toFixed(2)} %</TableCell>
@@ -431,7 +440,7 @@ export default function TriageComponent() {
 
           {selectedAnalysis && (
             <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-              
+
               {/* Prefilled Analysis Info */}
               <div className="grid grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
                 <div>
@@ -445,6 +454,10 @@ export default function TriageComponent() {
                 <div>
                   <span className="text-slate-400 block font-semibold uppercase">Granulométrie du</span>
                   <span className="font-semibold">{selectedAnalysis.granulometrie?.date}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block font-semibold uppercase">Qualité</span>
+                  <span className="font-semibold">{selectedAnalysis.qualite}</span>
                 </div>
                 <div>
                   <span className="text-slate-400 block font-semibold uppercase">Calibre dominant</span>
@@ -539,6 +552,10 @@ export default function TriageComponent() {
                   <span className="font-semibold">{selectedDetailItem.societe}</span>
                 </div>
                 <div>
+                  <span className="text-slate-400 block font-uppercase font-semibold">Qualité</span>
+                  <span className="font-semibold">{selectedDetailItem.qualite}</span>
+                </div>
+                <div>
                   <span className="text-slate-400 block font-uppercase font-semibold">Date Triage</span>
                   <span className="font-semibold">{selectedDetailItem.triage.date}</span>
                 </div>
@@ -585,9 +602,9 @@ export default function TriageComponent() {
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400">Statut suivant</span>
                 {selectedDetailItem.status === "triage_complete" ? (
-                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">Attente Torréfaction</Badge>
+                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">Triage terminée</Badge>
                 ) : (
-                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Dégusté</Badge>
+                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">En cours de triage</Badge>
                 )}
               </div>
 

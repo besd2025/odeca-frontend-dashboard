@@ -32,6 +32,7 @@ const initialLabAnalyses = [
     qteEchantillon: 8.5,
     sacsCount: 85,
     societe: "KIBIRA COFFEE",
+    qualite: "15+",
     deparcheur: "Usine Kayanza SOGESTAL",
     receptionniste: "Marc Ndayishimiye",
     codeEtiquette: "LAB-ETQ-26-003-8812",
@@ -56,6 +57,7 @@ const initialLabAnalyses = [
     qteEchantillon: 12.0,
     sacsCount: 100,
     societe: "COPROCA",
+    qualite: "15+",
     deparcheur: "Usine Ngozi SOGESTAL",
     receptionniste: "Marc Ndayishimiye",
     codeEtiquette: "LAB-ETQ-26-004-7744",
@@ -76,7 +78,7 @@ const initialLabAnalyses = [
       observation: "Excellent corps, notes florales et agrumes bien prononcées.",
       nbDegustateurs: 3,
       moyenne: 84.5,
-      qualite: "Qualité",
+      qualite: "15+",
       dateDegustation: "2026-05-29"
     }
   }
@@ -102,24 +104,7 @@ export default function CuppingComponent() {
     qualite: "Qualité",
   });
 
-  // ==============================================================
-  // BRANCHEMENT BACKEND : Charger les données depuis le serveur
-  // ==============================================================
-  useEffect(() => {
-    // POUR LE BACKEND : Charger les analyses en attente de dégustation ou déjà dégustées
-    /*
-    async function fetchCuppingAnalyses() {
-      try {
-        const res = await fetch("/api/production/laboratoire/analyses");
-        const data = await res.json();
-        setLabAnalyses(data);
-      } catch (err) {
-        console.error("Erreur lors de la récupération des analyses", err);
-      }
-    }
-    fetchCuppingAnalyses();
-    */
-  }, []);
+
 
   const pendingAnalyses = labAnalyses.filter((item) => item.status === "triage_complete");
   const completedAnalyses = labAnalyses.filter(
@@ -160,40 +145,6 @@ export default function CuppingComponent() {
       toast.error("Veuillez renseigner une moyenne valide entre 0 et 100.");
       return;
     }
-
-    // ==============================================================
-    // BRANCHEMENT BACKEND : Enregistrer le cupping sur le serveur
-    // ==============================================================
-    /*
-    async function saveCupping() {
-      try {
-        const payload = {
-          status: "degustation_complete",
-          degustation: {
-            qteTorrefier: parseFloat(formData.qteTorrefier) || 200,
-            observation: formData.observation,
-            nbDegustateurs: parseInt(formData.nbDegustateurs) || 1,
-            moyenne: avgVal,
-            qualite: formData.qualite,
-            dateDegustation: new Date().toISOString().split("T")[0]
-          }
-        };
-        const res = await fetch(`/api/production/laboratoire/analyses/${selectedAnalysis.id}/cupping`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          toast.success("Torréfaction & Dégustation validées avec succès !");
-          // Recharger les données depuis le backend après
-        }
-      } catch (err) {
-        toast.error("Erreur lors de la sauvegarde du cupping.");
-      }
-    }
-    saveCupping();
-    */
-
     const updatedAnalyses = labAnalyses.map((item) => {
       if (item.id === selectedAnalysis.id) {
         return {
@@ -239,7 +190,7 @@ export default function CuppingComponent() {
 
       <Tabs defaultValue="pending" className="">
         <TabsList className="grid grid-cols-2 w-full">
-          <TabsTrigger value="pending">En attente de dégustation</TabsTrigger>
+          <TabsTrigger value="pending">Pret pour la dégustation</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
         </TabsList>
 
@@ -276,6 +227,7 @@ export default function CuppingComponent() {
                         <TableHead>Code Étiquette</TableHead>
                         <TableHead>Numéro de Lot</TableHead>
                         <TableHead>Société</TableHead>
+                        <TableHead>Qualité</TableHead>
                         <TableHead>Date Triage</TableHead>
                         <TableHead className="text-right">Taux Défauts</TableHead>
                       </TableRow>
@@ -292,7 +244,7 @@ export default function CuppingComponent() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='start'>
                                 <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => handleOpenModal(item)}>
-                                  Saisir Cupping
+                                  Torréfier
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 font-semibold" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
@@ -304,6 +256,7 @@ export default function CuppingComponent() {
                           <TableCell className="font-mono font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">{item.codeEtiquette}</TableCell>
                           <TableCell className="font-bold text-slate-700 dark:text-slate-300">{item.lotNumber}</TableCell>
                           <TableCell>{item.societe}</TableCell>
+                          <TableCell>{item.qualite}</TableCell>
                           <TableCell className="text-xs text-slate-500">{item.triage?.date}</TableCell>
                           <TableCell className="text-right font-bold text-slate-800 dark:text-slate-200">{item.triage?.totalDefectPct.toFixed(2)} %</TableCell>
                         </TableRow>
@@ -322,7 +275,7 @@ export default function CuppingComponent() {
             <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 p-6">
               <div>
                 <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                  <Clipboard className="h-5 w-5 text-primary" /> 📋 Fiches de Cupping Validées
+                  <Clipboard className="h-5 w-5 text-primary" />Fiches de Cupping Validées
                 </CardTitle>
                 <CardDescription className="text-slate-500 dark:text-slate-400">
                   Historique des évaluations organoleptiques des cafés testés en aveugle.
@@ -419,7 +372,7 @@ export default function CuppingComponent() {
 
           {selectedAnalysis && (
             <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-              
+
               {/* Prefilled Analysis Info */}
               <div className="grid grid-cols-2 gap-4 bg-slate-50/50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
                 <div>
@@ -429,6 +382,10 @@ export default function CuppingComponent() {
                 <div>
                   <span className="text-slate-400 block font-semibold uppercase">Numéro de Lot</span>
                   <span className="font-bold">{selectedAnalysis.lotNumber}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block font-semibold uppercase">Qualité</span>
+                  <span className="font-bold text-primary text-xl uppercase">{selectedAnalysis.qualite}</span>
                 </div>
                 <div>
                   <span className="text-slate-400 block font-semibold uppercase">Triage du</span>
@@ -456,27 +413,10 @@ export default function CuppingComponent() {
 
                 <div className="space-y-2">
                   <Label htmlFor="moyenne" className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                    Note Moyenne (/ 100) <Sparkles className="h-3 w-3 text-amber-500" />
+                    Note Moyenne (/ 100)
                   </Label>
-                  <Input type="number" step="0.01" min="0" max="100" id="moyenne" name="moyenne" value={formData.moyenne} onChange={handleChange} placeholder="Ex: 84.50" className="font-bold border-amber-300 dark:border-amber-900 focus-visible:ring-amber-500" required />
+                  <Input type="number" step="0.01" min="0" max="100" id="moyenne" name="moyenne" value={formData.moyenne} onChange={handleChange} placeholder="Ex: 84.50" className="font-bold" required />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="qualite" className="font-bold text-slate-700 dark:text-slate-300">Appréciation de la Qualité</Label>
-                <Select value={formData.qualite} onValueChange={(val) => handleSelectChange("qualite", val)}>
-                  <SelectTrigger id="qualite" className="w-full">
-                    <SelectValue placeholder="Sélectionner l'appréciation..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Qualité" className="text-emerald-600 dark:text-emerald-400 font-semibold">
-                      ☕ Qualité (Apte à la taxation / Exportation Premium)
-                    </SelectItem>
-                    <SelectItem value="Sans qualité" className="text-red-500 font-semibold">
-                      ⚠️ Sans qualité (Sous-grade / Défauts majeurs en tasse)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="space-y-2">
@@ -563,15 +503,15 @@ export default function CuppingComponent() {
                 </div>
 
                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-900 mt-2">
-                  <span className="text-xs font-semibold text-slate-500">Appréciation de la qualité</span>
-                  <Badge className={selectedDetailItem.degustation.qualite === "Qualité" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"}>
+                  <span className=" font-semibold">Appréciation de la qualité</span>
+                  <Badge className="bg-secondary/80 text-white border-secondary-500/20 text-lg">
                     {selectedDetailItem.degustation.qualite}
                   </Badge>
                 </div>
 
                 {/* Observation */}
                 <div className="pt-2">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Observations organoleptiques</span>
+                  <span className=" font-bold block uppercase">Observations</span>
                   <p className="text-xs text-slate-600 dark:text-slate-400 italic leading-relaxed mt-1 p-3 bg-slate-50/50 dark:bg-slate-900/30 rounded-lg border border-slate-100 dark:border-slate-800">
                     "{selectedDetailItem.degustation.observation}"
                   </p>

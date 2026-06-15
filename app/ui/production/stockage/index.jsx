@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
 import { ROLES } from "@/lib/permissions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,7 +20,7 @@ const STOCKED_LOTS = [
         id: "STOCK-2026-001",
         societe: "SOGESTAL Ngozi",
         sdls: ["SDL Ngozi", "SDL Gitega"],
-        grades: { "FW NGOMA MILD-SDL": 118, "FW AA": 78, "W ABC": 20 },
+        grades: { "FW NGOMA MILD-SDL": 420, "FW AA": 78, "W ABC": 20 },
         nombreSacs: 216,
         dateStockage: "2026-05-20",
     },
@@ -79,6 +80,7 @@ const RETOUR_LOTS = [
 ];
 
 export default function StockagePage() {
+    const searchParams = useSearchParams();
     const [selectedLot, setSelectedLot] = useState(null);
     const [isViewingDetails, setIsViewingDetails] = useState(false);
     const [stockedLots, setStockedLots] = useState(STOCKED_LOTS);
