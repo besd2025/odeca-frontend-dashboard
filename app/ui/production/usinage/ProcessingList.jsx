@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Eye, FileText, CheckCircle2, AlertCircle, Layers, ClipboardList, PackageCheck } from "lucide-react";
 import PaginationContent from "@/components/ui/pagination-content";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetchData } from "@/app/_utils/api";
 
 export default function ProcessingList({ lots, onFinalize, onViewDetails }) {
   const [activeTab, setActiveTab] = React.useState("all");
