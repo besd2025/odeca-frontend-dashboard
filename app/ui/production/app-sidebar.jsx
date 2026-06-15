@@ -142,44 +142,44 @@ const menuItems = {
       icon: Package,
       keyword: "odeca-production/usine/stockage",
     },
-    {
-      title: "Laboratoire",
-      items: [
-        {
-          title: "Réception & Codage",
-          url: "/odeca-production/laboratoire/reception",
-          icon: Tag,
-        },
-        {
-          title: "Analyse Granulométrique",
-          url: "/odeca-production/laboratoire/granulometrie",
-          icon: BarChart3,
-        },
-        {
-          title: "Triage Manuel",
-          url: "/odeca-production/laboratoire/triage",
-          icon: Sliders,
-        },
-        {
-          title: "Torréfaction & Degustation",
-          url: "/odeca-production/laboratoire/cupping",
-          icon: Coffee,
-        },
-        {
-          title: "Décisions & Rapports",
-          url: "/odeca-production/laboratoire/rapports",
-          icon: Scroll,
-        },
-      ],
-      icon: Microscope,
-      keyword: "odeca-production/laboratoire",
-    },
-    {
-      title: "Commercialisation",
-      url: "/odeca-production/commercialisation",
-      icon: Package,
-      keyword: "odeca-production/commercialisation",
-    },
+    // {
+    //   title: "Laboratoire",
+    //   items: [
+    //     {
+    //       title: "Réception & Codage",
+    //       url: "/odeca-production/laboratoire/reception",
+    //       icon: Tag,
+    //     },
+    //     {
+    //       title: "Analyse Granulométrique",
+    //       url: "/odeca-production/laboratoire/granulometrie",
+    //       icon: BarChart3,
+    //     },
+    //     {
+    //       title: "Triage Manuel",
+    //       url: "/odeca-production/laboratoire/triage",
+    //       icon: Sliders,
+    //     },
+    //     {
+    //       title: "Torréfaction & Degustation",
+    //       url: "/odeca-production/laboratoire/cupping",
+    //       icon: Coffee,
+    //     },
+    //     {
+    //       title: "Décisions & Rapports",
+    //       url: "/odeca-production/laboratoire/rapports",
+    //       icon: Scroll,
+    //     },
+    //   ],
+    //   icon: Microscope,
+    //   keyword: "odeca-production/laboratoire",
+    // },
+    // {
+    //   title: "Commercialisation",
+    //   url: "/odeca-production/commercialisation",
+    //   icon: Package,
+    //   keyword: "odeca-production/commercialisation",
+    // },
   ],
   user: {
     name: "admin",
