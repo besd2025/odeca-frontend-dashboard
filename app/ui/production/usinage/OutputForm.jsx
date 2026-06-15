@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar, FileText, Coffee, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { fetchData } from "@/app/_utils/api";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const OUTPUT_CONFIG = {
   outputQ: {
@@ -34,6 +35,10 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+  const handleCheckedChange = () => {
+    setIsChecked(!isChecked);
+  };
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -387,7 +392,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
                                   </div>
                                   <div className="space-y-1.5">
                                     <div>
-                                      <Label className="text-[10px] text-slate-500 font-medium">Poids (kg)</Label>
+                                      <Label className="text-sm text-slate-600 font-medium">Poids (kg)</Label>
                                       <Input
                                         type="number"
                                         min="0"
@@ -400,7 +405,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
                                       />
                                     </div>
                                     <div>
-                                      <Label className="text-[10px] text-slate-500 font-medium">Nombre de sacs</Label>
+                                      <Label className="text-sm text-slate-600 font-medium">Nombre de sacs</Label>
                                       <Input
                                         type="number"
                                         step="1"
@@ -410,6 +415,13 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
                                         placeholder="Ex: 80"
                                         className="h-8 text-xs"
                                         required
+                                      />
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <Label className="text-sm text-slate-600 font-medium">Trier</Label>
+                                      <Checkbox
+                                        checked={isChecked}
+                                        onCheckedChange={() => handleCheckedChange(grade)}
                                       />
                                     </div>
                                   </div>
