@@ -61,6 +61,7 @@ export default function UsinagePage() {
     const [activeLot, setActiveLot] = useState(null);
     const [isFinalizing, setIsFinalizing] = useState(false);
     const [isViewingDetails, setIsViewingDetails] = useState(false);
+    const [id, setId] = useState("");
     const [formData, setFormData] = useState({
         id: "",
         societe: "",
@@ -142,7 +143,9 @@ export default function UsinagePage() {
         setActiveLot(null);
     };
 
-
+    const handlerIdChange = (value) => {
+        setId(value);
+    }
     return (
         <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
             <div className="p-6 max-w-6xl mx-auto space-y-6 animate-in fade-in duration-300">
@@ -164,6 +167,7 @@ export default function UsinagePage() {
                     lots={lots}
                     onFinalize={handleFinalizeLot}
                     onViewDetails={handleViewDetails}
+                    onIdChange={handlerIdChange}
                 />
 
                 {/* Component 3 (Modal): Output form to finalize a lot */}
@@ -205,7 +209,7 @@ export default function UsinagePage() {
                         </DialogHeader>
 
                         <UsinageDetails
-                            lot={INITIAL_LOTS[0]}
+                            lot={activeLot}
                             onCancel={() => {
                                 setIsViewingDetails(false);
                                 setActiveLot(null);

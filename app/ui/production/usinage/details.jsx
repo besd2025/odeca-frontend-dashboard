@@ -8,66 +8,53 @@ import { Calendar, FileText, Coffee, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { fetchData } from "@/app/_utils/api";
 
-const OUTPUT_CONFIG = {
-    outputQ: {
-        label: "Qualités",
-    },
-};
-
 export default function UsinageDetails({ lot, onSave, onCancel, readOnly = false }) {
     // Metadata states
     const [dateSortie, setDateSortie] = useState("");
     const [observation, setObservation] = useState("");
-
-    // Categories states
-    const [outputs, setOutputs] = useState({
-        outputQ: {},
-    });
-
-    // Active grades per category
-    const [activeGrades, setActiveGrades] = useState({
-        outputQ: [],
-    });
 
     const [apiGrades, setApiGrades] = useState([]);
     const [fullApiGrades, setFullApiGrades] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
-
+    const [allData, setAllData] = useState({});
+    const [details, setDetails] = useState({});
     // Load lot data into component state
     useEffect(() => {
+        async function loadInitialData() {
+            try {
+                const [allData, details] = await Promise.all([
+                    fetchData("get", `cafe/usinages/${lot}/get_sortie_usinages/`, { params: { offset: 0, limit: 150 } }),
+                    fetchData("get", `cafe/usinages/${lot}/`, { params: { offset: 0, limit: 150 } }),
+                ]);
+                setAllData(allData)
+                setDetails(details)
+            } catch (err) {
+                console.error("Error loading initial data:", err);
+            }
+        }
+
         if (lot) {
-            setDateSortie(lot.dateSortie || "");
-            setObservation(lot.observation || "");
-
-            // Load output data
-            const outputsData = {
-                outputQ: {},
-            };
-
-            if (lot.outputFW) {
-                outputsData.outputQ = { ...outputsData.outputQ, ...lot.outputFW };
-            }
-            if (lot.outputW) {
-                outputsData.outputQ = { ...outputsData.outputQ, ...lot.outputW };
-            }
-
-            setOutputs(outputsData);
-
-            // Set active grades based on available outputs
-            const activeGradesList = Object.keys(outputsData.outputQ);
-            setActiveGrades({
-                outputQ: activeGradesList,
-            });
+            loadInitialData();
+            setDateSortie(""); // Sera mis à jour via details
+            setObservation("");
         }
     }, [lot]);
 
     // Render a read-only list of outputs
     const renderReadOnlyOutputs = () => {
-        const hasOutputs = Object.keys(activeGrades).some(category => activeGrades[category].length > 0);
+        // L'API retourne probablement les sorties dans allData (ou details.productions)
+        let productions = [];
+        if (Array.isArray(allData)) {
+            productions = allData;
+        } else if (allData && Array.isArray(allData.results)) {
+            productions = allData.results;
+        } else if (details && Array.isArray(details.productions)) {
+            productions = details.productions;
+        }
 
-        if (!hasOutputs) {
+        if (!productions || productions.length === 0) {
             return (
                 <div className="text-center p-6 border border-dashed rounded-lg border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 text-slate-500 text-sm">
                     Aucune quantité de sortie enregistrée pour ce lot.
@@ -77,32 +64,26 @@ export default function UsinageDetails({ lot, onSave, onCancel, readOnly = false
 
         return (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {Object.entries(OUTPUT_CONFIG).map(([category, config]) => {
-                    const active = activeGrades[category] || [];
-                    if (active.length === 0) return null;
+                <div className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-100 dark:border-slate-900 space-y-2">
+                    <h4 className="text-xs font-bold text-primary uppercase tracking-wider">Qualités produites</h4>
+                    <div className="space-y-1.5">
+                        {productions.map((prod, idx) => {
+                            const gradeName = prod.nom_qualite;
+                            const kg = prod.quantite_sortie || 0;
+                            const sacs = prod.nombre_sacs || 0;
 
-                    return (
-                        <div key={category} className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-100 dark:border-slate-900 space-y-2">
-                            <h4 className="text-xs font-bold text-primary uppercase tracking-wider">{config.label}</h4>
-                            <div className="space-y-1.5">
-                                {active.map(grade => {
-                                    const val = outputs[category][grade];
-                                    const kg = val && typeof val === "object" ? val.kg : (val || 0);
-                                    const sacs = val && typeof val === "object" ? val.sacs : Math.round((val || 0) / 60);
-                                    return (
-                                        <div key={grade} className="flex justify-between items-center text-xs text-slate-700 dark:text-slate-300 border-b border-slate-100/50 dark:border-slate-900/50 pb-1 last:border-0 last:pb-0">
-                                            <span className="font-medium">{grade}</span>
-                                            <div className="flex items-center gap-3">
-                                                <span className="font-bold text-slate-900 dark:text-white">{kg} kg</span>
-                                                <span className="text-slate-500 dark:text-slate-400">({sacs} sacs)</span>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    );
-                })}
+                            return (
+                                <div key={idx} className="flex justify-between items-center text-xs text-slate-700 dark:text-slate-300 border-b border-slate-100/50 dark:border-slate-900/50 pb-1 last:border-0 last:pb-0">
+                                    <span className="font-medium">{gradeName}</span>
+                                    <div className="flex items-center gap-3">
+                                        <span className="font-bold text-slate-900 dark:text-white">{kg} kg</span>
+                                        <span className="text-slate-500 dark:text-slate-400">({sacs} sacs)</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
         );
     };
@@ -112,11 +93,11 @@ export default function UsinageDetails({ lot, onSave, onCancel, readOnly = false
             {/* Header Info */}
             <div className="p-3.5 bg-primary/5 border border-primary/10 rounded-lg text-sm text-slate-700 dark:text-slate-300 space-y-1">
                 <div className="flex justify-between items-center">
-                    <span className="font-semibold text-primary">USID: {lot?.id}</span>
-                    <span className="text-xs bg-primary/10 px-2.5 py-0.5 rounded-full font-semibold">{lot?.societe}</span>
+                    <span className="font-semibold text-primary">SOCIETE ID: {details?.code_societe}</span>
+                    <span className="text-xs bg-primary/10 px-2.5 py-0.5 rounded-full font-semibold">{details?.nom_societe}</span>
                 </div>
                 <div className="text-xs text-slate-500">
-                    Usinage débuté le {lot?.dateUsinage}
+                    Usinage débuté le {new Date(details?.date_debut).toLocaleDateString("fr-FR")} à {new Date(details?.date_debut).toLocaleTimeString("fr-FR")}
                 </div>
             </div>
 
@@ -136,7 +117,7 @@ export default function UsinageDetails({ lot, onSave, onCancel, readOnly = false
                                 </Label>
 
                                 <div className="p-2 border rounded-md bg-slate-50 dark:bg-slate-900/50 text-sm text-slate-800 dark:text-slate-200">
-                                    {dateSortie}
+                                    {new Date(details?.date_fin).toLocaleDateString("fr-FR")}
                                 </div>
 
                             </div>
@@ -146,7 +127,7 @@ export default function UsinageDetails({ lot, onSave, onCancel, readOnly = false
                                     Observations / Remarques
                                 </Label>
                                 <div className="p-2.5 border rounded-md bg-slate-50 dark:bg-slate-900/50 text-sm text-slate-700 dark:text-slate-300 min-h-[100px] whitespace-pre-wrap">
-                                    {observation || "Aucune observation."}
+                                    {details?.observation || "Aucune observation."}
                                 </div>
 
                             </div>

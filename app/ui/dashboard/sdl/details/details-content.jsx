@@ -336,6 +336,8 @@ function DetailsContent({ id }) {
         Zone: c?.cultivator_adress?.zone_code?.zone_name || "",
         Colline: c?.cultivator_adress?.colline_name || "",
         Champs: c?.nombre_champs || 0,
+        status: c?.in_payment ? "Payé" : "Non Payé",
+
       }));
       buildXlsx(rows, "Cultivateurs", `cultivateurs_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
     } catch (e) { console.error("Export cultivateurs erreur:", e); }

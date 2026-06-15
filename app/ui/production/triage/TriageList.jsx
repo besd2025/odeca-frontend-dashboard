@@ -23,7 +23,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { fetchData } from "@/app/_utils/api";
-
 // Status helpers
 const STATUS_CONFIG = {
   "Prêt à trier": {
@@ -80,6 +79,11 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
   const [stockingGrade, setStockingGrade] = React.useState(null);
   const [bagsToStock, setBagsToStock] = React.useState("");
   const [lotNumbers, setLotNumbers] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [receptionsAllList, setReceptionsAllList] = React.useState([]);
+  const [totalCount, setTotalCount] = React.useState(0);
+  const [pointer, setPointer] = React.useState(0);
+  const [limit, setLimit] = React.useState(20);
 
   const getPretAStockerGrades = (lotsList) => {
     const list = [];
@@ -166,6 +170,97 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
     return lot.status.toLowerCase() === activeTab.toLowerCase();
   });
 
+  const loadDataForTab = async (tab) => {
+    setLoading(true);
+    try {
+      if (tab === "Prêt à trier") {
+        const pendingRes = await fetchData("get", `cafe/usinages/`, { params: { processing_status: "TERMINE", limit, offset: pointer } });
+        const pendingMapped = pendingRes?.results?.map((item) => {
+          const processedGrades = Array.isArray(item?.productions)
+            ? item.productions.reduce((acc, curr) => {
+              acc[curr.nom_qualite || `Qualité ${curr.qualite || 'Inconnue'}`] = curr.nombre_sacs;
+              return acc;
+            }, {})
+            : (item?.productions || {});
+
+          return {
+            id: item.id,
+            societe: item.nom_societe,
+            sdls: [],
+            grades: processedGrades,
+            dateEntree: new Date(item?.date_debut).toLocaleDateString(),
+            dateSortie: new Date(item?.date_fin).toLocaleDateString(),
+            status: "PRET A TRIER",
+            taxationQuantities: processedGrades,
+            remainingQuantities: processedGrades,
+          };
+        }) || [];
+        console.log("pendingRes", pendingRes);
+
+        setReceptionsAllList(pendingMapped);
+
+        setTotalCount((pendingRes?.count || 0));
+      } else if (tab === "En cours") {
+        const pendingRes = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/`, { params: { etat_selection: "EN_COURS", limit, offset: pointer } });
+        const pendingMapped = pendingRes?.results?.map((item) => {
+          const sdlsData = item?.transfert_details_comfirmation || [];
+          return {
+            id: item?.id,
+            code_societe: item?.code_societe || "",
+            societe: item?.nom_societe || "",
+            sdls: sdlsData.map(d => d.sdl_nom || d.id || d).filter(v => typeof v === 'string' || typeof v === 'number'),
+            grades: {},
+            dateTransfert: item?.transfer_date || "-",
+            dateReception: "-",
+            usinageQuantitiesTotal: item?.total_quantite_confirme || 0,
+            status: item?.pret_usine || "",
+          };
+        }) || [];
+        setReceptionsAllList(pendingMapped);
+        setTotalCount(pendingRes?.count || 0);
+      } else if (tab === "Finalisé") {
+        const confirmedRes = await fetchData("get", `cafe/usinages/`, { params: { processing_status: "TERMINE", limit, offset: pointer } });
+        const confirmedMapped = confirmedRes?.results?.map((item) => {
+          const sdlsData = item?.transfert_details_comfirmation || [];
+          const processedGrades = Array.isArray(item?.productions)
+            ? item.productions.reduce((acc, curr) => {
+              acc[curr.nom_qualite || `Qualité ${curr.qualite || 'Inconnue'}`] = curr.nombre_sacs;
+              return acc;
+            }, {})
+            : (item?.productions || {});
+
+          return {
+            id: item?.id,
+            code_societe: item?.societe || "",
+            societe: item?.nom_societe || "",
+            sdls: sdlsData.map(d => d.sdl_nom || d.id || d).filter(v => typeof v === 'string' || typeof v === 'number'),
+            grades: processedGrades,
+            dateSortie: new Date(item?.date_fin).toLocaleDateString() || "-",
+            dateUsinage: new Date(item?.date_debut).toLocaleDateString() || "-",
+            usinageQuantitiesTotal: item?.quantite_total || 0,
+            status: item?.processing_status || "",
+          };
+        }) || [];
+        setReceptionsAllList(confirmedMapped);
+        setTotalCount(confirmedRes?.count || 0);
+      }
+    } catch (error) {
+      console.error(`Error fetching data for tab ${tab}:`, error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadDataForTab(activeTab);
+  }, [activeTab, pointer, limit]);
+
+
+
+
+
+
+
   const isStocked = (lot) =>
     lot.status === "Trié & Stocké" || lot.status === "Trié & Tri non requis";
   const isInProgress = (lot) => lot.status === "En cours de triage";
@@ -192,7 +287,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
               </TabsTrigger>
               <TabsTrigger value="Prêt à trier" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <ClipboardList className="h-3.5 w-3.5 text-blue-500" />
-                <span>Prêt à trier ({lots.filter(l => l.status === "Prêt à trier").length})</span>
+                <span>Prêt à trier ({receptionsAllList?.filter(l => l.status === "PRET A TRIER").length})</span>
               </TabsTrigger>
               <TabsTrigger value="En cours de triage" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <Play className="h-3.5 w-3.5 text-amber-500" />
@@ -238,7 +333,8 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pretAStockerGrades.map((item, idx) => (
+                {receptionsAllList.map((item, idx) => (
+                  console.log("item", item),
                   <TableRow key={`${item.lotId}-${item.grade}-${idx}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
                     <TableCell className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
                       {item.lotId}
@@ -303,7 +399,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredLots.map((lot) => (
+              {receptionsAllList.map((lot) => (
                 <TableRow key={lot.id}>
                   {/* Code Lot */}
                   <TableCell className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
@@ -332,7 +428,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                   {/* Grade / Poids */}
                   <TableCell>
                     <div className="flex flex-col gap-1">
-                      {Object.entries(lot.grades).map(([grade, qty]) => (
+                      {lot.grades && Object.entries(lot.grades).map(([grade, qty]) => (
                         <div key={grade} className="text-xs flex items-center gap-1.5">
                           <span className="font-semibold text-slate-700 dark:text-slate-300">
                             {grade}:
