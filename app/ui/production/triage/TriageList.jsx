@@ -175,7 +175,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
     setLoading(true);
     try {
       if (tab === "Prêt à trier") {
-        const pendingRes = await fetchData("get", `cafe/usinages/`, { params: { processing_status: "TERMINE", limit, offset: pointer } });
+        const pendingRes = await fetchData("get", `cafe/usinages/get_pret_pour_triage/`, { params: { limit, offset: pointer } });
         const pendingMapped = pendingRes?.results?.map((item) => {
           const processedGrades = Array.isArray(item?.productions)
             ? item.productions.reduce((acc, curr) => {
@@ -196,8 +196,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
             remainingQuantities: processedGrades,
           };
         }) || [];
-        console.log("pendingRes", pendingRes);
-
+        console.log("pendingMapped", pendingRes);
         setReceptionsAllList(pendingMapped);
 
         setTotalCount((pendingRes?.count || 0));
