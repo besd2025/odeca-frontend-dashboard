@@ -35,9 +35,12 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const handleCheckedChange = () => {
-    setIsChecked(!isChecked);
+  const [checkedGrades, setCheckedGrades] = useState({});
+  const handleCheckedChange = (grade) => {
+    setCheckedGrades(prev => ({
+      ...prev,
+      [grade]: !prev[grade]
+    }));
   };
   useEffect(() => {
     const loadData = async () => {
@@ -119,8 +122,8 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!dateSortie) {
-      toast.error("Veuillez renseigner la date de sortie.");
+    if (!dateSortie || !observation) {
+      toast.error("Veuillez renseigner la date de sortie et l'observation.");
       return;
     }
 
@@ -151,6 +154,8 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
             formData.append("quantite_sortie", val.kg);
             formData.append("nombre_sacs", val.sacs);
             formData.append("qualite", gradeId);
+            const isGradeChecked = !!checkedGrades[grade];
+            formData.append("pret_pour_triage", isGradeChecked)
 
 
             const promise = new Promise(async (resolve, reject) => {
@@ -420,7 +425,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
                                     <div className="flex items-center gap-3">
                                       <Label className="text-sm text-slate-600 font-medium">Trier</Label>
                                       <Checkbox
-                                        checked={isChecked}
+                                        checked={!!checkedGrades[grade]}
                                         onCheckedChange={() => handleCheckedChange(grade)}
                                       />
                                     </div>

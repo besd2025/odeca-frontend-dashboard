@@ -6,40 +6,68 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Layers, Check, X, Info } from "lucide-react";
 import { toast } from "sonner";
-
-const TRIAGE_GRADES = [
-  "FW NGOMA MILD-SDL",
-  "FW AA",
-  "15+",
-  "PB",
-  "FW TT",
-  "W ABC",
-  "W TT",
-  "W STOCK LOT",
-  "GRADE 1",
-  "GRADE 2",
-  "ROBUSTA NATURAL CLEAN SUPER",
-  "COQUE"
-];
+import { fetchData } from "@/app/_utils/api";
+// const TRIAGE_GRADES = [
+//   "FW NGOMA MILD-SDL",
+//   "FW AA",
+//   "15+",
+//   "PB",
+//   "FW TT",
+//   "W ABC",
+//   "W TT",
+//   "W STOCK LOT",
+//   "GRADE 1",
+//   "GRADE 2",
+//   "ROBUSTA NATURAL CLEAN SUPER",
+//   "COQUE"
+// ];
 
 export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }) {
   const [dateEntree, setDateEntree] = useState("");
   const [dateSortie, setDateSortie] = useState("");
   const [activeGrades, setActiveGrades] = useState([]);
-  const [quantities, setQuantities] = useState(
-    TRIAGE_GRADES.reduce((acc, g) => ({ ...acc, [g]: "" }), {})
-  );
-
+  const [apiGrades, setApiGrades] = useState([]);
+  const [fullApiGrades, setFullApiGrades] = useState([]);
+  const [quantities, setQuantities] = useState({});
+  const [quantiteKgs, setQuantiteKgs] = useState({});
+  const [observation, setObservation] = useState("");
   useEffect(() => {
+
+    const loadData = async () => {
+      try {
+        const data = await fetchData("get", `cafe/qualite_cafe/`);
+        const gradesData = data.results || data || [];
+        setFullApiGrades(gradesData);
+        const newGrades = Array.isArray(gradesData)
+          ? gradesData.map(item => typeof item === 'object' ? (item.nom || item.designation || item.name || item.code) : item).filter(Boolean)
+          : [];
+        if (newGrades.length > 0) {
+          setApiGrades(newGrades);
+        }
+
+        const triages = await fetchData("get", `/cafe/triage/get_termine_triage?triage_id=${lot.id}`);
+        if (triages.status == 200 || triages.status == 201) {
+          const triagesData = triages.results || triages || [];
+          if (triagesData.length > 0) {
+            console.log("tringes", triagesData)
+          }
+        }
+
+
+
+      } catch (error) {
+        console.error("Error fetching grades:", error);
+      }
+
+    };
+
+    loadData();
     if (lot) {
       setDateEntree(lot.dateEntree || new Date().toISOString().split("T")[0]);
       setDateSortie(lot.dateSortie || new Date().toISOString().split("T")[0]);
 
       if (!readOnly) {
-        if (lot.gradesATrier && lot.gradesATrier.length > 0) {
-          // Pre-populate with grades designated to be sorted
-          setActiveGrades(lot.gradesATrier);
-        } else if (lot.taxationQuantities) {
+        if (lot.taxationQuantities) {
           const active = Object.keys(lot.taxationQuantities).filter(
             (g) => lot.taxationQuantities[g] !== "" && lot.taxationQuantities[g] !== undefined
           );
@@ -48,8 +76,6 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
             ? active.filter((g) => !lot.gradesStockesDirect.includes(g))
             : active;
           setActiveGrades(filteredActive);
-        } else if (lot.grades) {
-          setActiveGrades(Object.keys(lot.grades));
         }
       } else {
         // In read-only mode, display all grades present in taxationQuantities
@@ -64,6 +90,9 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
       if (lot.taxationQuantities) {
         setQuantities((prev) => ({ ...prev, ...lot.taxationQuantities }));
       }
+      if (lot.taxationPoids) {
+        setQuantiteKgs((prev) => ({ ...prev, ...lot.taxationPoids }));
+      }
     }
   }, [lot, readOnly]);
 
@@ -76,6 +105,17 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
   const handleGradeRemove = (grade) => {
     setActiveGrades((prev) => prev.filter((g) => g !== grade));
     setQuantities((prev) => ({ ...prev, [grade]: "" }));
+    setQuantiteKgs((prev) => ({ ...prev, [grade]: "" }));
+  };
+
+  const getQualityId = (gradeName) => {
+    const gradeObj = fullApiGrades.find((item) => {
+      if (typeof item === 'object') {
+        return item.nom === gradeName || item.designation === gradeName || item.name === gradeName || item.code === gradeName;
+      }
+      return item === gradeName;
+    });
+    return gradeObj ? gradeObj.id : gradeName;
   };
 
   const handleSubmit = (e) => {
@@ -90,21 +130,83 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
     }
 
     const finalTaxation = { ...lot.taxationQuantities };
+    const finalPoids = { ...(lot.taxationPoids || {}) };
     activeGrades.forEach((g) => {
       finalTaxation[g] = parseFloat(quantities[g]) || 0;
+      finalPoids[g] = parseFloat(quantiteKgs[g]) || 0;
     });
 
     const finalizedData = {
-      dateEntree,
+      id: lot.id,
       dateSortie,
       status: "Trié & Stocké",
-      taxationQuantities: finalTaxation,
+      quantiteKgs: finalPoids,
+      quantiteSacs: finalTaxation,
+      observation: observation,
+      qualites: activeGrades.map(getQualityId),
     };
-    onSave(lot.id, finalizedData);
+    if (!finalPoids || !finalTaxation) {
+      toast.error("Veuillez renseigner les quantités.");
+      return;
+    }
+
+    const promise = Promise.all(
+      activeGrades.map(async (g) => {
+        const qualiteId = getQualityId(g);
+        const results = await fetchData(
+          "post",
+          `/cafe/production_apres_triage/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {
+              "triage": lot.id,
+              "quantite_sortie": parseFloat(quantiteKgs[g]) || 0,
+              "qualite": qualiteId,
+              "nombre_sacs": parseInt(quantities[g]) || 0,
+              "observation": observation
+            }
+          }
+        );
+        if (results.status != 200 && results.status != 201) {
+          throw new Error("Erreur lors de l'enregistrement");
+        }
+        return results;
+      })
+    ).then(async () => {
+      const result2 = await fetchData(
+        "patch",
+        `/cafe/triage/${lot.id}/`,
+        {
+          params: {},
+          additionalHeaders: {},
+          body: {
+            status: 'TERMINE',
+            fin_triage: dateSortie,
+            observation: observation
+          },
+        }
+      );
+      if (result2.status == 200 || result2.status == 201) {
+        return { lot: lot.id };
+      } else {
+        throw new Error("Erreur de mise à jour du triage");
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "Modification...",
+      success: (data) => {
+
+        return `Données Enregistrées avec succès`;
+      },
+      error: "Donnée non enregistrée!!!",
+    });
   };
 
-  const availableGrades = TRIAGE_GRADES.filter(
+  const availableGrades = apiGrades.filter(
     (g) => !activeGrades.includes(g) && !lot?.gradesStockesDirect?.includes(g)
+
   );
 
   return (
@@ -139,22 +241,22 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
               {/* Date Entrée */}
               <div className="space-y-2">
                 <Label className="font-semibold text-slate-700 dark:text-slate-300 text-sm">
-                  Date d'Entrée au Processus
+                  Observation
                 </Label>
                 {readOnly ? (
                   <div className="p-2 border rounded-md bg-slate-50 dark:bg-slate-900/50 text-sm text-slate-800 dark:text-slate-200">
-                    {dateEntree || "—"}
+                    {observation || "—"}
                   </div>
                 ) : (
                   <div className="relative">
                     <Input
-                      type="date"
-                      value={dateEntree}
-                      onChange={(e) => setDateEntree(e.target.value)}
+                      type="text"
+                      value={observation}
+                      onChange={(e) => setObservation(e.target.value)}
                       className="w-full pl-10"
                       required
                     />
-                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+
                   </div>
                 )}
               </div>
@@ -245,11 +347,11 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
                               key={grade}
                               className="p-3 bg-blue-50/30 dark:bg-blue-950/10 rounded-lg border border-blue-100/30 dark:border-blue-900/20 flex flex-col gap-1"
                             >
-                              <span className="text-xs font-bold text-blue-700 dark:text-blue-400">
+                              <span className="text-xs font-bold text-blue-700 dark:text-blue-400 truncate">
                                 {grade}
                               </span>
                               <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                                {quantities[grade] ?? 0} sacs
+                                {quantities[grade] ?? 0} sacs {quantiteKgs[grade] ? `— ${quantiteKgs[grade]} kg` : ''}
                               </span>
                             </div>
                           ))}
@@ -270,11 +372,11 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
                             key={grade}
                             className="p-3 bg-emerald-50/30 dark:bg-emerald-950/10 rounded-lg border border-emerald-100/30 dark:border-emerald-900/20 flex flex-col gap-1"
                           >
-                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 truncate">
                               {grade}
                             </span>
                             <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                              {quantities[grade] ?? 0} sacs
+                              {quantities[grade] ?? 0} sacs {quantiteKgs[grade] ? `— ${quantiteKgs[grade]} kg` : ''}
                             </span>
                           </div>
                         ))}
@@ -290,15 +392,18 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
                           key={grade}
                           className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-100 dark:border-slate-900 flex flex-col gap-1"
                         >
-                          <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                          <span className="text-xs font-bold text-slate-600 dark:text-slate-400 truncate">
                             {grade}
                           </span>
                           <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                            {quantities[grade] ?? "—"} sacs
+                            {quantities[grade] ?? "—"} sacs {quantiteKgs[grade] ? `— ${quantiteKgs[grade]} kg` : ''}
                           </span>
+
                         </div>
+
                       ))}
                     </div>
+
                   )}
                 </div>
               ) : (
@@ -317,11 +422,11 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
                             key={grade}
                             className="bg-emerald-50/20 dark:bg-emerald-950/10 p-2.5 rounded-lg border border-emerald-100/20 dark:border-emerald-900/20 flex justify-between items-center"
                           >
-                            <div className="flex flex-col">
-                              <span className="text-xs font-bold text-emerald-800 dark:text-emerald-400">{grade}</span>
-                              <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold">{quantities[grade] || 0} sacs</span>
+                            <div className="flex flex-col overflow-hidden pr-2">
+                              <span className="text-xs font-bold text-emerald-800 dark:text-emerald-400 truncate">{grade}</span>
+                              <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold">{quantities[grade] || 0} sacs {quantiteKgs[grade] ? `— ${quantiteKgs[grade]} kg` : ''}</span>
                             </div>
-                            <span className="text-[9px] bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded font-semibold border border-emerald-200/50 dark:border-emerald-800/40">
+                            <span className="text-[9px] bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded font-semibold border border-emerald-200/50 dark:border-emerald-800/40 shrink-0">
                               Direct
                             </span>
                           </div>
@@ -338,14 +443,14 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
                         Grades triés (Ajustement quantité finale)
                       </h4>
                     )}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[260px] overflow-y-auto pr-1">
+                    <div className="grid grid-cols-2  gap-3 max-h-[260px] overflow-y-auto pr-1">
                       {activeGrades.map((grade) => (
                         <div
                           key={grade}
                           className="bg-slate-50/50 dark:bg-slate-900/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-900 space-y-1.5"
                         >
                           <div className="flex justify-between items-center">
-                            <Label htmlFor={`triage-${grade}`} className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                            <Label htmlFor={`triage-${grade}`} className="text-xs font-bold text-slate-600 dark:text-slate-400 truncate pr-2">
                               {grade}
                             </Label>
                             {/* Allow removal only if not part of the initially designated grades to sort */}
@@ -353,25 +458,48 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
                               <button
                                 type="button"
                                 onClick={() => handleGradeRemove(grade)}
-                                className="text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                                className="text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors shrink-0"
                               >
                                 <X className="h-3 w-3" />
                               </button>
                             )}
                           </div>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="1"
-                            id={`triage-${grade}`}
-                            value={quantities[grade]}
-                            onChange={(e) =>
-                              setQuantities((prev) => ({ ...prev, [grade]: e.target.value }))
-                            }
-                            placeholder="Nbr de sacs"
-                            className="h-8 text-xs bg-transparent"
-                            required
-                          />
+                          <div className="flex flex-col gap-2">
+                            <Label htmlFor={`triage-sacs-${grade}`} className="text-xs text-slate-600 dark:text-slate-400 truncate pr-2">
+                              Nbr de sacs
+                            </Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="1"
+                              id={`triage-sacs-${grade}`}
+                              value={quantities[grade] || ""}
+                              onChange={(e) =>
+                                setQuantities((prev) => ({ ...prev, [grade]: e.target.value }))
+                              }
+                              placeholder="Sacs"
+                              className="h-8 text-xs bg-transparent flex-1"
+                              required
+                            />
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <Label htmlFor={`triage-kg-${grade}`} className="text-xs text-slate-600 dark:text-slate-400 truncate pr-2">
+                              Qté (kg)
+                            </Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              id={`triage-kg-${grade}`}
+                              value={quantiteKgs[grade] || ""}
+                              onChange={(e) =>
+                                setQuantiteKgs((prev) => ({ ...prev, [grade]: e.target.value }))
+                              }
+                              placeholder="Qté (kg)"
+                              className="h-8 text-xs bg-transparent flex-1"
+                              required
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>

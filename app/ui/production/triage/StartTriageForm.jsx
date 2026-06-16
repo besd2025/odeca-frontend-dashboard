@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar, Info, Play, X } from "lucide-react";
 import { toast } from "sonner";
-
+import { fetchData } from "@/app/_utils/api";
 export default function StartTriageForm({ lot, onConfirm, onCancel }) {
   const [dateEntree, setDateEntree] = useState(
     new Date().toISOString().split("T")[0]
@@ -25,23 +25,47 @@ export default function StartTriageForm({ lot, onConfirm, onCancel }) {
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!dateEntree) {
       toast.error("Veuillez renseigner la date d'entrée.");
       return;
     }
-    if (selectedGrades.length === 0) {
-      toast.error("Veuillez sélectionner au moins un grade à trier. Si aucun grade ne doit être trié, utilisez l'option 'Étiqueter / Stocker' directement.");
-      return;
-    }
+    const promise = Promise.all(
 
-    const gradesATrier = selectedGrades;
-    const gradesStockesDirect = initialGrades.filter(
-      (g) => !selectedGrades.includes(g)
+      await fetchData(
+        "patch",
+        `/cafe/triage/${lot.id}/`,
+        {
+          params: {},
+          additionalHeaders: {},
+          body: {
+            "production": lot.id,
+            "status": "EN_COURS",
+            "fin_triage": dateEntree,
+          },
+        }
+      ).then((res) => {
+        if (res.status == 200 || res.status == 201) {
+          return { lot: lot.id };
+        } else {
+          throw new Error("Erreur de mise à jour du triage");
+        }
+      }).catch((error) => {
+        toast.error("Erreur de mise à jour du triage");
+      })
     );
 
-    onConfirm(lot, gradesATrier, gradesStockesDirect, dateEntree);
+
+    toast.promise(promise, {
+      loading: "Modification...",
+      success: (data) => {
+
+        return `Données Enregistrées avec succès`;
+      },
+      error: "Donnée non enregistrée!!!",
+    });
+
   };
 
   return (
@@ -102,8 +126,8 @@ export default function StartTriageForm({ lot, onConfirm, onCancel }) {
                   </span>
                   <span
                     className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${isChecked
-                        ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
-                        : "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
+                      ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
+                      : "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
                       }`}
                   >
                     {isChecked ? "Sera trié" : "Stocké direct"}

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import TriageList from "./TriageList";
 import TriageDialog from "./TriageDialog";
 import StartTriageForm from "./StartTriageForm";
-
+import { fetchData } from "@/app/_utils/api";
 // Sample lots from usinage outputs, ready for triage
 const INITIAL_LOTS = [
   {
@@ -81,6 +81,7 @@ export default function TriagePage() {
       toast.error("Impossible de démarrer le triage : lot non défini.");
       return;
     }
+
 
     setLots((prev) =>
       prev.map((l) => {
@@ -178,6 +179,38 @@ export default function TriagePage() {
     );
     toast.success(`Grade ${grade} enregistré en stockage sous le(s) numéro(s) de lot: ${lotNumbers.join(", ")}`);
   };
+
+
+  // const fetchLots = async () => {
+  //   try {
+  //     const data = await fetchData("get", `cafe/triage/get_termine_triage`);
+  //     const lotsData = data.results || data || [];
+  //     const formattedLots = lotsData.map(item => ({
+
+
+  //       id: item?.id,
+  //       societe: item?.nom_societe,
+  //       sdls: [],
+  //       grades: item?.productions,
+  //       dateEntree: item?.date_entree,
+  //       dateSortie: item?.date_sortie,
+  //       status: item?.statut,
+  //       taxationQuantities: item?.production_quantities,
+  //       remainingQuantities: item?.production_quantities,
+  //     }));
+  //     setLots(formattedLots);
+  //     console.log("formattedLots ", formattedLots);
+  //   } catch (error) {
+  //     console.error("Error fetching lots:", error);
+  //   }
+  // };
+
+  // React.useEffect(() => {
+  //   fetchLots();
+  // }, []);
+
+
+
 
   return (
     <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
