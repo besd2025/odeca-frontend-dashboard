@@ -11,7 +11,7 @@ export default function Page() {
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            🏷️ Réception & Codage
+            Réception & Codage
           </h1>
           <p className="text-slate-500 dark:text-slate-400">
             Enregistrement, réception et codage anonyme des échantillons au laboratoire.
