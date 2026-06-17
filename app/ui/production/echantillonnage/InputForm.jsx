@@ -156,13 +156,13 @@ export default function InputForm({ onAddSample }) {
         qualite: batch.grades.join(", "),
       }));
       setActiveGrades(batch.grades);
-      
+
       const newQuantities = COFFEE_QUALITIES.reduce((acc, g) => ({ ...acc, [g]: "" }), {});
       batch.grades.forEach(g => {
         newQuantities[g] = Math.ceil(batch.sacsCount * 0.1).toString();
       });
       setQuantities(newQuantities);
-      
+
       toast.success(`Lot ${batch.id} sélectionné. Les informations ont été pré-remplies.`);
     } else {
       setFormData((prev) => ({
@@ -288,46 +288,6 @@ export default function InputForm({ onAddSample }) {
               </CardHeader>
               <CardContent className="space-y-4">
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="lotNumber" className="font-semibold text-slate-700 dark:text-slate-300">
-                      Numéro de Lot (Stocké)
-                    </Label>
-                    <Select
-                      value={formData.lotNumber}
-                      onValueChange={handleLotSelect}
-                    >
-                      <SelectTrigger id="lotNumber" className="w-full">
-                        <SelectValue placeholder="Choisir un lot stocké" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MOCK_STOCKED_BATCHES.map((b) => (
-                          <SelectItem key={b.id} value={b.id} className="text-xs">
-                            {b.id} ({b.societe} — {b.sacsCount} sacs)
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="sacsCount" className="font-semibold text-slate-700 dark:text-slate-300">
-                      Nombre de Sacs représentés
-                    </Label>
-                    <Input
-                      type="number"
-                      step="1"
-                      min="0"
-                      id="sacsCount"
-                      name="sacsCount"
-                      value={formData.sacsCount}
-                      onChange={handleChange}
-                      placeholder="Ex: 85"
-                      required
-                    />
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div className="space-y-2">
                     <Label htmlFor="proprieteSociete" className="font-semibold text-slate-700 dark:text-slate-300">
@@ -377,6 +337,46 @@ export default function InputForm({ onAddSample }) {
                     </div>
                   </div>
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="lotNumber" className="font-semibold text-slate-700 dark:text-slate-300">
+                      Numéro de Lot (Stocké)
+                    </Label>
+                    <Select
+                      value={formData.lotNumber}
+                      onValueChange={handleLotSelect}
+                    >
+                      <SelectTrigger id="lotNumber" className="w-full">
+                        <SelectValue placeholder="Choisir un lot stocké" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MOCK_STOCKED_BATCHES.map((b) => (
+                          <SelectItem key={b.id} value={b.id} className="text-xs">
+                            {b.id} ({b.societe} — {b.sacsCount} sacs)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="sacsCount" className="font-semibold text-slate-700 dark:text-slate-300">
+                      Nombre de Sacs représentés
+                    </Label>
+                    <Input
+                      type="number"
+                      step="1"
+                      min="0"
+                      id="sacsCount"
+                      name="sacsCount"
+                      value={formData.sacsCount}
+                      onChange={handleChange}
+                      placeholder="Ex: 85"
+                      required
+                    />
+                  </div>
+                </div>
+
               </CardContent>
             </Card>
             <Card className="shadow-none dark:bg-slate-950 border-slate-200 dark:border-slate-800 flex flex-col justify-between">
@@ -440,6 +440,17 @@ export default function InputForm({ onAddSample }) {
                           className="h-8 text-xs"
                           required
                         />
+                        <Input
+                          type="number"
+                          min="0"
+                          step="any"
+                          id={`input-${quality}`}
+                          value={quantities[quality]}
+                          onChange={(e) => handleQtyChange(quality, e.target.value)}
+                          placeholder="Nbre  des sacs"
+                          className="h-8 text-xs"
+                          required
+                        />
                       </div>
                     ))}
                   </div>
@@ -447,39 +458,6 @@ export default function InputForm({ onAddSample }) {
               </CardContent>
             </Card>
 
-            {/* Checkbox settings */}
-            <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                  <ShieldAlert className="h-5 w-5 text-primary" /> Protocole d'Échantillonnage
-                </CardTitle>
-                <CardDescription>Règles et protocole de dosage du prélèvement.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div
-                  onClick={() => handleCheckboxChange(!formData.hundredGPerBag)}
-                  className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer select-none transition-all duration-200 ${formData.hundredGPerBag
-                    ? "bg-primary/5 border-primary dark:bg-primary/10"
-                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 dark:border-slate-800 dark:hover:bg-slate-900"
-                    }`}
-                >
-                  <Checkbox
-                    id="hundredGPerBag"
-                    checked={formData.hundredGPerBag}
-                    onCheckedChange={handleCheckboxChange}
-                    className="mt-1"
-                  />
-                  <div className="space-y-1">
-                    <Label htmlFor="hundredGPerBag" className="font-bold text-slate-800 dark:text-slate-200 cursor-pointer">
-                      Méthode standard 100g / Sac
-                    </Label>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                      Cochez cette case pour confirmer que l'échantillon respecte le prélèvement obligatoire de 100 grammes par sac pour l'analyse de qualité ODECA.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Actor & Date Card */}

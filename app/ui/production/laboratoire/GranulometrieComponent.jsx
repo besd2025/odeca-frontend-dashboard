@@ -91,16 +91,11 @@ const initialLabAnalyses = [
 ];
 
 export default function GranulometrieComponent() {
-  const [labAnalyses, setLabAnalyses] = useState(initialLabAnalyses);
+  // UI States Only
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
-
-  // Detail Modal States
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState(null);
-
-  const [searchPendingQuery, setSearchPendingQuery] = useState("");
-  const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
 
   const [formData, setFormData] = useState({
     quantite: "300",
@@ -113,27 +108,9 @@ export default function GranulometrieComponent() {
     fond: "",
   });
 
-  // ==============================================================
-  // BRANCHEMENT BACKEND : Charger les données depuis le serveur
-  // ==============================================================
-  useEffect(() => {
-    // POUR LE BACKEND : Charger les analyses en attente de granulométrie depuis le serveur
-    /*
-    async function fetchGranulometries() {
-      try {
-        const res = await fetch("/api/production/laboratoire/analyses");
-        const data = await res.json();
-        setLabAnalyses(data);
-      } catch (err) {
-        console.error("Erreur lors de la récupération des analyses", err);
-      }
-    }
-    fetchGranulometries();
-    */
-  }, []);
-
-  const pendingAnalyses = labAnalyses.filter((item) => item.status === "receptionne");
-  const completedAnalyses = labAnalyses.filter(
+  // Static Data Presentation
+  const pendingAnalyses = initialLabAnalyses.filter((item) => item.status === "receptionne");
+  const completedAnalyses = initialLabAnalyses.filter(
     (item) => item.status !== "receptionne" && item.granulometrie
   );
 
@@ -182,95 +159,14 @@ export default function GranulometrieComponent() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!selectedAnalysis) {
-      toast.error("Aucun échantillon sélectionné.");
-      return;
-    }
     if (!isSumPerfect) {
       toast.warning(`La somme totale est de ${totalSum}%. Elle doit être de 100%.`);
       return;
     }
-
-    // ==============================================================
-    // BRANCHEMENT BACKEND : Enregistrer l'analyse physique / granulométrie
-    // ==============================================================
-    /*
-    async function saveGranulometrie() {
-      try {
-        const payload = {
-          status: "granulometrie_complete",
-          granulometrie: {
-            quantite: parseFloat(formData.quantite) || 300,
-            date: formData.dateGranulo,
-            sieve_7_1: val_7_1,
-            sieve_6_3: val_6_3,
-            sieve_5_5: val_5_5,
-            sieve_4_0: val_4_0,
-            sieve_3_0: val_3_0,
-            fond: val_fond,
-          }
-        };
-        const res = await fetch(`/api/production/laboratoire/analyses/${selectedAnalysis.id}/granulometrie`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          toast.success("Analyse granulométrique validée et enregistrée !");
-          // Recharger les données depuis le backend après
-        }
-      } catch (err) {
-        toast.error("Erreur lors de la sauvegarde sur le serveur.");
-      }
-    }
-    saveGranulometrie();
-    */
-
-    const updatedAnalyses = labAnalyses.map((item) => {
-      if (item.id === selectedAnalysis.id) {
-        return {
-          ...item,
-          status: "granulometrie_complete",
-          granulometrie: {
-            quantite: parseFloat(formData.quantite) || 300,
-            date: formData.dateGranulo,
-            sieve_7_1: val_7_1,
-            sieve_6_3: val_6_3,
-            sieve_5_5: val_5_5,
-            sieve_4_0: val_4_0,
-            sieve_3_0: val_3_0,
-            fond: val_fond,
-          },
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return item;
-    });
-
-    setLabAnalyses(updatedAnalyses);
     toast.success("Analyse granulométrique validée et enregistrée ! (Illustration locale)");
     setIsModalOpen(false);
     setSelectedAnalysis(null);
   };
-
-  const filteredPending = pendingAnalyses.filter((item) => {
-    const q = searchPendingQuery.toLowerCase();
-    return (
-      item.codeEtiquette.toLowerCase().includes(q) ||
-      item.lotNumber.toLowerCase().includes(q) ||
-      item.societe.toLowerCase().includes(q)
-    );
-  });
-
-  const filteredCompleted = completedAnalyses.filter((item) => {
-    const q = searchHistoryQuery.toLowerCase();
-    return (
-      item.codeEtiquette.toLowerCase().includes(q) ||
-      item.lotNumber.toLowerCase().includes(q) ||
-      item.societe.toLowerCase().includes(q)
-    );
-  });
 
   return (
     <div className="space-y-6">
@@ -295,11 +191,11 @@ export default function GranulometrieComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." value={searchPendingQuery} onChange={(e) => setSearchPendingQuery(e.target.value)} className="pl-9 h-9 text-sm" />
+                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {filteredPending.length === 0 ? (
+              {pendingAnalyses.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
                   <p className="font-semibold text-slate-700 dark:text-slate-300">Tous les échantillons ont été analysés !</p>
@@ -321,7 +217,7 @@ export default function GranulometrieComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredPending.map((item) => (
+                      {pendingAnalyses.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -372,11 +268,11 @@ export default function GranulometrieComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." value={searchHistoryQuery} onChange={(e) => setSearchHistoryQuery(e.target.value)} className="pl-9 h-9 text-sm" />
+                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {filteredCompleted.length === 0 ? (
+              {completedAnalyses.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Clipboard className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
                   <p className="font-medium">Aucune analyse granulométrique terminée.</p>
@@ -403,7 +299,7 @@ export default function GranulometrieComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCompleted.map((item) => (
+                      {completedAnalyses.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>

@@ -85,16 +85,11 @@ const initialLabAnalyses = [
 ];
 
 export default function CuppingComponent() {
-  const [labAnalyses, setLabAnalyses] = useState(initialLabAnalyses);
+  // UI States Only
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
-
-  // Detail Modal States
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState(null);
-
-  const [searchPendingQuery, setSearchPendingQuery] = useState("");
-  const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
 
   const [formData, setFormData] = useState({
     qteTorrefier: "200",
@@ -104,10 +99,9 @@ export default function CuppingComponent() {
     qualite: "Qualité",
   });
 
-
-
-  const pendingAnalyses = labAnalyses.filter((item) => item.status === "triage_complete");
-  const completedAnalyses = labAnalyses.filter(
+  // Static Data Presentation
+  const pendingAnalyses = initialLabAnalyses.filter((item) => item.status === "triage_complete");
+  const completedAnalyses = initialLabAnalyses.filter(
     (item) => item.status !== "receptionne" && item.status !== "granulometrie_complete" && item.status !== "triage_complete" && item.degustation
   );
 
@@ -135,55 +129,16 @@ export default function CuppingComponent() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!selectedAnalysis) {
-      toast.error("Aucun échantillon sélectionné.");
-      return;
-    }
-
     const avgVal = parseFloat(formData.moyenne);
     if (isNaN(avgVal) || avgVal < 0 || avgVal > 100) {
       toast.error("Veuillez renseigner une moyenne valide entre 0 et 100.");
       return;
     }
-    const updatedAnalyses = labAnalyses.map((item) => {
-      if (item.id === selectedAnalysis.id) {
-        return {
-          ...item,
-          status: "degustation_complete",
-          degustation: {
-            qteTorrefier: parseFloat(formData.qteTorrefier) || 200,
-            observation: formData.observation,
-            nbDegustateurs: parseInt(formData.nbDegustateurs) || 1,
-            moyenne: avgVal,
-            qualite: formData.qualite,
-            dateDegustation: new Date().toISOString().split("T")[0],
-          },
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return item;
-    });
 
-    setLabAnalyses(updatedAnalyses);
     toast.success("Torréfaction & Dégustation validées avec succès ! (Illustration locale)");
     setIsModalOpen(false);
     setSelectedAnalysis(null);
   };
-
-  const filteredPending = pendingAnalyses.filter((item) => {
-    const q = searchPendingQuery.toLowerCase();
-    return item.codeEtiquette.toLowerCase().includes(q) || item.lotNumber.toLowerCase().includes(q) || item.societe.toLowerCase().includes(q);
-  });
-
-  const filteredCompleted = completedAnalyses.filter((item) => {
-    const q = searchHistoryQuery.toLowerCase();
-    return (
-      item.codeEtiquette.toLowerCase().includes(q) ||
-      item.lotNumber.toLowerCase().includes(q) ||
-      item.societe.toLowerCase().includes(q) ||
-      item.degustation.qualite.toLowerCase().includes(q)
-    );
-  });
 
   return (
     <div className="space-y-6">
@@ -208,11 +163,11 @@ export default function CuppingComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." value={searchPendingQuery} onChange={(e) => setSearchPendingQuery(e.target.value)} className="pl-9 h-9 text-sm" />
+                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {filteredPending.length === 0 ? (
+              {pendingAnalyses.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
                   <p className="font-semibold text-slate-700 dark:text-slate-300">Tous les échantillons ont été dégustés !</p>
@@ -233,7 +188,7 @@ export default function CuppingComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredPending.map((item) => (
+                      {pendingAnalyses.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -283,11 +238,11 @@ export default function CuppingComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot, qualité..." value={searchHistoryQuery} onChange={(e) => setSearchHistoryQuery(e.target.value)} className="pl-9 h-9 text-sm" />
+                <Input placeholder="Rechercher code, lot, qualité..." className="pl-9 h-9 text-sm" />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {filteredCompleted.length === 0 ? (
+              {completedAnalyses.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Coffee className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
                   <p className="font-medium">Aucun cupping enregistré.</p>
@@ -310,7 +265,7 @@ export default function CuppingComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCompleted.map((item) => (
+                      {completedAnalyses.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>

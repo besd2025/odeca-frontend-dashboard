@@ -13,6 +13,7 @@ import StockageForm from "./StockageForm";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
 import { searchParams } from "next/navigation";
+import StockInitial from "./stockInitial";
 // ---------- Mock data ----------
 
 const STOCKED_LOTS = [
@@ -156,6 +157,9 @@ export default function StockagePage() {
                         <p className="text-slate-500 dark:text-slate-400 text-sm">
                             Suivi des lots de café stockés en entrepôt et des lots retournés pour un cycle de réusinage.
                         </p>
+                    </div>
+                    <div>
+                        <StockInitial />
                     </div>
                 </div>
                 <StockedList lots={stockedLots} onViewDetails={handleViewDetails} onStartStocking={handleStartStocking} />

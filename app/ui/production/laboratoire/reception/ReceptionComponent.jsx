@@ -83,13 +83,9 @@ const initialLabAnalyses = [
 ];
 
 export default function ReceptionComponent() {
-  const [samples, setSamples] = useState(initialPendingSamples);
-  const [labAnalyses, setLabAnalyses] = useState(initialLabAnalyses);
+  // UI States Only
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSample, setSelectedSample] = useState(null);
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchPendingQuery, setSearchPendingQuery] = useState("");
 
   const [formData, setFormData] = useState({
     transfertEchantillon: "",
@@ -104,32 +100,9 @@ export default function ReceptionComponent() {
     dateReception: new Date().toISOString().split("T")[0],
   });
 
-  // ==============================================================
-  // BRANCHEMENT BACKEND : Charger les données depuis le serveur
-  // ==============================================================
-  useEffect(() => {
-    // POUR LE BACKEND : Charger les échantillons physiques en attente et l'historique
-    /*
-    async function fetchData() {
-      try {
-        const samplesRes = await fetch("/api/production/samples/pending-reception");
-        const samplesData = await samplesRes.json();
-        setSamples(samplesData);
-
-        const analysesRes = await fetch("/api/production/laboratoire/analyses");
-        const analysesData = await analysesRes.json();
-        setLabAnalyses(analysesData);
-      } catch (err) {
-        console.error("Erreur de chargement des données", err);
-      }
-    }
-    fetchData();
-    */
-  }, []);
-
-  // Filter out samples already received in the lab (if any)
-  const receivedSampleIds = labAnalyses.map((analysis) => analysis.sampleId);
-  const pendingSamples = samples.filter((sample) => !receivedSampleIds.includes(sample.id));
+  // Static Data Presentation
+  const receivedSampleIds = initialLabAnalyses.map((analysis) => analysis.sampleId);
+  const pendingSamples = initialPendingSamples.filter((sample) => !receivedSampleIds.includes(sample.id));
 
   // Open modal for a specific pending sample
   const handleOpenConfirmModal = (sample) => {
@@ -166,106 +139,14 @@ export default function ReceptionComponent() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!selectedSample) {
-      toast.error("Échantillon invalide.");
-      return;
-    }
-    if (!formData.transfertEchantillon) {
-      toast.error("Veuillez renseigner le transfert de l'échantillon.");
-      return;
-    }
-    if (!formData.receptionniste) {
-      toast.error("Veuillez renseigner le nom du réceptionniste.");
-      return;
-    }
-
-    const newAnalysis = {
-      id: `LAB-ANA-${Date.now()}`,
-      sampleId: selectedSample.id,
-      transfertEchantillon: formData.transfertEchantillon,
-      lotNumber: formData.lotNumber,
-      qteEchantillon: parseFloat(formData.qteEchantillon),
-      sacsCount: parseInt(formData.sacsCount) || 0,
-      societe: formData.societe,
-      deparcheur: formData.deparcheur,
-      echantillonneur: formData.echantillonneur,
-      receptionniste: formData.receptionniste,
-      codeEtiquette: formData.codeEtiquette,
-      dateReception: formData.dateReception,
-      status: "receptionne",
-      createdAt: new Date().toISOString(),
-    };
-
-    // ==============================================================
-    // BRANCHEMENT BACKEND : Enregistrer la réception sur le serveur
-    // ==============================================================
-    /*
-    async function submitReception() {
-      try {
-        const res = await fetch("/api/production/laboratoire/receptions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newAnalysis)
-        });
-        if (res.ok) {
-          toast.success("Échantillon réceptionné et codé avec succès !");
-        }
-      } catch (err) {
-        toast.error("Erreur serveur lors de la réception.");
-      }
-    }
-    submitReception();
-    */
-
-    setLabAnalyses([newAnalysis, ...labAnalyses]);
     toast.success("Échantillon réceptionné et codé avec succès ! (Illustration locale)");
     setIsModalOpen(false);
     setSelectedSample(null);
   };
 
   const handleDeleteAnalysis = (id) => {
-    // ==============================================================
-    // BRANCHEMENT BACKEND : Supprimer l'analyse sur le serveur
-    // ==============================================================
-    /*
-    async function deleteReception() {
-      try {
-        const res = await fetch(`/api/production/laboratoire/receptions/${id}`, {
-          method: "DELETE"
-        });
-        if (res.ok) {
-          toast.success("Enregistrement de laboratoire supprimé");
-        }
-      } catch (err) {
-        toast.error("Erreur serveur lors de la suppression.");
-      }
-    }
-    deleteReception();
-    */
-
-    setLabAnalyses(labAnalyses.filter((item) => item.id !== id));
     toast.success("Enregistrement de laboratoire supprimé (Illustration locale)");
   };
-
-  const filteredAnalyses = labAnalyses.filter((item) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      item.codeEtiquette.toLowerCase().includes(query) ||
-      item.lotNumber.toLowerCase().includes(query) ||
-      item.societe.toLowerCase().includes(query) ||
-      item.receptionniste.toLowerCase().includes(query)
-    );
-  });
-
-  const filteredPending = pendingSamples.filter((sample) => {
-    const query = searchPendingQuery.toLowerCase();
-    return (
-      sample.id.toLowerCase().includes(query) ||
-      sample.lotNumber.toLowerCase().includes(query) ||
-      sample.societe.toLowerCase().includes(query)
-    );
-  });
 
   return (
     <div className="space-y-6">
@@ -285,14 +166,13 @@ export default function ReceptionComponent() {
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Rechercher prélèvement, lot..."
-              value={searchPendingQuery}
-              onChange={(e) => setSearchPendingQuery(e.target.value)}
+
               className="pl-9 h-9 text-sm"
             />
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {filteredPending.length === 0 ? (
+          {pendingSamples.length === 0 ? (
             <div className="text-center p-12 text-slate-500 dark:text-slate-400">
               <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
               <p className="font-semibold text-slate-700 dark:text-slate-300">Tous les échantillons ont été réceptionnés !</p>
@@ -314,7 +194,7 @@ export default function ReceptionComponent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredPending.map((sample) => (
+                  {pendingSamples.map((sample) => (
                     <TableRow key={sample.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                       <TableCell className="pl-6 font-semibold">{sample.id}</TableCell>
                       <TableCell className="font-bold text-slate-700 dark:text-slate-300">{sample.lotNumber}</TableCell>
@@ -356,14 +236,13 @@ export default function ReceptionComponent() {
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Rechercher étiquette, lot, propriétaire..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+
               className="pl-9 h-9 text-sm"
             />
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {filteredAnalyses.length === 0 ? (
+          {initialLabAnalyses.length === 0 ? (
             <div className="text-center p-12 text-slate-500 dark:text-slate-400">
               <Tag className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
               <p className="font-medium">Aucun échantillon réceptionné pour le moment.</p>
@@ -386,7 +265,7 @@ export default function ReceptionComponent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredAnalyses.map((item) => (
+                  {initialLabAnalyses.map((item) => (
                     <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                       <TableCell className="pl-6 font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">
                         {item.codeEtiquette}

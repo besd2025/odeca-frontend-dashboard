@@ -86,16 +86,11 @@ const initialLabAnalyses = [
 ];
 
 export default function TriageComponent() {
-  const [labAnalyses, setLabAnalyses] = useState(initialLabAnalyses);
+  // UI States Only
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
-
-  // Detail Modal States
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState(null);
-
-  const [searchPendingQuery, setSearchPendingQuery] = useState("");
-  const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
 
   const [formData, setFormData] = useState({
     qteTrier: "300",
@@ -107,27 +102,9 @@ export default function TriageComponent() {
     corpsEtrangers: "",
   });
 
-  // ==============================================================
-  // BRANCHEMENT BACKEND : Charger les données depuis le serveur
-  // ==============================================================
-  useEffect(() => {
-    // POUR LE BACKEND : Charger les analyses en attente de triage ou archivées
-    /*
-    async function fetchTriages() {
-      try {
-        const res = await fetch("/api/production/laboratoire/analyses");
-        const data = await res.json();
-        setLabAnalyses(data);
-      } catch (err) {
-        console.error("Erreur lors de la récupération des analyses", err);
-      }
-    }
-    fetchTriages();
-    */
-  }, []);
-
-  const pendingAnalyses = labAnalyses.filter((item) => item.status === "granulometrie_complete");
-  const completedAnalyses = labAnalyses.filter(
+  // Static Data Presentation
+  const pendingAnalyses = initialLabAnalyses.filter((item) => item.status === "granulometrie_complete");
+  const completedAnalyses = initialLabAnalyses.filter(
     (item) => item.status !== "receptionne" && item.status !== "granulometrie_complete" && item.triage
   );
 
@@ -162,87 +139,14 @@ export default function TriageComponent() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!selectedAnalysis) {
-      toast.error("Aucun échantillon sélectionné.");
-      return;
-    }
     if (!isDefectValid) {
       toast.error("La somme des défauts ne peut pas dépasser 100% !");
       return;
     }
-
-    // ==============================================================
-    // BRANCHEMENT BACKEND : Enregistrer le triage physique sur le serveur
-    // ==============================================================
-    /*
-    async function saveTriage() {
-      try {
-        const payload = {
-          status: "triage_complete",
-          triage: {
-            qteTrier: parseFloat(formData.qteTrier) || 300,
-            date: formData.dateTriage,
-            vraisDefauts: val_vraisDefauts,
-            defectueux: val_defectueux,
-            brisure: val_brisure,
-            nEtRat: val_nEtRat,
-            corpsEtrangers: val_corpsEtrangers,
-            totalDefectPct: totalDefects,
-          }
-        };
-        const res = await fetch(`/api/production/laboratoire/analyses/${selectedAnalysis.id}/triage`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          toast.success("Triage manuel validé et enregistré !");
-          // Recharger les données depuis le backend après
-        }
-      } catch (err) {
-        toast.error("Erreur lors de la sauvegarde du triage.");
-      }
-    }
-    saveTriage();
-    */
-
-    const updatedAnalyses = labAnalyses.map((item) => {
-      if (item.id === selectedAnalysis.id) {
-        return {
-          ...item,
-          status: "triage_complete",
-          triage: {
-            qteTrier: parseFloat(formData.qteTrier) || 300,
-            date: formData.dateTriage,
-            vraisDefauts: val_vraisDefauts,
-            defectueux: val_defectueux,
-            brisure: val_brisure,
-            nEtRat: val_nEtRat,
-            corpsEtrangers: val_corpsEtrangers,
-            totalDefectPct: totalDefects,
-          },
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return item;
-    });
-
-    setLabAnalyses(updatedAnalyses);
     toast.success("Triage manuel validé et enregistré ! (Illustration locale)");
     setIsModalOpen(false);
     setSelectedAnalysis(null);
   };
-
-  const filteredPending = pendingAnalyses.filter((item) => {
-    const q = searchPendingQuery.toLowerCase();
-    return item.codeEtiquette.toLowerCase().includes(q) || item.lotNumber.toLowerCase().includes(q) || item.societe.toLowerCase().includes(q);
-  });
-
-  const filteredCompleted = completedAnalyses.filter((item) => {
-    const q = searchHistoryQuery.toLowerCase();
-    return item.codeEtiquette.toLowerCase().includes(q) || item.lotNumber.toLowerCase().includes(q) || item.societe.toLowerCase().includes(q);
-  });
 
   return (
     <div className="space-y-6">
@@ -267,11 +171,11 @@ export default function TriageComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." value={searchPendingQuery} onChange={(e) => setSearchPendingQuery(e.target.value)} className="pl-9 h-9 text-sm" />
+                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {filteredPending.length === 0 ? (
+              {pendingAnalyses.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
                   <p className="font-semibold text-slate-700 dark:text-slate-300">Tous les échantillons ont été triés !</p>
@@ -292,7 +196,7 @@ export default function TriageComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredPending.map((item) => (
+                      {pendingAnalyses.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -344,11 +248,11 @@ export default function TriageComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." value={searchHistoryQuery} onChange={(e) => setSearchHistoryQuery(e.target.value)} className="pl-9 h-9 text-sm" />
+                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {filteredCompleted.length === 0 ? (
+              {completedAnalyses.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Sliders className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
                   <p className="font-medium">Aucun triage manuel enregistré.</p>
@@ -375,7 +279,7 @@ export default function TriageComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCompleted.map((item) => (
+                      {completedAnalyses.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
