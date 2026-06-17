@@ -158,11 +158,7 @@ const initialExports = [
 ];
 
 export default function CommercialisationComponent() {
-  // states (will be populated/synchronized with API later)
-  const [taxationReports, setTaxationReports] = useState(initialTaxationReports);
-  const [contracts, setContracts] = useState(initialContracts);
-  const [exportsList, setExportsList] = useState(initialExports);
-
+  // UI States Only
   const [activeMainTab, setActiveMainTab] = useState("taxation");
 
   // Search filter states
@@ -188,64 +184,12 @@ export default function CommercialisationComponent() {
   };
 
   const handleRegisterContract = (contractData) => {
-    // Generates a mock ID (to be replaced by DB auto-increment or backend response)
-    const newContract = {
-      id: `CTR-2026-00${contracts.length + 2}`,
-      ...contractData,
-      unitPrice: parseFloat(contractData.unitPrice) || 0,
-      quantity: parseFloat(contractData.quantity) || 0,
-      sacsCount: parseInt(contractData.sacsCount) || 0,
-      guaranteeAmount: parseFloat(contractData.guaranteeAmount) || 0,
-      lotCount: parseInt(contractData.lotCount) || 1,
-      status: "Actif",
-      createdAt: new Date().toISOString().split("T")[0]
-    };
-
-    // Replace with: API post call
-    setContracts(prev => [newContract, ...prev]);
-    toast.success(`Le contrat ${newContract.id} a été enregistré.`);
+    toast.success(`Le contrat a été enregistré (Illustration locale).`);
     setIsContractFormOpen(false);
   };
 
   const handleRegisterExport = (exportData) => {
-    const matchedContract = contracts.find(c => c.id === exportData.contractId);
-    const matchedReport = taxationReports.find(r => r.lotNumber === matchedContract?.lotNumber);
-
-    // Generates a mock ID (to be replaced by DB auto-increment or backend response)
-    const newExport = {
-      id: `EXP-2026-00${exportsList.length + 2}`,
-      contractId: exportData.contractId,
-      lotNumber: matchedContract?.lotNumber || "N/A",
-      exporterName: matchedContract?.sellerName || "N/A",
-      loadingDate: exportData.loadingDate,
-      transportMode: exportData.transportMode,
-      carrierName: exportData.carrierName,
-      sacsCount: matchedContract?.sacsCount || 0,
-      quality: matchedReport?.qualite || matchedContract?.coffeeType || "N/A",
-      modeE: exportData.modeE,
-      douaneDoc: exportData.douaneDoc || "douane_doc.pdf",
-      qualityCertDoc: exportData.qualityCertDoc || "certificat_qualite.pdf",
-      oicDocName: exportData.oicDoc || "oic_certificat.pdf",
-      oicExporter: matchedContract?.sellerName || "",
-      oicNotifyAddress: exportData.oicNotifyAddress,
-      oicDestinationCountry: matchedContract?.buyerCountry || "",
-      oicTranshipmentCountry: exportData.oicTranshipmentCountry,
-      swiftTransactionId: exportData.swiftTransactionId,
-      swiftDoc: exportData.swiftDoc || "swift_doc.pdf",
-      exploitationDoc: exportData.exploitationDoc || "exploitation_doc.pdf",
-      contractDoc: exportData.contractDoc || "contract_copy.pdf",
-      factureDoc: exportData.factureDoc || "facture_invoice.pdf",
-      accordVenteDoc: exportData.accordVenteDoc || "accord_vente.pdf",
-      accordVenteQty: parseFloat(exportData.accordVenteQty) || matchedContract?.quantity || 0,
-      debitNoteDoc: exportData.debitNoteDoc || "debit_note.pdf",
-      lotCount: parseInt(exportData.lotCount) || 1,
-      status: "Confirmé BESD & ODECA",
-      createdAt: new Date().toISOString().split("T")[0]
-    };
-
-    // Replace with: API post call
-    setExportsList(prev => [newExport, ...prev]);
-    toast.success(`La confirmation d'exportation ${newExport.id} a été soumise avec succès.`);
+    toast.success(`La confirmation d'exportation a été soumise avec succès (Illustration locale).`);
     setIsExportFormOpen(false);
   };
 
@@ -281,7 +225,7 @@ export default function CommercialisationComponent() {
         {/* TAB 1: RECEPTION & TAXATION */}
         <TabsContent value="taxation" className="space-y-4 mt-4">
           <TaxationTab
-            taxationReports={taxationReports}
+            taxationReports={initialTaxationReports}
             searchTaxation={searchTaxation}
             setSearchTaxation={setSearchTaxation}
             onViewDetails={handleViewReportDetails}
@@ -292,7 +236,7 @@ export default function CommercialisationComponent() {
         {/* TAB 2: CONTRAT DE VENTE / ACHAT */}
         <TabsContent value="contracts" className="space-y-4 mt-4">
           <ContractsTab
-            contracts={contracts}
+            contracts={initialContracts}
             searchContract={searchContract}
             setSearchContract={setSearchContract}
           />
@@ -301,7 +245,7 @@ export default function CommercialisationComponent() {
         {/* TAB 3: CONFIRMATION EXPORT */}
         <TabsContent value="exports" className="space-y-4 mt-4">
           <ExportsTab
-            exportsList={exportsList}
+            exportsList={initialExports}
             searchExport={searchExport}
             setSearchExport={setSearchExport}
             onRequestExport={() => setIsExportFormOpen(true)}
@@ -320,7 +264,7 @@ export default function CommercialisationComponent() {
       <ContractFormDialog
         isOpen={isContractFormOpen}
         onOpenChange={setIsContractFormOpen}
-        taxationReports={taxationReports}
+        taxationReports={initialTaxationReports}
         onSubmit={handleRegisterContract}
         prefilledReport={selectedReport}
       />
@@ -329,8 +273,8 @@ export default function CommercialisationComponent() {
       <ExportFormDialog
         isOpen={isExportFormOpen}
         onOpenChange={setIsExportFormOpen}
-        contracts={contracts}
-        taxationReports={taxationReports}
+        contracts={initialContracts}
+        taxationReports={initialTaxationReports}
         onSubmit={handleRegisterExport}
       />
     </div>

@@ -151,87 +151,20 @@ const initialLabAnalyses = [
 ];
 
 export default function RapportsComponent() {
-  const [labAnalyses, setLabAnalyses] = useState(initialLabAnalyses);
-  const [searchPendingQuery, setSearchPendingQuery] = useState("");
-  const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
-
-  // Detail Modal (Fiche Synthèse)
+  // UI States Only
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState(null);
-
-  // Taxation Report Preview Modal
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [activeAnalysis, setActiveAnalysis] = useState(null);
 
-  // ==============================================================
-  // BRANCHEMENT BACKEND : Charger les données depuis le serveur
-  // ==============================================================
-  useEffect(() => {
-    // POUR LE BACKEND : Charger toutes les analyses depuis le serveur
-    /*
-    async function fetchAnalyses() {
-      try {
-        const res = await fetch("/api/production/laboratoire/analyses");
-        const data = await res.json();
-        setLabAnalyses(data);
-      } catch (err) {
-        console.error("Erreur lors de la récupération des analyses", err);
-      }
-    }
-    fetchAnalyses();
-    */
-  }, []);
-
-  // Pending: degustation_complete (ready for final decision)
-  const pendingDecisions = labAnalyses.filter((item) => item.status === "degustation_complete");
-  // Finalized: taxed or returned
-  const finalizedReports = labAnalyses.filter(
+  // Static Data Presentation
+  const pendingDecisions = initialLabAnalyses.filter((item) => item.status === "degustation_complete");
+  const finalizedReports = initialLabAnalyses.filter(
     (item) => item.status === "finalise_taxe" || item.status === "finalise_retourne"
   );
 
   // Actions
   const handleGenerateTaxationReport = (item) => {
-    // ==============================================================
-    // BRANCHEMENT BACKEND : Valider et générer le rapport sur le serveur
-    // ==============================================================
-    /*
-    async function finalizeTaxation() {
-      try {
-        const payload = {
-          status: "finalise_taxe",
-          decisionNotes: "Rapport de Taxation Généré. Qualité conforme aux critères de taxation."
-        };
-        const res = await fetch(`/api/production/laboratoire/analyses/${item.id}/finalize-taxe`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          toast.success("Rapport de taxation généré et finalisé.");
-          // Recharger les données du backend
-        }
-      } catch (err) {
-        toast.error("Erreur lors de la finalisation.");
-      }
-    }
-    finalizeTaxation();
-    */
-
-    const updatedAnalyses = labAnalyses.map((anal) => {
-      if (anal.id === item.id) {
-        return {
-          ...anal,
-          status: "finalise_taxe",
-          finalizedAt: new Date().toISOString(),
-          decisionNotes: "Rapport de Taxation Généré. Qualité conforme aux critères de taxation.",
-        };
-      }
-      return anal;
-    });
-
-    setLabAnalyses(updatedAnalyses);
-
-    // Set for active report print preview
     setActiveAnalysis({
       ...item,
       status: "finalise_taxe",
@@ -243,66 +176,10 @@ export default function RapportsComponent() {
   };
 
   const handleReturnToFactory = (item) => {
-    // ==============================================================
-    // BRANCHEMENT BACKEND : Signaler le retour à l'usine sur le serveur
-    // ==============================================================
-    /*
-    async function finalizeReturn() {
-      try {
-        const payload = {
-          status: "finalise_retourne",
-          decisionNotes: "Retour à l'usine - pas de rapport. Échantillon rejeté ou insuffisant."
-        };
-        const res = await fetch(`/api/production/laboratoire/analyses/${item.id}/finalize-return`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          toast.warning("Échantillon retourné à l'usine.");
-          // Recharger les données du backend
-        }
-      } catch (err) {
-        toast.error("Erreur lors du retour à l'usine.");
-      }
-    }
-    finalizeReturn();
-    */
-
-    const updatedAnalyses = labAnalyses.map((anal) => {
-      if (anal.id === item.id) {
-        return {
-          ...anal,
-          status: "finalise_retourne",
-          finalizedAt: new Date().toISOString(),
-          decisionNotes: "Retour à l'usine - pas de rapport. Échantillon rejeté ou insuffisant.",
-        };
-      }
-      return anal;
-    });
-
-    setLabAnalyses(updatedAnalyses);
     toast.warning(`Échantillon ${item.codeEtiquette} renvoyé à l'usine (Illustration locale)`);
   };
 
-  const filteredPending = pendingDecisions.filter((item) => {
-    const q = searchPendingQuery.toLowerCase();
-    return (
-      item.codeEtiquette.toLowerCase().includes(q) ||
-      item.lotNumber.toLowerCase().includes(q) ||
-      item.societe.toLowerCase().includes(q)
-    );
-  });
 
-  const filteredFinalized = finalizedReports.filter((item) => {
-    const q = searchHistoryQuery.toLowerCase();
-    return (
-      item.codeEtiquette.toLowerCase().includes(q) ||
-      item.lotNumber.toLowerCase().includes(q) ||
-      item.societe.toLowerCase().includes(q) ||
-      item.status.toLowerCase().includes(q)
-    );
-  });
 
   // Print helper
   const handlePrint = () => {
@@ -332,11 +209,11 @@ export default function RapportsComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher lot, étiquette..." value={searchPendingQuery} onChange={(e) => setSearchPendingQuery(e.target.value)} className="pl-9 h-9 text-sm" />
+                <Input placeholder="Rechercher lot, étiquette..." className="pl-9 h-9 text-sm" />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {filteredPending.length === 0 ? (
+              {pendingDecisions.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
                   <p className="font-semibold text-slate-700 dark:text-slate-300">Toutes les décisions ont été prises !</p>
@@ -356,7 +233,7 @@ export default function RapportsComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredPending.map((item) => (
+                      {pendingDecisions.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -423,11 +300,11 @@ export default function RapportsComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher lot, étiquette, statut..." value={searchHistoryQuery} onChange={(e) => setSearchHistoryQuery(e.target.value)} className="pl-9 h-9 text-sm" />
+                <Input placeholder="Rechercher lot, étiquette, statut..." className="pl-9 h-9 text-sm" />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {filteredFinalized.length === 0 ? (
+              {finalizedReports.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Scroll className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
                   <p className="font-medium">Aucun rapport finalisé.</p>
@@ -449,7 +326,7 @@ export default function RapportsComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredFinalized.map((item) => (
+                      {finalizedReports.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
