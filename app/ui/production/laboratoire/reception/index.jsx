@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetchData } from "@/app/_utils/api";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -281,6 +282,25 @@ export default function ReceptionPage() {
       sample.societe.toLowerCase().includes(query)
     );
   });
+  const [data, setData] = useState([])
+  const fetchPendingSamples = async () => {
+    try {
+
+      const res = await fetchData("get", "cafe/echantillonage/en-attente-reception/");
+      console.log("res", res)
+
+      setData(res);
+
+
+    } catch (err) {
+      console.error("Erreur serveur lors de la récupération des échantillons en attente");
+    }
+  };
+
+  React.useEffect(() => {
+    fetchPendingSamples();
+  }, []);
+
 
   return (
     <div className="space-y-6">

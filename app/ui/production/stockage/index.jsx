@@ -84,7 +84,7 @@ export default function StockagePage() {
     const [selectedLot, setSelectedLot] = useState(null);
     const [isViewingDetails, setIsViewingDetails] = useState(false);
     const [stockedLots, setStockedLots] = useState(STOCKED_LOTS);
-    const [isCreatingStock, setIsCreatingStock] = useState(false);
+    const [stockingLot, setStockingLot] = useState(null);
     const [formData, setFormData] = useState({
         id: "",
         societe: "",
@@ -98,9 +98,13 @@ export default function StockagePage() {
         grades: {},
         gradeSDLs: {}
     })
-    const handleStore = () => {
-        setIsCreatingStock(false);
+    const handleStore = (newLot) => {
+        setStockingLot(null);
     }
+
+    const handleStartStocking = (lot) => {
+        setStockingLot(lot);
+    };
 
     // const code_societe = React.searchParams.get("id")
     // console.log("this is code", "code_societe")
@@ -110,35 +114,35 @@ export default function StockagePage() {
     };
 
 
-    async function loadInitialData() {
-        try {
+    // async function loadInitialData() {
+    //     try {
 
-            const [allData] = await Promise.all([
-                fetchData("get", `cafe/usinages/quantites_usinage/`, { params: { offset: 0, limit: 150 } })
-            ]);
-            console.log(allData)
-            setFormData(pre => ({
-                ...pre,
-                societe: allData?.societe?.nom || "",
-                selectedSDLs: allData?.results?.sdls_list || [],
-                humidite: allData?.humidite || "",
-                rendement: allData?.rendement || "",
-                sacsCount: allData?.sacs_count || "",
-                poidsBrut: allData?.poids_brut || "",
-                poidsTare: allData?.poids_tare || "",
-                dateReception: allData?.date_reception || "",
-                grades: allData?.transferts?.[0]?.details[0] || {},
-                gradeSDLs: allData?.gradeSDLs || {}
-            }))
+    //         const [allData] = await Promise.all([
+    //             fetchData("get", `cafe/usinages/quantites_usinage/`, { params: { offset: 0, limit: 150 } })
+    //         ]);
+    //         console.log(allData)
+    //         setFormData(pre => ({
+    //             ...pre,
+    //             societe: allData?.societe?.nom || "",
+    //             selectedSDLs: allData?.results?.sdls_list || [],
+    //             humidite: allData?.humidite || "",
+    //             rendement: allData?.rendement || "",
+    //             sacsCount: allData?.sacs_count || "",
+    //             poidsBrut: allData?.poids_brut || "",
+    //             poidsTare: allData?.poids_tare || "",
+    //             dateReception: allData?.date_reception || "",
+    //             grades: allData?.transferts?.[0]?.details[0] || {},
+    //             gradeSDLs: allData?.gradeSDLs || {}
+    //         }))
 
 
-        } catch (err) {
-            console.error("Error loading initial data:", err);
-        }
-    }
-    React.useEffect(() => {
-        loadInitialData();
-    }, []);
+    //     } catch (err) {
+    //         console.error("Error loading initial data:", err);
+    //     }
+    // }
+    // React.useEffect(() => {
+    //     loadInitialData();
+    // }, []);
     return (
         <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
             <div className="p-6 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
@@ -153,18 +157,8 @@ export default function StockagePage() {
                             Suivi des lots de café stockés en entrepôt et des lots retournés pour un cycle de réusinage.
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Button size="sm" onClick={() => setIsCreatingStock(true)}>Nouveau Stockage</Button>
-                    </div>
                 </div>
-                <StockedList lots={stockedLots} onViewDetails={handleViewDetails} />
-
-                <Dialog open={isCreatingStock} onOpenChange={setIsCreatingStock}>
-                    <DialogContent className="sm:max-w-2xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto ">
-
-                        <StockageForm onCancel={() => setIsCreatingStock(false)} onStore={handleStore} />
-                    </DialogContent>
-                </Dialog>
+                <StockedList lots={stockedLots} onViewDetails={handleViewDetails} onStartStocking={handleStartStocking} />
 
                 {/* Details Dialog */}
                 <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
@@ -195,7 +189,7 @@ export default function StockagePage() {
                                 </div>
 
                                 {/* Info grid */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="gap-4">
                                     {/* Grades */}
                                     <div className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-100 dark:border-slate-900 space-y-2">
                                         <span className="text-xs font-bold text-secondary uppercase tracking-wider">
@@ -211,49 +205,6 @@ export default function StockagePage() {
                                         </div>
                                     </div>
 
-                                    {/* Metadata */}
-                                    <div className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-100 dark:border-slate-900 space-y-3">
-                                        {selectedLot.nombreSacs !== undefined && (
-                                            <div>
-                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block">
-                                                    Nombre de Sacs
-                                                </span>
-                                                <span className="text-lg font-bold text-primary dark:text-white">
-                                                    {selectedLot.nombreSacs} sacs
-                                                </span>
-                                            </div>
-                                        )}
-                                        {selectedLot.dateStockage && (
-                                            <div>
-                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block">
-                                                    Date de Stockage
-                                                </span>
-                                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                                    {selectedLot.dateStockage}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {selectedLot.dateRetour && (
-                                            <div>
-                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block">
-                                                    Date de Retour
-                                                </span>
-                                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                                    {selectedLot.dateRetour}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {selectedLot.status && (
-                                            <div>
-                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block">
-                                                    Statut
-                                                </span>
-                                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                                    {selectedLot.status}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
                                 </div>
 
                                 {/* Motif retour if applicable */}
@@ -268,6 +219,27 @@ export default function StockagePage() {
                                     </div>
                                 )}
                             </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* Stockage Form Dialog */}
+                <Dialog open={!!stockingLot} onOpenChange={(open) => !open && setStockingLot(null)}>
+                    <DialogContent className="sm:max-w-2xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
+                        <DialogHeader>
+                            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <PackageCheck className="h-5 w-5 text-primary" /> Stockage - {stockingLot?.societe}
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-500 dark:text-slate-400">
+                                Enregistrer un nouveau lot en stockage.
+                            </DialogDescription>
+                        </DialogHeader>
+                        {stockingLot && (
+                            <StockageForm
+                                lot={stockingLot}
+                                onCancel={() => setStockingLot(null)}
+                                onStore={handleStore}
+                            />
                         )}
                     </DialogContent>
                 </Dialog>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-
+import { fetchData } from "@/app/_utils/api";
 const SOCIETES = [
   "SOGESTAL Ngozi",
   "SOGESTAL Kayanza",
@@ -30,6 +30,7 @@ const GRADES = [
   "COQUE"
 ];
 
+
 export default function StockageForm({ onCancel, onStore }) {
   const [societe, setSociete] = useState(SOCIETES[0]);
   const [grade, setGrade] = useState(GRADES[0]);
@@ -41,12 +42,12 @@ export default function StockageForm({ onCancel, onStore }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!societe) return toast.error("Sélectionnez une société.");
-    if (!grade) return toast.error("Sélectionnez un grade.");
-    if (!nombreSacs || parseInt(nombreSacs) <= 0) {
-      return toast.error("Veuillez renseigner un nombre de sacs valide.");
-    }
-
+    // if (!societe) return toast.error("Sélectionnez une société.");
+    // if (!grade) return toast.error("Sélectionnez un grade.");
+    // if (!nombreSacs || parseInt(nombreSacs) <= 0) {
+    //   return toast.error("Veuillez renseigner un nombre de sacs valide.");
+    // }
+    console.log("newLot")
     const newLot = {
       id: lotNumber || `STOCK-2026-${Math.floor(Math.random() * 900 + 100)}`,
       societe,
@@ -55,19 +56,52 @@ export default function StockageForm({ onCancel, onStore }) {
       dateStockage,
     };
 
-    if (onStore) {
-      onStore(newLot);
-    }
-    toast.success(`Lot ${newLot.id} enregistré avec succès !`);
-    onCancel?.();
+    // console.log(newLot)
+    // if (onStore) {
+    //   onStore(newLot);
+
+    // }
+    // toast.success(`Lot ${newLot.id} enregistré avec succès !`);
+    // onCancel?.();
   };
 
+
+  async function loadInitialData() {
+    try {
+
+      const [allData] = await Promise.all([
+        fetchData("get", `cafe/stock_cafe/get_qualites_pretes_stockage/`, { params: { societe_id: 0, limit: 150 } })
+      ]);
+      console.log(allData)
+      setFormData(pre => ({
+        ...pre,
+        societe: allData?.societe?.nom || "",
+        selectedSDLs: allData?.results?.sdls_list || [],
+        humidite: allData?.humidite || "",
+        rendement: allData?.rendement || "",
+        sacsCount: allData?.sacs_count || "",
+        poidsBrut: allData?.poids_brut || "",
+        poidsTare: allData?.poids_tare || "",
+        dateReception: allData?.date_reception || "",
+        grades: allData?.transferts?.[0]?.details[0] || {},
+        gradeSDLs: allData?.gradeSDLs || {}
+      }))
+
+
+    } catch (err) {
+      console.error("Error loading initial data:", err);
+    }
+  }
+  React.useEffect(() => {
+    loadInitialData();
+  }, []);
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form className="space-y-4">
       <h3 className="text-lg font-bold text-slate-900 dark:text-white">
         Nouveau Stockage d'un Lot
       </h3>
-      
+
       <div className="space-y-2">
         <Label className="text-sm font-semibold">Société / Propriétaire</Label>
         <Select onValueChange={setSociete} value={societe}>
@@ -135,7 +169,7 @@ export default function StockageForm({ onCancel, onStore }) {
         <Button variant="outline" type="button" onClick={onCancel}>
           Annuler
         </Button>
-        <Button type="submit" className="bg-primary text-white">
+        <Button type="submit" className="bg-primary text-white" onClick={handleSubmit}>
           Stocker
         </Button>
       </div>

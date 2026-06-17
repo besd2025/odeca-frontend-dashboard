@@ -18,7 +18,6 @@ import PaginationContent from "@/components/ui/pagination-content";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StockageForm from "../stockage/StockageForm";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -119,49 +118,6 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
     setBagsToStock(gradeItem.bags.toString());
     const numLots = Math.ceil(gradeItem.bags / 320);
     setLotNumbers(Array(numLots).fill(""));
-  };
-
-  const handleBagsChange = (val) => {
-    setBagsToStock(val);
-    const bags = parseInt(val) || 0;
-    if (bags > 0) {
-      const numLots = Math.ceil(bags / 320);
-      setLotNumbers((prev) => {
-        const next = [...prev];
-        if (next.length < numLots) {
-          while (next.length < numLots) next.push("");
-        } else if (next.length > numLots) {
-          next.length = numLots;
-        }
-        return next;
-      });
-    } else {
-      setLotNumbers([]);
-    }
-  };
-
-  const handleConfirmStocking = (e) => {
-    e.preventDefault();
-    if (!stockingGrade) return;
-
-    const bags = parseInt(bagsToStock) || 0;
-    if (bags <= 0 || bags > stockingGrade.bags) {
-      toast.error(`Veuillez saisir une quantité valide entre 1 et ${stockingGrade.bags} sacs.`);
-      return;
-    }
-
-    const numLots = Math.ceil(bags / 320);
-    for (let i = 0; i < numLots; i++) {
-      if (!lotNumbers[i] || !lotNumbers[i].trim()) {
-        toast.error(`Veuillez renseigner le numéro de lot pour le Lot #${i + 1}.`);
-        return;
-      }
-    }
-
-    if (onStockGrade) {
-      onStockGrade(stockingGrade.lotId, stockingGrade.grade, bags, lotNumbers);
-    }
-    setStockingGrade(null);
   };
 
   const filteredLots = lots.filter((lot) => {
@@ -524,83 +480,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
         <PaginationContent />
       </CardContent>
 
-      <Dialog open={!!stockingGrade} onOpenChange={(open) => !open && setStockingGrade(null)}>
-        <DialogContent className="sm:max-w-xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <PackageCheck className="h-5 w-5 text-primary" /> Stocker le Grade
-            </DialogTitle>
-            <DialogDescription className="text-slate-500 dark:text-slate-400">
-              Définir les numéros de lot et les sacs pour le stockage. 1 lot = 320 sacs.
-            </DialogDescription>
-          </DialogHeader>
 
-          {stockingGrade && (
-            <form onSubmit={handleConfirmStocking} className="space-y-4">
-              <div className="p-3 bg-primary/5 border border-primary/10 rounded-lg text-sm space-y-1">
-                <div><span className="font-semibold text-primary">Lot d'origine:</span> {stockingGrade.lotId}</div>
-                <div><span className="font-semibold text-primary">Société:</span> {stockingGrade.societe}</div>
-                <div><span className="font-semibold text-primary">Grade:</span> {stockingGrade.grade}</div>
-                <div><span className="font-semibold text-primary">Sacs disponibles:</span> {stockingGrade.bags} sacs</div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">Nombre de sacs à stocker</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  max={stockingGrade.bags}
-                  value={bagsToStock}
-                  onChange={(e) => handleBagsChange(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
-                {lotNumbers.map((_, i) => {
-                  const bags = parseInt(bagsToStock) || 0;
-                  const bagsForThisLot = (i === lotNumbers.length - 1) ? (bags % 320 || 320) : 320;
-                  const isComplete = bagsForThisLot === 320;
-                  return (
-                    <div key={i} className="space-y-1.5 border border-slate-100 dark:border-slate-800 p-2.5 rounded-lg bg-slate-50/50 dark:bg-slate-900/20">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                          Lot #{i + 1} ({bagsForThisLot} sacs)
-                        </span>
-                        <Badge variant="outline" className={isComplete ? "border-emerald-200 bg-emerald-50 text-emerald-700 text-[10px]" : "border-amber-200 bg-amber-50 text-amber-700 text-[10px]"}>
-                          {isComplete ? "Complet" : "Incomplet"}
-                        </Badge>
-                      </div>
-                      <Label htmlFor={`lot-num-${i}`} className="text-xs text-slate-500">Numéro de Lot</Label>
-                      <Input
-                        id={`lot-num-${i}`}
-                        value={lotNumbers[i] || ""}
-                        onChange={(e) => {
-                          const newNums = [...lotNumbers];
-                          newNums[i] = e.target.value;
-                          setLotNumbers(newNums);
-                        }}
-                        placeholder={`Saisir le numéro du lot #${i + 1}`}
-                        required
-                        className="h-8 text-xs bg-transparent"
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <Button variant="outline" type="button" onClick={() => setStockingGrade(null)} size="sm">
-                  Annuler
-                </Button>
-                <Button type="submit" className="bg-primary text-white" size="sm">
-                  Enregistrer
-                </Button>
-              </div>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
     </Card>
   );
 }
