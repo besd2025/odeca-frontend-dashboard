@@ -46,7 +46,6 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
 
   const handleLotChange = (value) => {
     setLotsExistants(value);
-    console.log("lotsExistants : ", lotsExistants);
   }
   const [lotsAvailable, setLotsAvailable] = React.useState([])
   const handleOpenStocking = async (gradeItem) => {
@@ -118,215 +117,124 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
       [productionId]: Number(value), // Convertit la saisie en nombre
     }));
   };
-  const handleConfirmStocking = (e) => {
+  const handleConfirmStocking = async (e) => {
     e.preventDefault();
+
+    // 1. Vérification du lot sélectionné
     if (!lotsExistants) {
-      toast.error(`Veuillez sélectionner un lot existant.`);
-      return;
-    }
-    console.log("lotsExistants : ", lotsExistants);
-    console.log("checkedTries : ", checkedTries);
-    console.log("checkedNonRequisTries : ", checkedNonRequisTries);
-    // console.log("quantities : ", quantities);
-    if (checkedTries?.length === 0 && checkedNonRequisTries?.length === 0) {
-      toast.error(`Veuillez sélectionner au moins une qualité.`);
+      toast.error("Veuillez sélectionner un lot existant.");
       return;
     }
 
-    else {
+    // 2. Détection correcte des éléments cochés (Gestion sécurisée des objets {})
+    const hasTriesChecked = Object.values(checkedTries || {}).some(v => v === true);
+    const hasNonRequisChecked = Object.values(checkedNonRequisTries || {}).some(v => v === true);
 
-      const selectedItems = formData
-        .filter((g) => checkedTries[g.production_id] === true)
-        .reduce((acc, g) => {
-          const id = g.production_id;
-
-          // Somme par id unique
-          acc[id] = (acc[id] || 0) + g.nombre_sacs_restant;
-
-          return acc;
-        }, {});
-
-      // optionnel : revenir à une liste d’objets
-      const selectedItemsList = Object.entries(selectedItems).map(([production_id, sacs]) => ({
-        production_id: Number(production_id),
-        qualite: null,          // car qualite n'est plus unique si plusieurs lignes existent
-        sacs_a_stocker: sacs,
-
-
-
-      }));
-      const selectedNonRequisItems = formData
-        .filter((g) => checkedNonRequisTries[g.production_id] === true)
-        .reduce((acc, g) => {
-          const id = g.production_id;
-
-          // Somme par id unique
-          acc[id] = (acc[id] || 0) + g.nombre_sacs_restant;
-
-          return acc;
-        }, {});
-
-      // optionnel : revenir à une liste d’objets
-      const selectedNonRequisItemsList = Object.entries(selectedNonRequisItems).map(([production_id, sacs]) => ({
-        production_id: Number(production_id),
-        qualite: null,          // car qualite n'est plus unique si plusieurs lignes existent
-        sacs_a_stocker: sacs,
-      }));
-
-      // total global (si tu le veux)
-      const totalNonRequisSacs = selectedNonRequisItemsList.reduce((sum, item) => sum + item.sacs_a_stocker, 0);
-      const totalSacs = selectedItemsList.reduce((sum, item) => sum + item.sacs_a_stocker, 0);
-      const total = Object.values(quantitiesSelected).reduce((sum, n) => sum + Number(n), 0);
-
-      if (totalSacs + totalNonRequisSacs < total) {
-        toast.error(`La quantité à stocker est supérieure au nombre de sacs disponibles.`);
-        return;
-      }
-      else {
-
-
-        if (Object.values(checkedTries).includes(true)) {
-          const productIds = Object.keys(quantitiesSelected); // Récupère ["1", "4", "6"]
-
-          productIds.map(async (item) => {
-            // item vaut successivement "1", puis "4", puis "6"
-            const idProduction = Number(item); // Convertit la clé en nombre (1, 4, 6)
-            const nombreSacs = quantitiesSelected[item]; // Récupère la valeur associée (3000, 20, 500)
-            try {
-              const promise = new Promise(async (resolve, reject) => {
-                try {
-                  const results = await fetchData(
-                    "post",
-                    `cafe/prestockage_apres_triage/`,
-                    {
-                      params: {},
-                      additionalHeaders: {},
-                      body: {
-                        "nombre_sacs": nombreSacs,
-                        "stockage": lotsExistants,
-                        "apres_triage": idProduction
-                      },
-                    },
-                  );
-
-                  if (results.status == 200 || results.status == 201) {
-
-                    resolve({ lot: lotsExistants });
-                  } else {
-                    reject(new Error("Erreur"));
-                  }
-
-                }
-                catch (error) {
-                  reject(error);
-                }
-              });
-
-              toast.promise(promise, {
-                loading: "Modification...",
-                success: (data) => {
-                  //onSave(data.lot, finalizedData);
-                  setTimeout(() => setOpen(false), 500);
-                  return `Données Enregistrées avec succès `;
-                },
-                error: "Donnée non enregistrée!!!",
-              });
-
-              try {
-                promise;
-              } catch (error) {
-                console.error(error);
-                setError(error);
-              } finally {
-                setLoading(false);
-              }
-            }
-            catch (err) {
-              console.error("Error loading initial data:", err);
-            }
-
-          })
-
-        }
-        if (checkedNonRequisTries?.length > 0 && !Object.values(checkedTries).includes(true)) {
-          const productIds = Object.keys(nonRequisQuantity); // Récupère ["1", "4", "6"]
-
-          productIds.map(async (item) => {
-            // item vaut successivement "1", puis "4", puis "6"
-            const idProduction = Number(item); // Convertit la clé en nombre (1, 4, 6)
-            const nombreSacs = nonRequisQuantity[item];
-            console.log("nombreSacs : ", nombreSacs);
-            // Récupère la valeur associée (3000, 20, 500)
-            // try {
-            //   const promise = new Promise(async (resolve, reject) => {
-            //     try {
-            //       const results = await fetchData(
-            //         "post",
-            //         `cafe/prestockage_apres_triage/`,
-            //         {
-            //           params: {},
-            //           additionalHeaders: {},
-            //           body: {
-            //             "nombre_sacs": nombreSacs,
-            //             "stockage": lotsExistants,
-            //             "apres_triage": idProduction
-            //           },
-            //         },
-            //       );
-
-            //       if (results.status == 200 || results.status == 201) {
-
-            //         resolve({ lot: lotsExistants });
-            //       } else {
-            //         reject(new Error("Erreur"));
-            //       }
-
-            //     }
-            //     catch (error) {
-            //       reject(error);
-            //     }
-            //   });
-
-            //   toast.promise(promise, {
-            //     loading: "Modification...",
-            //     success: (data) => {
-            //       //onSave(data.lot, finalizedData);
-            //       setTimeout(() => setOpen(false), 500);
-            //       return `Données Enregistrées avec succès `;
-            //     },
-            //     error: "Donnée non enregistrée!!!",
-            //   });
-
-            //   try {
-            //     promise;
-            //   } catch (error) {
-            //     console.error(error);
-            //     setError(error);
-            //   } finally {
-            //     setLoading(false);
-            //   }
-            // }
-            // catch (err) {
-            //   console.error("Error loading initial data:", err);
-            // }
-
-          })
-
-        }
-        else {
-          console.log("Mise en Stock des lots requis et non requis : ");
-        }
-      }
+    if (!hasTriesChecked && !hasNonRequisChecked) {
+      toast.error("Veuillez sélectionner au moins une qualité.");
+      return;
     }
 
+    // 3. Calcul de la disponibilité physique globale des sacs
+    const selectedItems = formData
+      .filter((g) => checkedTries?.[g.production_id] === true)
+      .reduce((acc, g) => ({ ...acc, [g.production_id]: (acc[g.production_id] || 0) + g.nombre_sacs_restant }), {});
 
+    const selectedNonRequisItems = formData
+      .filter((g) => checkedNonRequisTries?.[g.production_id] === true)
+      .reduce((acc, g) => ({ ...acc, [g.production_id]: (acc[g.production_id] || 0) + g.nombre_sacs_restant }), {});
 
+    const totalSacsAvailable = Object.values(selectedItems).reduce((sum, n) => sum + n, 0);
+    const totalNonRequisAvailable = Object.values(selectedNonRequisItems).reduce((sum, n) => sum + n, 0);
 
-    // if (onStockGrade) {
-    //   console.log(stockingGrade.id || stockingGrade.lotId, stockingGrade.grades || stockingGrade.grade, bags, lotNumbers);
-    //   onStockGrade(stockingGrade.id || stockingGrade.lotId, stockingGrade.grades || stockingGrade.grade, bags, lotNumbers);
-    // }
-    // setStockingGrade(null);
+    // Total des volumes saisis par l'utilisateur
+    const totalSacsDemandes = Object.values(quantitiesSelected || {}).reduce((sum, n) => sum + Number(n), 0) +
+      Object.values(nonRequisQuantity || {}).reduce((sum, n) => sum + Number(n), 0);
+
+    if ((totalSacsAvailable + totalNonRequisAvailable) < totalSacsDemandes) {
+      toast.error("La quantité à stocker est supérieure au nombre de sacs disponibles.");
+      return;
+    }
+
+    // 4. Construction de la liste des charges utiles (Payloads) pour les API
+    const apiPayloads = [];
+
+    // Cas A : Ajout des tris requis (Après Triage)
+    if (hasTriesChecked) {
+      Object.keys(quantitiesSelected || {}).forEach((id) => {
+        const nombreSacs = Number(quantitiesSelected[id]);
+        if (nombreSacs > 0) {
+          apiPayloads.push({
+            idProduction: Number(id),
+            nombreSacs: nombreSacs,
+            endpoint: "cafe/prestockage_apres_triage/",
+            payloadKey: "apres_triage"
+          });
+        }
+      });
+    }
+
+    // Cas B : Ajout des tris non requis (Après Usinage)
+    if (hasNonRequisChecked) {
+      Object.keys(nonRequisQuantity || {}).forEach((id) => {
+        const nombreSacs = Number(nonRequisQuantity[id]);
+        if (nombreSacs > 0) {
+          apiPayloads.push({
+            idProduction: Number(id),
+            nombreSacs: nombreSacs,
+            endpoint: "cafe/prestockage_apres_usinage/", // Cible le bon endpoint détecté dans ton code initial
+            payloadKey: "apres_usinage"
+          });
+        }
+      });
+    }
+
+    if (apiPayloads.length === 0) {
+      toast.error("Aucune quantité valide à enregistrer.");
+      return;
+    }
+
+    // 5. Lancement des requêtes réseau
+    setLoading(true);
+
+    // Transformation des configurations de payload en promesses actives
+    const savePromises = apiPayloads.map(async (item) => {
+      const results = await fetchData(
+        "post",
+        `/${item.endpoint}`,
+        {
+          params: {},
+          additionalHeaders: {},
+          body: {
+            "nombre_sacs": item.nombreSacs,
+            "stockage": lotsExistants,
+            [item.payloadKey]: item.idProduction, // Devient dynamiquement "apres_triage" ou "apres_usinage"
+          },
+        }
+      );
+
+      if (results.status !== 200 && results.status !== 201) {
+        throw new Error(`Erreur lors du traitement du lot ID ${item.idProduction}`);
+      }
+      return results.data;
+    });
+
+    // 6. Résolution synchronisée avec Toast unique de contrôle
+    toast.promise(Promise.all(savePromises), {
+      loading: "Mise en stock des données en cours...",
+      success: () => {
+        if (typeof onSave === "function") onSave(lotsExistants, finalizedData);
+        setTimeout(() => setOpen(false), 500);
+        setLoading(false);
+        return "Toutes les données ont été enregistrées avec succès !";
+      },
+      error: (err) => {
+        console.error("Stocking error:", err);
+        if (typeof setError === "function") setError(err.message);
+        setLoading(false);
+        return "Une ou plusieurs données n'ont pas pu être enregistrées.";
+      },
+    });
   };
 
   const fetchLots = async () => {
