@@ -113,11 +113,6 @@ export default function ConfirmationPage() {
     const totalGradesQty = Object.values(formData.grades).reduce((acc, qty) => acc + (parseFloat(qty) || 0), 0);
 
     console.log("Submit Reception Lots Data:", { ...formData, poidsNet, totalGradesQty });
-    toast.success("Lot reçu et enregistré avec succès !");
-  };
-  const availableSDLs = formData.societe ? (SOCIETE_SDL_MAP[formData.societe] || []) : [];
-  const handleGradeRemove = (grade) => {
-    setActiveGrades((prev) => prev.filter((g) => g !== grade));
   };
 
   return (

@@ -278,7 +278,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
           <span className="text-xs bg-primary/10 px-2.5 py-0.5 rounded-full font-semibold">{lot?.societe}</span>
         </div>
         <div className="text-xs text-slate-500">
-          Usinage débuté le {lot?.dateUsinage}
+          Usinage débuté le {lot?.date_usinage}
         </div>
       </div>
 
@@ -422,8 +422,8 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
                                         required
                                       />
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                      <Label className="text-sm text-slate-600 font-medium">Trier</Label>
+                                    <div className="flex items-center gap-3 mt-4">
+                                      <Label className="text-sm text-slate-600 font-medium">Triage necessaire?</Label>
                                       <Checkbox
                                         checked={!!checkedGrades[grade]}
                                         onCheckedChange={() => handleCheckedChange(grade)}

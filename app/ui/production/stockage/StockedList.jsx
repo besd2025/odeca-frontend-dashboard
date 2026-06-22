@@ -3,10 +3,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, PackageCheck, AlertCircle, MoreHorizontal } from "lucide-react";
+import { Eye, PackageCheck, AlertCircle, MoreHorizontal, Banknote } from "lucide-react";
 import PaginationContent from "@/components/ui/pagination-content";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -325,7 +325,9 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="w-full md:w-1/2">
           <TabsTrigger value="account">Nouveau lot</TabsTrigger>
-          <TabsTrigger value="password">Stock</TabsTrigger>
+          <TabsTrigger value="password">Stock non prélevés</TabsTrigger>
+          <TabsTrigger value="Taxation">Rapport de taxation</TabsTrigger>
+          <TabsTrigger value="stocked">Lots Stockes & taxes</TabsTrigger>
         </TabsList>
         <TabsContent value="account">
           <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
@@ -428,14 +430,143 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="Taxation">
+          <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <Banknote className="h-5 w-5 text-primary" /> Lots Taxés
+              </CardTitle>
+              <CardDescription>
+                Liste des lots echantillonés, taxés et pret a etre stockés.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {lots.length === 0 ? (
+                <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
+                  <AlertCircle className="h-8 w-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                    Aucun lot stocké pour le moment
+                  </p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Numero lot</TableHead>
+                      <TableHead>Propriétaire / Société</TableHead>
+                      <TableHead>Grade / Qualité validée</TableHead>
+                      <TableHead className="text-right">Nombre de Sacs</TableHead>
+                      <TableHead>Date de prelevement</TableHead>
+                      <TableHead className="text-right sticky right-0 bg-sidebar shadow-2xl">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {lots?.map((lot) => (
+                      <TableRow key={lot.id}>
+                        <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
+                          {lot.lotNumbers}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-medium text-slate-800 dark:text-slate-200">
+                              {lot?.societe}
+                            </span>
+                            {lot?.sdls && lot?.sdls?.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {lot?.sdls?.map((sdl) => (
+                                  <span
+                                    key={sdl}
+                                    className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
+                                  >
+                                    {sdl}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1.5">
+                            {lot?.grades &&
+                              Object.keys(lot?.grades).map((grade) => (
+                                <Badge
+                                  key={grade}
+                                  variant="secondary"
+                                  className="text-xs bg-primary/10 text-primary dark:bg-primary/30 dark:text-primary dark:border-primary/30"
+                                >
+                                  {grade}
+                                </Badge>
+                              ))}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
+                          {lot.nombreSacs ?? "—"}
+                        </TableCell>
+                        <TableCell className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                          {lot.dateStockage || "—"}
+                        </TableCell>
+                        <TableCell className="text-right sticky right-0 bg-background shadow-2xl border-l border-slate-200 dark:border-slate-800">
+                          <>
+                            {/* 1. LE MENU DROPDOWN UNIQUE */}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Open menu</span>
+                                  <MoreHorizontal />
+                                </Button>
+                              </DropdownMenuTrigger>
+
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel className="text-muted-foreground font-normal text-xs">
+                                  Actions
+                                </DropdownMenuLabel>
+
+                                {/* Option Détails */}
+                                {/* <DropdownMenuItem onClick={() => handleViewDetailsStock(lot)}>
+                                  Détails
+                                </DropdownMenuItem> */}
+
+                                {/* CORRECTION : L'item Echantillonner est un simple frère direct de "Détails" */}
+                                <DropdownMenuItem
+                                  onClick={() => handleOpenEchantillonner(lot)}
+                                  className="text-primary cursor-pointer"
+                                >
+                                  Taxer & Stocker
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            {/* 2. EN DEHORS DU DROPDOWN : Le formulaire s'affiche de manière indépendante */}
+                            {openEchantillonner && (
+                              <InputForm
+                                lotData={DataStockage}
+                                onClose={() => {
+                                  setOpenEchantillonner(false);
+                                  setDataStockage([]);
+                                }}
+                              />
+                            )}
+                          </>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+              <PaginationContent />
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="password">
           <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
             <CardHeader>
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <PackageCheck className="h-5 w-5 text-primary" /> Lots Stockés
+                <PackageCheck className="h-5 w-5 text-primary" /> Lots non taxés
               </CardTitle>
               <CardDescription>
-                Liste des lots de café finalisés, étiquetés et disponibles en entrepôt.
+                Liste des lots non taxés.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -548,6 +679,67 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                             )}
                           </>
                         </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+              <PaginationContent />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="stocked">
+          <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <PackageCheck className="h-5 w-5 text-primary" /> Lots stockés & taxes
+              </CardTitle>
+              <CardDescription>
+                Lots stockés & taxes prets pour exportation
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {lots.length === 0 ? (
+                <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
+                  <AlertCircle className="h-8 w-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                    Aucun lots stockés.
+                  </p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nouveau lot</TableHead>
+                      <TableHead>Propriétaire / Société</TableHead>
+                      <TableHead>Grade / Qualité</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {lots?.map((lot) => (
+                      <TableRow key={lot.id}>
+                        <TableCell className="flex  gap-2 bg-sidebar dark:bg-slate-900">
+                          {lot.id}
+                        </TableCell>
+                        <TableCell>
+                          {lot?.societe}
+                        </TableCell>
+                        <TableCell className="text-sm text-slate-600 dark:text-slate-300">
+                          <div className="flex flex-wrap gap-1">
+                            {/* CORRECTION : Utilisation des clés directement (Grade) */}
+                            {Object.keys(lot.grades).map((grade) => (
+                              <Badge
+                                key={grade}
+                                variant="secondary"
+                                className="text-xs bg-primary/10 text-primary dark:bg-primary/30 dark:text-primary dark:border-primary/30"
+                              >
+                                {grade}
+                              </Badge>
+                            ))}
+                          </div>
+                        </TableCell>
+
+
                       </TableRow>
                     ))}
                   </TableBody>

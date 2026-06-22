@@ -159,7 +159,7 @@ export default function InputForm({ onAddLot, id, code_societe, societe }) {
         loading: "Modification...",
         success: (data) => {
           setTimeout(() => setOpen(false), 500);
-          return `Données Enregistrées avec succès `;
+          return `Grades selectionnées avec succès `;
         },
         error: "Donnée non enregistrée!!!",
       });
@@ -263,7 +263,7 @@ export default function InputForm({ onAddLot, id, code_societe, societe }) {
                               <TableHead className="w-[150px]">Grade</TableHead>
                               <TableHead>Quantité (Kg)</TableHead>
                               <TableHead>Nombre de Sacs</TableHead>
-                              <TableHead>Combiner</TableHead>
+                              <TableHead>Selectionnner/Combiner</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>

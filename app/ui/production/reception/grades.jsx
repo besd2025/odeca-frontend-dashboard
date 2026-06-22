@@ -18,7 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, Layers, MoreHorizontal, Settings, Trash2, Percent, Plus } from "lucide-react";
+import { CheckCircle2, Clock, Layers, MoreHorizontal, Settings, Trash2, Percent, Plus, CheckCheckIcon, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -200,7 +200,7 @@ export default function Grades() {
 
                         resolve({ idGrade });
                     } else {
-                        reject(new Error("Erreur lors de la modification"));
+                        reject(new Error("Erreur lors de la confirmation"));
                     }
 
                 } catch (error) {
@@ -209,7 +209,7 @@ export default function Grades() {
             });
 
             toast.promise(promise, {
-                loading: "Modification en cours...",
+                loading: "Confirmation en cours...",
                 success: (data) => {
                     setIsFinalizing(false);
                     setFormData((prev) => ({
@@ -222,9 +222,9 @@ export default function Grades() {
                         dateReception: "",
                     }));
                     loadGradesData(activeTab);
-                    return `Donnée enregistrée avec succès`;
+                    return `Donnée confirmée avec succès`;
                 },
-                error: "Donnée non enregistrée",
+                error: "Donnée non confirmée",
             });
 
             try {
@@ -273,7 +273,7 @@ export default function Grades() {
                                     <TableCell className="text-right font-semibold">{grade.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</TableCell>
                                     <TableCell className="text-center lowercase">
                                         {grade.status === "CONFIRMEE" ? (
-                                            <div className='gap-2 flex items-center justify-center'>
+                                            <div className='gap-2 flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/30 rounded-full px-2 py-0.5'>
                                                 <Badge variant="default" className="gap-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
                                                     <CheckCircle2 size={24} />
                                                 </Badge>
@@ -281,7 +281,7 @@ export default function Grades() {
                                             </div>
 
                                         ) : (
-                                            <div className='gap-2 flex items-center justify-center'>
+                                            <div className='gap-2 flex items-center justify-center bg-amber-100 dark:bg-amber-900/30 rounded-full px-2 py-0.5'>
                                                 <Badge variant="secondary" className="gap-1 bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400">
                                                     <Clock size={24} />
                                                 </Badge>
@@ -293,7 +293,7 @@ export default function Grades() {
                                         <div className="flex items-center gap-2">
                                             {grade.status === "EN_ATTENTE" && (
 
-                                                <Button className="cursor-pointer" onClick={() => activegradedetails(grade.id, grade.grade)}>Confirmer</Button>
+                                                <Button variant={"secondary"} className="cursor-pointer" onClick={() => activegradedetails(grade.id, grade.grade)}><Check size={24} /> Confirmer</Button>
 
 
                                             )}
@@ -429,7 +429,7 @@ export default function Grades() {
                                                 />
                                             </div>
 
-                                            <div className="space-y-2">
+                                            {/* <div className="space-y-2">
                                                 <Label htmlFor="rendement" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                                                     Rendement <Percent className="h-3 w-3 text-slate-400" />
                                                 </Label>
@@ -445,7 +445,7 @@ export default function Grades() {
                                                     placeholder="Ex: 82.50 %"
                                                     required
                                                 />
-                                            </div>
+                                            </div> */}
 
                                             <div className="mt-2">
                                                 <div className="bg-slate-50 dark:bg-slate-900 rounded-lg flex flex-col justify-between">
