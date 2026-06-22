@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Tag, Clipboard, Inbox, Calendar, User, FileText, ArrowRight, Truck, CheckCircle, Search, Trash2, ShieldAlert } from "lucide-react";
-
+import { fetchData } from "@/app/_utils/api";
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
 // ==========================================

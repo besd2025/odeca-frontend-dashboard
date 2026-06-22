@@ -129,11 +129,6 @@ export default function StockInitial() {
             catch (err) {
                 console.error("Error loading initial data:", err);
             }
-
-
-
-
-
         }
     }
     return (
