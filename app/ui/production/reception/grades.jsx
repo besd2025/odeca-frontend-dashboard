@@ -247,10 +247,10 @@ export default function Grades() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="pl-4">Actions</TableHead>
                             <TableHead>Grades</TableHead>
                             <TableHead className="text-right">Poids Net (kg)</TableHead>
                             <TableHead className="text-center">Statut</TableHead>
+                            <TableHead className="pl-4">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -263,26 +263,7 @@ export default function Grades() {
                         ) : (
                             gradesList.map((grade) => (
                                 <TableRow className="odd:bg-muted/50" key={grade.id}>
-                                    <TableCell className="pl-4 font-medium">
-                                        <div className="flex items-center gap-2">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align='start'>
-                                                    {grade.status === "EN_ATTENTE" && (
 
-                                                        <DropdownMenuItem className="cursor-pointer" onClick={() => activegradedetails(grade.id, grade.grade)}>Confirmer</DropdownMenuItem>
-
-
-                                                    )}
-                                                    {/* <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem> */}
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-                                    </TableCell>
                                     <TableCell className="font-semibold"><div className="flex flex-col gap-1">
                                         <span className="font-medium text-slate-800 dark:text-slate-200">
                                             {grade.grade}
@@ -307,6 +288,16 @@ export default function Grades() {
                                                 <span>En attente</span>
                                             </div>
                                         )}
+                                    </TableCell>
+                                    <TableCell className="pl-4 font-medium">
+                                        <div className="flex items-center gap-2">
+                                            {grade.status === "EN_ATTENTE" && (
+
+                                                <Button className="cursor-pointer" onClick={() => activegradedetails(grade.id, grade.grade)}>Confirmer</Button>
+
+
+                                            )}
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )))}
