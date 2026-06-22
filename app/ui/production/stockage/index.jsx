@@ -67,7 +67,7 @@ const RETOUR_LOTS = [
         grades: { "W TT": 12 },
         motifRetour: "Taux d'humidité trop élevé (supérieur à 12%). Nécessite un séchage complémentaire et un re-triage.",
         dateRetour: "2026-05-22",
-        status: "En réusinage",
+        status: "En retriage",
     },
     {
         id: "STOCK-2026-R02",

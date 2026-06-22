@@ -156,7 +156,7 @@ export default function InputForm({ onAddLot, id, code_societe, societe }) {
       });
 
       toast.promise(promise, {
-        loading: "Modification...",
+        loading: "Enregistrement...",
         success: (data) => {
           setTimeout(() => setOpen(false), 500);
           return `Grades selectionnées avec succès `;

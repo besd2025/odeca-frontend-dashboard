@@ -74,7 +74,7 @@ const STATUS_CONFIG = {
 };
 
 export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinalize, onViewDetails, onStockGrade }) {
-  const [activeTab, setActiveTab] = React.useState("all");
+  const [activeTab, setActiveTab] = React.useState("Prêt à trier");
   const [stockingGrade, setStockingGrade] = React.useState(null);
   const [bagsToStock, setBagsToStock] = React.useState("");
   const [lotNumbers, setLotNumbers] = React.useState([]);
@@ -210,6 +210,43 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
   const isInProgress = (lot) => lot.status === "En cours de triage" || lot.status === "EN_COURS_TRIAGE";
   const isReady = (lot) => lot.status === "Prêt à trier" || lot.status === "PRET A TRIER";
 
+  const [pretTriageNbr, setPretTriageNbr] = React.useState(0);
+  const [encoursTriageNbr, setEncoursTriageNbr] = React.useState(0);
+  const [finaliseTriageNbr, setFinaliseTriageNbr] = React.useState(0);
+
+  const handleLoadPretTriageNbr = async () => {
+    try {
+      const res = await fetchData("get", `cafe/usinages/get_pret_pour_triage/`, { params: { pret_triage: "PRET_TRIAGE" } });
+      setPretTriageNbr(res?.count || 0);
+    } catch (error) {
+      console.error("Error loading pret triage nbr:", error);
+    }
+  };
+
+  const handleLoadEncoursTriageNbr = async () => {
+    try {
+      const res = await fetchData("get", `cafe/triage/get_en_cours_triage/`, { params: { encours_triage: "EN_COURS_TRIAGE" } });
+      setEncoursTriageNbr(res?.count || 0);
+    } catch (error) {
+      console.error("Error loading encours triage nbr:", error);
+    }
+  };
+
+  const handleLoadFinaliseTriageNbr = async () => {
+    try {
+      const res = await fetchData("get", `cafe/triage/get_termine_triage/`, { params: { finalise_triage: "TERMINE" } });
+      setFinaliseTriageNbr(res?.count || 0);
+    } catch (error) {
+      console.error("Error loading finalise triage nbr:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    handleLoadPretTriageNbr();
+    handleLoadEncoursTriageNbr();
+    handleLoadFinaliseTriageNbr();
+  }, []);
+
   return (
     <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
       <CardHeader>
@@ -231,15 +268,15 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
               </TabsTrigger> */}
               <TabsTrigger value="Prêt à trier" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <ClipboardList className="h-3.5 w-3.5 text-blue-500" />
-                <span>Prêt à trier ({receptionsAllList?.filter(l => l.status === "Prêt à trier").length})</span>
+                <span>Prêt à trier ({pretTriageNbr})</span>
               </TabsTrigger>
               <TabsTrigger value="En cours de triage" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <Play className="h-3.5 w-3.5 text-amber-500" />
-                <span>En cours de triage ({receptionsAllList?.filter(l => l.status === "En cours de triage").length})</span>
+                <span>En cours de triage ({encoursTriageNbr})</span>
               </TabsTrigger>
               <TabsTrigger value="Trié & Stocké" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <CheckCircle2 className="h-3.5 w-3.5 text-indigo-500" />
-                <span>Trié ({receptionsAllList?.filter(l => l.status === "Trié & Stocké").length})</span>
+                <span>Trié ({finaliseTriageNbr})</span>
               </TabsTrigger>
               {/* <TabsTrigger value="Trié & Tri non requis" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <PackageCheck className="h-3.5 w-3.5 text-violet-500" />
