@@ -78,7 +78,7 @@ function StatsCard({ id }) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-13 gap-1">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-1">
       <Card className="@container/card col-span-1 lg:col-span-6 relative">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
@@ -219,7 +219,7 @@ function StatsCard({ id }) {
 
         </CardHeader>
       </Card>
-      <Card className="@container/card lg:col-span-3">
+      <Card className="@container/card lg:col-span-3 hidden">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-md">
@@ -339,7 +339,7 @@ function StatsCard({ id }) {
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card lg:col-span-2 overflow-hidden">
+      <Card className="@container/card lg:col-span-3 overflow-hidden">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-yellow-500 p-2 rounded-md">
@@ -402,7 +402,7 @@ function StatsCard({ id }) {
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card col-span-2 p-2 h-max overflow-hidden">
+      <Card className="@container/card col-span-3 p-2 h-max overflow-hidden">
         <CardHeader className="p-2">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-full">

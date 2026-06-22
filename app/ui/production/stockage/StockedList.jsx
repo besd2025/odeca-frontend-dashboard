@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fetchData } from "@/app/_utils/api";
+import InputForm from "../echantillonnage/InputForm";
 // Mock data to replace the statics
 const MOCK_GRADES = [
   { id: "fv", label: "FV", bags: 454 },
@@ -40,13 +41,19 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
   const [nombreSacs, setNombreSacs] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [DataStockage, setDataStockage] = React.useState([]);
+  const [openEchantillonner, setOpenEchantillonner] = React.useState(false);
   const handleViewDetailsStock = (lot) => {
     setIsViewingDetailsStock(true);
   };
-
+  const handleOpenEchantillonner = (lot) => {
+    setDataStockage(lot);
+    setOpenEchantillonner(true);
+  };
   const handleLotChange = (value) => {
     setLotsExistants(value);
   }
+
   const [lotsAvailable, setLotsAvailable] = React.useState([])
   const handleOpenStocking = async (gradeItem) => {
     setStockingGrade(gradeItem);
@@ -244,7 +251,6 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
 
 
         const lotsData = await fetchData("get", `cafe/stock_cafe/get_qualites_pretes_stockage/`, { params: { limit: 10000, offset: 0 } });
-        console.log("lotsData : ", lotsData);
         const formattedLots = lotsData?.results?.map(item => {
           // Transform productions array into an object { "Grade Name": numberOfBags }
           const processedGrades = Array.isArray(item?.qualites)
@@ -273,7 +279,6 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
 
         const lotsData = await fetchData("get", `cafe/stock_cafe/get_qualites_stockees/`, { params: { limit: 10000, offset: 0 } });
         const formattedLots = lotsData?.results?.map(item => {
-          console.log("item : ", item);
           // Transform productions array into an object { "Grade Name": numberOfBags }
 
           const processedGrades = Array.isArray(item?.qualites)
@@ -284,15 +289,21 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
             : (item?.qualites || {});
 
           return {
-            id: item?.societe_id,
+            id: item?.stock_id,
             societe: item?.nom_societe,
+            lotNumbers: item?.stock_lot,
             sdls: [],
             grades: processedGrades,
             dateEntree: item?.created_at?.split("T")[0],
             status: "Prêt à stocker",
             remainingQuantities: { ...processedGrades },
+            nombreSacs: item?.total_sacs,
+            dateStockage: item?.date_stockage,
+
+
           };
         });
+        console.log("formattedLots : ", lotsData);
         setLots(formattedLots);
 
       }
@@ -383,7 +394,6 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                           </div>
                         </TableCell>
                         <TableCell className="text-right sticky right-0 bg-background shadow-2xl border-l border-slate-200 dark:border-slate-800">
-
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -440,6 +450,7 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Numero lot</TableHead>
                       <TableHead>Propriétaire / Société</TableHead>
                       <TableHead>Grade / Qualité</TableHead>
                       <TableHead className="text-right">Nombre de Sacs</TableHead>
@@ -452,7 +463,9 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                   <TableBody>
                     {lots?.map((lot) => (
                       <TableRow key={lot.id}>
-
+                        <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
+                          {lot.lotNumbers}
+                        </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-0.5">
                             <span className="font-medium text-slate-800 dark:text-slate-200">
@@ -493,25 +506,47 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                           {lot.dateStockage || "—"}
                         </TableCell>
                         <TableCell className="text-right sticky right-0 bg-background shadow-2xl border-l border-slate-200 dark:border-slate-800">
+                          <>
+                            {/* 1. LE MENU DROPDOWN UNIQUE */}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Open menu</span>
+                                  <MoreHorizontal />
+                                </Button>
+                              </DropdownMenuTrigger>
 
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel className="text-muted-foreground font-normal text-xs">
-                                Actions
-                              </DropdownMenuLabel>
-                              <DropdownMenuItem
-                                onClick={() => handleViewDetailsStock(lot)}
-                              >
-                                Détails
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel className="text-muted-foreground font-normal text-xs">
+                                  Actions
+                                </DropdownMenuLabel>
+
+                                {/* Option Détails */}
+                                <DropdownMenuItem onClick={() => handleViewDetailsStock(lot)}>
+                                  Détails
+                                </DropdownMenuItem>
+
+                                {/* CORRECTION : L'item Echantillonner est un simple frère direct de "Détails" */}
+                                <DropdownMenuItem
+                                  onClick={() => handleOpenEchantillonner(lot)}
+                                  className="text-primary cursor-pointer"
+                                >
+                                  Echantillonner
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            {/* 2. EN DEHORS DU DROPDOWN : Le formulaire s'affiche de manière indépendante */}
+                            {openEchantillonner && (
+                              <InputForm
+                                lotData={DataStockage}
+                                onClose={() => {
+                                  setOpenEchantillonner(false);
+                                  setDataStockage([]);
+                                }}
+                              />
+                            )}
+                          </>
                         </TableCell>
                       </TableRow>
                     ))}

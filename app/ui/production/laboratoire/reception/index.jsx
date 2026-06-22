@@ -283,28 +283,43 @@ export default function ReceptionPage() {
     );
   });
   const [data, setData] = useState([])
-  const fetchPendingSamples = async () => {
-    try {
-
-      const res = await fetchData("get", "cafe/echantillonage/en-attente-reception/");
-      console.log("res", res)
-
-      setData(res);
-
-
-    } catch (err) {
-      console.error("Erreur serveur lors de la récupération des échantillons en attente");
-    }
-  };
-
+  const [echantillons, setEchantillons] = useState([]);
+  const [tabs, setTabs] = useState("reception");
   React.useEffect(() => {
-    fetchPendingSamples();
-  }, []);
+    const fetchEchantillons = async () => {
+      if (tabs === "reception") {
+        try {
+          const response = await fetchData("get", `cafe/echantillonage/en-attente-reception/`);
+          const dataResponse = response?.results;
 
+          const formattedData = dataResponse.map((item) => ({
+            id: item.id,
+            id_prelevement: item?.id_prelevement,
+            lotNumber: item?.numero_lot,
+            societe: item?.societe_proprietaire,
+            deparcheur: item?.deparcheur_usine,
+            sacsCount: item?.nombre_sacs,
+            qtePrelevee: item?.quantite,
+            qualite: item?.qualite_nom,
+            dateEchantillonnage: item?.date_prelevement,
+            echantillonneur: item.nomAgentEchantillonneur
+          }));
 
+          setEchantillons(formattedData);
+          console.log("Echantillonseeeeee", formattedData);
+        } catch (error) {
+          console.error("Error fetching pending samples:", error);
+        }
+      } else if (tabs === "history") {
+        // Ajouter un call API pour l'historique si besoin
+        // const response = await fetchData("get", `...`);
+      }
+    };
+    fetchEchantillons();
+  }, [tabs]);
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="reception" className="">
+      <Tabs value={tabs} onValueChange={setTabs} className="">
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger value="reception">Réception</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
@@ -415,7 +430,7 @@ export default function ReceptionPage() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {filteredAnalyses.length === 0 ? (
+              {echantillons?.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Tag className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
                   <p className="font-medium">Aucun échantillon réceptionné pour le moment.</p>
@@ -438,7 +453,7 @@ export default function ReceptionPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredAnalyses.map((item) => (
+                      {echantillons?.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -471,7 +486,7 @@ export default function ReceptionPage() {
                           <TableCell className="font-semibold text-slate-700 dark:text-slate-300">{item.lotNumber}</TableCell>
                           <TableCell>{item.societe}</TableCell>
                           <TableCell className="text-right font-semibold">{item.qualite}</TableCell>
-                          <TableCell className="text-right font-semibold">{item.qteEchantillon.toFixed(2)} kg</TableCell>
+                          <TableCell className="text-right font-semibold">{item.qteEchantillon} kg</TableCell>
                           <TableCell className="text-xs">{item.receptionniste}</TableCell>
                           <TableCell className="text-xs text-slate-500 whitespace-nowrap">{item.dateReception}</TableCell>
                           <TableCell>
