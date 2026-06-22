@@ -1,16 +1,12 @@
-
-
-"use client";
-
 import React, { useState } from "react";
-import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
-import { ROLES } from "@/lib/permissions";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { PackageCheck, RotateCcw, Warehouse } from "lucide-react";
-import RetourList from "./RetourList";
 
-
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Eye, RotateCcw, AlertCircle } from "lucide-react";
+import PaginationContent from "@/components/ui/pagination-content";
 const RETOUR_LOTS = [
     {
         id: "STOCK-2026-R01",
@@ -32,33 +28,117 @@ const RETOUR_LOTS = [
     },
 ];
 
-export default function RetoursEchantillonnage() {
-    const [selectedLot, setSelectedLot] = useState(null);
+export default function RetourList({ }) {
     const [isViewingDetails, setIsViewingDetails] = useState(false);
-
+    const [selectedLot, setSelectedLot] = useState(null);
     const handleViewDetails = (lot) => {
         setSelectedLot(lot);
         setIsViewingDetails(true);
     };
 
     return (
-        <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR, ROLES.UDP]}>
-            <div className="p-6 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
-
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
-                    <div className="space-y-1">
-                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Warehouse className="h-8 w-8 text-primary" /> Retours
-                        </h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">
-                            Suivi des lots de café retournés pour un cycle de réusinage.
+        <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+            <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <RotateCcw className="h-5 w-5 text-primary" /> LOTS Retournés pour Réusinage
+                </CardTitle>
+                <CardDescription>
+                    Liste des LOTS renvoyés pour un cycle de ré-usinage suite à un défaut de qualité ou un problème identifié.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                {RETOUR_LOTS.length === 0 ? (
+                    <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 text-center bg-slate-50/50 dark:bg-slate-900/30">
+                        <AlertCircle className="h-8 w-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                            Aucun lot retourné pour réusinage. Les LOTS refusés après contrôle qualité apparaîtront ici.
                         </p>
                     </div>
-                </div>
-                <RetourList lots={RETOUR_LOTS} onViewDetails={handleViewDetails} />
-
-                {/* Details Dialog */}
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Numéro de Lot</TableHead>
+                                <TableHead>Propriétaire / Société</TableHead>
+                                <TableHead>Motif de Retour</TableHead>
+                                <TableHead>Date de Retour</TableHead>
+                                <TableHead>Statut</TableHead>
+                                <TableHead className="text-right sticky right-0 bg-sidebar shadow-2xl">
+                                    Actions
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {RETOUR_LOTS.map((lot) => (
+                                <TableRow key={lot.id}>
+                                    <TableCell className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
+                                        {lot.id}
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col gap-0.5">
+                                            <span className="font-medium text-slate-800 dark:text-slate-200">
+                                                {lot.societe}
+                                            </span>
+                                            {lot.sdls && lot.sdls.length > 0 && (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {lot.sdls.map((sdl) => (
+                                                        <span
+                                                            key={sdl}
+                                                            className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
+                                                        >
+                                                            {sdl}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="max-w-[200px]">
+                                        <span className="text-sm text-slate-700 dark:text-slate-300 line-clamp-2">
+                                            {lot.motifRetour || "—"}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                                        {lot.dateRetour || "—"}
+                                    </TableCell>
+                                    <TableCell>
+                                        {lot.status === "En retriage" ? (
+                                            <Badge
+                                                variant="outline"
+                                                className="border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800 flex items-center gap-1 whitespace-nowrap"
+                                            >
+                                                <span className="relative flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                                </span>
+                                                En retriage
+                                            </Badge>
+                                        ) : (
+                                            <Badge
+                                                variant="outline"
+                                                className="border-red-200 bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800 flex items-center gap-1 whitespace-nowrap"
+                                            >
+                                                <RotateCcw className="h-3 w-3" />
+                                                Retourné
+                                            </Badge>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-right sticky right-0 bg-background shadow-2xl border-l border-slate-200 dark:border-slate-800">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleViewDetails(lot)}
+                                            className="h-8 text-xs flex items-center gap-1.5 ml-auto bg-sidebar"
+                                        >
+                                            <Eye className="h-3.5 w-3.5" /> Détails
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
+                <PaginationContent />
                 <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
                     <DialogContent className="sm:max-w-2xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
                         <DialogHeader>
@@ -163,7 +243,7 @@ export default function RetoursEchantillonnage() {
                         )}
                     </DialogContent>
                 </Dialog>
-            </div>
-        </ProtectedRoute>
+            </CardContent>
+        </Card>
     );
 }

@@ -63,7 +63,7 @@ export default function UsinageDetails({ lot, onSave, onCancel, readOnly = false
         }
 
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 <div className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-100 dark:border-slate-900 space-y-2">
                     <h4 className="text-xs font-bold text-primary uppercase tracking-wider">Qualités produites</h4>
                     <div className="space-y-1.5">
@@ -76,7 +76,9 @@ export default function UsinageDetails({ lot, onSave, onCancel, readOnly = false
                                 <div key={idx} className="flex justify-between items-center text-xs text-slate-700 dark:text-slate-300 border-b border-slate-100/50 dark:border-slate-900/50 pb-1 last:border-0 last:pb-0">
                                     <span className="font-medium">{gradeName}</span>
                                     <div className="flex items-center gap-3">
-                                        <span className="font-bold text-slate-900 dark:text-white">{kg} kg</span>
+                                        <span className="font-bold text-slate-900 dark:text-white">
+                                            {kg > 1000 ? `${(kg / 1000).toFixed(1)} T` : `${kg} kg`}
+                                        </span>
                                         <span className="text-slate-500 dark:text-slate-400">({sacs} sacs)</span>
                                     </div>
                                 </div>

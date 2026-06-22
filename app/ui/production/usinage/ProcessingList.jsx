@@ -105,6 +105,43 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails, onIdCh
     loadDataForTab(activeTab);
   }, [activeTab, pointer, limit]);
 
+  const [pretUsinageNbr, setPretUsinageNbr] = React.useState(0);
+  const [encoursUsinageNbr, setEncoursUsinageNbr] = React.useState(0);
+  const [finaliseNbr, setFinaliseNbr] = React.useState(0);
+
+  const handleLoadPretUsinageNbr = async () => {
+    try {
+      const res = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/`, { params: { pret_usine: "PRET_USINE" } });
+      setPretUsinageNbr(res?.count || 0);
+    } catch (error) {
+      console.error("Error loading pret usinage nbr:", error);
+    }
+  };
+
+  const handleLoadEncoursUsinageNbr = async () => {
+    try {
+      const res = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/`, { params: { etat_selection: "EN_COURS" } });
+      setEncoursUsinageNbr(res?.count || 0);
+      console.log(res)
+    } catch (error) {
+      console.error("Error loading encours usinage nbr:", error);
+    }
+  };
+
+  const handleLoadFinaliseUsinageNbr = async () => {
+    try {
+      const res = await fetchData("get", `cafe/usinages/`, { params: { processing_status: "TERMINE" } });
+      setFinaliseNbr(res?.count || 0);
+    } catch (error) {
+      console.error("Error loading finalise usinage nbr:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    handleLoadPretUsinageNbr();
+    handleLoadEncoursUsinageNbr();
+    handleLoadFinaliseUsinageNbr();
+  }, []);
   return (
     <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
       <CardHeader>
@@ -122,18 +159,18 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails, onIdCh
 
               <TabsTrigger value="Reception" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <Layers className="h-3.5 w-3.5 text-slate-500" />
-                <span>Pretes à l'usinage ({receptionsAllList.filter(l => l.status === "PRET_USINE").length})</span>
+                <span>Pretes à l'usinage ({pretUsinageNbr})</span>
               </TabsTrigger>
               <TabsTrigger value="En cours" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                 </span>
-                <span>En cours ({receptionsAllList.filter(l => l.status === "EN_COURS").length})</span>
+                <span>En cours ({encoursUsinageNbr})</span>
               </TabsTrigger>
               <TabsTrigger value="Finalisé" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                <span>Finalisé ({receptionsAllList.filter(l => l.status === "TERMINE").length})</span>
+                <span>Finalisé ({finaliseNbr})</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>

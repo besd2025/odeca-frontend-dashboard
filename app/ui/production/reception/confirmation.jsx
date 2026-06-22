@@ -23,33 +23,6 @@ const GRADES = [
   "CAFE NATUREL", "CAFE Miel", "Anaerobic", "Robusta"
 ];
 
-const SOCIETE_LIST = [
-  "KIREMA",
-  "KIRYAMA",
-  "COCOCA",
-  "SOGESTAL Kirundo-Muyinga",
-  "SOGESTAL Kayanza",
-  "SOGESTAL Ngozi",
-  "SOGESTAL Mumirwa"
-];
-
-const SOCIETE_SDL_MAP = {
-  "KIREMA": ["SDL Ngozi", "SDL Kayanza"],
-  "KIRYAMA": ["SDL Gitega", "SDL Muramvya"],
-  "COCOCA": ["SDL Karusi", "SDL Ngozi"],
-  "SOGESTAL Kirundo-Muyinga": ["SDL Ngozi", "SDL Karusi"],
-  "SOGESTAL Kayanza": ["SDL Kayanza"],
-  "SOGESTAL Ngozi": ["SDL Ngozi"],
-  "SOGESTAL Mumirwa": ["SDL Muramvya", "SDL Gitega"],
-};
-
-const SDL_GRADES_MAP = {
-  "SDL Ngozi": ["A1", "A2", "COQUE"],
-  "SDL Kayanza": ["A1", "A3", "CAFE NATUREL"],
-  "SDL Gitega": ["B1", "B2", "B3"],
-  "SDL Muramvya": ["B2", "B3", "COQUE"],
-  "SDL Karusi": ["A2", "B2", "CAFE Miel"],
-};
 
 export default function ConfirmationPage() {
   const searchParams = useSearchParams();
@@ -113,11 +86,6 @@ export default function ConfirmationPage() {
     const totalGradesQty = Object.values(formData.grades).reduce((acc, qty) => acc + (parseFloat(qty) || 0), 0);
 
     console.log("Submit Reception Lots Data:", { ...formData, poidsNet, totalGradesQty });
-    toast.success("Lot reçu et enregistré avec succès !");
-  };
-  const availableSDLs = formData.societe ? (SOCIETE_SDL_MAP[formData.societe] || []) : [];
-  const handleGradeRemove = (grade) => {
-    setActiveGrades((prev) => prev.filter((g) => g !== grade));
   };
 
   return (

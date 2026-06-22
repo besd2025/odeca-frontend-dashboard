@@ -133,7 +133,7 @@ export default function StockInitial() {
     }
     return (
         <Dialog>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button>
                     <Plus className="h-5 w-5" /> Stock initial
                 </Button>

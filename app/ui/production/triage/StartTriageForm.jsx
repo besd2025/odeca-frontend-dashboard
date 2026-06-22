@@ -124,14 +124,7 @@ export default function StartTriageForm({ lot, onConfirm, onCancel }) {
                   <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
                     {quantity} sacs
                   </span>
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${isChecked
-                      ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
-                      : "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
-                      }`}
-                  >
-                    {isChecked ? "Sera trié" : "Stocké direct"}
-                  </span>
+
                 </div>
               </div>
             );

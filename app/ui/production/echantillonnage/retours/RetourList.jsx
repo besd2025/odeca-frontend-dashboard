@@ -88,7 +88,7 @@ export default function RetourList({ lots, onViewDetails }) {
                     {lot.dateRetour || "—"}
                   </TableCell>
                   <TableCell>
-                    {lot.status === "En réusinage" ? (
+                    {lot.status === "En retriage" ? (
                       <Badge
                         variant="outline"
                         className="border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800 flex items-center gap-1 whitespace-nowrap"
@@ -97,7 +97,7 @@ export default function RetourList({ lots, onViewDetails }) {
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                         </span>
-                        En réusinage
+                        En retriage
                       </Badge>
                     ) : (
                       <Badge
