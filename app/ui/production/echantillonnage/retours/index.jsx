@@ -42,7 +42,7 @@ export default function RetoursEchantillonnage() {
     };
 
     return (
-        <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR, ROLES.UDP]}>
             <div className="p-6 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
 
                 {/* Header */}

@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { fetchData } from "@/app/_utils/api"
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
 // ==========================================
@@ -157,27 +157,224 @@ export default function GranulometrieComponent() {
     toast.success(`Fond calculé : ${remaining}%`);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!isSumPerfect) {
       toast.warning(`La somme totale est de ${totalSum}%. Elle doit être de 100%.`);
       return;
     }
-    toast.success("Analyse granulométrique validée et enregistrée ! (Illustration locale)");
-    setIsModalOpen(false);
-    setSelectedAnalysis(null);
-  };
 
+    const tamisList = [
+      { id: "sieve_7_1", label: "7.1 mm" },
+      { id: "sieve_6_3", label: "6.3 mm" },
+      { id: "sieve_5_5", label: "5.5 mm" },
+      { id: "sieve_4_0", label: "4 mm" },
+      { id: "sieve_3_0", label: "3 mm" },
+      { id: "fond", label: "Fond" }
+    ];
+
+    try {
+      for (const tamis of tamisList) {
+        const valeur = formData[tamis.id];
+
+        try {
+          const res = await fetchData(
+            "post",
+            `/cafe/determination_caribre/`,
+            {
+              params: {},
+              additionalHeaders: {},
+              body: {
+                "calibre_nom": tamis.label,
+                "pourcentage": parseFloat(valeur),
+                "granulometrie": selectedAnalysis?.id,
+              },
+            }
+          );
+
+          if (res.status !== 200 && res.status !== 201) {
+            throw new Error("Erreur de mise à jour du triage");
+          }
+
+          toast.success("Données enregistrées avec succès");
+          return { lot: selectedAnalysis?.id };
+        } catch (error) {
+          console.error(error);
+          toast.error("Donnée non enregistrée!!!");
+          throw error;
+        }
+
+      }
+
+      toast.success("Analyse granulométrique validée et enregistrée !");
+      setIsModalOpen(false);
+      setSelectedAnalysis(null);
+    } catch (error) {
+      console.error(error);
+      toast.error("Erreur lors de l'enregistrement.");
+    }
+  };
+  const [granulometrieAttente, setGranulometrieAttente] = useState([]);
+  const [granulometrieHisto, setGranulometrieHisto] = useState([]);
+  const [selectedTab, setSelectedTab] = useState("en_attente");
+  const [granulometrieConfirmer, setGranulometrieConfirmer] = useState([]);
+  useEffect(() => {
+    const fetchPendingSamples = async () => {
+      if (selectedTab === "en_attente") {
+        try {
+          const data = await fetchData(
+            "get",
+            `cafe/granulometrie/echantillons_attente/`,
+            {},
+            {},
+          );
+          console.log(data, "dataaaa")
+          // Traitement des données pour l'affichage
+          const formattedData = data?.results?.map((item) => ({
+            id: item.id,
+            sampleId: "",
+            transfertEchantillon: "Par coursier Ngozi",
+            lotNumber: item.numero_lot,
+            qualite: item.qualite,
+            qteEchantillon: item?.quantite,
+            sacsCount: item?.nombre_sacs,
+            societe: item?.societe,
+            deparcheur: item?.nom,
+            receptionniste: item.receptionniste,
+            codeEtiquette: item.code_etiquette,
+            dateReception: new Date(item.date_reception).toLocaleDateString(),
+            status: "receptionne"
+          }));
+          console.log(formattedData, "formattedData")
+
+          setGranulometrieAttente(formattedData);
+
+        } catch (error) {
+          console.error("Error fetching pending samples:", error);
+        }
+      }
+      else if (selectedTab === "pending") {
+        try {
+          const data = await fetchData(
+            "get",
+            `cafe/granulometrie/pret_analyse/`,
+            {},
+            {},
+          );
+          console.log(data, "dataaaa")
+          // Traitement des données pour l'affichage
+          const formattedData = data?.results?.map((item) => ({
+            id: item.id_granulometrie,
+            sampleId: "",
+            transfertEchantillon: "Par coursier Ngozi",
+            lotNumber: item.numero_lot,
+            qualite: item.qualite,
+            qteEchantillon: item?.quantite,
+            sacsCount: item?.nombre_sacs,
+            societe: item?.societe,
+            deparcheur: item?.nom,
+            receptionniste: item.receptionniste,
+            codeEtiquette: item.code_etiquette,
+            dateReception: new Date(item.date_reception).toLocaleDateString(),
+            status: "receptionne"
+          }));
+
+          setGranulometrieConfirmer(formattedData);
+
+        } catch (error) {
+          console.error("Error fetching pending samples:", error);
+        }
+      }
+
+      else if (selectedTab === "history") {
+        try {
+          const data = await fetchData(
+            "get",
+            `cafe/granulometrie/historique_analyses/`,
+            {},
+            {},
+          );
+          console.log(data, "datahisto")
+          // Traitement des données pour l'affichage
+          const formattedData = data?.results?.map((item) => ({
+
+            id: item.id,
+            sampleId: item?.code_echantillon,
+            transfertEchantillon: "Chauffeur ODECA",
+            lotNumber: item.numero_lot,
+            qualite: item.qualite,
+            qteEchantillon: item?.quantite,
+            sacsCount: item?.nombre_sacs,
+            societe: item?.societe,
+            deparcheur: item?.nom,
+            receptionniste: item.receptionniste,
+            codeEtiquette: item.code_etiquette,
+            dateReception: item.date_reception,
+            status: "granulometrie_complete",
+            granulometrie: {
+              quantite: item?.quantite,
+              date: new Date(item.date_analyse).toLocaleString(),
+              sieve_7_1: item?.tami_7_1,
+              sieve_6_3: item?.tami_6_3,
+              sieve_5_5: item?.tami_5_5,
+              sieve_4_0: item?.tami_4_0,
+              sieve_3_0: item?.tami_3_0,
+              fond: item?.fond
+            }
+          }));
+
+          setGranulometrieHisto(formattedData);
+
+        } catch (error) {
+          console.error("Error fetching pending samples:", error);
+        }
+
+      }
+    };
+
+    fetchPendingSamples();
+  }, [selectedTab]);
+
+  const handleAnalyse = async (id) => {
+    try {
+      const res = await fetchData(
+        "post",
+        `/cafe/granulometrie/`,
+        {
+          params: {},
+          additionalHeaders: {},
+          body: {
+            "comfirm_echantillon": id,
+            "quanite": 300,
+          },
+        }
+      );
+
+      if (res.status !== 200 && res.status !== 201) {
+        throw new Error("Erreur de mise à jour du triage");
+      }
+
+      toast.success("Données enregistrées avec succès");
+      return { lot: id }
+    } catch (error) {
+      console.error(error);
+      toast.error("Donnée non enregistrée!!!");
+      throw error;
+    }
+
+  };
   return (
     <div className="space-y-6">
 
-      <Tabs defaultValue="pending" className="">
-        <TabsList className="grid grid-cols-2 w-full">
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="">
+        <TabsList className="grid grid-cols-3 w-full">
+          <TabsTrigger value="en_attente">En attente</TabsTrigger>
           <TabsTrigger value="pending">Pret pour l'analyse</TabsTrigger>
           <TabsTrigger value="history">Status des analyses</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pending">
+        <TabsContent value="en_attente">
           {/* 1. Pending Samples Table */}
           <Card className="shadow-md border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
             <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 p-6">
@@ -195,7 +392,7 @@ export default function GranulometrieComponent() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {pendingAnalyses.length === 0 ? (
+              {granulometrieAttente.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
                   <p className="font-semibold text-slate-700 dark:text-slate-300">Tous les échantillons ont été analysés !</p>
@@ -217,7 +414,83 @@ export default function GranulometrieComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {pendingAnalyses.map((item) => (
+                      {granulometrieAttente.map((item) => (
+                        <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
+                          <TableCell className="pl-6">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align='start'>
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => handleAnalyse(item?.id)}>
+                                  Analyser
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
+                                  Rejeter
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                          <TableCell className="font-mono font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">{item.codeEtiquette}</TableCell>
+                          <TableCell className="font-bold text-slate-700 dark:text-slate-300">{item.lotNumber}</TableCell>
+                          <TableCell>{item.societe}</TableCell>
+                          <TableCell>{item.qualite}</TableCell>
+                          <TableCell className="text-right font-semibold">{item.qteEchantillon} kg</TableCell>
+                          <TableCell className="text-xs text-slate-500">{item.dateReception}</TableCell>
+                          <TableCell className="text-xs">{item.receptionniste}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="pending">
+          {/* 1. Pending Samples Table */}
+          <Card className="shadow-md border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+            <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 p-6">
+              <div>
+                <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                  <Inbox className="h-5 w-5 text-primary" /> Échantillons en Attente d'Analyse Granulométrique
+                </CardTitle>
+                <CardDescription className="text-slate-500 dark:text-slate-400">
+                  Échantillons réceptionnés au laboratoire n'ayant pas encore été testés au tamis.
+                </CardDescription>
+              </div>
+              <div className="relative w-full md:w-72">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              {granulometrieConfirmer.length === 0 ? (
+                <div className="text-center p-12 text-slate-500 dark:text-slate-400">
+                  <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">Tous les échantillons ont été analysés !</p>
+                  <p className="text-xs text-slate-400 mt-1">Aucun échantillon en attente de granulométrie.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-left pl-6 w-16">Action</TableHead>
+                        <TableHead>Code Étiquette</TableHead>
+                        <TableHead>Numéro de Lot</TableHead>
+                        <TableHead>Société</TableHead>
+                        <TableHead>Qualité</TableHead>
+                        <TableHead className="text-right">Quantité (kg)</TableHead>
+                        <TableHead>Date Réception</TableHead>
+                        <TableHead>Réceptionniste</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {granulometrieConfirmer.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -241,7 +514,7 @@ export default function GranulometrieComponent() {
                           <TableCell className="font-bold text-slate-700 dark:text-slate-300">{item.lotNumber}</TableCell>
                           <TableCell>{item.societe}</TableCell>
                           <TableCell>{item.qualite}</TableCell>
-                          <TableCell className="text-right font-semibold">{item.qteEchantillon.toFixed(2)} kg</TableCell>
+                          <TableCell className="text-right font-semibold">{item.qteEchantillon} kg</TableCell>
                           <TableCell className="text-xs text-slate-500">{item.dateReception}</TableCell>
                           <TableCell className="text-xs">{item.receptionniste}</TableCell>
                         </TableRow>
@@ -272,7 +545,7 @@ export default function GranulometrieComponent() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {completedAnalyses.length === 0 ? (
+              {granulometrieHisto.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Clipboard className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
                   <p className="font-medium">Aucune analyse granulométrique terminée.</p>
@@ -299,7 +572,7 @@ export default function GranulometrieComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {completedAnalyses.map((item) => (
+                      {granulometrieHisto.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>

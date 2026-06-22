@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { fetchData } from "@/app/_utils/api"
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
 // ==========================================
@@ -91,6 +91,10 @@ export default function TriageComponent() {
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState(null);
+  const [pendingData, setPendingData] = useState([]);
+  const [completedData, setCompletedData] = useState([]);
+  const [searchPendingQuery, setSearchPendingQuery] = useState("");
+  const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
 
   const [formData, setFormData] = useState({
     qteTrier: "300",
@@ -101,13 +105,6 @@ export default function TriageComponent() {
     nEtRat: "",
     corpsEtrangers: "",
   });
-
-  // Static Data Presentation
-  const pendingAnalyses = initialLabAnalyses.filter((item) => item.status === "granulometrie_complete");
-  const completedAnalyses = initialLabAnalyses.filter(
-    (item) => item.status !== "receptionne" && item.status !== "granulometrie_complete" && item.triage
-  );
-
   const handleOpenModal = (analysis) => {
     setSelectedAnalysis(analysis);
     const syncedDate = analysis.granulometrie?.date || new Date().toISOString().split("T")[0];
@@ -137,21 +134,158 @@ export default function TriageComponent() {
   const totalDefects = parseFloat((val_vraisDefauts + val_defectueux + val_brisure + val_nEtRat + val_corpsEtrangers).toFixed(2));
   const isDefectValid = totalDefects <= 100;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isDefectValid) {
       toast.error("La somme des défauts ne peut pas dépasser 100% !");
       return;
     }
-    toast.success("Triage manuel validé et enregistré ! (Illustration locale)");
-    setIsModalOpen(false);
-    setSelectedAnalysis(null);
+    const body = {
+      granulometrie_id: selectedAnalysis?.id,
+      quantite_trier: formData.qteTrier,
+      vrais_defauts_brisure: formData.vraisDefauts,
+      defectueux: formData.defectueux,
+      brisure: formData.brisure,
+      n_et_rat: formData.nEtRat,
+      corps_etrangers: formData.corpsEtrangers
+    }
+    console.log("data", body);
+    try {
+      const response = await fetchData("post", "cafe/tirage_manuel/enregistrer_triage/",
+        { params: {}, additionalHeaders: {}, body: body });
+      if (response.status !== 200 && response.status !== 201) {
+        throw new Error("Erreur de mise à jour du triage");
+      }
+
+      toast.success("Triage manuel validé et enregistré");
+      setIsModalOpen(false);
+      setSelectedAnalysis(null);
+      return { lot: selectedAnalysis?.id };
+    } catch (error) {
+      console.error(error);
+      toast.error("Donnée non enregistrée!!!");
+      throw error;
+    }
   };
+  const [selectedTab, setSelectedTab] = useState("pending");
+  React.useEffect(() => {
+    const fetchPendingAnalyses = async () => {
+      if (selectedTab === "pending") {
+
+
+        try {
+          const response = await fetchData("get", "cafe/tirage_manuel/pret_pour_triage/",
+            { params: {}, additionalHeaders: {}, body: {} });
+          console.log("les analyses:", response);
+          const analyses = response?.results?.map((item) => ({
+            id: item.id,
+            sampleId: item.echantillon_id,
+            transfertEchantillon: item.transfert_echantillon,
+            lotNumber: item.numero_lot,
+            qualite: item.qualite,
+            qteEchantillon: item.quantite_echantillon,
+            sacsCount: item.sacs_count,
+            societe: item.societe,
+            deparcheur: item.deparcheur,
+            receptionniste: item.receptionniste,
+            codeEtiquette: item.code_etiquette,
+            dateReception: item.date_reception,
+            status: "granulometrie_complete",
+            granulometrie: {
+              quantite: item?.quantite,
+              date: item?.date_granulometrie ? new Date(item.date_granulometrie).toLocaleDateString() : "",
+              sieve_7_1: item?.tami_7_1,
+              sieve_6_3: item?.tami_6_3,
+              sieve_5_5: item?.tami_5_5,
+              sieve_4_0: item?.tami_4_0,
+              sieve_3_0: item?.tami_3_0,
+              fond: item?.fond
+            }
+          }));
+          console.log("les analyses", analyses);
+          setPendingData(analyses);
+        } catch (error) {
+          console.error("Error fetching pending analyses:", error);
+        }
+      }
+      if (selectedTab === "history") {
+        try {
+          const response = await fetchData("get", "cafe/tirage_manuel/historique_triages/",
+            { params: {}, additionalHeaders: {}, body: {} });
+          console.log("les analyse_EEEE:", response);
+          const analyses = response?.results?.map((item) => ({
+            id: item.id,
+            sampleId: item.echantillon_id,
+            transfertEchantillon: item.transfert_echantillon,
+            lotNumber: item.lot_number,
+            qualite: item.qualite,
+            qteEchantillon: item.quantite_trier,
+            sacsCount: item.sacs_count,
+            societe: item.societe,
+            deparcheur: item.deparcheur,
+            receptionniste: item.receptionniste,
+            codeEtiquette: item.code_etiquette,
+            dateReception: item.date_reception,
+            status: "triage_complete",
+            granulometrie: {
+              quantite: item?.quantite,
+              date: item?.date_analyse ? new Date(item.date_analyse).toLocaleDateString() : "",
+              sieve_7_1: item?.tami_7_1,
+              sieve_6_3: item?.tami_6_3,
+              sieve_5_5: item?.tami_5_5,
+              sieve_4_0: item?.tami_4_0,
+              sieve_3_0: item?.tami_3_0,
+              fond: item?.fond
+            },
+            triage: {
+              date: item?.date ? new Date(item.date).toLocaleDateString() : "",
+              vraisDefauts: parseFloat(item?.vrais_defauts_brisure) || 0,
+              defectueux: parseFloat(item?.defectueux) || 0,
+              brisure: parseFloat(item?.brisure) || 0,
+              nEtRat: parseFloat(item?.n_et_rat) || 0,
+              corpsEtrangers: parseFloat(item?.corps_etrangers) || 0,
+              totalDefectPct: parseFloat(item?.vrais_defauts_brisure || 0) +
+                parseFloat(item?.defectueux || 0) +
+                parseFloat(item?.brisure || 0) +
+                parseFloat(item?.n_et_rat || 0) +
+                parseFloat(item?.corps_etrangers || 0)
+            }
+          }));
+          console.log("les analyses", analyses);
+          setCompletedData(analyses);
+        } catch (error) {
+          console.error("Error fetching pending analyses:", error);
+        }
+
+      }
+    };
+
+
+    fetchPendingAnalyses();
+  }, [selectedTab]);
+
+  const filteredPending = (pendingData || []).filter((item) => {
+    const query = searchPendingQuery.toLowerCase();
+    return (
+      String(item.codeEtiquette || "").toLowerCase().includes(query) ||
+      String(item.lotNumber || "").toLowerCase().includes(query) ||
+      String(item.societe || "").toLowerCase().includes(query)
+    );
+  });
+
+  const filteredHistory = (completedData || []).filter((item) => {
+    const query = searchHistoryQuery.toLowerCase();
+    return (
+      String(item.codeEtiquette || "").toLowerCase().includes(query) ||
+      String(item.lotNumber || "").toLowerCase().includes(query) ||
+      String(item.societe || "").toLowerCase().includes(query)
+    );
+  });
 
   return (
     <div className="space-y-6">
 
-      <Tabs defaultValue="pending" className="">
+      <Tabs className="" value={selectedTab} onValueChange={setSelectedTab}>
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger value="pending">Pret pour le triage</TabsTrigger>
           <TabsTrigger value="history">Status des triages</TabsTrigger>
@@ -171,15 +305,20 @@ export default function TriageComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
+                <Input
+                  placeholder="Rechercher code, lot..."
+                  className="pl-9 h-9 text-sm"
+                  value={searchPendingQuery}
+                  onChange={(e) => setSearchPendingQuery(e.target.value)}
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {pendingAnalyses.length === 0 ? (
+              {filteredPending.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
                   <p className="font-semibold text-slate-700 dark:text-slate-300">Tous les échantillons ont été triés !</p>
-                  <p className="text-xs text-slate-400 mt-1">Aucun échantillon en attente de triage manuel.</p>
+                  <p className="text-xs text-slate-400 mt-1">Aucun échantillon en attente de triage manuel ou trouvé pour cette recherche.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -196,7 +335,7 @@ export default function TriageComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {pendingAnalyses.map((item) => (
+                      {filteredPending.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -210,9 +349,9 @@ export default function TriageComponent() {
                                   Saisir Triage
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
+                                {/* <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
                                   Rejeter
-                                </DropdownMenuItem>
+                                </DropdownMenuItem> */}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
@@ -221,9 +360,9 @@ export default function TriageComponent() {
                           <TableCell>{item.societe}</TableCell>
                           <TableCell className="text-xs text-slate-500">{item.granulometrie?.date}</TableCell>
                           <TableCell className="text-xs text-slate-600 dark:text-slate-400">
-                            {item.granulometrie?.sieve_7_1.toFixed(1)}% / {item.granulometrie?.sieve_6_3.toFixed(1)}%
+                            {item.granulometrie?.sieve_7_1}% / {item.granulometrie?.sieve_6_3}%
                           </TableCell>
-                          <TableCell className="text-xs text-slate-600 dark:text-slate-400">{item.granulometrie?.fond.toFixed(1)}%</TableCell>
+                          <TableCell className="text-xs text-slate-600 dark:text-slate-400">{item.granulometrie?.fond}%</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -248,14 +387,19 @@ export default function TriageComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
+                <Input
+                  placeholder="Rechercher code, lot..."
+                  className="pl-9 h-9 text-sm"
+                  value={searchHistoryQuery}
+                  onChange={(e) => setSearchHistoryQuery(e.target.value)}
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {completedAnalyses.length === 0 ? (
+              {completedData.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Sliders className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
-                  <p className="font-medium">Aucun triage manuel enregistré.</p>
+                  <p className="font-medium">Aucun triage manuel enregistré ou trouvé.</p>
                   <p className="text-xs text-slate-400 mt-1">Validez le triage d'un échantillon ci-dessus.</p>
                 </div>
               ) : (
@@ -279,7 +423,7 @@ export default function TriageComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {completedAnalyses.map((item) => (
+                      {completedData.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -295,9 +439,9 @@ export default function TriageComponent() {
                                 }}>
                                   Détails
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="cursor-pointer " >
+                                {/* <DropdownMenuItem className="cursor-pointer " >
                                   Torrefier
-                                </DropdownMenuItem>
+                                </DropdownMenuItem> */}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>

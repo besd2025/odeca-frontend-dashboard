@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { fetchData } from "@/app/_utils/api";
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
 // ==========================================
@@ -126,24 +126,134 @@ export default function CuppingComponent() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
 
     const avgVal = parseFloat(formData.moyenne);
     if (isNaN(avgVal) || avgVal < 0 || avgVal > 100) {
       toast.error("Veuillez renseigner une moyenne valide entre 0 et 100.");
       return;
     }
+    const body = {
+      triage_id: selectedAnalysis?.id,
+      quantite_torrefier: formData.qteTorrefier,
+      observation: formData.observation,
+      nombre_degustateurs: formData.nbDegustateurs,
+      note_moyenne: formData.moyenne,
+    }
+    console.log("body", body);
+    try {
+      const response = await fetchData("post", "cafe/torrefaction/enregistrer_torrefaction/",
+        { params: {}, additionalHeaders: {}, body: body });
+      if (response.status !== 200 && response.status !== 201) {
+        throw new Error("Erreur de mise à jour du triage");
+      }
 
-    toast.success("Torréfaction & Dégustation validées avec succès ! (Illustration locale)");
-    setIsModalOpen(false);
-    setSelectedAnalysis(null);
+      toast.success("Torréfaction & Dégustation validées avec succès ! ");
+      setIsModalOpen(false);
+      setSelectedAnalysis(null);
+    } catch (error) {
+      console.error(error);
+      toast.error("Donnée non enregistrée!!!");
+      throw error;
+    }
   };
+  const [selectedTab, setSelectedTab] = useState("pending");
+  const [pendingData, setPendingData] = useState([]);
+  const [completedData, setCompletedData] = useState([]);
+  React.useEffect(() => {
+    const fetchPendingAnalyses = async () => {
+      if (selectedTab === "pending") {
+
+
+        try {
+          const response = await fetchData("get", "cafe/torrefaction/pret_pour_torrefaction/",
+            { params: {}, additionalHeaders: {}, body: {} });
+          console.log("les analyses:", response);
+          const analyses = response?.results?.map((item) => ({
+            id: item.id,
+            lotNumber: item.numero_lot,
+            qualite: item.qualite,
+            qteEchantillon: item.quantite_echantillon,
+            sacsCount: item.sacs_count,
+            societe: item.societe,
+            deparcheur: item.deparcheur,
+            receptionniste: item.receptionniste,
+            codeEtiquette: item.code_etiquette,
+            dateReception: item.date_reception,
+            status: "granulometrie_complete",
+            taux_defauts: item.taux_defauts,
+            date_triage: new Date(item.date_triage).toLocaleDateString()
+
+          }));
+          console.log("les analyses", analyses);
+          setPendingData(analyses);
+        } catch (error) {
+          console.error("Error fetching pending analyses:", error);
+        }
+      }
+      if (selectedTab === "history") {
+        try {
+          const response = await fetchData("get", "cafe/degustation/historique_degustations/",
+            { params: {}, additionalHeaders: {}, body: {} });
+          console.log("les analyse_EEEE:", response);
+          const analyses = response?.results?.map((item) => ({
+            id: item.id,
+            sampleId: item.echantillon_id,
+            transfertEchantillon: item.transfert_echantillon,
+            lotNumber: item.lot_number,
+            qualite: item.qualite,
+            qteEchantillon: item.quantite_trier,
+            sacsCount: item.sacs_count,
+            societe: item.societe,
+            deparcheur: item.deparcheur,
+            receptionniste: item.receptionniste,
+            codeEtiquette: item.code_etiquette,
+            dateReception: item.date_reception,
+            status: "triage_complete",
+            granulometrie: {
+              quantite: item?.quantite,
+              date: item?.date_analyse ? new Date(item.date_analyse).toLocaleDateString() : "",
+              sieve_7_1: item?.tami_7_1,
+              sieve_6_3: item?.tami_6_3,
+              sieve_5_5: item?.tami_5_5,
+              sieve_4_0: item?.tami_4_0,
+              sieve_3_0: item?.tami_3_0,
+              fond: item?.fond
+            },
+            triage: {
+              date: item?.date ? new Date(item.date).toLocaleDateString() : "",
+              vraisDefauts: parseFloat(item?.vrais_defauts_brisure) || 0,
+              defectueux: parseFloat(item?.defectueux) || 0,
+              brisure: parseFloat(item?.brisure) || 0,
+              nEtRat: parseFloat(item?.n_et_rat) || 0,
+              corpsEtrangers: parseFloat(item?.corps_etrangers) || 0,
+              totalDefectPct: parseFloat(item?.vrais_defauts_brisure || 0) +
+                parseFloat(item?.defectueux || 0) +
+                parseFloat(item?.brisure || 0) +
+                parseFloat(item?.n_et_rat || 0) +
+                parseFloat(item?.corps_etrangers || 0)
+            }
+          }));
+          console.log("les analyses", analyses);
+          setCompletedData(analyses);
+        } catch (error) {
+          console.error("Error fetching pending analyses:", error);
+        }
+
+      }
+    };
+
+
+    fetchPendingAnalyses();
+  }, [selectedTab]);
+
 
   return (
     <div className="space-y-6">
 
-      <Tabs defaultValue="pending" className="">
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="">
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger value="pending">Pret pour la dégustation</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
@@ -167,7 +277,7 @@ export default function CuppingComponent() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {pendingAnalyses.length === 0 ? (
+              {pendingData.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
                   <p className="font-semibold text-slate-700 dark:text-slate-300">Tous les échantillons ont été dégustés !</p>
@@ -188,7 +298,7 @@ export default function CuppingComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {pendingAnalyses.map((item) => (
+                      {pendingData.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -212,8 +322,8 @@ export default function CuppingComponent() {
                           <TableCell className="font-bold text-slate-700 dark:text-slate-300">{item.lotNumber}</TableCell>
                           <TableCell>{item.societe}</TableCell>
                           <TableCell>{item.qualite}</TableCell>
-                          <TableCell className="text-xs text-slate-500">{item.triage?.date}</TableCell>
-                          <TableCell className="text-right font-bold text-slate-800 dark:text-slate-200">{item.triage?.totalDefectPct.toFixed(2)} %</TableCell>
+                          <TableCell className="text-xs text-slate-500">{item.date_triage}</TableCell>
+                          <TableCell className="text-right font-bold text-slate-800 dark:text-slate-200">{item.taux_defauts}%</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -242,7 +352,7 @@ export default function CuppingComponent() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {completedAnalyses.length === 0 ? (
+              {completedData.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Coffee className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
                   <p className="font-medium">Aucun cupping enregistré.</p>
@@ -265,7 +375,7 @@ export default function CuppingComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {completedAnalyses.map((item) => (
+                      {completedData.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -294,7 +404,7 @@ export default function CuppingComponent() {
                               {item.degustation.qualite}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-xs text-slate-500 whitespace-nowrap">{item.degustation.dateDegustation}</TableCell>
+                          <TableCell className="text-xs text-slate-500 whitespace-nowrap">{item.date_triage}</TableCell>
                           <TableCell className="pr-6">
                             {item.status === "degustation_complete" ? (
                               <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[10px]">Attente Décision</Badge>

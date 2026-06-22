@@ -112,6 +112,7 @@ export default function ReceptionPage() {
   const [searchPendingQuery, setSearchPendingQuery] = useState("");
 
   const [formData, setFormData] = useState({
+    id: "",
     transfertEchantillon: "",
     lotNumber: "",
     qteEchantillon: "",
@@ -120,6 +121,8 @@ export default function ReceptionPage() {
     deparcheur: "",
     echantillonneur: "",
     receptionniste: "",
+    prenom_receptionniste: "",
+    phone_receptionniste: "",
     codeEtiquette: "",
     dateReception: new Date().toISOString().split("T")[0],
   });
@@ -156,14 +159,15 @@ export default function ReceptionPage() {
     setSelectedSample(sample);
 
     // Auto-generate anonymous label code: LAB-ETQ-26-XXXXX
-    const numericPart = sample.id.split("-").pop() || Math.floor(100 + Math.random() * 900).toString();
+    const numericPart = String(sample.id).split("-").pop() || Math.floor(100 + Math.random() * 900).toString();
     const randomPart = Math.floor(1000 + Math.random() * 9000).toString();
-    const codeEtiquette = `LAB-ETQ-26-${numericPart}-${randomPart}`;
+    //const codeEtiquette = `LAB-ETQ-26-${numericPart}-${randomPart}`;
 
     // Convert quantity from grams to kilograms if it is large, or display directly
     const qtyInKg = sample.qtePrelevee ? (sample.qtePrelevee / 1000).toFixed(2) : "0.00";
 
     setFormData({
+      id: sample.id || "",
       transfertEchantillon: "",
       lotNumber: sample.lotNumber || "",
       qteEchantillon: qtyInKg,
@@ -172,7 +176,9 @@ export default function ReceptionPage() {
       deparcheur: sample.deparcheur || "",
       echantillonneur: sample.echantillonneur || "",
       receptionniste: "",
-      codeEtiquette: codeEtiquette,
+      prenom_receptionniste: "",
+      phone_receptionniste: "",
+      codeEtiquette: "",
       dateReception: new Date().toISOString().split("T")[0],
     });
 
@@ -184,7 +190,7 @@ export default function ReceptionPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!selectedSample) {
@@ -192,7 +198,18 @@ export default function ReceptionPage() {
       return;
     }
     if (!formData.receptionniste) {
+
       toast.error("Veuillez renseigner le nom du réceptionniste.");
+      return;
+    }
+    if (!formData.codeEtiquette) {
+
+      toast.error("Veuillez renseigner le code etiquette.");
+      return;
+    }
+    if (!formData.dateReception) {
+
+      toast.error("Veuillez renseigner la date de reception.");
       return;
     }
 
@@ -212,84 +229,96 @@ export default function ReceptionPage() {
       status: "receptionne",
       createdAt: new Date().toISOString(),
     };
+    console.log(formData?.id);
+    try {
+      const res = await fetchData(
+        "post",
+        `/cafe/comfirmation_echantillon/`,
+        {
+          params: {},
+          additionalHeaders: {},
+          body: {
+            "echantillon": selectedSample.id,
+            "code_etiquette": formData.codeEtiquette,
+            "receptioniste_nom": formData.receptionniste,
+            "receptioniste_prenom": formData.prenom_receptionniste,
+            "receptioniste_phone": formData.phone_receptionniste,
+            "date_comfirmation": formData.dateReception,
 
-    // ==============================================================
-    // BRANCHEMENT BACKEND : Enregistrer la réception sur le serveur
-    // ==============================================================
-    /*
-    async function submitReception() {
-      try {
-        const res = await fetch("/api/production/laboratoire/receptions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newAnalysis)
-        });
-        if (res.ok) {
-          toast.success("Échantillon réceptionné et codé avec succès !");
+          },
         }
-      } catch (err) {
-        toast.error("Erreur serveur lors de la réception.");
-      }
-    }
-    submitReception();
-    */
+      );
 
-    setLabAnalyses([newAnalysis, ...labAnalyses]);
-    toast.success("Échantillon réceptionné et codé avec succès ! (Illustration locale)");
-    setIsModalOpen(false);
-    setSelectedSample(null);
+      if (res.status !== 200 && res.status !== 201) {
+        throw new Error("Erreur de mise à jour du triage");
+      }
+
+      toast.success("Données enregistrées avec succès");
+      return { lot: selectedSample?.lotNumber };
+    } catch (error) {
+      console.error(error);
+      toast.error("Donnée non enregistrée!!!");
+      throw error;
+    }
+
   };
 
   const handleDeleteAnalysis = (id) => {
-    // ==============================================================
-    // BRANCHEMENT BACKEND : Supprimer l'analyse sur le serveur
-    // ==============================================================
-    /*
-    async function deleteReception() {
-      try {
-        const res = await fetch(`/api/production/laboratoire/receptions/${id}`, {
-          method: "DELETE"
-        });
-        if (res.ok) {
-          toast.success("Enregistrement de laboratoire supprimé");
-        }
-      } catch (err) {
-        toast.error("Erreur serveur lors de la suppression.");
-      }
-    }
-    deleteReception();
-    */
-
     setLabAnalyses(labAnalyses.filter((item) => item.id !== id));
     toast.success("Enregistrement de laboratoire supprimé (Illustration locale)");
   };
 
-  const filteredAnalyses = labAnalyses.filter((item) => {
+  const [data, setData] = useState([])
+  const [echantillons, setEchantillons] = useState([]);
+  const [echantillonsHisto, setEchantillonsHisto] = useState([]);
+  const [tabs, setTabs] = useState("reception");
+
+  const filteredAnalyses = (echantillonsHisto || []).filter((item) => {
     const query = searchQuery.toLowerCase();
     return (
-      item.codeEtiquette.toLowerCase().includes(query) ||
-      item.lotNumber.toLowerCase().includes(query) ||
-      item.societe.toLowerCase().includes(query) ||
-      item.receptionniste.toLowerCase().includes(query)
+      String(item.id_prelevement || "").toLowerCase().includes(query) ||
+      String(item.lotNumber || "").toLowerCase().includes(query) ||
+      String(item.societe || "").toLowerCase().includes(query) ||
+      String(item.receptionniste || "").toLowerCase().includes(query)
     );
   });
 
-  const filteredPending = pendingSamples.filter((sample) => {
+  const filteredPending = (echantillons || []).filter((sample) => {
     const query = searchPendingQuery.toLowerCase();
     return (
-      sample.id.toLowerCase().includes(query) ||
-      sample.lotNumber.toLowerCase().includes(query) ||
-      sample.societe.toLowerCase().includes(query)
+      String(sample.id_prelevement || "").toLowerCase().includes(query) ||
+      String(sample.lotNumber || "").toLowerCase().includes(query) ||
+      String(sample.societe || "").toLowerCase().includes(query)
     );
   });
-  const [data, setData] = useState([])
-  const [echantillons, setEchantillons] = useState([]);
-  const [tabs, setTabs] = useState("reception");
   React.useEffect(() => {
     const fetchEchantillons = async () => {
       if (tabs === "reception") {
         try {
           const response = await fetchData("get", `cafe/echantillonage/en-attente-reception/`);
+          const dataResponse = response?.results;
+
+          const formattedData = dataResponse.map((item) => ({
+            id: item.id,
+            id_prelevement: item?.id_prelevement,
+            lotNumber: item?.numero_lot,
+            societe: item?.societe_proprietaire,
+            deparcheur: item?.deparcheur_usine,
+            sacsCount: item?.nombre_sacs,
+            qtePrelevee: item?.volume_preleve,
+            qualite: item?.qualite_nom,
+            dateEchantillonnage: item?.date_prelevement,
+            echantillonneur: item.nomAgentEchantillonneur
+          }));
+
+          setEchantillons(formattedData);
+
+        } catch (error) {
+          console.error("Error fetching pending samples:", error);
+        }
+      } else if (tabs === "history") {
+        try {
+          const response = await fetchData("get", `cafe/echantillonage/historique_echantillonage/`);
           const dataResponse = response?.results;
 
           const formattedData = dataResponse.map((item) => ({
@@ -305,18 +334,44 @@ export default function ReceptionPage() {
             echantillonneur: item.nomAgentEchantillonneur
           }));
 
-          setEchantillons(formattedData);
-          console.log("Echantillonseeeeee", formattedData);
+          setEchantillonsHisto(formattedData);
+          console.log("EchantillonseeeeeeYYYY", response);
         } catch (error) {
           console.error("Error fetching pending samples:", error);
         }
-      } else if (tabs === "history") {
-        // Ajouter un call API pour l'historique si besoin
-        // const response = await fetchData("get", `...`);
       }
     };
     fetchEchantillons();
   }, [tabs]);
+
+  const handleAnalyse = async (id) => {
+    try {
+      const res = await fetchData(
+        "post",
+        `/cafe/granulometrie/`,
+        {
+          params: {},
+          additionalHeaders: {},
+          body: {
+            "comfirm_echantillon": id,
+            "quanite": 300,
+          },
+        }
+      );
+
+      if (res.status !== 200 && res.status !== 201) {
+        throw new Error("Erreur de mise à jour du triage");
+      }
+
+      toast.success("Données enregistrées avec succès");
+      return { lot: selectedSample?.lotNumber };
+    } catch (error) {
+      console.error(error);
+      toast.error("Donnée non enregistrée!!!");
+      throw error;
+    }
+
+  };
   return (
     <div className="space-y-6">
       <Tabs value={tabs} onValueChange={setTabs} className="">
@@ -366,11 +421,11 @@ export default function ReceptionPage() {
                         <TableHead className="text-right">Qualite</TableHead>
                         <TableHead className="text-right">Sacs</TableHead>
                         <TableHead className="text-right">Volume Prélevé</TableHead>
-                        <TableHead>Date Prélèvement</TableHead>
+                        <TableHead>Date d'Echantillon</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredPending.map((sample) => (
+                      {filteredPending?.map((sample) => (
                         <TableRow key={sample.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -389,13 +444,13 @@ export default function ReceptionPage() {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
-                          <TableCell className="font-semibold">{sample.id}</TableCell>
+                          <TableCell className="font-semibold">{sample.id_prelevement}</TableCell>
                           <TableCell className="font-bold text-slate-700 dark:text-slate-300">{sample.lotNumber}</TableCell>
                           <TableCell>{sample.societe}</TableCell>
                           <TableCell className="text-xs text-slate-500">{sample.deparcheur}</TableCell>
                           <TableCell className="text-xs text-slate-500">{sample.qualite}</TableCell>
                           <TableCell className="text-right">{sample.sacsCount} sacs</TableCell>
-                          <TableCell className="text-right font-semibold">{(sample.qtePrelevee / 1000).toFixed(2)} kg</TableCell>
+                          <TableCell className="text-right font-semibold">{sample.qtePrelevee}</TableCell>
                           <TableCell className="text-xs text-slate-500">{sample.dateEchantillonnage}</TableCell>
                         </TableRow>
                       ))}
@@ -430,7 +485,7 @@ export default function ReceptionPage() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {echantillons?.length === 0 ? (
+              {echantillonsHisto?.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Tag className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
                   <p className="font-medium">Aucun échantillon réceptionné pour le moment.</p>
@@ -453,7 +508,7 @@ export default function ReceptionPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {echantillons?.map((item) => (
+                      {filteredAnalyses?.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -470,9 +525,11 @@ export default function ReceptionPage() {
                                   Détails
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem >
+                                {/* <DropdownMenuItem
+                                  onClick={() => handleAnalyse(item.id)}
+                                >
                                   Analyser
-                                </DropdownMenuItem>
+                                </DropdownMenuItem> */}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 font-semibold" onClick={() => handleDeleteAnalysis(item.id)}>
                                   Supprimer
@@ -481,14 +538,14 @@ export default function ReceptionPage() {
                             </DropdownMenu>
                           </TableCell>
                           <TableCell className="font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">
-                            {item.codeEtiquette}
+                            {item.id_prelevement}
                           </TableCell>
                           <TableCell className="font-semibold text-slate-700 dark:text-slate-300">{item.lotNumber}</TableCell>
                           <TableCell>{item.societe}</TableCell>
                           <TableCell className="text-right font-semibold">{item.qualite}</TableCell>
                           <TableCell className="text-right font-semibold">{item.qteEchantillon} kg</TableCell>
                           <TableCell className="text-xs">{item.receptionniste}</TableCell>
-                          <TableCell className="text-xs text-slate-500 whitespace-nowrap">{item.dateReception}</TableCell>
+                          <TableCell className="text-xs text-slate-500 whitespace-nowrap">{item.date_prelevement}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
                               Réceptionné
@@ -593,6 +650,42 @@ export default function ReceptionPage() {
                     <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   </div>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="prenom_receptionniste" className="font-bold text-slate-700 dark:text-slate-300">
+                    Prenom du réceptionniste
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      id="prenom_receptionniste"
+                      name="prenom_receptionniste"
+                      value={formData.prenom_receptionniste}
+                      onChange={handleChange}
+                      placeholder="Prenom"
+                      className="pl-10 text-slate-950 dark:text-white"
+                      required
+                    />
+                    <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone_receptionniste" className="font-bold text-slate-700 dark:text-slate-300">
+                    Telephone du réceptionniste
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      id="phone_receptionniste"
+                      name="phone_receptionniste"
+                      value={formData.phone_receptionniste}
+                      onChange={handleChange}
+                      placeholder="Telephone"
+                      className="pl-10 text-slate-950 dark:text-white"
+                      required
+                    />
+                    <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  </div>
+                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="dateReception" className="font-bold text-slate-700 dark:text-slate-300">
@@ -619,8 +712,10 @@ export default function ReceptionPage() {
                   </Label>
                   <Input
                     type="text"
+                    id="codeEtiquette"
+                    name="codeEtiquette"
                     value={formData.codeEtiquette}
-                    readOnly
+                    onChange={handleChange}
                     className="bg-emerald-50/30 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 font-bold select-all tracking-wider font-mono"
                   />
                 </div>
@@ -691,7 +786,7 @@ export default function ReceptionPage() {
                 <div className="grid grid-cols-2 gap-4 text-xs font-medium">
                   <div>
                     <span className="text-slate-400 block">Quantité de l'échantillon</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{selectedDetailItem.qteEchantillon.toFixed(2)} kg</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">{selectedDetailItem.qteEchantillon} kg</span>
                   </div>
                   <div>
                     <span className="text-slate-400 block">Réceptionniste</span>
