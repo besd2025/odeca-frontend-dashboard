@@ -51,6 +51,7 @@ import {
   FileCheck,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { ROLES } from "@/lib/permissions";
 // This is sample data.
 const menuItems = {
   navMain: [
@@ -97,89 +98,96 @@ const menuItems = {
       url: "/odeca-production/usine/reception",
       icon: Inbox,
       keyword: "odeca-production/usine/reception",
+      roles: [ROLES.ADMIN, ROLES.UDP],
     },
     {
       title: "Usinage",
       url: "/odeca-production/usine/usinage",
       icon: Settings,
       keyword: "odeca-production/usine/usinage",
+      roles: [ROLES.ADMIN, ROLES.UDP],
     },
     {
       title: "Triage",
       url: "/odeca-production/usine/triage",
       icon: Search,
       keyword: "odeca-production/usine/triage",
+      roles: [ROLES.ADMIN, ROLES.UDP],
     },
-    {
-      title: "Échantillonnage",
-      // url: "/odeca-production/usine/echantillonnage",
-      items: [
-        {
-          title: "Prélèvement",
-          url: "/odeca-production/usine/echantillonnage",
-          icon: FlaskConical,
-          keyword: "odeca-production/usine/echantillonnage",
-        },
-        {
-          title: "Retours",
-          url: "/odeca-production/usine/echantillonnage/retours",
-          icon: Undo2,
-          keyword: "odeca-production/usine/echantillonnage/retours",
-        },
-        {
-          title: "Resultats",
-          url: "/odeca-production/usine/echantillonnage/resultats",
-          icon: FileCheck,
-          keyword: "odeca-production/usine/echantillonnage/resultats",
-        },
-      ],
-      icon: Beaker,
-      keyword: "odeca-production/usine/echantillonnage",
-    },
+    // {
+    //   title: "Échantillonnage",
+    //   // url: "/odeca-production/usine/echantillonnage",
+    //   items: [
+    //     {
+    //       title: "Prélèvement",
+    //       url: "/odeca-production/usine/echantillonnage",
+    //       icon: FlaskConical,
+    //       keyword: "odeca-production/usine/echantillonnage",
+    //     },
+    //     {
+    //       title: "Retours",
+    //       url: "/odeca-production/usine/echantillonnage/retours",
+    //       icon: Undo2,
+    //       keyword: "odeca-production/usine/echantillonnage/retours",
+    //     },
+    //     {
+    //       title: "Resultats",
+    //       url: "/odeca-production/usine/echantillonnage/resultats",
+    //       icon: FileCheck,
+    //       keyword: "odeca-production/usine/echantillonnage/resultats",
+    //     },
+    //   ],
+    //   icon: Beaker,
+    //   keyword: "odeca-production/usine/echantillonnage",
+    // },
     {
       title: "Stockage",
       url: "/odeca-production/usine/stockage",
       icon: Package,
       keyword: "odeca-production/usine/stockage",
+      roles: [ROLES.ADMIN, ROLES.UDP],
     },
     {
-      title: "Laboratoire",
-      items: [
-        {
-          title: "Réception & Codage",
-          url: "/odeca-production/laboratoire/reception",
-          icon: Tag,
-        },
-        {
-          title: "Analyse Granulométrique",
-          url: "/odeca-production/laboratoire/granulometrie",
-          icon: BarChart3,
-        },
-        {
-          title: "Triage Manuel",
-          url: "/odeca-production/laboratoire/triage",
-          icon: Sliders,
-        },
-        {
-          title: "Torréfaction & Degustation",
-          url: "/odeca-production/laboratoire/cupping",
-          icon: Coffee,
-        },
-        {
-          title: "Décisions & Rapports",
-          url: "/odeca-production/laboratoire/rapports",
-          icon: Scroll,
-        },
-      ],
-      icon: Microscope,
-      keyword: "odeca-production/laboratoire",
+      title: "Réception & Codage",
+      url: "/odeca-production/laboratoire/reception",
+      icon: Tag,
+      keyword: "odeca-production/laboratoire/reception",
+      roles: [ROLES.ADMIN, ROLES.LABORATOIRE],
     },
     {
-      title: "Commercialisation",
-      url: "/odeca-production/commercialisation",
-      icon: Package,
-      keyword: "odeca-production/commercialisation",
+      title: "Analyse Granulométrique",
+      url: "/odeca-production/laboratoire/granulometrie",
+      icon: BarChart3,
+      keyword: "odeca-production/laboratoire/granulometrie",
+      roles: [ROLES.ADMIN, ROLES.LABORATOIRE],
     },
+    {
+      title: "Triage Manuel",
+      url: "/odeca-production/laboratoire/triage",
+      icon: Sliders,
+      keyword: "odeca-production/laboratoire/triage",
+      roles: [ROLES.ADMIN, ROLES.LABORATOIRE],
+    },
+    {
+      title: "Torréfaction & Degustation",
+      url: "/odeca-production/laboratoire/cupping",
+      icon: Coffee,
+      keyword: "odeca-production/laboratoire/cupping",
+      roles: [ROLES.ADMIN, ROLES.LABORATOIRE],
+    },
+    {
+      title: "Décisions & Rapports",
+      url: "/odeca-production/laboratoire/rapports",
+      icon: Scroll,
+      keyword: "odeca-production/laboratoire/rapports",
+      roles: [ROLES.ADMIN, ROLES.LABORATOIRE],
+    },
+    // {
+    //   title: "Commercialisation",
+    //   url: "/odeca-production/commercialisation",
+    //   icon: Package,
+    //   keyword: "odeca-production/commercialisation",
+    // },
   ],
   user: {
     name: "admin",

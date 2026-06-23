@@ -89,78 +89,78 @@ export default function ConfirmationPage() {
   };
 
   return (
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
-      <div className="p-6 max-w-6xl mx-auto space-y-6 animate-in fade-in duration-300">
 
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Inbox className="h-8 w-8 text-primary" /> Réception
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
-              Enregistrement et pesée des nouveaux lots de café déparché en provenance des Stations de Lavage (SDL).
-            </p>
-          </div>
+    <div className="p-6 max-w-6xl mx-auto space-y-6 animate-in fade-in duration-300">
 
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Inbox className="h-8 w-8 text-primary" /> Réception
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
+            Enregistrement et pesée des nouveaux lots de café déparché en provenance des Stations de Lavage (SDL).
+          </p>
         </div>
 
-        {lotId && (
-          <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in slide-in-from-top-4 duration-300">
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Confirmation de Réception</p>
-              <h2 className="text-lg font-bold text-primary">ID : {lotId}</h2>
-            </div>
-            <div className="flex gap-2">
-              <Badge variant="outline" className="bg-white dark:bg-slate-900 border-primary/20 text-primary font-semibold">
-                Société: {formData.societe || "Non spécifiée"}
-              </Badge>
-            </div>
+      </div>
+
+      {lotId && (
+        <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in slide-in-from-top-4 duration-300">
+          <div>
+            <p className="text-xs text-slate-500 font-medium">Confirmation de Réception</p>
+            <h2 className="text-lg font-bold text-primary">ID : {lotId}</h2>
           </div>
-        )}
+          <div className="flex gap-2">
+            <Badge variant="outline" className="bg-white dark:bg-slate-900 border-primary/20 text-primary font-semibold">
+              Société: {formData.societe || "Non spécifiée"}
+            </Badge>
+          </div>
+        </div>
+      )}
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* Main Info Card */}
-          <div className="lg:col-span-3 space-y-6">
-            <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-primary" /> Informations Générales
-                </CardTitle>
-                <CardDescription>Détails du transfert et caractéristiques physico-chimiques.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Société */}
-                  <div className="space-y-2">
-                    <Label htmlFor="societe" className="font-semibold text-slate-700 dark:text-slate-300">
-                      Société / Propriétaire
-                    </Label>
-                    <Input
-                      type="text"
-                      id="societe"
-                      name="societe"
-                      value={formData.societe}
-                      disabled
-                    />
-                  </div>
-                  {/* SDL */}
-                  <div className="space-y-2">
-                    <Label htmlFor="sdl" className="font-semibold text-slate-700 dark:text-slate-300">
-                      Station de Lavage
-                    </Label>
-                    <Input
-                      type="text"
-                      id="sdl"
-                      name="sdl"
-                      value={initialSdls}
-                      disabled
-                    />
-                  </div>
+        {/* Main Info Card */}
+        <div className="lg:col-span-3 space-y-6">
+          <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-primary" /> Informations Générales
+              </CardTitle>
+              <CardDescription>Détails du transfert et caractéristiques physico-chimiques.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Société */}
+                <div className="space-y-2">
+                  <Label htmlFor="societe" className="font-semibold text-slate-700 dark:text-slate-300">
+                    Société / Propriétaire
+                  </Label>
+                  <Input
+                    type="text"
+                    id="societe"
+                    name="societe"
+                    value={formData.societe}
+                    disabled
+                  />
+                </div>
+                {/* SDL */}
+                <div className="space-y-2">
+                  <Label htmlFor="sdl" className="font-semibold text-slate-700 dark:text-slate-300">
+                    Station de Lavage
+                  </Label>
+                  <Input
+                    type="text"
+                    id="sdl"
+                    name="sdl"
+                    value={initialSdls}
+                    disabled
+                  />
+                </div>
 
-                  {/* Date de Réception */}
-                  {/* <div className="space-y-2">
+                {/* Date de Réception */}
+                {/* <div className="space-y-2">
                     <Label htmlFor="dateReception" className="font-semibold text-slate-700 dark:text-slate-300">
                       Date de Réception
                     </Label>
@@ -177,17 +177,17 @@ export default function ConfirmationPage() {
                       <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     </div>
                   </div> */}
-                </div>
+              </div>
 
 
-              </CardContent>
-            </Card>
-            <Grades />
-          </div>
+            </CardContent>
+          </Card>
+          <Grades />
+        </div>
 
 
-        </form>
-      </div>
-    </ProtectedRoute>
+      </form>
+    </div>
+
   );
 }

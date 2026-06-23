@@ -4,11 +4,17 @@ import ProfileUser from "./profile";
 import UsersContent from "./users/UsersContent";
 import ChefSocietesContent from "./chef_societtes/ChefSocietesContent";
 import SupervisorsContent from "./supervisors/SuperviseursContent.jsx";
+import UsinesContent from "./usine/UsinesContent";
+import LaboUsersContent from "./laboratoire/LaboUsersContent";
+
 const tabs = [
   { name: 'Generale', value: 'profil' },
   { name: 'Utilisateurs', value: 'users' },
   { name: 'chef_societes', value: 'chef_societes' },
-  { name: 'superviseurs', value: 'superviseurs' }
+  { name: 'superviseurs', value: 'superviseurs' },
+  { name: 'Usines', value: 'Usines' },
+  { name: 'Laboratoires', value: 'Laboratoires' }
+
 ]
 
 
@@ -43,6 +49,12 @@ export default function Settings() {
         </TabsContent>
         <TabsContent value="superviseurs" className="pt-4">
           <SupervisorsContent />
+        </TabsContent>
+        <TabsContent value="Usines" className="pt-4">
+          <UsinesContent />
+        </TabsContent>
+        <TabsContent value="Laboratoires" className="pt-4">
+          <LaboUsersContent />
         </TabsContent>
       </Tabs>
     </div>

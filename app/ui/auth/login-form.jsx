@@ -86,7 +86,6 @@ export function LoginForm({ className, ...props }) {
       }
       const data = await response.json();
       const user = DecodeToJwt(data.access);
-      console.log("user", user)
       if (
         user?.category === "Admin" ||
         user?.category === "General" ||
@@ -98,7 +97,23 @@ export function LoginForm({ className, ...props }) {
         document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
         localStorage.setItem("Access_Token", data.access);
         router.push("/odeca-dashboard/home");
-      } else {
+      }
+      else if (
+        user?.category === "Respo_usine_deparchage"
+      ) {
+        document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
+        localStorage.setItem("Access_Token", data.access);
+        router.push("odeca-production/usine/reception");
+      }
+      else if (
+        user?.category === "Respo_labo"
+      ) {
+        document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
+        localStorage.setItem("Access_Token", data.access);
+        router.push("odeca-production/laboratoire/reception");
+      }
+
+      else {
         setError("Vous n'avez pas d'accès.");
       }
     } catch (err) {

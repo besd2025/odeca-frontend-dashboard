@@ -213,100 +213,99 @@ export default function TriagePage() {
 
 
   return (
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
-      <div className="p-6 max-w-6xl mx-auto space-y-6 animate-in fade-in duration-300">
+    <div className="p-6 max-w-6xl mx-auto space-y-6 animate-in fade-in duration-300">
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Search className="h-8 w-8 text-primary" /> Processus de Triage
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
-              Suivi et validation des lots de café prêts à être triés, en cours de triage et étiquetés/stockés.
-            </p>
-          </div>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Search className="h-8 w-8 text-primary" /> Processus de Triage
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
+            Suivi et validation des lots de café prêts à être triés, en cours de triage et étiquetés/stockés.
+          </p>
         </div>
-
-        {/* Component 1: Triage List */}
-        <TriageList
-          lots={lots}
-          onStartTriage={handleStartTriage}
-          onLabelDirect={handleLabelDirect}
-          onFinalize={handleFinalize}
-          onViewDetails={handleViewDetails}
-          onStockGrade={handleStockGrade}
-        />
-
-
-        {/* Component 2a: Finalize triage dialog */}
-        <Dialog open={isFinalizing} onOpenChange={setIsFinalizing}>
-          <DialogContent className="sm:max-w-4xl md:max-w-4xl lg:max-w-[80vw] bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
-                Finalisation du Triage
-              </DialogTitle>
-              <DialogDescription className="text-slate-500 dark:text-slate-400">
-                Saisissez la chronologie et les quantités triées prêtes à être taxées par grade.
-              </DialogDescription>
-            </DialogHeader>
-            {activeLot && (
-              <TriageDialog
-                lot={activeLot}
-                onSave={handleSaveTriage}
-                onCancel={() => { setIsFinalizing(false); setActiveLot(null); }}
-                readOnly={false}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-
-        {/* Component 2b: View details dialog */}
-        <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
-          <DialogContent className="sm:max-w-4xl md:max-w-4xl lg:max-w-[80vw] bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
-                Fiche Récapitulative du Triage
-              </DialogTitle>
-              <DialogDescription className="text-slate-500 dark:text-slate-400">
-                Détail complet du lot trié, des quantités taxables et de la chronologie du processus.
-              </DialogDescription>
-            </DialogHeader>
-            {activeLot && (
-              <TriageDialog
-                lot={activeLot}
-                onCancel={() => { setIsViewingDetails(false); setActiveLot(null); }}
-                readOnly={true}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-
-        {/* Component 2c: Start triage configuration dialog */}
-        <Dialog open={isStartingTriage} onOpenChange={setIsStartingTriage}>
-          <DialogContent className="sm:max-w-2xl max-h-[95vh] overflow-y-auto bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
-                Démarrer le Triage - Configuration du Lot
-              </DialogTitle>
-              <DialogDescription className="text-slate-500 dark:text-slate-400">
-                Sélectionnez les grades à trier pour le lot {activeLot?.id}. Les autres grades seront stockés directement.
-              </DialogDescription>
-            </DialogHeader>
-            {activeLot && (
-              <StartTriageForm
-                lot={activeLot}
-                onConfirm={handleConfirmStartTriage}
-                onCancel={() => {
-                  setIsStartingTriage(false);
-                  setActiveLot(null);
-                }}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-
       </div>
-    </ProtectedRoute>
+
+      {/* Component 1: Triage List */}
+      <TriageList
+        lots={lots}
+        onStartTriage={handleStartTriage}
+        onLabelDirect={handleLabelDirect}
+        onFinalize={handleFinalize}
+        onViewDetails={handleViewDetails}
+        onStockGrade={handleStockGrade}
+      />
+
+
+      {/* Component 2a: Finalize triage dialog */}
+      <Dialog open={isFinalizing} onOpenChange={setIsFinalizing}>
+        <DialogContent className="sm:max-w-4xl md:max-w-4xl lg:max-w-[80vw] bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
+              Finalisation du Triage
+            </DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400">
+              Saisissez la chronologie et les quantités triées prêtes à être taxées par grade.
+            </DialogDescription>
+          </DialogHeader>
+          {activeLot && (
+            <TriageDialog
+              lot={activeLot}
+              onSave={handleSaveTriage}
+              onCancel={() => { setIsFinalizing(false); setActiveLot(null); }}
+              readOnly={false}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Component 2b: View details dialog */}
+      <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
+        <DialogContent className="sm:max-w-4xl md:max-w-4xl lg:max-w-[80vw] bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
+              Fiche Récapitulative du Triage
+            </DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400">
+              Détail complet du lot trié, des quantités taxables et de la chronologie du processus.
+            </DialogDescription>
+          </DialogHeader>
+          {activeLot && (
+            <TriageDialog
+              lot={activeLot}
+              onCancel={() => { setIsViewingDetails(false); setActiveLot(null); }}
+              readOnly={true}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Component 2c: Start triage configuration dialog */}
+      <Dialog open={isStartingTriage} onOpenChange={setIsStartingTriage}>
+        <DialogContent className="sm:max-w-2xl max-h-[95vh] overflow-y-auto bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
+              Démarrer le Triage - Configuration du Lot
+            </DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400">
+              Sélectionnez les grades à trier pour le lot {activeLot?.id}. Les autres grades seront stockés directement.
+            </DialogDescription>
+          </DialogHeader>
+          {activeLot && (
+            <StartTriageForm
+              lot={activeLot}
+              onConfirm={handleConfirmStartTriage}
+              onCancel={() => {
+                setIsStartingTriage(false);
+                setActiveLot(null);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+    </div>
+
   );
 }
