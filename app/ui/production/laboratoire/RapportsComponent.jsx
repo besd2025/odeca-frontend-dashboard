@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
@@ -730,6 +731,15 @@ export default function RapportsComponent() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="motif" className="text-sm font-semibold">Motif de retour</Label>
+              {/* <Select >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un motif" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Taux d'humidité trop élevé">Retriage nécessaire</SelectItem>
+                  <SelectItem value="Présence de défauts majeurs">Défectueux </SelectItem>
+                </SelectContent>
+              </Select> */}
               <textarea
                 id="motif"
                 className="flex w-full rounded-md border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300 min-h-[120px]"
