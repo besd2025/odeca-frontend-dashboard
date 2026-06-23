@@ -5,7 +5,7 @@ import React from 'react'
 
 export default function page() {
   return (
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.UDP]}>
+    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.UDP]}>
       <StockagePage />
     </ProtectedRoute>
   )

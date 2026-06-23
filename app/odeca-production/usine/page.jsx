@@ -8,7 +8,7 @@ import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
 import { ROLES } from "@/lib/permissions";
 function page() {
   return (
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.UDP
+    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.UDP
     ]}>
       <div className="p-4">
         <Tabs defaultValue="list" className="w-full">
