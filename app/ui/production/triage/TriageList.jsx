@@ -131,6 +131,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
     try {
       if (tab === "Prêt à trier") {
         const pendingRes = await fetchData("get", `cafe/usinages/get_pret_pour_triage/`, { params: { limit, offset: pointer } });
+        console.log("pendingRes", pendingRes)
         const pendingMapped = pendingRes?.results?.map((item) => {
           const processedGrades = Array.isArray(item?.productions)
             ? item.productions.reduce((acc, curr) => {
