@@ -47,6 +47,7 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
   const [formData, setFormData] = React.useState([]);
   const [nombreSacs, setNombreSacs] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [codeSociete, setCodeSociete] = React.useState("")
   const [open, setOpen] = React.useState(false);
   const handleViewDetailsStock = (lot) => {
     setIsViewingDetailsStock(true);
@@ -56,8 +57,14 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
   }
 
   const [lotsAvailable, setLotsAvailable] = React.useState([])
+  const [newLotName, setNewLotName] = React.useState("");
+  const [qualities, setQualities] = React.useState([]);
+  const [selectedQuality, setSelectedQuality] = React.useState("");
   const handleOpenStocking = async (gradeItem) => {
     setStockingGrade(gradeItem);
+    setLotsExistants("");
+    setNewLotName("");
+    setSelectedQuality("");
     const initialTries = {};
     const initialNonRequis = {};
     MOCK_GRADES.forEach((g) => {
@@ -72,11 +79,13 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
 
     try {
 
-      const [allData, lotsData] = await Promise.all([
+      const [allData, lotsData, qualiteRes] = await Promise.all([
         fetchData("get", `cafe/stock_cafe/get_qualites_pretes_stockage/`, { params: { societe_id: gradeItem?.id } }),
-        fetchData("get", `cafe/stock_cafe/`, { params: { proprietaire: gradeItem?.id, limit: 100, offset: 0 } })
+        fetchData("get", `cafe/stock_cafe/`, { params: { proprietaire: gradeItem?.id, limit: 100, offset: 0 } }),
+        fetchData("get", "cafe/qualite_cafe/", { params: { limit: 200, offset: 0 } })
       ]);
       setFormData(allData?.qualites)
+      setCodeSociete(allData?.code_societe)
       const lotdata = lotsData?.results?.map(item => {
         return {
           id: String(item?.id),
@@ -84,6 +93,8 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
         };
       });
       setLotsAvailable(lotdata)
+      const dataQualities = qualiteRes?.results || qualiteRes?.data?.results || [];
+      setQualities(dataQualities);
 
     } catch (err) {
       console.error("Error loading initial data:", err);
@@ -130,7 +141,21 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
 
     // 1. Vérification du lot sélectionné
     if (!lotsExistants) {
-      toast.error("Veuillez sélectionner un lot existant.");
+      toast.error("Veuillez sélectionner un lot.");
+      return;
+    }
+
+    if (lotsExistants === "AUTRE" && !newLotName.trim()) {
+      toast.error("Veuillez saisir le nom du nouveau lot.");
+      return;
+    }
+
+    if (lotsExistants === "AUTRE" && !selectedQuality) {
+      toast.error("Veuillez sélectionner une qualité pour le nouveau lot.");
+      return;
+    }
+    if (!codeSociete) {
+      toast.error("Veuillez réessayer");
       return;
     }
 
@@ -205,42 +230,91 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
     // 5. Lancement des requêtes réseau
     setLoading(true);
 
-    // Transformation des configurations de payload en promesses actives
-    const savePromises = apiPayloads.map(async (item) => {
-      const results = await fetchData(
-        "post",
-        `/${item.endpoint}`,
-        {
-          params: {},
-          additionalHeaders: {},
-          body: {
-            "nombre_sacs": item.nombreSacs,
-            "stockage": lotsExistants,
-            [item.payloadKey]: item.idProduction, // Devient dynamiquement "apres_triage" ou "apres_usinage"
-          },
-        }
-      );
+    const executeSaving = async () => {
+      let finalLotId = lotsExistants;
 
-      if (results.status !== 200 && results.status !== 201) {
-        throw new Error(`Erreur lors du traitement du lot ID ${item.idProduction}`);
+      // Si c'est un nouveau lot, on l'enregistre d'abord dans l'API
+      if (lotsExistants === "AUTRE") {
+        const createLotRes = await fetchData(
+          "post",
+          "cafe/stock_cafe/",
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {
+              numero_lot: newLotName.trim(),
+              proprietaire: codeSociete,
+              qualite: Number(selectedQuality)
+            }
+          }
+        );
+
+        if (createLotRes.status !== 200 && createLotRes.status !== 201) {
+          throw new Error("Erreur lors de la création du nouveau lot.");
+        }
+
+        const newLotData = createLotRes.data || createLotRes;
+        if (!newLotData?.id) {
+          throw new Error("Impossible de récupérer l'ID du nouveau lot créé.");
+        }
+
+        finalLotId = String(newLotData.id);
       }
-      return results.data;
-    });
+
+      // Une fois le lotId obtenu (existant ou nouveau), on effectue le préstockage
+      const savePromises = apiPayloads.map(async (item) => {
+        const results = await fetchData(
+          "post",
+          `/${item.endpoint}`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {
+              "nombre_sacs": item.nombreSacs,
+              "stockage": finalLotId,
+              [item.payloadKey]: item.idProduction,
+            },
+          }
+        );
+
+        if (results.status !== 200 && results.status !== 201) {
+          throw new Error(`Erreur lors du traitement du lot ID ${item.idProduction}`);
+        }
+        return results.data;
+      });
+
+      return Promise.all(savePromises);
+    };
 
     // 6. Résolution synchronisée avec Toast unique de contrôle
-    toast.promise(Promise.all(savePromises), {
+    toast.promise(executeSaving(), {
       loading: "Mise en stock des données en cours...",
       success: () => {
-        if (typeof onSave === "function") onSave(lotsExistants, finalizedData);
-        setTimeout(() => setOpen(false), 500);
+        if (typeof onSave === "function") {
+          try {
+            onSave(lotsExistants, typeof finalizedData !== "undefined" ? finalizedData : null);
+          } catch (e) {
+            console.error(e);
+          }
+        }
+        setTimeout(() => {
+          setOpen(false);
+          setStockingGrade(null);
+        }, 500);
         setLoading(false);
         return "Toutes les données ont été enregistrées avec succès !";
       },
       error: (err) => {
         console.error("Stocking error:", err);
-        if (typeof setError === "function") setError(err.message);
+        if (typeof setError === "function") {
+          try {
+            setError(err.message);
+          } catch (e) {
+            console.error(e);
+          }
+        }
         setLoading(false);
-        return "Une ou plusieurs données n'ont pas pu être enregistrées.";
+        return err.message || "Une ou plusieurs données n'ont pas pu être enregistrées.";
       },
     });
   };
@@ -305,8 +379,43 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                       {item.name}
                     </SelectItem>
                   ))}
+                  <SelectItem value="AUTRE">AUTRE</SelectItem>
                 </SelectContent>
               </Select>
+
+              {lotsExistants === "AUTRE" && (
+                <>
+                  <div className="space-y-2 mt-2">
+                    <Label htmlFor="newLotName">Nom du nouveau lot</Label>
+                    <Input
+                      id="newLotName"
+                      type="text"
+                      placeholder="Saisir le nom du nouveau lot"
+                      value={newLotName}
+                      onChange={(e) => setNewLotName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2 mt-2">
+                    <Label htmlFor="qualitySelect">Qualité</Label>
+                    <Select
+                      value={selectedQuality}
+                      onValueChange={setSelectedQuality}
+                    >
+                      <SelectTrigger className="w-full bg-background">
+                        <SelectValue placeholder="Sélectionner une qualité" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {qualities.map((item) => (
+                          <SelectItem key={item.id} value={String(item.id)}>
+                            {item.nom}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
               <Label>Combiner</Label>
               <div className="flex flex-col md:flex-row justify-between gap-6">
                 <div>
