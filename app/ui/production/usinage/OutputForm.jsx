@@ -184,7 +184,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
                 if (results.status == 200 || results.status == 201) {
                   const result2 = await fetchData(
                     "patch",
-                    `/cafe/usinages/${lot.id}/`,
+                    `/cafe/usinages/${UsinageId}/`,
                     {
                       params: {},
                       additionalHeaders: {},

@@ -145,8 +145,8 @@ export default function InputForm({ onAddLot, id, code_societe, societe }) {
             },
           );
 
-          if (results.status == 200) {
-            resolve({ sdlName });
+          if (results.status == 200 || results.status == 201) {
+            resolve({ code_societe });
           } else {
             reject(new Error("Erreur"));
           }
@@ -159,7 +159,7 @@ export default function InputForm({ onAddLot, id, code_societe, societe }) {
         loading: "Enregistrement...",
         success: (data) => {
           setTimeout(() => setOpen(false), 500);
-          return `Grades selectionnées avec succès `;
+          return `Donnée enregistrée avec succès `;
         },
         error: "Donnée non enregistrée!!!",
       });
