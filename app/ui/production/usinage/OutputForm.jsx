@@ -36,6 +36,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const [checkedGrades, setCheckedGrades] = useState({});
+  const [UsinageId, setUsinageId] = useState("");
   const handleCheckedChange = (grade) => {
     setCheckedGrades(prev => ({
       ...prev,
@@ -45,9 +46,15 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
   useEffect(() => {
     const loadData = async () => {
       try {
+        const retoursData = await fetchData("get", `cafe/usinages/get_usinage_encours_par_societe/`, {
+          params: {
+            societe_code: lot?.code_societe
+          }
+        })
         const data = await fetchData("get", `cafe/qualite_cafe/`);
         const gradesData = data.results || data || [];
         setFullApiGrades(gradesData);
+        setUsinageId(retoursData?.usinage_id)
         const newGrades = Array.isArray(gradesData)
           ? gradesData.map(item => typeof item === 'object' ? (item.nom || item.designation || item.name || item.code) : item).filter(Boolean)
           : [];
@@ -127,6 +134,10 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
       return;
     }
 
+    if (!UsinageId) {
+      toast.error("Pas de L'ID d'usinage correspondant.");
+      return;
+    }
     // Prepare clean output data
     const finalizedData = {
       dateSortie,
@@ -149,7 +160,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
           if (typeof val === "object") {
 
             const formData = new FormData();
-            formData.append("usinage", lot.id);
+            formData.append("usinage", UsinageId);
             formData.append("observation", observation);
             formData.append("quantite_sortie", val.kg);
             formData.append("nombre_sacs", val.sacs);

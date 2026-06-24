@@ -223,12 +223,18 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails, onIdCh
                           {lot.societe}
                         </span>
                         <div className="flex flex-wrap gap-1">
-                          {lot?.sdls.map((sdl) => (
+                          {Array.from(
+                            new Set(
+                              (lot?.sdls || [])
+                                .map((sdl) => sdl?.transfert_detail?.transfer?.sdl?.sdl_nom)
+                                .filter(Boolean)
+                            )
+                          ).map((sdlNom) => (
                             <span
-                              key={sdl?.id}
+                              key={sdlNom}
                               className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
                             >
-                              {sdl?.transfert_detail?.transfer?.sdl?.sdl_nom}
+                              {sdlNom}
                             </span>
                           ))}
                         </div>
