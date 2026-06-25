@@ -161,7 +161,6 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
         setTotalCount((pendingRes?.count || 0));
       } else if (tab === "En cours de triage") {
         const pendingRes = await fetchData("get", `cafe/triage/get_en_cours_triage/`, { params: { limit, offset: pointer } });
-        console.log("pendingRes", pendingRes)
         const pendingMapped = pendingRes?.results?.map((item) => {
           return {
             id: item.id,

@@ -43,7 +43,6 @@ export default function StartTriageForm({ lot, onConfirm, onCancel }) {
 
     for (const grade of selectedGrades) {
       const gradeData = lot.grades[grade]; // { nombre_sacs, triage_id, production_id }µ
-      console.log(gradeData)
       try {
         const res = await fetchData(
           "post",
