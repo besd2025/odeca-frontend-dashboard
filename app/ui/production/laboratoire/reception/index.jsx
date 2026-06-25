@@ -320,7 +320,6 @@ export default function ReceptionPage() {
         try {
           const response = await fetchData("get", `cafe/echantillonage/historique_echantillonage/`);
           const dataResponse = response?.results;
-          console.log("EchantillonseeeeeeYYYY", response);
           const formattedData = dataResponse.map((item) => ({
             id: item.id,
             id_prelevement: item?.id_prelevement,
