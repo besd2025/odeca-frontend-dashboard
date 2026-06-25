@@ -82,7 +82,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
   const [receptionsAllList, setReceptionsAllList] = React.useState([]);
   const [totalCount, setTotalCount] = React.useState(0);
   const [pointer, setPointer] = React.useState(0);
-  const [limit, setLimit] = React.useState(20);
+  const [limit, setLimit] = React.useState(10);
 
   const getPretAStockerGrades = (lotsList) => {
     const list = [];
@@ -135,7 +135,11 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
         const pendingMapped = pendingRes?.results?.map((item) => {
           const processedGrades = Array.isArray(item?.productions)
             ? item.productions.reduce((acc, curr) => {
-              acc[curr.nom_qualite || `Qualité ${curr.qualite || 'Inconnue'}`] = curr.nombre_sacs;
+              acc[curr.nom_qualite || `Qualité ${curr.qualite || 'Inconnue'}`] = {
+                nombre_sacs: curr.nombre_sacs,
+                triage_id: curr.id_triage,
+                production_id: curr.id,
+              };
               return acc;
             }, {})
             : (item?.productions || {});
@@ -157,6 +161,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
         setTotalCount((pendingRes?.count || 0));
       } else if (tab === "En cours de triage") {
         const pendingRes = await fetchData("get", `cafe/triage/get_en_cours_triage/`, { params: { limit, offset: pointer } });
+        console.log("pendingRes", pendingRes)
         const pendingMapped = pendingRes?.results?.map((item) => {
           return {
             id: item.id,
@@ -415,7 +420,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                           <span className="font-semibold text-slate-700 dark:text-slate-300">
                             {grade}:
                           </span>
-                          <span className="text-slate-600 dark:text-slate-400">{qty} sacs</span>
+                          <span className="text-slate-600 dark:text-slate-400">{qty?.nombre_sacs ?? qty} sacs</span>
                         </div>
                       ))}
                     </div>
@@ -515,7 +520,18 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
             </TableBody>
           </Table>
         )}
-        <PaginationContent />
+        <PaginationContent
+          currentPage={Math.floor(pointer / limit) + 1}
+          totalPages={Math.ceil(totalCount / limit)}
+          totalCount={totalCount}
+          pointer={pointer}
+          limit={limit}
+          onPageChange={(page) => setPointer((page - 1) * limit)}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            setPointer(0);
+          }}
+        />
       </CardContent>
 
 
