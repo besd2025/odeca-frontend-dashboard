@@ -35,6 +35,7 @@ const MOCK_LOTS = [
   { id: "LOT-004", name: "LOT-004", },
 ]
 export default function StockedList({ lots: initialLots = [], onViewDetails, onStockGrade }) {
+  console.log("initialLots", initialLots)
   const [lots, setLots] = React.useState(initialLots);
   const [activeTab, setActiveTab] = React.useState("account");
   const [lotsExistants, setLotsExistants] = React.useState("");
@@ -49,7 +50,10 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
   const [loading, setLoading] = React.useState(false);
   const [codeSociete, setCodeSociete] = React.useState("")
   const [open, setOpen] = React.useState(false);
+  const [lotSelectedDetails, setLotSelectedDetails] = React.useState(null);
   const handleViewDetailsStock = (lot) => {
+    setLotSelectedDetails(lot);
+    console.log("lotSelectedDetails", lotSelectedDetails)
     setIsViewingDetailsStock(true);
   };
   const handleLotChange = (value) => {
@@ -557,33 +561,46 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Societe</TableHead>
                       <TableHead>Qualité</TableHead>
                       <TableHead className="text-right">Nombre de Sacs</TableHead>
-                      <TableHead>Poids Net</TableHead>
-                      <TableHead>Poids Brut</TableHead>
+                      {/* <TableHead>Poids Net</TableHead>
+                      <TableHead>Poids Brut</TableHead> */}
                       <TableHead>Date de Stockage</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {lots.map((lot) => (
-                      <TableRow key={lot.id}>
-                        <TableCell>
-                          grade
-                        </TableCell>
-                        <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
-                          {lot.nombreSacs ?? "—"}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
-                          {lot.poidsNet ?? "—"}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
-                          {lot.poidsBrut ?? "—"}
-                        </TableCell>
-                        <TableCell className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                          {lot.dateStockage || "—"}
+                    {lotSelectedDetails?.grades && Object.entries(lotSelectedDetails.grades).length > 0 ? (
+                      Object.entries(lotSelectedDetails.grades).map(([grade, qty]) => (
+                        <TableRow key={grade}>
+                          <TableCell className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                            {lotSelectedDetails.societe || "—"}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="secondary"
+                              className="text-xs bg-secondary/10 text-secondary dark:bg-secondary/30 dark:text-secondary dark:border-secondary/30"
+                            >
+                              {grade}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
+                            {qty?.nombre_sacs ?? qty ?? "—"}
+                          </TableCell>
+                          {/* <TableCell>{qty?.poidsNet ?? "—"}</TableCell>
+                          <TableCell>{qty?.poidsBrut ?? "—"}</TableCell> */}
+                          <TableCell className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                            {lotSelectedDetails.dateStockage || "—"}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={3} className="text-center text-slate-400 text-sm py-4">
+                          Aucune qualité disponible
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
 
