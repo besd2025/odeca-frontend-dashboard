@@ -19,6 +19,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { fetchData } from "@/app/_utils/api";
+import PaginationContent from "@/components/ui/pagination-content";
 
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
@@ -163,11 +165,74 @@ export default function RapportsComponent() {
   const [returnMotif, setReturnMotif] = useState("");
   const [selectedReturnItem, setSelectedReturnItem] = useState(null);
 
-  // Static Data Presentation
-  const pendingDecisions = initialLabAnalyses.filter((item) => item.status === "degustation_complete");
-  const finalizedReports = initialLabAnalyses.filter(
-    (item) => item.status === "finalise_taxe" || item.status === "finalise_retourne"
-  );
+  // API Data
+  const [pendingDecisions, setPendingDecisions] = useState([]);
+  const [finalizedReports, setFinalizedReports] = useState([]);
+  const [selectedTab, setSelectedTab] = useState("pending");
+  const [searchPendingQuery, setSearchPendingQuery] = useState("");
+  const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [pointer, setPointer] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // useEffect(() => {
+  //   const fetchReportsData = async () => {
+  //     if (selectedTab === "pending") {
+  //       try {
+  //         const response = await fetchData("get", "cafe/rapports/decisions_en_attente/", {
+  //           params: { limit, offset: pointer, search: searchPendingQuery }
+  //         });
+  //         const data = (response?.results || []).map((item) => ({
+  //           id: item.id,
+  //           sampleId: item.echantillon_id,
+  //           lotNumber: item.numero_lot,
+  //           societe: item.societe,
+  //           codeEtiquette: item.code_etiquette,
+  //           dateReception: item.date_reception,
+  //           status: "degustation_complete",
+  //           degustation: item.cupping ? {
+  //             moyenne: parseFloat(item.cupping.note_finale) || 0,
+  //             qualite: item.cupping.qualite || "",
+  //             dateDegustation: item.cupping.date_cupping || "",
+  //           } : null,
+  //         }));
+  //         setPendingDecisions(data);
+  //         setTotalCount(response?.count || 0);
+  //       } catch (error) {
+  //         console.error("Error fetching pending decisions:", error);
+  //       }
+  //     } else if (selectedTab === "history") {
+  //       try {
+  //         const response = await fetchData("get", "cafe/rapports/historique_rapports/", {
+  //           params: { limit, offset: pointer, search: searchHistoryQuery }
+  //         });
+  //         const data = (response?.results || []).map((item) => ({
+  //           id: item.id,
+  //           sampleId: item.echantillon_id,
+  //           lotNumber: item.numero_lot,
+  //           societe: item.societe,
+  //           codeEtiquette: item.code_etiquette,
+  //           dateReception: item.date_reception,
+  //           status: item.statut,
+  //           finalizedAt: item.date_finalisation,
+  //           decisionNotes: item.notes_decision || "",
+  //           degustation: item.cupping ? {
+  //             moyenne: parseFloat(item.cupping.note_finale) || 0,
+  //             qualite: item.cupping.qualite || "",
+  //             dateDegustation: item.cupping.date_cupping || "",
+  //           } : null,
+  //         }));
+  //         setFinalizedReports(data);
+  //         setTotalCount(response?.count || 0);
+  //       } catch (error) {
+  //         console.error("Error fetching finalized reports:", error);
+  //       }
+  //     }
+  //   };
+  //   fetchReportsData();
+  // }, [selectedTab, limit, pointer, searchPendingQuery, searchHistoryQuery, refreshTrigger]);
 
   // Actions
   const handleGenerateTaxationReport = (item) => {
@@ -203,7 +268,15 @@ export default function RapportsComponent() {
   return (
     <div className="space-y-6">
 
-      <Tabs defaultValue="pending" className="">
+      <Tabs
+        value={selectedTab}
+        onValueChange={(val) => {
+          setSelectedTab(val);
+          setPointer(0);
+          setCurrentPage(1);
+        }}
+        className=""
+      >
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger value="pending">Décisions en cours</TabsTrigger>
           <TabsTrigger value="history">Historique des rapports</TabsTrigger>
@@ -223,11 +296,20 @@ export default function RapportsComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher lot, étiquette..." className="pl-9 h-9 text-sm" />
+                <Input
+                  placeholder="Rechercher lot, étiquette..."
+                  className="pl-9 h-9 text-sm"
+                  value={searchPendingQuery}
+                  onChange={(e) => {
+                    setSearchPendingQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {pendingDecisions.length === 0 ? (
+              {initialLabAnalyses.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-3" />
                   <p className="font-semibold text-slate-700 dark:text-slate-300">Toutes les décisions ont été prises !</p>
@@ -247,7 +329,7 @@ export default function RapportsComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {pendingDecisions.map((item) => (
+                      {initialLabAnalyses.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -296,6 +378,26 @@ export default function RapportsComponent() {
                   </Table>
                 </div>
               )}
+              {initialLabAnalyses.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -314,11 +416,20 @@ export default function RapportsComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher lot, étiquette, statut..." className="pl-9 h-9 text-sm" />
+                <Input
+                  placeholder="Rechercher lot, étiquette, statut..."
+                  className="pl-9 h-9 text-sm"
+                  value={searchHistoryQuery}
+                  onChange={(e) => {
+                    setSearchHistoryQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              {finalizedReports.length === 0 ? (
+              {initialLabAnalyses.length === 0 ? (
                 <div className="text-center p-12 text-slate-500 dark:text-slate-400">
                   <Scroll className="h-10 w-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
                   <p className="font-medium">Aucun rapport finalisé.</p>
@@ -340,7 +451,7 @@ export default function RapportsComponent() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {finalizedReports.map((item) => (
+                      {initialLabAnalyses.map((item) => (
                         <TableRow key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                           <TableCell className="pl-6">
                             <DropdownMenu>
@@ -397,6 +508,26 @@ export default function RapportsComponent() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
+              )}
+              {initialLabAnalyses.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
                 </div>
               )}
             </CardContent>

@@ -21,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import PaginationContent from "@/components/ui/pagination-content";
 
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
@@ -110,7 +111,11 @@ export default function ReceptionPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchPendingQuery, setSearchPendingQuery] = useState("");
-  console.log("searchPendingQuery", selectedDetailItem)
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [pointer, setPointer] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [formData, setFormData] = useState({
     id: "",
     transfertEchantillon: "",
@@ -254,6 +259,9 @@ export default function ReceptionPage() {
       }
 
       toast.success("Données enregistrées avec succès");
+      setIsModalOpen(false);
+      setSelectedSample(null);
+      setRefreshTrigger((prev) => prev + 1);
       return { lot: selectedSample?.lotNumber };
     } catch (error) {
       console.error(error);
@@ -264,7 +272,7 @@ export default function ReceptionPage() {
   };
 
   const handleDeleteAnalysis = (id) => {
-    setLabAnalyses(labAnalyses.filter((item) => item.id !== id));
+    setEchantillonsHisto(echantillonsHisto.filter((item) => item.id !== id));
     toast.success("Enregistrement de laboratoire supprimé (Illustration locale)");
   };
 
@@ -273,30 +281,18 @@ export default function ReceptionPage() {
   const [echantillonsHisto, setEchantillonsHisto] = useState([]);
   const [tabs, setTabs] = useState("reception");
 
-  const filteredAnalyses = (echantillonsHisto || []).filter((item) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      String(item.id_prelevement || "").toLowerCase().includes(query) ||
-      String(item.lotNumber || "").toLowerCase().includes(query) ||
-      String(item.societe || "").toLowerCase().includes(query) ||
-      String(item.receptionniste || "").toLowerCase().includes(query)
-    );
-  });
+  const filteredAnalyses = echantillonsHisto || [];
+  const filteredPending = echantillons || [];
 
-  const filteredPending = (echantillons || []).filter((sample) => {
-    const query = searchPendingQuery.toLowerCase();
-    return (
-      String(sample.id_prelevement || "").toLowerCase().includes(query) ||
-      String(sample.lotNumber || "").toLowerCase().includes(query) ||
-      String(sample.societe || "").toLowerCase().includes(query)
-    );
-  });
   React.useEffect(() => {
     const fetchEchantillons = async () => {
       if (tabs === "reception") {
         try {
-          const response = await fetchData("get", `cafe/echantillonage/en-attente-reception/`);
-          const dataResponse = response?.results;
+          const response = await fetchData("get", `cafe/echantillonage/en-attente-reception/`, {
+            params: { limit, offset: pointer, search: searchPendingQuery }
+          });
+          const dataResponse = response?.results || [];
+          setTotalCount(response?.count || 0);
 
           const formattedData = dataResponse.map((item) => ({
             id: item.id,
@@ -318,8 +314,11 @@ export default function ReceptionPage() {
         }
       } else if (tabs === "history") {
         try {
-          const response = await fetchData("get", `cafe/echantillonage/historique_echantillonage/`);
-          const dataResponse = response?.results;
+          const response = await fetchData("get", `cafe/echantillonage/historique_echantillonage/`, {
+            params: { limit, offset: pointer, search: searchQuery }
+          });
+          const dataResponse = response?.results || [];
+          setTotalCount(response?.count || 0);
           const formattedData = dataResponse.map((item) => ({
             id: item.id,
             id_prelevement: item?.id_prelevement,
@@ -327,10 +326,15 @@ export default function ReceptionPage() {
             societe: item?.societe_proprietaire,
             deparcheur: item?.deparcheur_usine,
             sacsCount: item?.nombre_sacs,
-            qtePrelevee: item?.quantite,
+            qtePrelevee: item?.quantite || item?.volume_preleve || 0,
+            qteEchantillon: item?.quantite || item?.volume_preleve || 0,
             qualite: item?.qualite_nom,
             dateEchantillonnage: item?.date_prelevement,
-            echantillonneur: item.nomAgentEchantillonneur
+            echantillonneur: item.nomAgentEchantillonneur || item?.echantillonneur,
+            receptionniste: item?.receptionniste || item?.receptioniste_nom,
+            codeEtiquette: item?.code_etiquette || item?.codeEtiquette,
+            dateReception: item?.date_reception || item?.date_comfirmation || item?.date_prelevement,
+            sampleId: item?.id_prelevement,
           }));
 
           setEchantillonsHisto(formattedData);
@@ -341,7 +345,7 @@ export default function ReceptionPage() {
       }
     };
     fetchEchantillons();
-  }, [tabs]);
+  }, [tabs, limit, pointer, searchQuery, searchPendingQuery, refreshTrigger]);
 
   const handleAnalyse = async (id) => {
     try {
@@ -373,7 +377,15 @@ export default function ReceptionPage() {
   };
   return (
     <div className="space-y-6">
-      <Tabs value={tabs} onValueChange={setTabs} className="">
+      <Tabs
+        value={tabs}
+        onValueChange={(val) => {
+          setTabs(val);
+          setPointer(0);
+          setCurrentPage(1);
+        }}
+        className=""
+      >
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger value="reception">Réception</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
@@ -395,7 +407,11 @@ export default function ReceptionPage() {
                 <Input
                   placeholder="Rechercher prélèvement, lot..."
                   value={searchPendingQuery}
-                  onChange={(e) => setSearchPendingQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchPendingQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
                   className="pl-9 h-9 text-sm"
                 />
               </div>
@@ -457,6 +473,26 @@ export default function ReceptionPage() {
                   </Table>
                 </div>
               )}
+              {filteredPending.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -478,7 +514,11 @@ export default function ReceptionPage() {
                 <Input
                   placeholder="Rechercher étiquette, lot, propriétaire..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
                   className="pl-9 h-9 text-sm"
                 />
               </div>
@@ -554,6 +594,26 @@ export default function ReceptionPage() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
+              )}
+              {filteredAnalyses.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
                 </div>
               )}
             </CardContent>

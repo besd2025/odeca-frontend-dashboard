@@ -156,7 +156,6 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
             (item.nom || item.designation || item.name || item.code) === grade
           );
           const gradeId = gradeObj?.id || grade;
-
           if (typeof val === "object") {
 
             const formData = new FormData();

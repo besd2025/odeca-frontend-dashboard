@@ -18,7 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { fetchData } from "@/app/_utils/api"
+import { fetchData } from "@/app/_utils/api";
+import PaginationContent from "@/components/ui/pagination-content";
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
 // ==========================================
@@ -95,6 +96,11 @@ export default function TriageComponent() {
   const [completedData, setCompletedData] = useState([]);
   const [searchPendingQuery, setSearchPendingQuery] = useState("");
   const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [pointer, setPointer] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [formData, setFormData] = useState({
     qteTrier: "300",
@@ -160,6 +166,7 @@ export default function TriageComponent() {
       toast.success("Triage manuel validé et enregistré");
       setIsModalOpen(false);
       setSelectedAnalysis(null);
+      setRefreshTrigger((prev) => prev + 1);
       return { lot: selectedAnalysis?.id };
     } catch (error) {
       console.error(error);
@@ -174,10 +181,13 @@ export default function TriageComponent() {
 
 
         try {
-          const response = await fetchData("get", "cafe/tirage_manuel/pret_pour_triage/",
-            { params: {}, additionalHeaders: {}, body: {} });
+          const response = await fetchData("get", "cafe/tirage_manuel/pret_pour_triage/", {
+            params: { limit, offset: pointer, search: searchPendingQuery }
+          });
           console.log("les analyses:", response);
-          const analyses = response?.results?.map((item) => ({
+          const dataResponse = response?.results || [];
+          setTotalCount(response?.count || 0);
+          const analyses = dataResponse.map((item) => ({
             id: item.id,
             sampleId: item.echantillon_id,
             transfertEchantillon: item.transfert_echantillon,
@@ -210,10 +220,13 @@ export default function TriageComponent() {
       }
       if (selectedTab === "history") {
         try {
-          const response = await fetchData("get", "cafe/tirage_manuel/historique_triages/",
-            { params: {}, additionalHeaders: {}, body: {} });
+          const response = await fetchData("get", "cafe/tirage_manuel/historique_triages/", {
+            params: { limit, offset: pointer, search: searchHistoryQuery }
+          });
           console.log("les analyse_EEEE:", response);
-          const analyses = response?.results?.map((item) => ({
+          const dataResponse2 = response?.results || [];
+          setTotalCount(response?.count || 0);
+          const analyses = dataResponse2.map((item) => ({
             id: item.id,
             sampleId: item.echantillon_id,
             transfertEchantillon: item.transfert_echantillon,
@@ -262,30 +275,23 @@ export default function TriageComponent() {
 
 
     fetchPendingAnalyses();
-  }, [selectedTab]);
+  }, [selectedTab, limit, pointer, searchPendingQuery, searchHistoryQuery, refreshTrigger]);
 
-  const filteredPending = (pendingData || []).filter((item) => {
-    const query = searchPendingQuery.toLowerCase();
-    return (
-      String(item.codeEtiquette || "").toLowerCase().includes(query) ||
-      String(item.lotNumber || "").toLowerCase().includes(query) ||
-      String(item.societe || "").toLowerCase().includes(query)
-    );
-  });
-
-  const filteredHistory = (completedData || []).filter((item) => {
-    const query = searchHistoryQuery.toLowerCase();
-    return (
-      String(item.codeEtiquette || "").toLowerCase().includes(query) ||
-      String(item.lotNumber || "").toLowerCase().includes(query) ||
-      String(item.societe || "").toLowerCase().includes(query)
-    );
-  });
+  const filteredPending = pendingData || [];
+  const filteredHistory = completedData || [];
 
   return (
     <div className="space-y-6">
 
-      <Tabs className="" value={selectedTab} onValueChange={setSelectedTab}>
+      <Tabs
+        className=""
+        value={selectedTab}
+        onValueChange={(val) => {
+          setSelectedTab(val);
+          setPointer(0);
+          setCurrentPage(1);
+        }}
+      >
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger value="pending">Pret pour le triage</TabsTrigger>
           <TabsTrigger value="history">Status des triages</TabsTrigger>
@@ -309,7 +315,11 @@ export default function TriageComponent() {
                   placeholder="Rechercher code, lot..."
                   className="pl-9 h-9 text-sm"
                   value={searchPendingQuery}
-                  onChange={(e) => setSearchPendingQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchPendingQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
                 />
               </div>
             </CardHeader>
@@ -369,6 +379,26 @@ export default function TriageComponent() {
                   </Table>
                 </div>
               )}
+              {filteredPending.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -391,7 +421,11 @@ export default function TriageComponent() {
                   placeholder="Rechercher code, lot..."
                   className="pl-9 h-9 text-sm"
                   value={searchHistoryQuery}
-                  onChange={(e) => setSearchHistoryQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchHistoryQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
                 />
               </div>
             </CardHeader>
@@ -467,6 +501,26 @@ export default function TriageComponent() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
+              )}
+              {filteredHistory.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
                 </div>
               )}
             </CardContent>
