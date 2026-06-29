@@ -105,6 +105,10 @@ export default function GranulometrieComponent() {
     sieve_5_5: "",
     sieve_4_0: "",
     sieve_3_0: "",
+    sieve_4_0_1: "",
+    sieve_4_0_2: "",
+    sieve_3_0_1: "",
+    sieve_3_0_2: "",
     fond: "",
   });
 
@@ -125,6 +129,10 @@ export default function GranulometrieComponent() {
       sieve_5_5: "",
       sieve_4_0: "",
       sieve_3_0: "",
+      sieve_4_0_1: "",
+      sieve_4_0_2: "",
+      sieve_3_0_1: "",
+      sieve_3_0_2: "",
       fond: "",
     });
     setIsModalOpen(true);
@@ -139,15 +147,22 @@ export default function GranulometrieComponent() {
   const val_7_1 = parseFloat(formData.sieve_7_1) || 0;
   const val_6_3 = parseFloat(formData.sieve_6_3) || 0;
   const val_5_5 = parseFloat(formData.sieve_5_5) || 0;
-  const val_4_0 = parseFloat(formData.sieve_4_0) || 0;
-  const val_3_0 = parseFloat(formData.sieve_3_0) || 0;
+  const val_4_0_1 = parseFloat(formData.sieve_4_0_1) || 0;
+  const val_4_0_2 = parseFloat(formData.sieve_4_0_2) || 0;
+  const val_3_0_1 = parseFloat(formData.sieve_3_0_1) || 0;
+  const val_3_0_2 = parseFloat(formData.sieve_3_0_2) || 0;
   const val_fond = parseFloat(formData.fond) || 0;
 
-  const totalSum = parseFloat((val_7_1 + val_6_3 + val_5_5 + val_4_0 + val_3_0 + val_fond).toFixed(2));
+  const totalSum = parseFloat((val_7_1 + val_6_3 + val_5_5 + val_4_0_1 + val_4_0_2 + val_3_0_1 + val_3_0_2 + val_fond).toFixed(2));
   const isSumPerfect = totalSum === 100.00;
 
+  // Helper to safely format numbers (prevents calling toFixed on undefined)
+  const fmt = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n.toFixed(2) : "0.00";
+  };
   const handleAutoFillFond = () => {
-    const partialSum = val_7_1 + val_6_3 + val_5_5 + val_4_0 + val_3_0;
+    const partialSum = val_7_1 + val_6_3 + val_5_5 + val_4_0 + val_4_0_1 + val_4_0_2 + val_3_0 + val_3_0_1 + val_3_0_2;
     if (partialSum > 100) {
       toast.error("La somme des tamis dépasse déjà 100% !");
       return;
@@ -169,8 +184,10 @@ export default function GranulometrieComponent() {
       { id: "sieve_7_1", label: "7.1 mm" },
       { id: "sieve_6_3", label: "6.3 mm" },
       { id: "sieve_5_5", label: "5.5 mm" },
-      { id: "sieve_4_0", label: "4 mm" },
-      { id: "sieve_3_0", label: "3 mm" },
+      { id: "sieve_4_0_1", label: "4 obl mm" },
+      { id: "sieve_4_0_2", label: "4 rond mm" },
+      { id: "sieve_3_0_1", label: "3 obl mm" },
+      { id: "sieve_3_0_2", label: "3 rond mm" },
       { id: "fond", label: "Fond" }
     ];
 
@@ -229,7 +246,6 @@ export default function GranulometrieComponent() {
             {},
             {},
           );
-          console.log(data, "dataaaa")
           // Traitement des données pour l'affichage
           const formattedData = data?.results?.map((item) => ({
             id: item.id,
@@ -246,14 +262,14 @@ export default function GranulometrieComponent() {
             dateReception: new Date(item.date_reception).toLocaleDateString(),
             status: "receptionne"
           }));
-          console.log(formattedData, "formattedData")
 
-          setGranulometrieAttente(formattedData);
+          setGranulometrieAttente(formattedData || []);
 
         } catch (error) {
           console.error("Error fetching pending samples:", error);
         }
       }
+
       else if (selectedTab === "pending") {
         try {
           const data = await fetchData(
@@ -262,10 +278,9 @@ export default function GranulometrieComponent() {
             {},
             {},
           );
-          console.log(data, "dataaaa")
           // Traitement des données pour l'affichage
           const formattedData = data?.results?.map((item) => ({
-            id: item.id_granulometrie,
+            id: item.id_granulometrie || item.id,
             sampleId: "",
             transfertEchantillon: "Par coursier Ngozi",
             lotNumber: item.numero_lot,
@@ -280,10 +295,10 @@ export default function GranulometrieComponent() {
             status: "receptionne"
           }));
 
-          setGranulometrieConfirmer(formattedData);
+          setGranulometrieConfirmer(formattedData || []);
 
         } catch (error) {
-          console.error("Error fetching pending samples:", error);
+          console.error("Error fetching pending confirmation samples:", error);
         }
       }
 
@@ -410,7 +425,7 @@ export default function GranulometrieComponent() {
                         <TableHead>Qualité</TableHead>
                         <TableHead className="text-right">Quantité (kg)</TableHead>
                         <TableHead>Date Réception</TableHead>
-                        <TableHead>Réceptionniste</TableHead>
+                        {/* <TableHead>Réceptionniste</TableHead> */}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -440,7 +455,7 @@ export default function GranulometrieComponent() {
                           <TableCell>{item.qualite}</TableCell>
                           <TableCell className="text-right font-semibold">{item.qteEchantillon} kg</TableCell>
                           <TableCell className="text-xs text-slate-500">{item.dateReception}</TableCell>
-                          <TableCell className="text-xs">{item.receptionniste}</TableCell>
+                          {/* <TableCell className="text-xs">{item.receptionniste}</TableCell> */}
                         </TableRow>
                       ))}
                     </TableBody>
@@ -601,12 +616,14 @@ export default function GranulometrieComponent() {
                           <TableCell className={`text-destructive`}>{item.qualite}</TableCell>
                           <TableCell>{item.societe}</TableCell>
                           <TableCell className="font-medium">{item.granulometrie.quantite} g</TableCell>
-                          <TableCell className="text-slate-600 dark:text-slate-400">{item.granulometrie.sieve_7_1.toFixed(2)} %</TableCell>
-                          <TableCell className="text-slate-600 dark:text-slate-400">{item.granulometrie.sieve_6_3.toFixed(2)} %</TableCell>
-                          <TableCell className="text-slate-600 dark:text-slate-400">{item.granulometrie.sieve_5_5.toFixed(2)} %</TableCell>
-                          <TableCell className="text-slate-600 dark:text-slate-400">{item.granulometrie.sieve_4_0.toFixed(2)} %</TableCell>
-                          <TableCell className="text-slate-600 dark:text-slate-400">{item.granulometrie.sieve_3_0.toFixed(2)} %</TableCell>
-                          <TableCell className="text-slate-600 dark:text-slate-400">{item.granulometrie.fond.toFixed(2)} %</TableCell>
+                          <TableCell className="text-slate-600 dark:text-slate-400">{fmt(item.granulometrie?.sieve_7_1)} %</TableCell>
+                          <TableCell className="text-slate-600 dark:text-slate-400">{fmt(item.granulometrie?.sieve_6_3)} %</TableCell>
+                          <TableCell className="text-slate-600 dark:text-slate-400">{fmt(item.granulometrie?.sieve_5_5)} %</TableCell>
+                          <TableCell className="text-slate-600 dark:text-slate-400">{fmt(item.granulometrie?.sieve_4_0_1)} %</TableCell>
+                          <TableCell className="text-slate-600 dark:text-slate-400">{fmt(item.granulometrie?.sieve_4_0_2)} %</TableCell>
+                          <TableCell className="text-slate-600 dark:text-slate-400">{fmt(item.granulometrie?.sieve_3_0_1)} %</TableCell>
+                          <TableCell className="text-slate-600 dark:text-slate-400">{fmt(item.granulometrie?.sieve_3_0_2)} %</TableCell>
+                          <TableCell className="text-slate-600 dark:text-slate-400">{fmt(item.granulometrie?.fond)} %</TableCell>
                           <TableCell className="text-xs text-slate-500 whitespace-nowrap">{item.granulometrie.date}</TableCell>
                           <TableCell className="pr-6">
                             {item.status === "granulometrie_complete" ? (
@@ -661,7 +678,7 @@ export default function GranulometrieComponent() {
                 </div>
                 <div>
                   <span className="text-slate-400 block font-semibold uppercase">Quantité reçue</span>
-                  <span className="font-semibold">{selectedAnalysis.qteEchantillon.toFixed(2)} kg</span>
+                  <span className="font-semibold">{fmt(selectedAnalysis?.qteEchantillon)} kg</span>
                 </div>
               </div>
 
@@ -684,8 +701,10 @@ export default function GranulometrieComponent() {
                   { id: "sieve_7_1", label: "Tamis 7.1 mm" },
                   { id: "sieve_6_3", label: "Tamis 6.3 mm" },
                   { id: "sieve_5_5", label: "Tamis 5.5 mm" },
-                  { id: "sieve_4_0", label: "Tamis 4 mm" },
-                  { id: "sieve_3_0", label: "Tamis 3 mm" },
+                  { id: "sieve_4_0_1", label: "Tamis 4 obl mm" },
+                  { id: "sieve_4_0_2", label: "Tamis 4 rond mm" },
+                  { id: "sieve_3_0_1", label: "Tamis 3 obl mm" },
+                  { id: "sieve_3_0_2", label: "Tamis 3 rond mm" },
                   { id: "fond", label: "Tamis Fond" },
                 ].map((sieve) => (
                   <div key={sieve.id} className="space-y-1.5 p-3 bg-slate-50/50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-900">
@@ -763,7 +782,7 @@ export default function GranulometrieComponent() {
                 </div>
                 <div>
                   <span className="text-slate-400 block font-uppercase font-semibold">Quantité reçue</span>
-                  <span className="font-semibold">{selectedDetailItem.qteEchantillon.toFixed(2)} kg</span>
+                  <span className="font-semibold">{fmt(selectedDetailItem?.qteEchantillon)} kg</span>
                 </div>
               </div>
 
@@ -793,14 +812,27 @@ export default function GranulometrieComponent() {
                   ].map((sieve) => (
                     <div key={sieve.label} className="p-2.5 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-900 text-center">
                       <span className="text-[10px] text-slate-400 block font-semibold uppercase">{sieve.label}</span>
-                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{sieve.value.toFixed(2)} %</span>
+                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{fmt(sieve.value)} %</span>
                     </div>
                   ))}
                 </div>
                 <div className="flex items-center justify-between p-3 bg-emerald-50/50 dark:bg-emerald-950/10 rounded-lg border border-emerald-200/50 dark:border-emerald-900/30 mt-2">
                   <span className="text-xs font-semibold text-slate-500">Total cumulé</span>
                   <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
-                    {(selectedDetailItem.granulometrie.sieve_7_1 + selectedDetailItem.granulometrie.sieve_6_3 + selectedDetailItem.granulometrie.sieve_5_5 + selectedDetailItem.granulometrie.sieve_4_0 + selectedDetailItem.granulometrie.sieve_3_0 + selectedDetailItem.granulometrie.fond).toFixed(2)} %
+                    {(() => {
+                      const vals = [
+                        selectedDetailItem.granulometrie?.sieve_7_1,
+                        selectedDetailItem.granulometrie?.sieve_6_3,
+                        selectedDetailItem.granulometrie?.sieve_5_5,
+                        selectedDetailItem.granulometrie?.sieve_4_0,
+                        selectedDetailItem.granulometrie?.sieve_3_0,
+                        selectedDetailItem.granulometrie?.fond,
+                      ];
+                      const hasAll = vals.every((v) => v !== undefined && v !== null);
+                      if (!hasAll) return "—";
+                      const sum = vals.reduce((a, b) => a + Number(b || 0), 0);
+                      return fmt(sum) + " %";
+                    })()}
                   </span>
                 </div>
               </div>
