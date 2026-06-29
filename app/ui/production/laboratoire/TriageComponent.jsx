@@ -252,12 +252,12 @@ export default function TriageComponent() {
             },
             triage: {
               date: item?.date ? new Date(item.date).toLocaleDateString() : "",
-              vraisDefauts: parseFloat(item?.vrais_defauts_brisure) || 0,
+              vraisDefauts: parseFloat(item?.vrais_defauts) || 0,
               defectueux: parseFloat(item?.defectueux) || 0,
               brisure: parseFloat(item?.brisure) || 0,
               nEtRat: parseFloat(item?.n_et_rat) || 0,
               corpsEtrangers: parseFloat(item?.corps_etrangers) || 0,
-              totalDefectPct: parseFloat(item?.vrais_defauts_brisure || 0) +
+              totalDefectPct: parseFloat(item?.vrais_defauts || 0) +
                 parseFloat(item?.defectueux || 0) +
                 parseFloat(item?.brisure || 0) +
                 parseFloat(item?.n_et_rat || 0) +

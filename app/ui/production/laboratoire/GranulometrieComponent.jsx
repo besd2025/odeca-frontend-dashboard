@@ -237,7 +237,7 @@ export default function GranulometrieComponent() {
             `cafe/granulometrie/echantillons_attente/`,
             { params: { limit, offset: pointer, search: searchAttenteQuery } },
           );
-          console.log(data, "dataaaa")
+          //console.log(data, "dataaaa")
           // Traitement des données pour l'affichage
           const formattedData = (data?.results || []).map((item) => ({
             id: item.id,
@@ -254,7 +254,7 @@ export default function GranulometrieComponent() {
             dateReception: new Date(item.date_reception).toLocaleDateString(),
             status: "receptionne"
           }));
-          console.log(formattedData, "formattedData")
+          //console.log(formattedData, "formattedData")
 
           setGranulometrieAttente(formattedData);
           setTotalCount(data?.count || 0);

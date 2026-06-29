@@ -401,7 +401,7 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                     />
                   </div>
                   <div className="space-y-2 mt-2">
-                    <Label htmlFor="qualitySelect">Qualité</Label>
+                    <Label htmlFor="qualitySelect">Qualité en Kg</Label>
                     <Select
                       value={selectedQuality}
                       onValueChange={setSelectedQuality}
