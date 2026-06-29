@@ -30,7 +30,15 @@ export function LoginForm({ className, ...props }) {
       const user = DecodeToJwt(accessToken);
       const now = new Date();
       if (now < new Date(user?.exp * 1000)) {
-        router.push("/odeca-dashboard/home");
+        if (user?.category === "Respo_usine_deparchage" || user?.category === "Superviseur_usine") {
+          router.push("odeca-production/usine/reception");
+        }
+        else if (user?.category === "Respo_labo") {
+          router.push("odeca-production/laboratoire/reception");
+        }
+        else if (user?.category === "Admin" || user?.category === "General" || user?.category === "Cafe_ODECA" || user?.category === "Cafe_Chef_societe" || user?.category === "Superviseur_Regional" || user?.category === "Superviseur") {
+          router.push("/odeca-dashboard/home");
+        }
       } else {
         localStorage.removeItem("Access_Token");
         router.push("/");
@@ -99,14 +107,16 @@ export function LoginForm({ className, ...props }) {
         router.push("/odeca-dashboard/home");
       }
       else if (
-        user?.category === "Respo_usine_deparchage"
+        user?.category === "Respo_usine_deparchage" ||
+        user?.category === "Superviseur_usine"
       ) {
         document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
         localStorage.setItem("Access_Token", data.access);
         router.push("odeca-production/usine/reception");
       }
       else if (
-        user?.category === "Respo_labo"
+        user?.category === "Respo_labo" ||
+        user?.category === "Superviseur_labo"
       ) {
         document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
         localStorage.setItem("Access_Token", data.access);

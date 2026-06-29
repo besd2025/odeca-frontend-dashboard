@@ -18,7 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { fetchData } from "@/app/_utils/api"
+import { fetchData } from "@/app/_utils/api";
+import PaginationContent from "@/components/ui/pagination-content";
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
 // ==========================================
@@ -236,6 +237,14 @@ export default function GranulometrieComponent() {
   const [granulometrieHisto, setGranulometrieHisto] = useState([]);
   const [selectedTab, setSelectedTab] = useState("en_attente");
   const [granulometrieConfirmer, setGranulometrieConfirmer] = useState([]);
+  const [searchAttenteQuery, setSearchAttenteQuery] = useState("");
+  const [searchPendingQuery, setSearchPendingQuery] = useState("");
+  const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [pointer, setPointer] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   useEffect(() => {
     const fetchPendingSamples = async () => {
       if (selectedTab === "en_attente") {
@@ -243,11 +252,11 @@ export default function GranulometrieComponent() {
           const data = await fetchData(
             "get",
             `cafe/granulometrie/echantillons_attente/`,
-            {},
-            {},
+            { params: { limit, offset: pointer, search: searchAttenteQuery } },
           );
+          //console.log(data, "dataaaa")
           // Traitement des données pour l'affichage
-          const formattedData = data?.results?.map((item) => ({
+          const formattedData = (data?.results || []).map((item) => ({
             id: item.id,
             sampleId: "",
             transfertEchantillon: "Par coursier Ngozi",
@@ -262,8 +271,10 @@ export default function GranulometrieComponent() {
             dateReception: new Date(item.date_reception).toLocaleDateString(),
             status: "receptionne"
           }));
+          //console.log(formattedData, "formattedData")
 
-          setGranulometrieAttente(formattedData || []);
+          setGranulometrieAttente(formattedData);
+          setTotalCount(data?.count || 0);
 
         } catch (error) {
           console.error("Error fetching pending samples:", error);
@@ -275,12 +286,11 @@ export default function GranulometrieComponent() {
           const data = await fetchData(
             "get",
             `cafe/granulometrie/pret_analyse/`,
-            {},
-            {},
+            { params: { limit, offset: pointer, search: searchPendingQuery } },
           );
           // Traitement des données pour l'affichage
-          const formattedData = data?.results?.map((item) => ({
-            id: item.id_granulometrie || item.id,
+          const formattedData = (data?.results || []).map((item) => ({
+            id: item.id_granulometrie,
             sampleId: "",
             transfertEchantillon: "Par coursier Ngozi",
             lotNumber: item.numero_lot,
@@ -294,8 +304,8 @@ export default function GranulometrieComponent() {
             dateReception: new Date(item.date_reception).toLocaleDateString(),
             status: "receptionne"
           }));
-
-          setGranulometrieConfirmer(formattedData || []);
+          setGranulometrieConfirmer(formattedData);
+          setTotalCount(data?.count || 0);
 
         } catch (error) {
           console.error("Error fetching pending confirmation samples:", error);
@@ -307,12 +317,11 @@ export default function GranulometrieComponent() {
           const data = await fetchData(
             "get",
             `cafe/granulometrie/historique_analyses/`,
-            {},
-            {},
+            { params: { limit, offset: pointer, search: searchHistoryQuery } },
           );
           console.log(data, "datahisto")
           // Traitement des données pour l'affichage
-          const formattedData = data?.results?.map((item) => ({
+          const formattedData = (data?.results || []).map((item) => ({
 
             id: item.id,
             sampleId: item?.code_echantillon,
@@ -340,6 +349,7 @@ export default function GranulometrieComponent() {
           }));
 
           setGranulometrieHisto(formattedData);
+          setTotalCount(data?.count || 0);
 
         } catch (error) {
           console.error("Error fetching pending samples:", error);
@@ -349,7 +359,7 @@ export default function GranulometrieComponent() {
     };
 
     fetchPendingSamples();
-  }, [selectedTab]);
+  }, [selectedTab, limit, pointer, searchAttenteQuery, searchPendingQuery, searchHistoryQuery, refreshTrigger]);
 
   const handleAnalyse = async (id) => {
     try {
@@ -382,7 +392,15 @@ export default function GranulometrieComponent() {
   return (
     <div className="space-y-6">
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="">
+      <Tabs
+        value={selectedTab}
+        onValueChange={(val) => {
+          setSelectedTab(val);
+          setPointer(0);
+          setCurrentPage(1);
+        }}
+        className=""
+      >
         <TabsList className="grid grid-cols-3 w-full">
           <TabsTrigger value="en_attente">En attente</TabsTrigger>
           <TabsTrigger value="pending">Pret pour l'analyse</TabsTrigger>
@@ -403,7 +421,16 @@ export default function GranulometrieComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
+                <Input
+                  placeholder="Rechercher code, lot..."
+                  className="pl-9 h-9 text-sm"
+                  value={searchAttenteQuery}
+                  onChange={(e) => {
+                    setSearchAttenteQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -462,6 +489,26 @@ export default function GranulometrieComponent() {
                   </Table>
                 </div>
               )}
+              {granulometrieAttente.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -479,7 +526,16 @@ export default function GranulometrieComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
+                <Input
+                  placeholder="Rechercher code, lot..."
+                  className="pl-9 h-9 text-sm"
+                  value={searchPendingQuery}
+                  onChange={(e) => {
+                    setSearchPendingQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -538,6 +594,26 @@ export default function GranulometrieComponent() {
                   </Table>
                 </div>
               )}
+              {granulometrieConfirmer.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -556,7 +632,16 @@ export default function GranulometrieComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
+                <Input
+                  placeholder="Rechercher code, lot..."
+                  className="pl-9 h-9 text-sm"
+                  value={searchHistoryQuery}
+                  onChange={(e) => {
+                    setSearchHistoryQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -636,6 +721,26 @@ export default function GranulometrieComponent() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
+              )}
+              {granulometrieHisto.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
                 </div>
               )}
             </CardContent>

@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { fetchData } from "@/app/_utils/api";
+import PaginationContent from "@/components/ui/pagination-content";
 // ==========================================
 // MOCKED DATA (ILLUSTRATION POUR LE DESIGN)
 // ==========================================
@@ -91,6 +92,14 @@ export default function CuppingComponent() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState(null);
 
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [pointer, setPointer] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [searchPendingQuery, setSearchPendingQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const [formData, setFormData] = useState({
     qteTorrefier: "200",
     observation: "",
@@ -98,12 +107,6 @@ export default function CuppingComponent() {
     moyenne: "",
     qualite: "Qualité",
   });
-
-  // Static Data Presentation
-  const pendingAnalyses = initialLabAnalyses.filter((item) => item.status === "triage_complete");
-  const completedAnalyses = initialLabAnalyses.filter(
-    (item) => item.status !== "receptionne" && item.status !== "granulometrie_complete" && item.status !== "triage_complete" && item.degustation
-  );
 
   const handleOpenModal = (analysis) => {
     setSelectedAnalysis(analysis);
@@ -153,6 +156,7 @@ export default function CuppingComponent() {
       toast.success("Torréfaction & Dégustation validées avec succès ! ");
       setIsModalOpen(false);
       setSelectedAnalysis(null);
+      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error(error);
       toast.error("Donnée non enregistrée!!!");
@@ -168,10 +172,14 @@ export default function CuppingComponent() {
 
 
         try {
-          const response = await fetchData("get", "cafe/torrefaction/pret_pour_torrefaction/",
-            { params: {}, additionalHeaders: {}, body: {} });
+          const response = await fetchData("get", "cafe/torrefaction/pret_pour_torrefaction/", {
+            params: { limit, offset: pointer, search: searchPendingQuery }
+          });
           console.log("les analyses:", response);
-          const analyses = response?.results?.map((item) => ({
+          const dataResponse = response?.results || [];
+          setTotalCount(response?.count || 0);
+
+          const analyses = dataResponse.map((item) => ({
             id: item.id,
             lotNumber: item.numero_lot,
             qualite: item.qualite,
@@ -195,10 +203,14 @@ export default function CuppingComponent() {
       }
       if (selectedTab === "history") {
         try {
-          const response = await fetchData("get", "cafe/degustation/historique_degustations/",
-            { params: {}, additionalHeaders: {}, body: {} });
+          const response = await fetchData("get", "cafe/degustation/historique_degustations/", {
+            params: { limit, offset: pointer, search: searchQuery }
+          });
           console.log("les analyse_EEEE:", response);
-          const analyses = response?.results?.map((item) => ({
+          const dataResponse = response?.results || [];
+          setTotalCount(response?.count || 0);
+
+          const analyses = dataResponse.map((item) => ({
             id: item.id,
             sampleId: item.echantillon_id,
             transfertEchantillon: item.transfert_echantillon,
@@ -234,6 +246,14 @@ export default function CuppingComponent() {
                 parseFloat(item?.brisure || 0) +
                 parseFloat(item?.n_et_rat || 0) +
                 parseFloat(item?.corps_etrangers || 0)
+            },
+            degustation: {
+              qteTorrefier: item.quantite_torrefier || 0,
+              observation: item.observation || "",
+              nbDegustateurs: item.nombre_degustateurs || 0,
+              moyenne: parseFloat(item.note_moyenne) || 0,
+              qualite: item.qualite || "",
+              dateDegustation: item.date_degustation || ""
             }
           }));
           console.log("les analyses", analyses);
@@ -247,13 +267,21 @@ export default function CuppingComponent() {
 
 
     fetchPendingAnalyses();
-  }, [selectedTab]);
+  }, [selectedTab, limit, pointer, searchQuery, searchPendingQuery, refreshTrigger]);
 
 
   return (
     <div className="space-y-6">
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="">
+      <Tabs
+        value={selectedTab}
+        onValueChange={(val) => {
+          setSelectedTab(val);
+          setPointer(0);
+          setCurrentPage(1);
+        }}
+        className=""
+      >
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger value="pending">Pret pour la dégustation</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
@@ -273,7 +301,16 @@ export default function CuppingComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot..." className="pl-9 h-9 text-sm" />
+                <Input
+                  placeholder="Rechercher code, lot..."
+                  value={searchPendingQuery}
+                  onChange={(e) => {
+                    setSearchPendingQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
+                  className="pl-9 h-9 text-sm"
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -330,6 +367,26 @@ export default function CuppingComponent() {
                   </Table>
                 </div>
               )}
+              {pendingData.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -348,7 +405,16 @@ export default function CuppingComponent() {
               </div>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <Input placeholder="Rechercher code, lot, qualité..." className="pl-9 h-9 text-sm" />
+                <Input
+                  placeholder="Rechercher code, lot, qualité..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPointer(0);
+                    setCurrentPage(1);
+                  }}
+                  className="pl-9 h-9 text-sm"
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -416,6 +482,26 @@ export default function CuppingComponent() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
+              )}
+              {completedData.length > 0 && (
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    totalCount={totalCount}
+                    pointer={pointer}
+                    limit={limit}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                      setPointer((page - 1) * limit);
+                    }}
+                    onLimitChange={(newLimit) => {
+                      setLimit(newLimit);
+                      setPointer(0);
+                      setCurrentPage(1);
+                    }}
+                  />
                 </div>
               )}
             </CardContent>

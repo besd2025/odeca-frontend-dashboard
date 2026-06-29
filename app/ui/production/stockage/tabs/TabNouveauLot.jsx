@@ -11,10 +11,30 @@ import { fetchData } from "@/app/_utils/api";
 export default function TabNouveauLot({ onViewDetails, handleOpenStocking }) {
   const [lots, setLots] = useState([]);
 
+  // Pagination states
+  const [limit, setLimit] = useState(5);
+  const [pointer, setPointer] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
     const fetchLots = async () => {
       try {
-        const lotsData = await fetchData("get", `cafe/stock_cafe/get_qualites_pretes_stockage/`, { params: { limit: 10000, offset: 0 } });
+        const lotsData = await fetchData("get", `cafe/stock_cafe/get_qualites_pretes_stockage/`, { 
+          params: { limit, offset: pointer } 
+        });
+
         const formattedLots = lotsData?.results?.map(item => {
           const processedGrades = Array.isArray(item?.qualites)
             ? item.qualites.reduce((acc, curr) => {
@@ -22,6 +42,10 @@ export default function TabNouveauLot({ onViewDetails, handleOpenStocking }) {
               return acc;
             }, {})
             : (item?.qualites || {});
+
+          const totalSacs = Array.isArray(item?.qualites)
+            ? item.qualites.reduce((sum, curr) => sum + (curr.nombre_sacs_restant || 0), 0)
+            : 0;
 
           return {
             id: item?.societe_id,
@@ -31,16 +55,19 @@ export default function TabNouveauLot({ onViewDetails, handleOpenStocking }) {
             dateEntree: item?.created_at?.split("T")[0],
             status: "Prêt à stocker",
             remainingQuantities: { ...processedGrades },
+            totalSacs,
           };
         });
+        console.log(formattedLots)
         setLots(formattedLots || []);
+        setTotalCount(lotsData?.count || 0);
       } catch (error) {
         console.error("Error fetching lots:", error);
       }
     };
 
     fetchLots();
-  }, []);
+  }, [limit, pointer]);
 
   return (
     <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
@@ -64,16 +91,21 @@ export default function TabNouveauLot({ onViewDetails, handleOpenStocking }) {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>#</TableHead>
                 <TableHead>Propriétaire / Société</TableHead>
                 <TableHead>Grade / Qualité</TableHead>
+                <TableHead className="text-right">Nombre de Sacs</TableHead>
                 <TableHead className="text-right sticky right-0 bg-sidebar shadow-2xl">
                   Actions
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {lots?.map((lot) => (
+              {lots?.map((lot, index) => (
                 <TableRow key={lot.id}>
+                  <TableCell className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
+                    {pointer + index + 1}
+                  </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-0.5">
                       <span className="font-medium text-slate-800 dark:text-slate-200">
@@ -107,6 +139,9 @@ export default function TabNouveauLot({ onViewDetails, handleOpenStocking }) {
                         ))}
                     </div>
                   </TableCell>
+                  <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
+                    {lot.totalSacs ?? 0}
+                  </TableCell>
                   <TableCell className="text-right sticky right-0 bg-background shadow-2xl border-l border-slate-200 dark:border-slate-800">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -138,7 +173,15 @@ export default function TabNouveauLot({ onViewDetails, handleOpenStocking }) {
             </TableBody>
           </Table>
         )}
-        <PaginationContent />
+        <PaginationContent
+          currentPage={currentPage}
+          totalPages={Math.ceil(totalCount / limit)}
+          onPageChange={onPageChange}
+          pointer={pointer}
+          totalCount={totalCount}
+          onLimitChange={onLimitChange}
+          limit={limit}
+        />
       </CardContent>
     </Card>
   );

@@ -133,7 +133,7 @@ const menuItems = {
       url: "/odeca-production/usine/reception",
       icon: <Coffee />,
       keyword: "production",
-      roles: ["Admin"],
+      roles: ["Admin", "General"],
     },
     {
       title: "Societes",

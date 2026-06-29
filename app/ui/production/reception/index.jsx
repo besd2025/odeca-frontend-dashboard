@@ -36,7 +36,7 @@ import {
 import { Button } from '@/components/ui/button';
 import PaginationContent from '@/components/ui/pagination-content';
 import Link from 'next/link';
-
+import ModificationForm from './modification_form';
 const DEFAULT_RECEPTIONS = [
     {
         id: "LOT-2026-001",
@@ -167,6 +167,16 @@ export default function ReceptionPage() {
         setPointer(0);
         setCurrentPage(1);
     };
+    const handleRejeter = (lot) => {
+        console.log(lot);
+    };
+    const [detailData, setDetailData] = useState([]);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const handleModifier = (lot) => {
+        setDetailData(lot);
+        setShowDetailModal(true);
+        console.log(lot);
+    };
 
     const filteredReceptions = activeTab === "all"
         ? [...receptionsEnAttenteList, ...receptionsConfirmeList]
@@ -263,8 +273,13 @@ export default function ReceptionPage() {
                                                                     <Settings className="h-3 w-3" /> Usiner
                                                                 </Button>
                                                             </Link>
+
                                                         )}
-                                                        {/* <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem> */}
+                                                        {lot.status === "en attente" ? (
+                                                            <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => handleRejeter(lot)}>Rejeter</DropdownMenuItem>
+                                                        ) : (
+                                                            <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => handleModifier(lot)}>Modifier</DropdownMenuItem>
+                                                        )}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
@@ -347,6 +362,7 @@ export default function ReceptionPage() {
                     limit={limit}
                 />
             </div>
+            <ModificationForm show={showDetailModal} onShowChange={setShowDetailModal} detailData={detailData} />
         </div>
 
     );

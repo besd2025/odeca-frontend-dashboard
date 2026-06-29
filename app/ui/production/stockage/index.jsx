@@ -155,7 +155,7 @@ export default function StockagePage() {
                         <Warehouse className="h-8 w-8 text-primary" /> Stockage & Retours
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm">
-                        Suivi des lots de café stockés en entrepôt et des lots retournés pour un cycle de réusinage.
+                        Suivi des lots de café stockés en entrepôt et des lots retournés pour un cycle de retriage.
                     </p>
                 </div>
                 <div>

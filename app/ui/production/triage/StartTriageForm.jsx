@@ -12,11 +12,11 @@ export default function StartTriageForm({ lot, onConfirm, onCancel }) {
   const [dateEntree, setDateEntree] = useState(
     new Date().toISOString().split("T")[0]
   );
-
+  console.log(lot)
   // By default, select all grades for sorting
   const initialGrades = lot?.grades ? Object.keys(lot.grades) : [];
   const [selectedGrades, setSelectedGrades] = useState(initialGrades);
-
+  console.log(initialGrades)
   const handleToggleGrade = (grade) => {
     setSelectedGrades((prev) =>
       prev.includes(grade)
@@ -27,45 +27,62 @@ export default function StartTriageForm({ lot, onConfirm, onCancel }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!dateEntree) {
       toast.error("Veuillez renseigner la date d'entrée.");
       return;
     }
-    const promise = Promise.all(
 
-      await fetchData(
-        "patch",
-        `/cafe/triage/${lot.id}/`,
-        {
-          params: {},
-          additionalHeaders: {},
-          body: {
-            "production": lot.id,
-            "status": "EN_COURS",
-            "fin_triage": dateEntree,
-          },
-        }
-      ).then((res) => {
-        if (res.status == 200 || res.status == 201) {
-          return { lot: lot.id };
+    if (selectedGrades.length === 0) {
+      toast.error("Veuillez sélectionner au moins un grade.");
+      return;
+    }
+
+    let successCount = 0;
+    const errors = [];
+
+    for (const grade of selectedGrades) {
+      const gradeData = lot.grades[grade]; // { nombre_sacs, triage_id, production_id }µ
+      try {
+        const res = await fetchData(
+          "post",
+          `/cafe/triage/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {
+              production: gradeData?.production_id,
+              status: "EN_COURS",
+              fin_triage: dateEntree,
+
+            },
+          }
+        );
+
+        if (res?.status === 200 || res?.status === 201) {
+          successCount++;
+          console.log(`✅ Grade "${grade}" enregistré`, res);
         } else {
-          throw new Error("Erreur de mise à jour du triage");
+          errors.push(`${grade}: statut inattendu (${res?.status})`);
         }
-      }).catch((error) => {
-        toast.error("Erreur de mise à jour du triage");
-      })
-    );
+      } catch (err) {
+        console.error(`❌ Erreur pour le grade "${grade}":`, err);
+        errors.push(`${grade}: ${err?.message || "Erreur inconnue"}`);
+      }
+    }
 
+    if (successCount > 0) {
+      toast.success(
+        `${successCount} grade(s) enregistré(s) avec succès`
+      );
+    }
+    if (errors.length > 0 && successCount === 0) {
+      toast.error("Aucun grade n'a pu être enregistré.");
+    }
 
-    toast.promise(promise, {
-      loading: "Modification...",
-      success: (data) => {
-
-        return `Données Enregistrées avec succès`;
-      },
-      error: "Donnée non enregistrée!!!",
-    });
-
+    if (successCount > 0 && onConfirm) {
+      onConfirm(lot, selectedGrades, [], dateEntree);
+    }
   };
 
   return (
@@ -122,7 +139,7 @@ export default function StartTriageForm({ lot, onConfirm, onCancel }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                    {quantity} sacs
+                    {quantity?.nombre_sacs} sacs
                   </span>
 
                 </div>

@@ -9,12 +9,32 @@ import { fetchData } from "@/app/_utils/api";
 export default function TabLotsStockesTaxes() {
   const [lots, setLots] = useState([]);
 
+  // Pagination states
+  const [limit, setLimit] = useState(5);
+  const [pointer, setPointer] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
     const fetchLots = async () => {
       try {
         // TODO: Replace with the correct API endpoint for Stocked & Taxes when ready
         // Currently using get_qualites_stockees as a placeholder
-        const lotsData = await fetchData("get", `cafe/stock_cafe/get_qualites_stockees/`, { params: { limit: 10000, offset: 0 } });
+        const lotsData = await fetchData("get", `cafe/stock_cafe/get_qualites_stockees/`, {
+          params: { limit, offset: pointer }
+        });
+        console.log("lotsData", lotsData);
         const formattedLots = lotsData?.results?.map(item => {
           const processedGrades = Array.isArray(item?.qualites)
             ? item.qualites.reduce((acc, curr) => {
@@ -37,13 +57,14 @@ export default function TabLotsStockesTaxes() {
           };
         });
         setLots(formattedLots || []);
+        setTotalCount(lotsData?.count || 0);
       } catch (error) {
         console.error("Error fetching lots:", error);
       }
     };
 
     fetchLots();
-  }, []);
+  }, [limit, pointer]);
 
   return (
     <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
@@ -67,16 +88,22 @@ export default function TabLotsStockesTaxes() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>#</TableHead>
                 <TableHead>Nouveau lot</TableHead>
                 <TableHead>Propriétaire / Société</TableHead>
                 <TableHead>Grade / Qualité</TableHead>
+                <TableHead>Nombre de sacs</TableHead>
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {lots?.map((lot) => (
+              {lots?.map((lot, index) => (
                 <TableRow key={lot.id}>
-                  <TableCell className="flex  gap-2 bg-sidebar dark:bg-slate-900">
-                    {lot.id}
+                  <TableCell className="font-semibold text-slate-900 dark:text-white">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell className="flex  gap-2 bg-sidebar dark:bg-slate-900 font-semibold text-slate-900 dark:text-white">
+                    {lot.lotNumbers}
                   </TableCell>
                   <TableCell>
                     {lot?.societe}
@@ -94,12 +121,24 @@ export default function TabLotsStockesTaxes() {
                       ))}
                     </div>
                   </TableCell>
+                  <TableCell>
+                    {lot?.nombreSacs}
+                  </TableCell>
+
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         )}
-        <PaginationContent />
+        <PaginationContent
+          currentPage={currentPage}
+          totalPages={Math.ceil(totalCount / limit)}
+          onPageChange={onPageChange}
+          pointer={pointer}
+          totalCount={totalCount}
+          onLimitChange={onLimitChange}
+          limit={limit}
+        />
       </CardContent>
     </Card>
   );

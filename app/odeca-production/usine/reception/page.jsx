@@ -5,7 +5,7 @@ import { ROLES } from '@/lib/permissions'
 export default function page() {
   console.log(ROLES.UDP)
   return (
-    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.UDP]}>
+    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.UDP]}>
       <ReceptionPage />
     </ProtectedRoute>
   )

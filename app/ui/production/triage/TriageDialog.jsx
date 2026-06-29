@@ -32,7 +32,7 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
   const [quantiteKgs, setQuantiteKgs] = useState({});
   const [observation, setObservation] = useState("");
   useEffect(() => {
-
+    console.log("lot", lot);
     const loadData = async () => {
       try {
         const data = await fetchData("get", `cafe/qualite_cafe/`);
@@ -45,13 +45,13 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
           setApiGrades(newGrades);
         }
 
-        const triages = await fetchData("get", `/cafe/triage/get_termine_triage?triage_id=${lot.id}`);
-        if (triages.status == 200 || triages.status == 201) {
-          const triagesData = triages.results || triages || [];
-          if (triagesData.length > 0) {
-            console.log("tringes", triagesData)
-          }
-        }
+        // const triages = await fetchData("get", `/cafe/triage/get_termine_triage?triage_id=${lot.id}`);
+        // if (triages.status == 200 || triages.status == 201) {
+        //   const triagesData = triages.results || triages || [];
+        //   if (triagesData.length > 0) {
+        //     console.log("tringes", triagesData)
+        //   }
+        // }
 
 
 
@@ -135,7 +135,7 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
       finalTaxation[g] = parseFloat(quantities[g]) || 0;
       finalPoids[g] = parseFloat(quantiteKgs[g]) || 0;
     });
-
+    console.log("lot:", lot);
     const finalizedData = {
       id: lot.id,
       dateSortie,
