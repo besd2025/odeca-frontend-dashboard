@@ -9,6 +9,7 @@ import {
 import {
   Archive,
   Banknote,
+  ChartColumn,
   CircleDollarSign,
   Grape,
   Landmark,
@@ -219,7 +220,112 @@ function StatsCard({ id }) {
 
         </CardHeader>
       </Card>
-      <Card className="@container/card lg:col-span-3 hidden">
+      <Card className="@container/card lg:col-span-3">
+        <CardHeader>
+          <div className="flex flex-row gap-x-2 items-center">
+            <div className="bg-yellow-500 p-2 rounded-md">
+              <CircleDollarSign className="text-white" />
+            </div>
+            <CardTitle className="text-md text-muted-foreground font-medium tabular-nums  ">
+              Montant
+            </CardTitle>
+          </div>
+          <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
+            {(
+              data?.qte_achete?.montant_cerise_a +
+              data?.qte_achete?.montant_cerise_b ?? 0
+            )
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+            <span className="text-base">FBU</span>
+          </CardTitle>
+          <Separator />
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-x-2 items-center justify-center">
+              <div className="flex flex-row gap-x-1 items-center">
+                <Banknote className="text-secondary" />
+                <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                  Tranche 1
+                </CardTitle>
+              </div>
+              <CardTitle className="text-base font-semibold tracking-tight tabular-nums">
+                0 <span className="text-xs">FBU</span>
+              </CardTitle>
+            </div>
+            <Separator />
+            <div className="flex flex-wrap gap-x-2 items-center justify-center">
+              <div className="flex flex-row gap-x-0.5 items-center">
+                <Banknote className="text-secondary" />
+                <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                  Tranche 2
+                </CardTitle>
+              </div>
+              <CardTitle className="text-base font-semibold tracking-tight tabular-nums">
+                0 <span className="text-xs">FBU</span>
+              </CardTitle>
+            </div>
+            {avance && (
+              <>
+                <Separator />
+                <div className="flex flex-wrap gap-x-2 items-center justify-center">
+                  <div className="flex flex-row gap-x-1 items-center">
+                    <Banknote className="text-secondary" />
+                    <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                      Avance
+                    </CardTitle>
+                  </div>
+                  <CardTitle className="text-base font-semibold tracking-tight tabular-nums">
+                    0 <span className="text-xs">FBU</span>
+                  </CardTitle>
+                </div>
+              </>
+            )}
+          </div>
+        </CardHeader>
+      </Card>
+      <Card className="@container/card col-span-3 p-2 h-max">
+        <CardHeader className="p-2">
+          <div className="flex flex-row gap-x-2 items-center">
+            <div className="bg-secondary p-2 rounded-full">
+              <Users className="text-white" />
+            </div>
+            <CardTitle className="font-normal flex flex-col   ">
+              <span className="text-muted-foreground text-sm">
+                Cafeiculteurs
+              </span>
+              <span className="text-lg font-semibold tracking-tight ">
+                {(data?.nombre_cultivateurs?.hommes ?? 0) +
+                  (data?.nombre_cultivateurs?.femmes ?? 0)}
+              </span>
+            </CardTitle>
+          </div>
+          <div className="flex flex-col gap-y-2 mt-4">
+            <div className="flex flex-row ">
+              <div className="text-muted-foreground flex gap-x-0.5">
+                <span className="bg-backgrou/nd rounded">
+                  <Mars />
+                </span>
+                Homme :
+              </div>
+              <div className="font-medium  ml-2">
+                {data?.nombre_cultivateurs?.hommes}
+              </div>
+            </div>
+            <div className="flex flex-row ">
+              <div className="text-muted-foreground flex gap-x-0.5 ">
+                <span className="">
+                  <Venus />
+                </span>
+                Femme :
+              </div>
+              <div className="font-medium  ml-2">
+                {data?.nombre_cultivateurs?.femmes || 0}
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+      <Card className="@container/card col-span-1 lg:col-span-4">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-md">
@@ -340,110 +446,86 @@ function StatsCard({ id }) {
         </CardHeader>
 
       </Card>
-      <Card className="@container/card lg:col-span-3 overflow-hidden">
-        <CardHeader>
+      <Card className="@container/card col-span-1 lg:col-span-4">
+        <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-yellow-500 p-2 rounded-md">
-              <CircleDollarSign className="text-white" />
+            <div className="bg-secondary p-2 rounded-md">
+              <ChartColumn className="text-white" />
             </div>
-            <CardTitle className="text-md text-muted-foreground font-medium tabular-nums  ">
-              Montant
+            <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+              {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                <>
+                  {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  <span className="text-base">T</span>
+                </>
+              ) : (
+                <>
+                  {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                  <span className="text-sm">Kg</span>
+                </>
+              )}
             </CardTitle>
-          </div>
-          <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
-            {(
-              data?.qte_achete?.montant_cerise_a +
-              data?.qte_achete?.montant_cerise_b ?? 0
-            )
-              .toString()
-              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-            <span className="text-base">FBU</span>
-          </CardTitle>
-          <Separator />
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-wrap gap-x-2 items-center justify-center">
-              <div className="flex flex-row gap-x-1 items-center">
-                <Banknote className="text-secondary" />
-                <CardTitle className="text-muted-foreground font-normal text-sm  ">
-                  Tranche 1
-                </CardTitle>
-              </div>
-              <CardTitle className="text-base font-semibold tracking-tight tabular-nums">
-                0 <span className="text-xs">FBU</span>
-              </CardTitle>
-            </div>
-            <Separator />
-            <div className="flex flex-wrap gap-x-2 items-center justify-center">
-              <div className="flex flex-row gap-x-0.5 items-center">
-                <Banknote className="text-secondary" />
-                <CardTitle className="text-muted-foreground font-normal text-sm  ">
-                  Tranche 2
-                </CardTitle>
-              </div>
-              <CardTitle className="text-base font-semibold tracking-tight tabular-nums">
-                0 <span className="text-xs">FBU</span>
-              </CardTitle>
-            </div>
-            {avance && (
-              <>
-                <Separator />
-                <div className="flex flex-wrap gap-x-2 items-center justify-center">
-                  <div className="flex flex-row gap-x-1 items-center">
-                    <Banknote className="text-secondary" />
-                    <CardTitle className="text-muted-foreground font-normal text-sm  ">
-                      Avance
-                    </CardTitle>
-                  </div>
-                  <CardTitle className="text-base font-semibold tracking-tight tabular-nums">
-                    0 <span className="text-xs">FBU</span>
-                  </CardTitle>
-                </div>
-              </>
+            {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+              </span>
+            ) : (
+              <></>
             )}
           </div>
-        </CardHeader>
-      </Card>
-      <Card className="@container/card col-span-3 p-2 h-max overflow-hidden">
-        <CardHeader className="p-2">
-          <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-secondary p-2 rounded-full">
-              <Users className="text-white" />
+          <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground ">
+            Rapport C
+          </CardTitle>
+          <Separator />
+          <div className="grid grid-cols-2 gap-2 text-xs font-medium w-full">
+            <div className="flex flex-col gap-2 items-center py-1 px-4 rounded-lg border">
+              <div className="flex flex-row gap-x-1 items-center">
+                <CardTitle className="text-base font-semibold text-primary">
+                  FW
+                </CardTitle>
+              </div>
+              <CardDescription className="font-semibold text-accent-foreground text-lg">
+                <div className="text-xs flex flex-col">
+                  <span>A1: 123</span>
+                  <span>B2: 123</span>
+                </div>
+
+              </CardDescription>
             </div>
-            <CardTitle className="font-normal flex flex-col   ">
-              <span className="text-muted-foreground text-sm">
-                Cafeiculteurs
-              </span>
-              <span className="text-lg font-semibold tracking-tight ">
-                {(data?.nombre_cultivateurs?.hommes ?? 0) +
-                  (data?.nombre_cultivateurs?.femmes ?? 0)}
-              </span>
-            </CardTitle>
+            <div className="flex flex-col gap-2 items-center py-1 px-4 rounded-lg border">
+              <div className="flex flex-row gap-x-1 items-center">
+                <CardTitle className="text-base font-semibold text-primary">
+                  NATUREL
+                </CardTitle>
+              </div>
+              <CardDescription className="font-semibold text-accent-foreground text-lg">
+                <div className="text-xs flex flex-col">
+                  <span>A1: 123</span>
+                  <span>B2: 123</span>
+                </div>
+
+              </CardDescription>
+            </div>
+            <div className="flex flex-col gap-2 items-center py-1 px-4 rounded-lg border">
+              <div className="flex flex-row gap-x-1 items-center">
+                <CardTitle className="text-base font-semibold text-primary">
+                  MIEL
+                </CardTitle>
+              </div>
+              <CardDescription className="font-semibold text-accent-foreground text-lg">
+                <div className="text-xs flex flex-col">
+                  <span>A1: 123</span>
+                  <span>B2: 123</span>
+                </div>
+
+              </CardDescription>
+            </div>
           </div>
-          <div className="flex flex-col gap-y-2 mt-4">
-            <div className="flex flex-row ">
-              <div className="text-muted-foreground flex gap-x-0.5">
-                <span className="bg-backgrou/nd rounded">
-                  <Mars />
-                </span>
-                Homme :
-              </div>
-              <div className="font-medium  ml-2">
-                {data?.nombre_cultivateurs?.hommes}
-              </div>
-            </div>
-            <div className="flex flex-row ">
-              <div className="text-muted-foreground flex gap-x-0.5 ">
-                <span className="">
-                  <Venus />
-                </span>
-                Femme :
-              </div>
-              <div className="font-medium  ml-2">
-                {data?.nombre_cultivateurs?.femmes || 0}
-              </div>
-            </div>
-          </div>
         </CardHeader>
+
       </Card>
     </div>
   );

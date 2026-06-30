@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -18,10 +19,12 @@ import {
 } from "@/components/ui/table";
 import PaginationControls from "@/components/ui/pagination-controls";
 import DetailsReceipt from "../receipt/details-receipt";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DetailsRendement from "./details-redement";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import EditRendement from "./edit";
+import { Input } from "@/components/ui/input";
 
 const products = [
   {
@@ -62,16 +65,23 @@ export default function RedementC() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">
+        <div className="relative ">
+          <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
+          <Input
+            placeholder="Rechercher..."
+            className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+          />
+        </div>
+        <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden mt-4">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="pl-4">Actions</TableHead>
                 <TableHead>Date Emmangasinage</TableHead>
                 <TableHead>No Lot</TableHead>
-                <TableHead>Grade A</TableHead>
-                <TableHead>Grade B</TableHead>
-                <TableHead>Coque</TableHead>
+                <TableHead>FW</TableHead>
+                <TableHead>Naturel</TableHead>
+                <TableHead>Miel</TableHead>
                 <TableHead>Qte TOTAL</TableHead>
                 <TableHead>Rendement</TableHead>
               </TableRow>
@@ -91,10 +101,12 @@ export default function RedementC() {
                         <DropdownMenuLabel className="text-muted-foreground font-normal">
                           Actions
                         </DropdownMenuLabel>
+                        <DetailsRendement />
+                        <EditRendement />
+                        <DropdownMenuItem className="text-destructive">
+                          Supprimer
+                        </DropdownMenuItem>
 
-                        <div>
-                          <DetailsRendement />
-                        </div>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
