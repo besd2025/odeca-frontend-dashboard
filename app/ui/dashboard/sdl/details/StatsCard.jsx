@@ -325,7 +325,7 @@ function StatsCard({ id }) {
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card col-span-1 lg:col-span-4">
+      <Card className="@container/card col-span-1 lg:col-span-4 hidden">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-md">
@@ -446,7 +446,7 @@ function StatsCard({ id }) {
         </CardHeader>
 
       </Card>
-      <Card className="@container/card col-span-1 lg:col-span-4">
+      <Card className="@container/card col-span-1 lg:col-span-4 hidden">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-md">
