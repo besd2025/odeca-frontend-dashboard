@@ -518,7 +518,7 @@ function DetailsContent({ id }) {
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
       <Tabs
         value={tab}
-        className="space-y-6 w-full"
+        className=" w-full"
         onValueChange={handleTabChange}
       >
         {/* TABS LIST */}
