@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { fetchData } from "@/app/_utils/api";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -38,64 +39,55 @@ export const schema = z.object({
   reviewer: z.string(),
 })
 
+
 const columns = [
   {
-    accessorKey: "type",
+    accessorKey: "societe",
     header: "Société",
     cell: ({ row }) => (
       <div className="w-32">
         <Badge variant="outline" className="px-1.5 text-foreground font-semibold">
-          {row.original.type}
+          {row.original.societe}
         </Badge>
       </div>
     ),
   },
   {
-    accessorKey: "target",
-    header: () => <div className="w-full">Quantité Entrée</div>,
-    cell: ({ row }) => (
-      <span
-        className="h-8 w-24 border-transparent bg-transparent text-right font-semibold shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30"
-        id={`${row.original.id}-target`}>
-        {parseFloat(row.original.target).toLocaleString()}
-      </span>
-    ),
+    accessorKey: "poids",
+    header: () => <div className="w-full text-right">Poids Total (Kg)</div>,
+    cell: ({ row }) => {
+      const val = Number(row.original.poids || 0);
+      return (
+        <div className="text-right font-semibold">
+          {val.toLocaleString("fr-FR")}
+        </div>
+      );
+    },
   },
   {
-    accessorKey: "limit",
-    header: () => <div className="w-full">Quantité taxée</div>,
-    cell: ({ row }) => (
-      <span
-        className="h-8 w-24 border-transparent bg-transparent text-right font-semibold shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30"
-        id={`${row.original.id}-limit`}>
-        {row.original.limit === "0" ? "-" : parseFloat(row.original.limit).toLocaleString()}
-      </span>
-
-    ),
+    accessorKey: "nombre_sacs",
+    header: () => <div className="w-full text-right">Nombre de sacs</div>,
+    cell: ({ row }) => {
+      const val = Number(row.original.nombre_sacs || 0);
+      return (
+        <div className="text-right font-semibold">
+          {val.toLocaleString("fr-FR")}
+        </div>
+      );
+    },
   },
-  // {
-  //   id: "actions",
-  //   cell: () => (
-  //     <DropdownMenu>
-  //       <DropdownMenuTrigger asChild>
-  //         <Button
-  //           variant="ghost"
-  //           className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
-  //           size="icon">
-  //           <IconDotsVertical />
-  //           <span className="sr-only">Open menu</span>
-  //         </Button>
-  //       </DropdownMenuTrigger>
-  //       <DropdownMenuContent align="end" className="w-32">
-  //         <DropdownMenuItem>Edit</DropdownMenuItem>
-  //         <DropdownMenuItem>Make a copy</DropdownMenuItem>
-  //         <DropdownMenuItem>Favorite</DropdownMenuItem>
-  //         <DropdownMenuSeparator />
-  //         <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-  //       </DropdownMenuContent>
-  //     </DropdownMenu>
-  //   ),
-  // },
+  {
+    accessorKey: "pourcentage",
+    header: () => <div className="w-full text-right">Pourcentage</div>,
+    cell: ({ row }) => {
+      const val = Number(row.original.pourcentage || 0);
+      return (
+        <div className="text-right font-bold text-primary">
+          {val}%
+        </div>
+      );
+    },
+  },
 ]
 
 export function DataTable({
@@ -112,6 +104,29 @@ export function DataTable({
     pageSize: 10,
   })
   const dataIds = React.useMemo(() => data?.map(({ id }) => id) || [], [data])
+
+  React.useEffect(() => {
+    const fetch = async () => {
+      const response = await fetchData('get', 'cafe/stock_cafe/societe-stock-stats-detail/')
+      console.log(response)
+      const results = response?.results || [];
+      const newData = results.map((item, index) => {
+        return {
+          id: String(item?.societe_id),
+          societe: item?.societe,
+          poids: item?.quantite_entree || item?.poids || 0,
+          nombre_sacs: item?.sacs_total || item?.nombre_sacs || 0,
+          pourcentage: item?.pourcentage || 0,
+        }
+      })
+
+      setData(newData)
+    }
+    fetch()
+  }, [])
+
+
+
 
   const table = useReactTable({
     data,

@@ -113,24 +113,24 @@ const menuItems = {
 
     {
       title: "Production",
-      // items: [
-      //   {
-      //     title: "Usine",
-      //     url: "/odeca-dashboard/usine",
-      //     roles: ["Admin", "General", "Cafe_ODECA"],
-      //   },
-      //   {
-      //     title: "Traitement",
-      //     url: "/odeca-dashboard/traitement",
-      //     roles: ["Admin", "General", "Cafe_ODECA"],
-      //   },
-      //   {
-      //     title: "Laboratoire",
-      //     url: "/odeca-dashboard/laboratoire",
-      //     roles: ["Admin", "General", "Cafe_ODECA"],
-      //   },
-      // ],
-      url: "/odeca-production/usine/reception",
+      items: [
+        {
+          title: "Usine",
+          url: "/odeca-dashboard/production/usine",
+          roles: ["Admin", "General", "Cafe_ODECA"],
+        },
+        {
+          title: "Laboratoire",
+          url: "/odeca-dashboard/production/laboratoire",
+          roles: ["Admin", "General", "Cafe_ODECA"],
+        },
+        {
+          title: "Enregistrements",
+          url: "/odeca-production/usine/reception",
+          roles: ["Admin", "Respo_usine_deparchage", "Respo_labo"],
+        },
+      ],
+      // url: "/odeca-production/usine/reception",
       icon: <Coffee />,
       keyword: "production",
       roles: ["Admin", "General"],

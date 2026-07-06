@@ -22,9 +22,9 @@ export default function TaxationTab({
   const filteredTaxationReports = taxationReports.filter(rep => {
     const q = searchTaxation.toLowerCase();
     return (
-      rep.lotNumber.toLowerCase().includes(q) ||
-      rep.codeEtiquette.toLowerCase().includes(q) ||
-      rep.societe.toLowerCase().includes(q)
+      rep.lotNumber?.toLowerCase().includes(q) ||
+      rep.codeEtiquette?.toLowerCase().includes(q) ||
+      rep.proprietaire?.toLowerCase().includes(q)
     );
   });
 
@@ -55,10 +55,10 @@ export default function TaxationTab({
             <TableRow>
               <TableHead className="w-[100px]">Actions</TableHead>
               <TableHead>No. du Lot</TableHead>
-              <TableHead>Code Étiquette</TableHead>
               <TableHead>Société</TableHead>
               <TableHead>Qualité / Grade</TableHead>
-              <TableHead>Sacs (Volume)</TableHead>
+              <TableHead>Sacs</TableHead>
+              <TableHead>Poids (Volume)</TableHead>
               <TableHead>Note Cupping</TableHead>
             </TableRow>
           </TableHeader>
@@ -86,11 +86,12 @@ export default function TaxationTab({
                   </div>
                 </TableCell>
                 <TableCell className="font-bold text-foreground">{report.lotNumber}</TableCell>
-                <TableCell className="font-mono text-xs tracking-wider text-muted-foreground">{report.codeEtiquette}</TableCell>
+                {/* <TableCell className="font-mono text-xs tracking-wider text-muted-foreground">{report.codeEtiquette}</TableCell> */}
                 <TableCell className="font-medium">{report.societe}</TableCell>
                 <TableCell>{report.qualite}</TableCell>
-                <TableCell>{report.sacsCount} sacs ({report.qteEchantillon.toFixed(1)} kg)</TableCell>
-                <TableCell className="font-bold text-amber-600 dark:text-amber-500">{report.noteCupping.toFixed(2)}/100</TableCell>
+                <TableCell>{report.sacsCount} Sacs</TableCell>
+                <TableCell>{report.qteEchantillon} kg</TableCell>
+                <TableCell className="font-bold text-amber-600 dark:text-amber-500">{report.noteCupping}/100</TableCell>
               </TableRow>
             ))}
             {filteredTaxationReports.length === 0 && (

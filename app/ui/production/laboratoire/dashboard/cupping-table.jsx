@@ -9,7 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import { fetchData } from "@/app/_utils/api";
+import React from "react";
 // Données : qualités de café vert classées par nombre de taxations émises
 const qualitesTaxation = [
   { id: 1, qualite: "15+", denomination: "Grade A / Specialty", nb_taxations: 38 },
@@ -28,6 +29,32 @@ const badgeStyle = {
 };
 
 export default function QualitesTaxationTable() {
+
+  const [data, setData] = React.useState([
+    { id: 0, qualite: "", denomination: "", nb_taxations: "", pourcentage: "" }
+  ])
+
+  React.useEffect(() => {
+    const fetch = async () => {
+      const response = await fetchData('get', 'cafe/echantillonage/qualite-taxations-stats-complete/')
+      console.log(response?.data)
+      const newData = response?.data?.map((item) => {
+        return {
+          id: item?.code,
+          qualite: item?.qualite,
+          denomination: item?.denomination,
+          nb_taxations: item?.nb_taxations,
+          pourcentage: item?.pourcentage
+        }
+      })
+
+
+      setData(newData)
+
+    }
+    fetch()
+  }, [])
+
   return (
     <Card className="p-4">
       <CardTitle className="font-bold text-lg">Qualités par Nombre de Taxations</CardTitle>
@@ -40,14 +67,16 @@ export default function QualitesTaxationTable() {
             <TableHead>Qualité</TableHead>
             <TableHead>Dénomination</TableHead>
             <TableHead className="text-right">Nb Taxations</TableHead>
+            <TableHead className="text-right">Pourcentage</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {qualitesTaxation.map((item) => (
+          {data.map((item) => (
             <TableRow key={item.id}>
               <TableCell className="font-bold font-mono">{item.qualite}</TableCell>
               <TableCell className="text-sm text-muted-foreground">{item.denomination}</TableCell>
               <TableCell className="text-right font-bold">{item.nb_taxations}</TableCell>
+              <TableCell className="text-right font-bold">{item.pourcentage}</TableCell>
             </TableRow>
           ))}
         </TableBody>

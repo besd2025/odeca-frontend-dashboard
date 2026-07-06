@@ -9,9 +9,61 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import * as React from "react";
 import { Separator } from "@/components/ui/separator";
-
+import { fetchData } from "@/app/_utils/api";
 export function LabSectionCards() {
+  const [data, setData] = React.useState([
+    {
+      total_receptionne: "",
+      total_analyse_echantillon: "",
+      total_encours_analyse_echantillon: "",
+      total_en_attente_analyse_echantillon: "",
+      total_analyse_granulometrie: "",
+      total_encours_analyse_granulometrie: "",
+      total_en_attente_analyse_granulometrie: "",
+      total_deja_analyse_granulometrie: "",
+      total_analyse_trie: "",
+      total_encours_analyse_trie: "",
+      total_en_attente_analyse_trie: "",
+      total_deja_analyse_trie: "",
+      total_cafe_taxe: "",
+      total_cafe_exporte: "",
+      total_sac_restant: ""
+    }
+  ])
+  React.useEffect(() => {
+    const fetch = async () => {
+      const response = await fetchData('get', 'cafe/echantillonage/echantionnage_stats/')
+      console.log(" echantillonage :", response)
+      const granulometries = await fetchData('get', 'cafe/echantillonage/granulometrie-stats-complete/')
+      console.log(" granulometrie :", granulometries)
+      const tries = await fetchData('get', 'cafe/echantillonage/triage-stats-complete/')
+      const taxes = await fetchData('get', 'cafe/stock_cafe/rapports_taxation_stats/')
+      console.log(" taxes :", taxes)
+      const newData = {
+        total_receptionne: response?.total,
+        total_analyse_echantillon: response?.analyses_terminees,
+        total_encours_analyse_echantillon: response?.en_cours,
+        total_en_attente_analyse_echantillon: response?.en_attente,
+        total_analyse_granulometrie: granulometries?.total_analyses,
+        total_encours_analyse_granulometrie: granulometries?.en_cours,
+        total_en_attente_analyse_granulometrie: granulometries?.prets_analyser,
+        total_deja_analyse_granulometrie: granulometries?.analyses_completees,
+        total_analyse_trie: tries?.total_triages,
+        total_encours_analyse_trie: tries?.en_cours,
+        total_en_attente_analyse_trie: tries?.en_attente,
+        total_deja_analyse_trie: tries?.triages_completes,
+        total_rapport_taxation: taxes?.total_rapports,
+        total_rapport_attente_liaison: taxes?.rapports_attente,
+        total_rapport_lies: taxes?.rapports_lies,
+
+      }
+      setData(newData)
+
+    }
+    fetch()
+  }, [])
   return (
     <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-3 dark:*:data-[slot=card]:bg-card">
 
@@ -19,7 +71,7 @@ export function LabSectionCards() {
       <Card className="@container/card">
         <CardHeader>
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
-            147
+            {data?.total_receptionne}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm">Échantillons Reçus</CardDescription>
           <CardAction>
@@ -34,20 +86,20 @@ export function LabSectionCards() {
             <div >
               <CardDescription className="text-muted-foreground text-xs">En attente d'analyse</CardDescription>
               <CardTitle className="font-bold tabular-nums text-foreground">
-                14
+                {data?.total_en_attente_analyse_echantillon}
               </CardTitle>
             </div>
             <div className="border-l border-primary/50 pl-2">
               <CardDescription className="text-muted-foreground text-xs">En cours d'analyse</CardDescription>
               <CardTitle className="font-bold tabular-nums text-foreground">
-                4
+                {data?.total_encours_analyse_echantillon}
               </CardTitle>
             </div>
           </div>
           <div>
             <CardDescription className="text-muted-foreground text-xs">Analysés & Rapports émis</CardDescription>
             <CardTitle className="font-bold tabular-nums text-foreground">
-              133
+              {data?.total_analyse_echantillon}
             </CardTitle>
           </div>
         </CardContent>
@@ -57,7 +109,7 @@ export function LabSectionCards() {
       <Card className="@container/card">
         <CardHeader>
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
-            45
+            {data?.total_analyse_granulometrie}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm">Analyses Granulométriques</CardDescription>
 
@@ -68,20 +120,20 @@ export function LabSectionCards() {
             <div >
               <CardDescription className="text-muted-foreground text-xs">Prêts à analyser</CardDescription>
               <CardTitle className="font-bold tabular-nums text-foreground">
-                8
+                {data?.total_en_attente_analyse_granulometrie}
               </CardTitle>
             </div>
             <div className="border-l border-primary/50 pl-2">
               <CardDescription className="text-muted-foreground text-xs">En cours</CardDescription>
               <CardTitle className="font-bold tabular-nums text-foreground">
-                37
+                {data?.total_encours_analyse_granulometrie}
               </CardTitle>
             </div>
           </div>
           <div>
             <CardDescription className="text-muted-foreground text-xs">Analyses complétées (total)</CardDescription>
             <CardTitle className="font-bold tabular-nums text-foreground">
-              37
+              {data?.total_deja_analyse_granulometrie}
             </CardTitle>
           </div>
         </CardContent>
@@ -91,7 +143,7 @@ export function LabSectionCards() {
       <Card className="@container/card">
         <CardHeader>
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
-            32
+            {data?.total_analyse_trie}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm">Triages Manuels</CardDescription>
 
@@ -102,19 +154,19 @@ export function LabSectionCards() {
             <div >
               <CardDescription className="text-muted-foreground text-xs">En attente de triage</CardDescription>
               <CardTitle className="font-bold tabular-nums text-foreground">
-                6
+                {data?.total_en_attente_analyse_trie}
               </CardTitle>
             </div>
             <div className="border-l border-primary/50 pl-2">
               <CardDescription className="text-muted-foreground text-xs">En cours</CardDescription>
               <CardTitle className="font-bold tabular-nums text-foreground">
-                26
+                {data?.total_encours_analyse_trie}
               </CardTitle>
             </div>
           </div>
           <CardDescription className="text-muted-foreground text-xs">Triages complétés</CardDescription>
           <CardTitle className="font-bold tabular-nums text-foreground">
-            26
+            {data?.total_deja_analyse_trie}
           </CardTitle>
         </CardContent>
       </Card>
@@ -124,7 +176,7 @@ export function LabSectionCards() {
       <Card className="@container/card">
         <CardHeader>
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
-            45
+            {data?.total_rapport_taxation}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm">Rapports de Taxation Émis</CardDescription>
 
@@ -133,11 +185,11 @@ export function LabSectionCards() {
         <CardContent className="grid gap-1 pt-3">
           <CardDescription className="text-muted-foreground text-xs">Rapports liés à un contrat</CardDescription>
           <CardTitle className="font-bold tabular-nums text-foreground">
-            38
+            {data?.total_rapport_lies}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-xs">Rapports en attente de liaison</CardDescription>
           <CardTitle className="font-bold tabular-nums text-amber-600 dark:text-amber-400">
-            7
+            {data?.total_rapport_attente_liaison}
           </CardTitle>
         </CardContent>
       </Card>
