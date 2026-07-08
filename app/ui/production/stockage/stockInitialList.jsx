@@ -67,6 +67,7 @@ export default function StockInitialList({ onStartStocking }) {
                 <Table>
                     <TableHeader>
                         <TableRow>
+                            <TableHead className="w-[120px]"> #</TableHead>
                             <TableHead className="w-[120px]">Lot</TableHead>
                             <TableHead>Société</TableHead>
                             <TableHead className="text-center">Qualités</TableHead>
@@ -77,8 +78,9 @@ export default function StockInitialList({ onStartStocking }) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {lots?.map((lot) => (
+                        {lots?.map((lot, index) => (
                             <TableRow key={lot.id}>
+                                <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell className="font-medium">{lot.numero_lot}</TableCell>
                                 <TableCell>{lot.societe}</TableCell>
                                 <TableCell className="text-center">
