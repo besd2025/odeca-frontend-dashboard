@@ -21,6 +21,7 @@ import TabLotsTaxes from "./tabs/TabLotsTaxes";
 import TabLotsNonTaxes from "./tabs/TabLotsNonTaxes";
 import TabLotsStockesTaxes from "./tabs/TabLotsStockesTaxes";
 import RetourList from "./tabs/retours";
+import StockInitialList from "./stockInitialList";
 
 // Mock data to replace the statics
 const MOCK_GRADES = [
@@ -330,12 +331,16 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
     <div>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="w-full md:w-max">
+          <TabsTrigger value="initials">Stocks initiaux</TabsTrigger>
           <TabsTrigger value="account">Nouveau lot</TabsTrigger>
           <TabsTrigger value="password">Stock non prélevés</TabsTrigger>
           <TabsTrigger value="Taxation">Rapport de taxation</TabsTrigger>
           <TabsTrigger value="stocked">Lots Stockes & taxes</TabsTrigger>
           <TabsTrigger value="retours">Retours</TabsTrigger>
         </TabsList>
+        <TabsContent value="initials">
+          <StockInitialList handleViewDetailsStock={handleViewDetailsStock} />
+        </TabsContent>
         <TabsContent value="account">
           <TabNouveauLot onViewDetails={handleViewDetailsStock} handleOpenStocking={handleOpenStocking} />
         </TabsContent>

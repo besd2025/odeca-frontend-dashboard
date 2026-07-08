@@ -182,12 +182,12 @@ const menuItems = {
       keyword: "odeca-production/laboratoire/rapports",
       roles: [ROLES.ADMIN, ROLES.GENERAL, ROLES.LABORATOIRE],
     },
-    // {
-    //   title: "Commercialisation",
-    //   url: "/odeca-production/commercialisation",
-    //   icon: Package,
-    //   keyword: "odeca-production/commercialisation",
-    // },
+    {
+      title: "Commercialisation",
+      url: "/odeca-production/commercialisation",
+      icon: Package,
+      keyword: "odeca-production/commercialisation",
+    },
   ],
   user: {
     name: "admin",
