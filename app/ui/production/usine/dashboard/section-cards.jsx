@@ -31,6 +31,8 @@ export function SectionCards() {
       const tries = await fetchData('get', 'cafe/triage/get_total_quantite_usine_et_encours_triage/')
       const taxe = await fetchData('get', 'cafe/stock_cafe/cafe-taxation-stats-detail/')
       const pretExport = await fetchData('get', 'cafe/stock_cafe/societe-stock-stats-detail/')
+      const StockInitial = await fetchData('get', 'cafe/prestockage_apres_usinage/get_total_quantite_and_sacs_initial/')
+      console.log("StockInitial : ", StockInitial)
       const newData = {
         total_receptionne: response?.total_net,
         total_cafe_usine: usinees?.total_quantite_termine,
@@ -44,6 +46,8 @@ export function SectionCards() {
         total_sac_restant: response?.total_sac_restant,
         total_cafe_taxe: taxe?.cafe_taxe,
         total_cafe_non_taxe: taxe?.cafe_non_taxe,
+        nombre_sac_initial: StockInitial?.total_sacs,
+        quantite_initial: StockInitial?.total_poids,
         // total_cafe_exporte: pretExport?.total_exportable,
         // total_cafe_en_stock: pretExport?.total
 
@@ -248,7 +252,14 @@ export function SectionCards() {
       <Card className="@container/card">
         <CardHeader>
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
-            45,000 Kg
+            {(() => {
+              const kg = Number(data.quantite_initial || 0);
+              const isTonne = kg >= 1000;
+              const value = isTonne ? kg / 1000 : kg;
+              const unit = isTonne ? "T" : "Kg";
+
+              return `${value.toLocaleString("fr-FR")} ${unit}`;
+            })()}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm">Stock Initiale</CardDescription>
         </CardHeader>

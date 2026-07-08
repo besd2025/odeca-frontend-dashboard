@@ -93,13 +93,13 @@ const menuItems = {
     //   icon: Factory,
     //   keyword: "odeca-production/usine",
     // },
-    {
-      title: "Usine de deparchage",
-      url: "/odeca-production/usine/dashboard",
-      icon: LayoutDashboard,
-      keyword: "odeca-production/usine/dashboard",
-      roles: [ROLES.ADMIN, ROLES.GENERAL, ROLES.RESPONSABLE],
-    },
+    // {
+    //   title: "Usine de deparchage",
+    //   url: "/odeca-production/usine/dashboard",
+    //   icon: LayoutDashboard,
+    //   keyword: "odeca-production/usine/dashboard",
+    //   roles: [ROLES.ADMIN, ROLES.GENERAL, ROLES.RESPONSABLE],
+    // },
     {
       title: "Réception",
       url: "/odeca-production/usine/reception",
@@ -154,13 +154,13 @@ const menuItems = {
       keyword: "odeca-production/usine/stockage",
       roles: [ROLES.ADMIN, ROLES.UDP],
     },
-    {
-      title: "Laboratoire",
-      url: "/odeca-production/laboratoire/dashboard",
-      icon: LayoutDashboard,
-      keyword: "odeca-production/laboratoire/dashboard",
-      roles: [ROLES.ADMIN, ROLES.GENERAL, ROLES.RESPONSABLE],
-    },
+    // {
+    //   title: "Laboratoire",
+    //   url: "/odeca-production/laboratoire/dashboard",
+    //   icon: LayoutDashboard,
+    //   keyword: "odeca-production/laboratoire/dashboard",
+    //   roles: [ROLES.ADMIN, ROLES.GENERAL, ROLES.RESPONSABLE],
+    // },
     {
       title: "Réception & Codage",
       url: "/odeca-production/laboratoire/reception",
