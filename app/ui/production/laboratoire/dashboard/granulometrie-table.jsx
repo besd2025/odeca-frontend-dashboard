@@ -9,7 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import { fetchData } from "@/app/_utils/api";
+import * as React from "react";
 // Données : usines de déparchage classées par quantité d'échantillons envoyés au labo
 const usinesEchantillonnage = [
   { id: 1, usine: "USINE CENTRALE", localite: "NGOZI", nb_echantillons: 52, quantite_kg: 47800 },
@@ -23,6 +24,29 @@ const statutStyle = {
 };
 
 export default function UsinesEchantillonnageTable() {
+
+  const [data, setData] = React.useState([
+    { id: 0, usine: "", localite: "", nb_echantillons: "", quantite_kg: "" }
+  ])
+
+  React.useEffect(() => {
+    const fetch = async () => {
+      const response = await fetchData('get', 'cafe/stock_cafe/stock-detail/')
+      console.log("stock detail :", response)
+      const newData = response?.data?.map((item) => {
+        return {
+          id: item?.id,
+          usine: item?.usine,
+          localite: item?.localite,
+          nb_echantillons: item?.nb_echantillons,
+          quantite_kg: item?.quantite_kg
+        }
+      })
+      setData(newData)
+    }
+    fetch()
+  }, [])
+
   return (
     <Card className="p-4">
       <CardTitle className="font-bold text-lg">Usines par Quantité d'Échantillonnage</CardTitle>

@@ -68,14 +68,16 @@ export default function ExportFormDialog({
     if (matchedContract) {
       setForm(prev => ({
         ...prev,
-        contractId: contractId,
-        oicExporter: matchedContract.sellerName,
-        oicNotifyAddress: `${matchedContract.buyerName}, ${matchedContract.buyerCountry}`,
-        oicDestinationCountry: matchedContract.buyerCountry,
-        accordVenteQty: matchedContract.quantity
+        contractId: contractId || "",
+        oicExporter: matchedContract.sellerName || "",
+        oicNotifyAddress: (matchedContract.buyerName && matchedContract.buyerCountry)
+          ? `${matchedContract.buyerName}, ${matchedContract.buyerCountry}`
+          : (matchedContract.buyerName || matchedContract.buyerCountry || ""),
+        oicDestinationCountry: matchedContract.buyerCountry || "",
+        accordVenteQty: matchedContract.quantity || ""
       }));
     } else {
-      setForm(prev => ({ ...prev, contractId }));
+      setForm(prev => ({ ...prev, contractId: contractId || "" }));
     }
   };
 
@@ -105,7 +107,7 @@ export default function ExportFormDialog({
                 <Label htmlFor="contractSelect">Sélectionner Contrat *</Label>
                 <select
                   id="contractSelect"
-                  value={form.contractId}
+                  value={form.contractId || ""}
                   onChange={(e) => handleContractChange(e.target.value)}
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none"
                   required
@@ -124,7 +126,7 @@ export default function ExportFormDialog({
                 <Input
                   id="loadingDate"
                   type="date"
-                  value={form.loadingDate}
+                  value={form.loadingDate || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, loadingDate: e.target.value }))}
                   required
                 />
@@ -134,7 +136,7 @@ export default function ExportFormDialog({
                 <Label htmlFor="transportMode">Mode de transport *</Label>
                 <select
                   id="transportMode"
-                  value={form.transportMode}
+                  value={form.transportMode || "Camion"}
                   onChange={(e) => setForm(prev => ({ ...prev, transportMode: e.target.value }))}
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
                   required
@@ -153,7 +155,7 @@ export default function ExportFormDialog({
                 <Input
                   id="carrierName"
                   placeholder="Nom du transporteur"
-                  value={form.carrierName}
+                  value={form.carrierName || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, carrierName: e.target.value }))}
                   required
                 />
@@ -164,7 +166,7 @@ export default function ExportFormDialog({
                 <Input
                   id="modeE"
                   placeholder="Ex: EXP-MODE-E-99"
-                  value={form.modeE}
+                  value={form.modeE || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, modeE: e.target.value }))}
                   required
                 />
@@ -175,7 +177,7 @@ export default function ExportFormDialog({
                 <Input
                   id="lotCountExport"
                   type="number"
-                  value={form.lotCount}
+                  value={form.lotCount ?? ""}
                   onChange={(e) => setForm(prev => ({ ...prev, lotCount: parseInt(e.target.value) || 1 }))}
                   required
                 />
@@ -189,7 +191,7 @@ export default function ExportFormDialog({
                   <Input
                     id="douaneDoc"
                     placeholder="Attacher Déclaration Douane"
-                    value={form.douaneDoc}
+                    value={form.douaneDoc || ""}
                     className="text-xs"
                     readOnly
                   />
@@ -211,7 +213,7 @@ export default function ExportFormDialog({
                   <Input
                     id="qualityCertDoc"
                     placeholder="Attacher Certificat Qualité"
-                    value={form.qualityCertDoc}
+                    value={form.qualityCertDoc || ""}
                     className="text-xs"
                     readOnly
                   />
@@ -239,7 +241,7 @@ export default function ExportFormDialog({
                   <Input
                     id="oicDoc"
                     placeholder="Uploader Certificat OIC"
-                    value={form.oicDoc}
+                    value={form.oicDoc || ""}
                     className="text-xs"
                     readOnly
                   />
@@ -260,7 +262,7 @@ export default function ExportFormDialog({
                   id="oicNotifyAddress"
                   rows={1}
                   placeholder="Nom, Adresse complète de l'acheteur"
-                  value={form.oicNotifyAddress}
+                  value={form.oicNotifyAddress || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, oicNotifyAddress: e.target.value }))}
                   className="flex min-h-[36px] w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs shadow-sm focus-visible:outline-none"
                   required
@@ -273,7 +275,7 @@ export default function ExportFormDialog({
                 <Label htmlFor="oicTranshipment">Pays de transbordement (Transit)</Label>
                 <select
                   id="oicTranshipment"
-                  value={form.oicTranshipmentCountry}
+                  value={form.oicTranshipmentCountry || "Tanzanie"}
                   onChange={(e) => setForm(prev => ({ ...prev, oicTranshipmentCountry: e.target.value }))}
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
                 >
@@ -304,7 +306,7 @@ export default function ExportFormDialog({
                   <Input
                     id="swiftTxId"
                     placeholder="Ex: Swift Reference ID"
-                    value={form.swiftTransactionId}
+                    value={form.swiftTransactionId || ""}
                     onChange={(e) => setForm(prev => ({ ...prev, swiftTransactionId: e.target.value }))}
                     required
                   />
@@ -326,7 +328,7 @@ export default function ExportFormDialog({
                   <Input
                     id="exploitationDoc"
                     placeholder="Uploader Déclaration"
-                    value={form.exploitationDoc}
+                    value={form.exploitationDoc || ""}
                     className="text-xs"
                     readOnly
                   />
@@ -349,7 +351,7 @@ export default function ExportFormDialog({
                   <Input
                     id="contractDoc"
                     placeholder="Lier Contrat Vente"
-                    value={form.contractDoc}
+                    value={form.contractDoc || ""}
                     className="text-xs"
                     readOnly
                   />
@@ -370,7 +372,7 @@ export default function ExportFormDialog({
                   <Input
                     id="factureDoc"
                     placeholder="Uploader Facture"
-                    value={form.factureDoc}
+                    value={form.factureDoc || ""}
                     className="text-xs"
                     readOnly
                   />
@@ -394,14 +396,14 @@ export default function ExportFormDialog({
                     id="accordVenteQty"
                     type="number"
                     placeholder="Quantité (kg)"
-                    value={form.accordVenteQty}
+                    value={form.accordVenteQty || ""}
                     onChange={(e) => setForm(prev => ({ ...prev, accordVenteQty: parseFloat(e.target.value) || "" }))}
                     className="w-1/2"
                     required
                   />
                   <Input
                     placeholder="Fichier Accord"
-                    value={form.accordVenteDoc}
+                    value={form.accordVenteDoc || ""}
                     className="text-xs w-1/2"
                     readOnly
                   />
@@ -422,7 +424,7 @@ export default function ExportFormDialog({
                   <Input
                     id="debitNoteDoc"
                     placeholder="Uploader Note de débit"
-                    value={form.debitNoteDoc}
+                    value={form.debitNoteDoc || ""}
                     className="text-xs"
                     readOnly
                   />

@@ -1,3 +1,4 @@
+"use client"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardDescription, CardTitle } from "@/components/ui/card"
 import {
@@ -9,6 +10,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { fetchData } from "@/app/_utils/api";
+import React from "react";
 export default function QualiteProduit() {
     const qualite = [
         {
@@ -33,6 +36,35 @@ export default function QualiteProduit() {
             pourcentage: "300%"
         },
     ]
+    const [data, setData] = React.useState([{
+        id: 0,
+        qualite: "",
+        poids: "",
+        nombre_sacs: "",
+        pourcentage: ""
+    }
+    ])
+
+    React.useEffect(() => {
+        const fetch = async () => {
+            const response = await fetchData('get', 'cafe/stock_cafe/stock_stats_par_quantite/')
+            const newData = response?.data?.map((item) => {
+                return {
+                    id: item?.code,
+                    qualite: item?.qualite,
+                    poids: item?.poids_total,
+                    nombre_sacs: item?.sacs_total,
+                    pourcentage: item?.pourcentage
+                }
+            })
+
+
+            setData(newData)
+
+        }
+        fetch()
+    }, [])
+
     return (
         <Card className="p-4">
             <CardTitle className="font-bold text-lg">Qualite Produit</CardTitle>
@@ -47,13 +79,13 @@ export default function QualiteProduit() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {qualite.map((item) => (
+                    {data?.map((item) => (
                         <TableRow key={item.id}>
                             <TableCell className="font-medium">
                                 <Badge variant="outline">{item.qualite}</Badge></TableCell>
                             <TableCell>{item.poids}</TableCell>
                             <TableCell>{item.nombre_sacs}</TableCell>
-                            <TableCell>{item.pourcentage}</TableCell>
+                            <TableCell>{item.pourcentage}%</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

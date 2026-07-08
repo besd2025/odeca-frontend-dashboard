@@ -4,6 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FileSignature } from "lucide-react";
+import { fetchData } from "@/app/_utils/api";
+import { toast } from "sonner";
 
 const countryList = [
   "Belgique", "Allemagne", "États-Unis", "Japon", "Suisse", "France",
@@ -19,8 +21,8 @@ export default function ContractFormDialog({
 }) {
   const [form, setForm] = useState({
     lotNumber: "",
-    contractType: "Vente",
-    coffeeType: "Arabica",
+    contractType: 1,
+    coffeeType: 1,
     sellerName: "",
     sellerNif: "",
     sellerPhone: "",
@@ -44,9 +46,9 @@ export default function ContractFormDialog({
     if (isOpen) {
       if (prefilledReport) {
         setForm({
-          lotNumber: prefilledReport.lotNumber,
-          contractType: "Vente",
-          coffeeType: "Arabica",
+          lotNumber: prefilledReport.lotNumber || "",
+          contractType: 1,
+          coffeeType: 1,
           sellerName: prefilledReport.societe || "",
           sellerNif: "",
           sellerPhone: "",
@@ -68,8 +70,8 @@ export default function ContractFormDialog({
         // Reset form
         setForm({
           lotNumber: "",
-          contractType: "Vente",
-          coffeeType: "Arabica",
+          contractType: 1,
+          coffeeType: 1,
           sellerName: "",
           sellerNif: "",
           sellerPhone: "",
@@ -96,13 +98,13 @@ export default function ContractFormDialog({
     if (matchedReport) {
       setForm(prev => ({
         ...prev,
-        lotNumber: lotNum,
-        sellerName: matchedReport.societe,
-        sacsCount: matchedReport.sacsCount,
-        quantity: matchedReport.sacsCount * (prev.tareWeight === "60 kgs" ? 60 : 30)
+        lotNumber: lotNum || "",
+        sellerName: matchedReport.societe || "",
+        sacsCount: matchedReport.sacsCount || "",
+        quantity: (matchedReport.sacsCount || 0) * (prev.tareWeight === "60 kgs" ? 60 : 30)
       }));
     } else {
-      setForm(prev => ({ ...prev, lotNumber: lotNum }));
+      setForm(prev => ({ ...prev, lotNumber: lotNum || "" }));
     }
   };
 
@@ -128,9 +130,101 @@ export default function ContractFormDialog({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(form);
+    // onSubmit(form);
+    const formData = {
+      type_contrat: form.contractType,
+      type_cafe: form.coffeeType,
+      date_contrat: form.deliveryDate,
+      statut: "EN_ATTENTE",
+      stock_lot: form.lotNumber,
+      vendeur_societe: prefilledReport.societe,
+      vendeur_nif: form.sellerNif,
+      vendeur_telephone: form.sellerPhone,
+      vendeur_email: form.sellerEmail,
+      vendeur_adresse: form.sellerAdresse,
+      vendeur_contact_nom: "",
+      vendeur_contact_prenom: "",
+      acheteur_nom: form.buyerName,
+      acheteur_prenom: "",
+      acheteur_societe: "",
+      acheteur_pays: form.buyerCountry,
+      acheteur_boite_postale: form.buyerBp,
+      acheteur_email: form.buyerEmail,
+      acheteur_telephone: form.buyerPhone,
+      acheteur_adresse: "",
+      prix_unitaire: form.unitPrice,
+      devise: "",
+      reference_cours: "",
+      nombre_sacs: form.sacsCount,
+      poids_tare: form.tareWeight,
+      quantite_totale_kg: form.quantity,
+      date_livraison_prevue: form.deliveryDate,
+      date_livraison_effective: null,
+      montant_garantie: null,
+      type_garantie: "AUCUNE",
+      details_garantie: "",
+      nombre_lots: null,
+      observations: "",
+      conditions_particulieres: "",
+      responsable_nom: "",
+      responsable_prenom: "",
+      responsable_email: ""
+    }
+    console.log('formData', formData)
+    try {
+      const promise = new Promise(async (resolve, reject) => {
+        try {
+          const results = await fetchData(
+            "post",
+            `cafe/commerce_contrats/`,
+            {
+              params: {},
+              additionalHeaders: {},
+              body: formData
+            },
+          );
+
+          if (results.status == 200 || results.status == 201) {
+
+            resolve({ lot: stockInfo.numero_lot });
+          } else {
+            reject(new Error("Erreur"));
+          }
+
+        }
+        catch (error) {
+          reject(error);
+        }
+      });
+
+      toast.promise(promise, {
+        loading: "Modification...",
+        success: (data) => {
+          //onSave(data.lot, finalizedData);
+          setTimeout(() =>
+
+            setOpen(false), 500);
+          return `Données Enregistrées avec succès `;
+        },
+        error: "Donnée non enregistrée!!!",
+      });
+
+      try {
+        promise;
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    catch (err) {
+      console.error("Error loading initial data:", err);
+    }
+
+
   };
 
   return (
@@ -152,7 +246,7 @@ export default function ContractFormDialog({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="lotSelect">No. du Lot *</Label>
-                <select
+                {/* <select
                   id="lotSelect"
                   value={form.lotNumber}
                   onChange={(e) => handleLotChange(e.target.value)}
@@ -166,7 +260,16 @@ export default function ContractFormDialog({
                     </option>
                   ))}
                 </select>
-                <span className="text-[10px] text-muted-foreground">Sélectionnez le lot pour pré-remplir les données.</span>
+                <span className="text-[10px] text-muted-foreground">Sélectionnez le lot pour pré-remplir les données.</span> */}
+
+                <Input
+                  id="lotSelect"
+                  value={form.lotNumber || ""}
+                  onChange={(e) => handleLotChange(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none"
+                  required
+                  readOnly
+                />
               </div>
 
               <div className="space-y-1.5">
@@ -204,8 +307,8 @@ export default function ContractFormDialog({
                     <input
                       type="radio"
                       name="coffeeType"
-                      value="Arabica"
-                      checked={form.coffeeType === "Arabica"}
+                      value="1"
+                      checked={form.coffeeType === "1"}
                       onChange={(e) => setForm(prev => ({ ...prev, coffeeType: e.target.value }))}
                       className="accent-primary"
                     />
@@ -215,8 +318,8 @@ export default function ContractFormDialog({
                     <input
                       type="radio"
                       name="coffeeType"
-                      value="Robusta"
-                      checked={form.coffeeType === "Robusta"}
+                      value="2"
+                      checked={form.coffeeType === "2"}
                       onChange={(e) => setForm(prev => ({ ...prev, coffeeType: e.target.value }))}
                       className="accent-primary"
                     />
@@ -236,9 +339,10 @@ export default function ContractFormDialog({
                 <Input
                   id="sellerName"
                   placeholder="Nom de la société"
-                  value={form.sellerName}
+                  value={form.sellerName || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, sellerName: e.target.value }))}
                   required
+                  readOnly
                 />
               </div>
               <div className="space-y-1.5">
@@ -246,7 +350,7 @@ export default function ContractFormDialog({
                 <Input
                   id="sellerNif"
                   placeholder="Ex: 400012345-0"
-                  value={form.sellerNif}
+                  value={form.sellerNif || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, sellerNif: e.target.value }))}
                   required
                 />
@@ -257,7 +361,7 @@ export default function ContractFormDialog({
                   id="sellerPhone"
                   type="tel"
                   placeholder="Téléphone"
-                  value={form.sellerPhone}
+                  value={form.sellerPhone || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, sellerPhone: e.target.value }))}
                   required
                 />
@@ -274,7 +378,7 @@ export default function ContractFormDialog({
                 <Input
                   id="buyerName"
                   placeholder="Ex: Starbucks Corp"
-                  value={form.buyerName}
+                  value={form.buyerName || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, buyerName: e.target.value }))}
                   required
                 />
@@ -283,7 +387,7 @@ export default function ContractFormDialog({
                 <Label htmlFor="buyerCountry">Pays de destination *</Label>
                 <select
                   id="buyerCountry"
-                  value={form.buyerCountry}
+                  value={form.buyerCountry || "Belgique"}
                   onChange={(e) => setForm(prev => ({ ...prev, buyerCountry: e.target.value }))}
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none"
                   required
@@ -301,7 +405,7 @@ export default function ContractFormDialog({
                 <Input
                   id="buyerBp"
                   placeholder="BP / Code Postal"
-                  value={form.buyerBp}
+                  value={form.buyerBp || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, buyerBp: e.target.value }))}
                 />
               </div>
@@ -311,7 +415,7 @@ export default function ContractFormDialog({
                   id="buyerEmail"
                   type="email"
                   placeholder="client@coffee.com"
-                  value={form.buyerEmail}
+                  value={form.buyerEmail || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, buyerEmail: e.target.value }))}
                   required
                 />
@@ -322,7 +426,7 @@ export default function ContractFormDialog({
                   id="buyerPhone"
                   type="tel"
                   placeholder="Numéro de tel"
-                  value={form.buyerPhone}
+                  value={form.buyerPhone || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, buyerPhone: e.target.value }))}
                   required
                 />
@@ -341,7 +445,7 @@ export default function ContractFormDialog({
                   type="number"
                   step="0.01"
                   placeholder="Ex: 4.85"
-                  value={form.unitPrice}
+                  value={form.unitPrice || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, unitPrice: e.target.value }))}
                   required
                 />
@@ -352,7 +456,7 @@ export default function ContractFormDialog({
                   id="sacsCount"
                   type="number"
                   placeholder="Ex: 85"
-                  value={form.sacsCount}
+                  value={form.sacsCount || ""}
                   onChange={(e) => handleSacsChange(e.target.value)}
                   required
                 />
@@ -361,7 +465,7 @@ export default function ContractFormDialog({
                 <Label htmlFor="tareWeight">Poids tare / sac *</Label>
                 <select
                   id="tareWeight"
-                  value={form.tareWeight}
+                  value={form.tareWeight || "60 kgs"}
                   onChange={(e) => handleTareWeightChange(e.target.value)}
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
                   required
@@ -376,7 +480,7 @@ export default function ContractFormDialog({
                   id="quantity"
                   type="number"
                   placeholder="Calculée"
-                  value={form.quantity}
+                  value={form.quantity || ""}
                   disabled
                 />
               </div>
@@ -388,19 +492,32 @@ export default function ContractFormDialog({
                 <Input
                   id="deliveryDate"
                   type="date"
-                  value={form.deliveryDate}
+                  value={form.deliveryDate || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, deliveryDate: e.target.value }))}
                   required
                 />
               </div>
               <div className="space-y-1.5">
+                <Label htmlFor="montantTotal">Montant Total ($) *</Label>
+                <Input
+                  id="montantTotal"
+                  type="number"
+                  step="0.01"
+                  placeholder="Montant Total"
+                  value={form.unitPrice * form.quantity || ""}
+                  //onChange={(e) => setForm(prev => ({ ...prev, montantTotal: e.target.value }))}
+                  required
+                  disabled
+                />
+              </div>
+              {/* <div className="space-y-1.5">
                 <Label htmlFor="guaranteeAmount">Montant garantie ($) *</Label>
                 <Input
                   id="guaranteeAmount"
                   type="number"
                   step="0.01"
                   placeholder="Garantie"
-                  value={form.guaranteeAmount}
+                  value={form.guaranteeAmount || ""}
                   onChange={(e) => setForm(prev => ({ ...prev, guaranteeAmount: e.target.value }))}
                   required
                 />
@@ -409,7 +526,7 @@ export default function ContractFormDialog({
                 <Label htmlFor="guaranteeType">Type de garantie *</Label>
                 <select
                   id="guaranteeType"
-                  value={form.guaranteeType}
+                  value={form.guaranteeType || "Par sac"}
                   onChange={(e) => setForm(prev => ({ ...prev, guaranteeType: e.target.value }))}
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
                   required
@@ -417,17 +534,17 @@ export default function ContractFormDialog({
                   <option value="Par sac">Par sac</option>
                   <option value="Par lot">Par lot</option>
                 </select>
-              </div>
-              <div className="space-y-1.5">
+              </div> */}
+              {/* <div className="space-y-1.5">
                 <Label htmlFor="lotCount">Nombre de lot *</Label>
                 <Input
                   id="lotCount"
                   type="number"
-                  value={form.lotCount}
+                  value={form.lotCount ?? ""}
                   onChange={(e) => setForm(prev => ({ ...prev, lotCount: parseInt(e.target.value) || 1 }))}
                   required
                 />
-              </div>
+              </div> */}
             </div>
           </div>
 
