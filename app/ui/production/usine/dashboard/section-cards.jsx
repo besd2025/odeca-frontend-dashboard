@@ -59,7 +59,7 @@ export function SectionCards() {
 
       {/* 1. Café Parche Apporté */}
       <Card className="@container/card">
-        <CardHeader>
+        <CardHeader className="gap-2">
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
             {(() => {
               const kg = Number(data.total_receptionne || 0);
@@ -71,6 +71,8 @@ export function SectionCards() {
             })()}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm">Café Parche Receptionné</CardDescription>
+          <Separator />
+
           <CardAction>
             <Badge variant="outline" className="bg-sky-50 text-sky-700 dark:bg-sky-950/20 dark:text-sky-400 border-sky-200 text-xs">
               Total Entrées
@@ -241,6 +243,16 @@ export function SectionCards() {
             129,600 Kg
           </CardTitle>
         </CardContent>
+      </Card>
+
+      <Card className="@container/card">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold tabular-nums text-foreground">
+            45,000 Kg
+          </CardTitle>
+          <CardDescription className="text-muted-foreground text-sm">Stock Initiale</CardDescription>
+        </CardHeader>
+        <Separator />
       </Card>
     </div>
   );
