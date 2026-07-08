@@ -24,6 +24,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { fetchData } from "@/app/_utils/api";
+import PaginationControls from "@/components/ui/pagination-controls";
+
 export default function Grades() {
     const [isFinalizing, setIsFinalizing] = useState(false);
     const [activeTab, setActiveTab] = useState("all");
@@ -304,6 +306,17 @@ export default function Grades() {
                     </TableBody>
                 </Table>
             </div>
+            <PaginationControls
+                className="mt-4"
+                page={currentPage}
+                pageSize={limit}
+                totalItems={totalCount}
+                totalPages={Math.ceil(totalCount / limit)}
+                onPageChange={onPageChange}
+                onPageSizeChange={onLimitChange}
+                hasNextPage={currentPage < Math.ceil(totalCount / limit)}
+                hasPreviousPage={currentPage > 1}
+            />
             <Dialog open={isFinalizing} onOpenChange={setIsFinalizing}>
                 <DialogContent className="border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
                     <DialogHeader>

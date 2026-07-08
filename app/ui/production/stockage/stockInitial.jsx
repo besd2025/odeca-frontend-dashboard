@@ -94,7 +94,6 @@ export default function StockInitial() {
                 annee_campagne: stockInfo.annee_campagne,
                 quantite_cafe_vert: stockInfo.quantite_cafe_vert
             }
-            console.log("formData", formData);
             try {
                 const promise = new Promise(async (resolve, reject) => {
                     try {
@@ -184,7 +183,7 @@ export default function StockInitial() {
                         </Select>
                     </div>
                     <div className='flex flex-col gap-2'>
-                        <Label htmlFor="quantite_cafe_vert">Quantité café vert</Label>
+                        <Label htmlFor="quantite_cafe_vert">Quantité café vert (en kg)</Label>
                         <Input type='number' id="quantite_cafe_vert" value={stockInfo?.quantite_cafe_vert} onChange={(e) => setStockInfo({ ...stockInfo, quantite_cafe_vert: e.target.value })} />
                     </div>
                     <div className='flex flex-col gap-2'>
