@@ -831,7 +831,7 @@ export default function RapportsComponent() {
                 <div className="text-center flex flex-col justify-end items-center h-28 space-y-1">
                   <div className="w-48 border-b border-slate-400"></div>
                   <span className="text-[10px] font-bold text-slate-400 block">SIGNATURE ET TIMBRE DU LABORATOIRE</span>
-                  <span className="text-xs font-bold text-slate-800">DIRECTEUR DU LAB ODECA</span>
+                  <span className="text-xs font-bold text-slate-800">Responsable du Labo de l'ODECA</span>
                 </div>
               </div>
             </div>
