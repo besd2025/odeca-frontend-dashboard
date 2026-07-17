@@ -49,6 +49,7 @@ import {
   FlaskConical,
   Undo2,
   FileCheck,
+  Warehouse,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ROLES } from "@/lib/permissions";
@@ -93,13 +94,13 @@ const menuItems = {
     //   icon: Factory,
     //   keyword: "odeca-production/usine",
     // },
-    // {
-    //   title: "Usine de deparchage",
-    //   url: "/odeca-production/usine/dashboard",
-    //   icon: LayoutDashboard,
-    //   keyword: "odeca-production/usine/dashboard",
-    //   roles: [ROLES.ADMIN, ROLES.GENERAL, ROLES.RESPONSABLE],
-    // },
+    {
+      title: "Usine de deparchage",
+      url: "/odeca-production/usine/dashboard",
+      icon: LayoutDashboard,
+      keyword: "odeca-production/usine/dashboard",
+      roles: [ROLES.ADMIN, ROLES.GENERAL, ROLES.RESPONSABLE],
+    },
     {
       title: "Réception",
       url: "/odeca-production/usine/reception",
@@ -154,13 +155,20 @@ const menuItems = {
       keyword: "odeca-production/usine/stockage",
       roles: [ROLES.ADMIN, ROLES.UDP],
     },
-    // {
-    //   title: "Laboratoire",
-    //   url: "/odeca-production/laboratoire/dashboard",
-    //   icon: LayoutDashboard,
-    //   keyword: "odeca-production/laboratoire/dashboard",
-    //   roles: [ROLES.ADMIN, ROLES.GENERAL, ROLES.RESPONSABLE],
-    // },
+    {
+      title: "Societes",
+      url: "/odeca-production/usine/societies",
+      icon: Warehouse,
+      keyword: "societies",
+      roles: [ROLES.ADMIN, ROLES.UDP],
+    },
+    {
+      title: "Laboratoire",
+      url: "/odeca-production/laboratoire/dashboard",
+      icon: LayoutDashboard,
+      keyword: "odeca-production/laboratoire/dashboard",
+      roles: [ROLES.ADMIN, ROLES.GENERAL, ROLES.RESPONSABLE],
+    },
     {
       title: "Réception & Codage",
       url: "/odeca-production/laboratoire/reception",
@@ -196,12 +204,12 @@ const menuItems = {
       keyword: "odeca-production/laboratoire/rapports",
       roles: [ROLES.ADMIN, ROLES.LABORATOIRE],
     },
-    // {
-    //   title: "Commercialisation",
-    //   url: "/odeca-production/commercialisation",
-    //   icon: Package,
-    //   keyword: "odeca-production/commercialisation",
-    // },
+    {
+      title: "Commercialisation",
+      url: "/odeca-production/commercialisation",
+      icon: Package,
+      keyword: "odeca-production/commercialisation",
+    },
   ],
   user: {
     name: "admin",

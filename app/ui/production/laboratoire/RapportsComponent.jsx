@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useReactToPrint } from "react-to-print";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -260,10 +261,24 @@ export default function RapportsComponent() {
 
 
 
-  // Print helper
-  const handlePrint = () => {
-    window.print();
-  };
+  // Print helper — react-to-print
+  const printRef = useRef(null);
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `Certificat_Qualite_${activeAnalysis?.codeEtiquette ?? "ODECA"}`,
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 15mm;
+      }
+      body {
+      background-color: white;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+      }
+    `,
+  });
 
   return (
     <div className="space-y-6">
@@ -720,7 +735,7 @@ export default function RapportsComponent() {
           </DialogHeader>
 
           {activeAnalysis && (
-            <div id="print-area" className="py-6 space-y-6 text-sm text-slate-800 leading-relaxed font-sans">
+            <div ref={printRef} id="print-area" className="py-6 space-y-6 text-sm text-slate-800 leading-relaxed font-sans">
 
               {/* Header Title */}
               <div className="text-center border-b-2 border-slate-900 pb-4">
@@ -812,7 +827,7 @@ export default function RapportsComponent() {
                     <span className="text-base font-bold text-slate-700">{activeAnalysis.degustation?.nbDegustateurs} experts agréés</span>
                   </div>
                 </div>
-                <div className="p-3 bg-white border border-slate-200 rounded-lg">
+                <div className="p-3 bg-white border border-slate-200 rounded-lg print:mt-40">
                   <span className="text-[10px] font-bold text-slate-400 block uppercase">Profil Aromatique en Tasse</span>
                   <p className="text-xs italic text-slate-600 leading-relaxed mt-1 font-medium">
                     "{activeAnalysis.degustation?.observation}"
@@ -823,7 +838,7 @@ export default function RapportsComponent() {
               {/* Taxation & signatures */}
               <div className="border-t-2 border-slate-900 pt-6 grid grid-cols-2 gap-8">
                 <div>
-                  <h4 className="font-bold text-xs text-slate-500 uppercase">DÉCISION DU CONSEIL DE TAXATION :</h4>
+                  <h4 className="font-bold text-xs text-slate-500 uppercase">DÉCISION DU LABORATOIRE :</h4>
                   <div className="mt-2 p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded font-bold text-xs">
                     CONFORME • GRADE ACCORDÉ ET APTE À L'EXPORTATION PREMIUM (TAXE VALIDÉE).
                   </div>

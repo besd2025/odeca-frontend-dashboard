@@ -148,13 +148,15 @@ export default function GranulometrieComponent() {
   const val_7_1 = parseFloat(formData.sieve_7_1) || 0;
   const val_6_3 = parseFloat(formData.sieve_6_3) || 0;
   const val_5_5 = parseFloat(formData.sieve_5_5) || 0;
+  const val_4_0 = parseFloat(formData.sieve_4_0) || 0;
   const val_4_0_1 = parseFloat(formData.sieve_4_0_1) || 0;
   const val_4_0_2 = parseFloat(formData.sieve_4_0_2) || 0;
+  const val_3_0 = parseFloat(formData.sieve_3_0) || 0;
   const val_3_0_1 = parseFloat(formData.sieve_3_0_1) || 0;
   const val_3_0_2 = parseFloat(formData.sieve_3_0_2) || 0;
   const val_fond = parseFloat(formData.fond) || 0;
 
-  const totalSum = parseFloat((val_7_1 + val_6_3 + val_5_5 + val_4_0_1 + val_4_0_2 + val_3_0_1 + val_3_0_2 + val_fond).toFixed(2));
+  const totalSum = parseFloat((val_7_1 + val_6_3 + val_5_5 + val_4_0 + val_4_0_1 + val_4_0_2 + val_3_0 + val_3_0_1 + val_3_0_2 + val_fond).toFixed(2));
   const isSumPerfect = totalSum === 100.00;
 
   // Helper to safely format numbers (prevents calling toFixed on undefined)
@@ -664,8 +666,10 @@ export default function GranulometrieComponent() {
                         <TableHead>7.1 mm</TableHead>
                         <TableHead>6.3 mm</TableHead>
                         <TableHead>5.5 mm</TableHead>
-                        <TableHead>4.0 mm</TableHead>
-                        <TableHead>3.0 mm</TableHead>
+                        <TableHead>4.0 obl mm</TableHead>
+                        <TableHead>4.0 rond mm</TableHead>
+                        <TableHead>3.0 obl mm</TableHead>
+                        <TableHead>3.0 rond mm</TableHead>
                         <TableHead>Fond</TableHead>
                         <TableHead>Date Analyse</TableHead>
                         <TableHead className="pr-6">Statut Suivant</TableHead>
@@ -690,7 +694,7 @@ export default function GranulometrieComponent() {
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 {item.status === "granulometrie_complete" && (
-                                  <DropdownMenuItem className="cursor-pointer text-primary" onClick={() => toast.info(`Échantillon ${item.codeEtiquette} rejeté (démo)`)}>
+                                  <DropdownMenuItem className="cursor-pointer text-primary" onClick={() => toast.info(`Échantillon ${item.codeEtiquette}`)}>
                                     Triage manuel
                                   </DropdownMenuItem>
                                 )}

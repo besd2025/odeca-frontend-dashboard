@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "../toggle-theme-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircleIcon, Loader2 } from "lucide-react";
+import { AlertCircleIcon, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchData } from "@/app/_utils/api";
 import { useRouter } from "next/navigation";
@@ -166,20 +166,33 @@ export function LoginForm({ className, ...props }) {
                 />
               </Field>
               <Field>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                <div className="relative">
+                  <div className="flex items-center">
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <a
+                      href="#"
+                      className="ml-auto text-sm underline-offset-2 hover:underline"
+                    >
+                      Mot de passe oublié ?
+                    </a>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <span
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-0 top-1/2 h-8 w-8 cursor-pointer"
                   >
-                    Mot de passe oublié ?
-                  </a>
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </span>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+
               </Field>
               {error && (
                 <Alert variant="destructive">
