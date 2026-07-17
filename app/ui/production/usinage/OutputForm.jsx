@@ -56,7 +56,7 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
         setFullApiGrades(gradesData);
         setUsinageId(retoursData?.usinage_id)
         const newGrades = Array.isArray(gradesData)
-          ? gradesData.map(item => typeof item === 'object' ? (item.nom || item.designation || item.name || item.code) : item).filter(Boolean)
+          ? [...new Set(gradesData.map(item => typeof item === 'object' ? (item.nom || item.designation || item.name || item.code) : item).filter(Boolean))]
           : [];
         if (newGrades.length > 0) {
           setApiGrades(newGrades);

@@ -25,7 +25,7 @@ const RHData = [
     total_price: 457,
   },
 ];
-export default function Rapports() {
+export default function Rapports({ id }) {
   const [rapports, setRapports] = useState("rapportC");
   return (
     <div className="w-full relative">
@@ -60,7 +60,7 @@ export default function Rapports() {
         </TabsContent> */}
         <TabsContent value="rapportC" className="relative">
           {/* <ComingSoonOverlay transparent={true} /> */}
-          <RedementC />
+          <RedementC id={id} />
         </TabsContent>
         {/* <TabsContent value="rapportG">
           <RG />

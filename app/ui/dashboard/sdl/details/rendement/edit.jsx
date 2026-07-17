@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
     Dialog,
     DialogClose,
@@ -9,76 +9,211 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Grape } from "lucide-react";
+import { Grape, Calendar, Loader2 } from "lucide-react";
 import { Input } from '@/components/ui/input';
-export default function EditRendement() {
-    const data = [
-        {
-            id: 1,
-            type: "FW",
-            data: [
-                { label: "A1", weight: 7.5 },
-                { label: "A2", weight: 7.5 },
-                { label: "A3", weight: 7.5 },
-            ]
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { fetchData } from '@/app/_utils/api';
 
-        },
-        {
-            id: 2,
-            type: "NATUREL",
-            data: [
-                { label: "A1", weight: 7.5 },
-                { label: "A2", weight: 7.5 },
-                { label: "A3", weight: 7.5 },
-            ]
-        },
-        {
-            id: 3,
-            type: "MIEL",
-            data: [
-                { label: "A1", weight: 7.5 },
-                { label: "A2", weight: 7.5 },
-                { label: "A3", weight: 7.5 },
-            ],
+export default function EditRendement({ data }) {
+    const [open, setOpen] = React.useState(false);
+    const [gradeOptions, setGradeOptions] = React.useState([]);
+    const [idGrade, setIdGrade] = React.useState("");
+    const [qteParche, setQteParche] = React.useState(data?.QteParche);
+    const [loading, setLoading] = React.useState(false);
+    const [error, setError] = React.useState(null);
+    const [dateSortie, setDateSortie] = React.useState(data?.date_production || new Date().toISOString().split("T")[0]);
 
+    // Fetch grades options only when dialog is opened
+    React.useEffect(() => {
+        if (!open) return;
+        const fetchGrades = async () => {
+            try {
+                const fetchedGrades = await fetchData("get", `cafe/grades/get_all_grades/`);
+                const seen = new Set();
+                const options = fetchedGrades
+                    ?.map((item) => ({
+                        value: item.grade_code,
+                        label: item.grade_name,
+                    }))
+                    .filter((item) => {
+                        if (!item.value) return false;
+                        if (seen.has(item.value)) return false;
+                        seen.add(item.value);
+                        return true;
+                    }) || [];
+                setGradeOptions(options);
+            } catch (err) {
+                console.error("Error fetching grades:", err);
+            }
+        };
+        fetchGrades();
+    }, [open]);
+
+    // Sync state with data prop when dialog opens
+    React.useEffect(() => {
+        if (open) {
+            setIdGrade(data?.grade_code);
+            setQteParche(data?.QteParche);
+            setDateSortie(data?.date_production || new Date().toISOString().split("T")[0]);
+            setError(null);
         }
-    ]
+    }, [open, data]);
+
+    const handleModifier = async (e) => {
+        if (e) e.preventDefault();
+        setLoading(true);
+        setError(null);
+
+        const dataToSend = {
+            grade_code: idGrade,
+            quantite_cafe_parche: qteParche ? Number(qteParche) : 0,
+            enregistrement_date: dateSortie,
+            rendement_cerise_detail_code: data?.rendement_detail_code,
+            rendement_code: data?.rendement_code
+        };
+        console.log("dataToSend", dataToSend)
+
+        const promise = new Promise(async (resolve, reject) => {
+            try {
+                if (!data?.id) {
+                    reject(new Error("ID du rendement manquant."));
+                    return;
+                }
+                if (!idGrade || !qteParche || !dateSortie) {
+                    reject(new Error("Veuillez remplir tous les champs obligatoires."));
+                    return;
+                }
+
+                const result = await fetchData(
+                    "patch",
+                    `/cafe/detail_rendements/${data.id}/`,
+                    { body: dataToSend }
+                );
+
+                if (result.status === 200 || result.status === 201) {
+                    resolve(result.data);
+                } else {
+                    reject(new Error("Erreur lors de la modification."));
+                }
+            } catch (err) {
+                reject(err);
+            }
+        });
+
+        toast.promise(promise, {
+            loading: "Modification en cours...",
+            success: () => {
+                setTimeout(() => setOpen(false), 1000);
+                return "Le rendement a été modifié avec succès !";
+            },
+            error: (err) => err?.message || "Erreur lors de la modification !",
+        });
+
+        try {
+            await promise;
+        } catch (err) {
+            console.error(err);
+            setError(err);
+        } finally {
+            setLoading(false);
+            setOpen(false);
+        }
+    };
+
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" className=" px-2 py-1.5 w-full  flex justify-start">
+                <Button variant="ghost" className="px-2 py-1.5 w-full flex justify-start">
                     Modifier
                 </Button>
             </DialogTrigger>
-            <DialogContent className="w-[70%] max-h-[95vh] overflow-y-auto" >
-                <DialogHeader>
-                    <DialogTitle>Modifier le rendement</DialogTitle>
-                    <div className="mt-2 grid grid-cols-2 gap-2 ">
-                        {data.map((item) => (
-                            <div key={item.id} className="#CA border rounded p-2">
-                                <h1 className="flex gap-x-2 bg-primary w-max items-center py-1 px-2 rounded-lg text-primary-foreground">
-                                    <Grape size={20} />
-                                    {item.type}
-                                </h1>
-                                <div className="mt-2 flex flex-col gap-y-2">
-                                    {item.data.map((data) => (
-                                        <div className="flex items-center gap-x-4 text-sm ">
-                                            <span className="text-muted-foreground">{data.label}</span>
-                                            <Input type="number" value={data.weight} className="w-[150px]" />
-                                        </div>
-                                    ))}
+            <DialogContent className="w-[70%] max-h-[95vh] overflow-y-auto">
+                <form onSubmit={handleModifier} className="space-y-4">
+                    <DialogHeader>
+                        <DialogTitle>Modifier le rendement</DialogTitle>
+                    </DialogHeader>
+
+                    {/* Quantité de parche */}
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-left">
+                        <div className="border rounded p-2">
+                            <h1 className="flex gap-x-2 bg-primary w-max items-center py-1 px-2 rounded-lg text-primary-foreground">
+                                <Grape size={20} />
+                                {data?.grade || "Grade inconnu"}
+                            </h1>
+                            <div className="mt-2 flex flex-col gap-y-2">
+                                <div className="flex items-center gap-x-4 text-sm">
+                                    <span className="text-muted-foreground">Quantité de parche</span>
+                                    <Input
+                                        type="number"
+                                        value={qteParche || ""}
+                                        onChange={(e) => setQteParche(e.target.value)}
+                                        className="w-[150px]"
+                                        required
+                                    />
                                 </div>
                             </div>
-                        ))}
+                        </div>
                     </div>
-                </DialogHeader>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="outline">Annuler</Button>
-                    </DialogClose>
-                    <Button variant="default">Enregistrer</Button>
-                </DialogFooter>
+
+                    {/* Grade Select — HORS de DialogHeader pour éviter le conflit Radix portal */}
+                    <div className="space-y-2 text-left">
+                        <Label htmlFor="gradeId" className="font-semibold text-slate-700 dark:text-slate-300">
+                            Grade
+                        </Label>
+                        <Select
+                            value={idGrade}
+                            onValueChange={setIdGrade}
+                        >
+                            <SelectTrigger id="gradeId" className="w-full cursor-pointer">
+                                <SelectValue placeholder="Ajouter un grade..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {gradeOptions.map((item, index) => (
+                                    <SelectItem key={`${index + 1}`} value={item.value}>
+                                        {item.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Date */}
+                    <div className="relative text-left">
+                        <Input
+                            type="date"
+                            value={dateSortie}
+                            onChange={(e) => setDateSortie(e.target.value)}
+                            className="w-full pl-10"
+                            required
+                        />
+                        <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                    </div>
+
+                    {error && (
+                        <p className="text-sm text-destructive font-medium mt-2">
+                            {error.message || "Une erreur est survenue."}
+                        </p>
+                    )}
+
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button type="button" variant="outline">Annuler</Button>
+                        </DialogClose>
+                        <Button type="submit" variant="default" disabled={loading || !idGrade}>
+                            {loading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Enregistrement...
+                                </>
+                            ) : (
+                                "Enregistrer"
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog>
-    )
+    );
 }

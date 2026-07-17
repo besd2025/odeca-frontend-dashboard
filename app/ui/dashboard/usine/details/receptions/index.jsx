@@ -65,7 +65,7 @@ export default function Receptions({ data = [] }) {
     [],
   );
 
-  const tableData = data.length > 0 ? data : defaultData;
+  const tableData = data?.length > 0 ? data : defaultData;
 
   // Columns definition
   const columns = React.useMemo(

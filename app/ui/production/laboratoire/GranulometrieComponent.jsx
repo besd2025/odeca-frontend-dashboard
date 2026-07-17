@@ -113,11 +113,6 @@ export default function GranulometrieComponent() {
     fond: "",
   });
 
-  // Static Data Presentation
-  const pendingAnalyses = initialLabAnalyses.filter((item) => item.status === "receptionne");
-  const completedAnalyses = initialLabAnalyses.filter(
-    (item) => item.status !== "receptionne" && item.granulometrie
-  );
 
   // Open modal for a specific pending analysis
   const handleOpenModal = (analysis) => {
@@ -288,6 +283,7 @@ export default function GranulometrieComponent() {
             `cafe/granulometrie/pret_analyse/`,
             { params: { limit, offset: pointer, search: searchPendingQuery } },
           );
+
           // Traitement des données pour l'affichage
           const formattedData = (data?.results || []).map((item) => ({
             id: item.id_granulometrie,
@@ -319,7 +315,6 @@ export default function GranulometrieComponent() {
             `cafe/granulometrie/historique_analyses/`,
             { params: { limit, offset: pointer, search: searchHistoryQuery } },
           );
-          console.log(data, "datahisto")
           // Traitement des données pour l'affichage
           const formattedData = (data?.results || []).map((item) => ({
 

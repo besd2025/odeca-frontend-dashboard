@@ -21,7 +21,7 @@ import DetailsReceipt from "../receipt/details-receipt";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DetailsRendement from "./details-redement";
-
+import fetchData from "@/app/_utils/api";
 const products = [
   {
     id: 101,
@@ -37,7 +37,7 @@ export default function RedementC() {
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
 
-  const totalItems = products.length;
+  const totalItems = products?.length;
   const totalPages = Math.max(Math.ceil(totalItems / pageSize), 1);
 
   React.useEffect(() => {
@@ -50,6 +50,7 @@ export default function RedementC() {
     const start = (page - 1) * pageSize;
     return products.slice(start, start + pageSize);
   }, [page, pageSize]);
+
 
   return (
     <div className="w-full mt-4">
@@ -69,7 +70,7 @@ export default function RedementC() {
           <TableBody>
             {paginatedProducts.map((product) => (
               <TableRow key={product.id} className="odd:bg-muted/50">
-                <TableCell className="pl-4" asChild>
+                <TableCell className="pl-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0">
