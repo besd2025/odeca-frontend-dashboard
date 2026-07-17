@@ -308,6 +308,7 @@ function DetailsContent({ id }) {
       console.error("Error fetching transfers data:", error);
     }
   };
+
   // ── Export functions filtrées par SDL ──────────────────────────────────────
   const buildXlsx = (rows, sheetName, filename) => {
     const ws = XLSX.utils.json_to_sheet(rows);
@@ -424,6 +425,7 @@ function DetailsContent({ id }) {
     if (tab === "receptionSdl") {
       getReceptionSdl();
     }
+
   }, [cultivateur_type, limit, pointer, tab]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
@@ -714,7 +716,7 @@ function DetailsContent({ id }) {
           <h1 className="text-xl font-semibold m-2">
             Selectionner les Rapports
           </h1>
-          <Rapports />
+          <Rapports id={id} />
         </TabsContent>
       </Tabs>
     </Card>
