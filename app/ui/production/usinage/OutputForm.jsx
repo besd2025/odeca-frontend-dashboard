@@ -166,8 +166,6 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
             formData.append("qualite", gradeId);
             const isGradeChecked = !!checkedGrades[grade];
             formData.append("pret_pour_triage", isGradeChecked)
-
-
             const promise = new Promise(async (resolve, reject) => {
               try {
                 const results = await fetchData(

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { fetchData } from "@/app/_utils/api";
 import {
   SortableContext,
@@ -19,6 +20,8 @@ import {
 import { z } from "zod"
 
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Building2 } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -93,6 +96,7 @@ const columns = [
 export function DataTable({
   data: initialData
 }) {
+  const router = useRouter()
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -107,7 +111,13 @@ export function DataTable({
 
   React.useEffect(() => {
     const fetch = async () => {
-      const response = await fetchData('get', 'cafe/stock_cafe/societe-stock-stats-detail/')
+      const response = await fetchData('get', 'cafe/stock_cafe/societe-stock-stats-detail/',
+        {
+          params: {
+            limit: 5,
+          },
+        }
+      )
       console.log(response)
       const results = response?.results || [];
       const newData = results.map((item, index) => {
@@ -156,6 +166,7 @@ export function DataTable({
 
   return (
     <div className="overflow-hidden rounded-lg">
+
       <Card className="p-4">
         <Table>
           <TableHeader className="sticky top-0 z-10">
@@ -196,6 +207,17 @@ export function DataTable({
           </TableBody>
         </Table>
       </Card>
+      <div className="flex justify-end mb-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => router.push("/odeca-production/usine/societies")}
+          className="flex items-center gap-2 text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors"
+        >
+          <Building2 className="h-4 w-4" />
+          Voir la liste
+        </Button>
+      </div>
     </div>
 
   );

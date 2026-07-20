@@ -155,13 +155,13 @@ const menuItems = {
       keyword: "odeca-production/usine/stockage",
       roles: [ROLES.ADMIN, ROLES.UDP],
     },
-    {
-      title: "Societes",
-      url: "/odeca-production/usine/societies",
-      icon: Warehouse,
-      keyword: "societies",
-      roles: [ROLES.ADMIN, ROLES.UDP],
-    },
+    // {
+    //   title: "Societes",
+    //   url: "/odeca-production/usine/societies",
+    //   icon: Warehouse,
+    //   keyword: "societies",
+    //   roles: [ROLES.ADMIN, ROLES.UDP],
+    // },
     {
       title: "Laboratoire",
       url: "/odeca-production/laboratoire/dashboard",
