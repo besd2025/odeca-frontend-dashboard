@@ -3,6 +3,17 @@
 import * as React from "react";
 import { fetchData } from "@/app/_utils/api";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, ArchiveX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Edit from "@/app/ui/dashboard/stocks/achats/EditIndividualAchats";
+import {
   Table,
   TableBody,
   TableCell,
@@ -12,9 +23,12 @@ import {
 } from "@/components/ui/table";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import PaginationContent from "@/components/ui/pagination-content";
+import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
+import { UserContext } from "@/app/ui/context/User_Context";
 export default function Ventes({ cult_id }) {
+  const user = React.useContext(UserContext)
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [limit, setLimit] = React.useState(10);
@@ -64,10 +78,12 @@ export default function Ventes({ cult_id }) {
             body: {},
           },
         );
+        console.log("achat", valuesdata);
         const AchatsData = valuesdata?.results?.map((item) => ({
           id: item?.id,
           date: item?.date_achat,
           sdl_ct_type: "SDL",
+          societe: item?.responsable?.sdl_ct?.sdl?.societe?.nom_societe,
           sdl_ct: item?.responsable?.sdl_ct?.sdl?.sdl_nom
             ? "SDL " + item.responsable.sdl_ct.sdl.sdl_nom
             : "CT " + item?.responsable?.sdl_ct?.ct?.ct_nom,
@@ -75,10 +91,21 @@ export default function Ventes({ cult_id }) {
           No_recus: item?.numero_recu,
           ca: item?.quantite_cerise_a,
           cb: item?.quantite_cerise_b,
+          num_page: item?.numero_page,
           fiche_photo: item?.photo_fiche,
           montant: item?.montant_total,
-        }));
+          cultivator: {
+            cultivator_id: item?.cafeiculteur?.id,
+            cultivator_code: item?.cafeiculteur?.cultivator_code,
+            first_name: item?.cafeiculteur?.cultivator_first_name,
+            last_name: item?.cafeiculteur?.cultivator_last_name || item?.cafeiculteur?.cultivator_assoc_name,
+            image_url: item?.cafeiculteur?.cultivator_photo,
+            cultivator_type: "personel",
 
+          },
+          responsable_id: item?.responsable?.unique_code,
+
+        }));
         setData(AchatsData);
         setTotalCount(valuesdata?.count || 0);
       } catch (error) {
@@ -93,15 +120,55 @@ export default function Ventes({ cult_id }) {
 
   if (loading && data?.length === 0)
     return <TableSkeleton rows={5} columns={9} />;
+  const HandleDelete = async (id) => {
 
+    setLoading(true);
+
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        await fetchData(
+          "delete",
+          `/cafe/achat_cafe/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+
+          },
+        );
+        resolve({ id: id || 'achat' });
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "SUPPRESSION...",
+      success: (data) => {
+        setTimeout(() => setOpen(false), 1000);
+        return `${data.id} a été supprimé avec succès `;
+      },
+      error: "Donnée non supprimée",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="w-full">
       <div className="w-full border rounded-md overflow-hidden">
+
         <Table>
           <TableHeader>
             <TableRow>
               {/* <TableHead className="pl-4">ID</TableHead> */}
+              <TableHead>Actions</TableHead>
               <TableHead>Date d'achat</TableHead>
+              <TableHead>Societe</TableHead>
               <TableHead>SDL/CT</TableHead>
               <TableHead>No Fiche</TableHead>
               <TableHead>No Recus</TableHead>
@@ -118,7 +185,52 @@ export default function Ventes({ cult_id }) {
               data.map((product) => (
                 <TableRow key={product.id} className="odd:bg-muted/50">
                   {/* <TableCell className="pl-4">{product.id}</TableCell> */}
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+                          product?.in_payment ? (
+                            " "
+                          ) : (
+                            <div>
+                              <Edit
+                                id={product?.id}
+                                cultivator={product.cultivator}
+                                num_fiche={product.No_fiche}
+                                num_recu={product.No_recus}
+                                num_page={product.num_page}
+                                ca={product.ca}
+                                cb={product.cb}
+                                date={product.date}
+                                photo_fiche={product.fiche_photo}
+                                responsable_id={product?.responsable_id}
+                              />
+                              <DropdownMenuItem
+                                onClick={() => HandleDelete(product?.id, product?.code)}
+                                className="text-destructive"
+                              >
+                                <ArchiveX className="text-destructive" /> Delete
+                              </DropdownMenuItem>
+                            </div>
+
+                          )
+                        ) : (
+                          ""
+                        )}
+
+
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                   <TableCell className="font-medium">{product.date}</TableCell>
+                  <TableCell>{product.societe}</TableCell>
                   <TableCell>{product.sdl_ct}</TableCell>
                   <TableCell>{product.No_fiche}</TableCell>
                   <TableCell>{product.No_recus}</TableCell>

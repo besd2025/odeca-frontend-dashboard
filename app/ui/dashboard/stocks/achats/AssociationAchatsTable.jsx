@@ -145,7 +145,7 @@ export default function AssociationAchatsTable({
         }));
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
-        console.log("formattedData : ", formattedData)
+        //console.log("formattedData : ", formattedData)
       } catch (error) {
         console.error("Error fetching association achats:", error);
       } finally {
