@@ -19,8 +19,8 @@ const outfit = Outfit({
 });
 
 export const metadata = {
-  title: "iKAWA y'u Burundi",
-  description: "iKAWA y'u Burundi management platform",
+  title: "Ikawa y'Uburundi",
+  description: "Ikawa y'Uburundi management platform",
 };
 
 export default function RootLayout({ children }) {

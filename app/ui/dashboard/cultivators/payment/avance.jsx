@@ -185,6 +185,7 @@ export default function AvancePayment({
                     id: item?.sdl_responsable?.id?.toString() || ""
                 })) || [];
                 setSdlOptions(options);
+                console.log("sdl options :", options);
             } else if (type === "ct") {
                 const response = await fetchData("get", `cafe/centres_transite/`, {
                     params: { colline_name: value }
@@ -195,6 +196,7 @@ export default function AvancePayment({
                     id: item?.ct_responsable?.id?.toString() || ""
                 })) || [];
                 setCtOptions(options);
+                console.log("ct options :", options);
             }
         } catch (error) {
             console.error("Error loading options:", error);

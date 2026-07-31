@@ -156,6 +156,7 @@ export default function IndividualAchatsTable({
   const [reportId, setReportId] = useState("");
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
   const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
+
   const exportCultivatorsToExcel = async () => {
     setLoadingEportBtn(true);
     try {
@@ -247,6 +248,103 @@ export default function IndividualAchatsTable({
       setLoadingEportBtn(false);
     }
   };
+  // const exportAchatsIndividusToExcel = async () => {
+  //   setLoadingEportBtn(true);
+  //   try {
+  //     const initResponse = await fetchData("get", `cafe/achat_cafe/`, {
+  //       params: { limit: 1 },
+  //     });
+  //     const total = initResponse?.count || 0;
+  //     if (total === 0) {
+  //       setLoadingEportBtn(false);
+  //       return;
+  //     }
+
+  //     const response = await fetchData("get", `cafe/achat_cafe/`, {
+  //       params: { limit: total },
+  //     });
+
+  //     const allData = response.results || [];
+  //     const formattedData = allData.map((item) => {
+
+
+  //       const row = {
+  //         cultivator_code: item?.cafeiculteur?.cultivator_code,
+  //         first_name: item?.cafeiculteur?.cultivator_first_name,
+  //         last_name: item?.cafeiculteur?.cultivator_last_name,
+  //         image_url: item?.cafeiculteur?.cultivator_photo,
+  //         sdl_ct: item?.responsable?.sdl_ct?.sdl?.sdl_nom
+  //           ? "SDL " + item.responsable.sdl_ct.sdl.sdl_nom
+  //           : "CT " + item?.responsable?.sdl_ct?.ct?.ct_nom,
+  //         society:
+  //           item?.responsable?.sdl_ct?.sdl?.societe?.nom_societe ||
+  //           item?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
+
+  //         province:
+  //           achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+  //             ?.province_code?.province_name || "N/A",
+  //         commune:
+  //           achat?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+  //             ?.commune_name || "N/A",
+  //         in_payment: achat?.in_payment,
+  //         num_fiche: achat?.cafeiculteur?.cultivator_assoc_numero_fiche || "0",
+  //         num_recu: achat?.numero_recu || "N/A",
+  //         num_page: achat?.numero_page || "N/A",
+  //         photo_fiche: achat?.photo_fiche,
+  //         ca: achat?.quantite_cerise_a || 0,
+  //         cb: achat?.quantite_cerise_b || 0,
+  //         date: achat?.date_achat || "N/A",
+  //         date_creation: achat?.created_at
+  //           ? new Date(achat.created_at).toLocaleString('fr-FR', {
+  //             year: 'numeric',
+  //             month: '2-digit',
+  //             day: '2-digit',
+  //             hour: '2-digit',
+  //             minute: '2-digit',
+  //             second: '2-digit',
+  //           })
+  //           : null
+  //       }
+  //       // if (user?.session?.category === ROLES.ADMIN) {
+  //       //   row.CODE_CT = item?.ct_code || "";
+  //       // }
+
+  //       // return row;
+  //     });
+
+  //     const worksheet = XLSX.utils.json_to_sheet(formattedData);
+  //     const workbook = XLSX.utils.book_new();
+  //     XLSX.utils.book_append_sheet(workbook, worksheet, "CT");
+  //     const excelBuffer = XLSX.write(workbook, {
+  //       bookType: "xlsx",
+  //       type: "array",
+  //     });
+  //     const blob = new Blob([excelBuffer], {
+  //       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+  //     });
+
+  //     setExportBlob(blob);
+  //     setActivedownloadBtn(true);
+  //   } catch (error) {
+  //     console.error("Erreur exportation Excel :", error);
+  //   } finally {
+  //     setLoadingEportBtn(false);
+  //   }
+  // };
+
+  // const DownloadIndividualAchatsToExcel = () => {
+  //   if (!exportBlob) return;
+  //   const now = new Date();
+  //   const date = now.toISOString().split("T")[0];
+  //   const hours = String(now.getHours()).padStart(2, "0");
+  //   const minutes = String(now.getMinutes()).padStart(2, "0");
+  //   const seconds = String(now.getSeconds()).padStart(2, "0");
+  //   const time = `${hours}_${minutes}_${seconds}`;
+  //   saveAs(exportBlob, `liste_achats_de_la_sdl_ct_${date}_${time}.xlsx`);
+  //   setActivedownloadBtn(false);
+  //   setExportBlob(null);
+  // };
+
   const HandleDelete = async (id, code) => {
 
     setLoading(true);
@@ -601,7 +699,7 @@ export default function IndividualAchatsTable({
           <div className="flex items-center gap-3">
             <IndividualAchatsFilter handleFilter={handleFilter} />
           </div>
-          {/* {(user?.session?.category !== "Superviseur" && user?.session?.category !== "Superviseur_Regional") && (
+          {(user?.session?.category !== "Superviseur" && user?.session?.category !== "Superviseur_Regional") && (
             <div className="flex items-center gap-3 text-gray-700">
               <ExportButton
                 exportType="achats_individual"
@@ -613,6 +711,7 @@ export default function IndividualAchatsTable({
                       await externalExportFn();
                     } else {
                       await exportCultivatorsToExcel();
+
                     }
                   } finally {
                     setLoadingEportBtn(false);
@@ -623,7 +722,7 @@ export default function IndividualAchatsTable({
                 onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
               />
             </div>
-          )} */}
+          )}
         </div>
       </div>
       <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">
