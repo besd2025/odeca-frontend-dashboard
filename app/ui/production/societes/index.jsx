@@ -96,23 +96,26 @@ export default function SocietesQty() {
                 </Table>
             </div>
 
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4 ">
+                <div className="flex-1 text-sm text-muted-foreground w-1/2">
                     {totalCount > 0 && (
                         <span>
                             {pointer + 1}–{Math.min(pointer + limit, totalCount)} sur {totalCount} société(s)
                         </span>
                     )}
                 </div>
-                <PaginationContent
-                    datapaginationlimit={() => { }}
-                    currentPage={currentPage}
-                    totalPages={Math.ceil(totalCount / limit)}
-                    onPageChange={handlePageChange}
-                    pointer={pointer}
-                    totalCount={totalCount}
-                    onLimitChange={handleLimitChange}
-                />
+                <div className="w-1/2">
+                    <PaginationContent
+                        datapaginationlimit={() => { }}
+                        currentPage={currentPage}
+                        totalPages={Math.ceil(totalCount / limit)}
+                        onPageChange={handlePageChange}
+                        pointer={pointer}
+                        totalCount={totalCount}
+                        onLimitChange={handleLimitChange}
+                    />
+                </div>
+
             </div>
         </div>
     );

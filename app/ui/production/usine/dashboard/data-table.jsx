@@ -207,9 +207,9 @@ export function DataTable({
           </TableBody>
         </Table>
       </Card>
-      <div className="flex justify-end mb-3">
+      <div className="flex justify-end mt-3">
         <Button
-          variant="outline"
+          variant="default"
           size="sm"
           onClick={() => router.push("/odeca-production/usine/societies")}
           className="flex items-center gap-2 text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors"

@@ -192,6 +192,10 @@ const menuItems = {
           title: "Transferts",
           url: "/odeca-dashboard/stocks/transfers",
         },
+        {
+          title: "Collecte Washed",
+          url: "/odeca-dashboard/stocks/washed",
+        },
       ],
       url: "/odeca-dashboard/stocks",
       icon: (
