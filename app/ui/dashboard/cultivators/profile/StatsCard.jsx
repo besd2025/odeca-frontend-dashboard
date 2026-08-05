@@ -9,11 +9,13 @@ import {
 import {
   Archive,
   Banknote,
+  Check,
   CircleDollarSign,
   Grape,
   Landmark,
   SquarePen,
   Timeline,
+  X,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
@@ -28,12 +30,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 function StatsCard({ cult_id }) {
   const [data, setData] = React.useState({});
   const [values, setValues] = React.useState({});
   const [dataavance, setDataavance] = React.useState({});
   const [loading, setLoading] = React.useState(true);
+  const [editAvance, setEdivAvance] = React.useState(false)
   const user = React.useContext(UserContext);
   console.log(user?.session);
   useEffect(() => {
@@ -315,7 +319,21 @@ function StatsCard({ cult_id }) {
                           <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
                             {dataavance?.montant_total?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} <span className="text-base">FBU</span>
                           </CardTitle>
-                          <Button variant="link" className="cursor-pointer"><SquarePen /> Modifier</Button>
+                          <div className="flex flex-col">
+                            <Button variant="link" className={`cursor-pointer ${editAvance ? "hidden" : ""}`} onClick={() => setEdivAvance(!editAvance)}><SquarePen /> Modifier</Button>
+                            {/*Save and cancel buttons */}
+                            {
+                              editAvance ?
+                                <div className="flex flex-row gap-x-2">
+                                  <Input className="w-full" type="text" value={dataavance?.montant_total} onChange={(e) => setDataavance({ ...dataavance, montant_total: e.target.value })} />
+                                  <Button variant="outline" className="cursor-pointer" onClick={() => setEdivAvance(!editAvance)}><X /></Button>
+                                  <Button variant="default" className="cursor-pointer" onClick={() => setEdivAvance(!editAvance)}><Check /></Button>
+                                </div>
+                                : null
+                            }
+                          </div>
+
+
                         </div>
 
                       </div>
