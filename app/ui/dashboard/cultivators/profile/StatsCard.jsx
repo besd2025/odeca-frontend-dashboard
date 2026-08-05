@@ -12,11 +12,22 @@ import {
   CircleDollarSign,
   Grape,
   Landmark,
+  SquarePen,
+  Timeline,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
 import { UserContext } from "@/app/ui/context/User_Context";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button";
 
 function StatsCard({ cult_id }) {
   const [data, setData] = React.useState({});
@@ -264,6 +275,56 @@ function StatsCard({ cult_id }) {
                 {dataavance?.montant_total?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} <span className="text-base">FBU</span>
               </CardTitle>
             </div>
+            <Separator />
+            <div className="flex flex-row gap-x-1 items-center cursor-pointer hover:underline">
+              <Dialog>
+                <DialogTrigger>
+                  <div className="flex flex-row gap-x-1 items-center cursor-pointer hover:underline">
+                    <Timeline size={20} className="text-secondary" />
+                    <span className="text-sm font-medium tracking-tight tabular-nums ">
+                      Voir l'historique
+                    </span>
+                  </div>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Historique de paiement</DialogTitle>
+                    <DialogDescription>
+                      <div className="flex flex-col gap-y-2 mt-4">
+                        <div className="flex flex-row gap-x-4 items-center justify-between">
+                          <div className="flex flex-row gap-x-1 items-center">
+                            <Banknote className="text-secondary" />
+
+                            <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                              Payé
+                            </CardTitle>
+                          </div>
+                          <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
+                            0 <span className="text-base">FBU</span>
+                          </CardTitle>
+                        </div>
+                        <Separator />
+                        <div className="flex flex-row gap-x-4 items-center justify-between">
+                          <div className="flex flex-row gap-x-1 items-center">
+                            <Banknote className="text-secondary" />
+
+                            <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                              Avance
+                            </CardTitle>
+                          </div>
+                          <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
+                            {dataavance?.montant_total?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} <span className="text-base">FBU</span>
+                          </CardTitle>
+                          <Button variant="link" className="cursor-pointer"><SquarePen /> Modifier</Button>
+                        </div>
+
+                      </div>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+
+            </div>
           </div>
         </CardHeader>
       </Card>
@@ -332,6 +393,7 @@ function StatsCard({ cult_id }) {
           )}
         </CardHeader>
       </Card>
+
     </div>
   );
 }

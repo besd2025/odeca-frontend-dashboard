@@ -29,6 +29,7 @@ const MOCK_QUALITES = ["Qualité A", "Qualité B", "Fully Washed", "Washed", "Gr
 export default function Edit({ id, item, onSave }) {
   const [open, setOpen] = React.useState(false);
   const [societe, setSociete] = React.useState(item?.societe || "SODEICO SARL");
+  const [hangar, setHangar] = React.useState(item?.hangar || "Hangar");
   const [quantiteWashed, setQuantiteWashed] = React.useState(item?.quantite_washed || 1250);
   const [qualite, setQualite] = React.useState(item?.qualite || "Qualité A");
   const [date, setDate] = React.useState(item?.date || "2026-07-28");
@@ -95,19 +96,24 @@ export default function Edit({ id, item, onSave }) {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Société</Label>
-              <select
+
+              <Input
+                type="name"
                 value={societe}
                 onChange={(e) => setSociete(e.target.value)}
-                className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                {MOCK_SOCIETES.map((soc) => (
-                  <option key={soc.id} value={soc.nom}>
-                    {soc.nom}
-                  </option>
-                ))}
-              </select>
+                disabled
+              />
             </div>
+            <div className="space-y-2">
+              <Label>Hangar</Label>
 
+              <Input
+                type="text"
+                value={hangar}
+                onChange={(e) => setHangar(e.target.value)}
+                disabled
+              />
+            </div>
             <div className="space-y-2">
               <Label>Quantité Washed (Kg)</Label>
               <Input
