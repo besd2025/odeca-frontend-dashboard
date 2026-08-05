@@ -9,20 +9,35 @@ import {
 import {
   Archive,
   Banknote,
+  Check,
   CircleDollarSign,
   Grape,
   Landmark,
+  SquarePen,
+  Timeline,
+  X,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
 import { UserContext } from "@/app/ui/context/User_Context";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 function StatsCard({ cult_id }) {
   const [data, setData] = React.useState({});
   const [values, setValues] = React.useState({});
   const [dataavance, setDataavance] = React.useState({});
   const [loading, setLoading] = React.useState(true);
+  const [editAvance, setEdivAvance] = React.useState(false)
   const user = React.useContext(UserContext);
   console.log(user?.session);
   useEffect(() => {
@@ -264,6 +279,70 @@ function StatsCard({ cult_id }) {
                 {dataavance?.montant_total?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} <span className="text-base">FBU</span>
               </CardTitle>
             </div>
+            <Separator />
+            <div className="flex flex-row gap-x-1 items-center cursor-pointer hover:underline">
+              <Dialog>
+                <DialogTrigger>
+                  <div className="flex flex-row gap-x-1 items-center cursor-pointer hover:underline">
+                    <Timeline size={20} className="text-secondary" />
+                    <span className="text-sm font-medium tracking-tight tabular-nums ">
+                      Voir l'historique
+                    </span>
+                  </div>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Historique de paiement</DialogTitle>
+                    <DialogDescription>
+                      <div className="flex flex-col gap-y-2 mt-4">
+                        <div className="flex flex-row gap-x-4 items-center justify-between">
+                          <div className="flex flex-row gap-x-1 items-center">
+                            <Banknote className="text-secondary" />
+
+                            <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                              Payé
+                            </CardTitle>
+                          </div>
+                          <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
+                            0 <span className="text-base">FBU</span>
+                          </CardTitle>
+                        </div>
+                        <Separator />
+                        <div className="flex flex-row gap-x-4 items-center justify-between">
+                          <div className="flex flex-row gap-x-1 items-center">
+                            <Banknote className="text-secondary" />
+
+                            <CardTitle className="text-muted-foreground font-normal text-sm  ">
+                              Avance
+                            </CardTitle>
+                          </div>
+                          <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
+                            {dataavance?.montant_total?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} <span className="text-base">FBU</span>
+                          </CardTitle>
+                          <div className="flex flex-col">
+                            <Button variant="link" className={`cursor-pointer ${editAvance ? "hidden" : ""}`} onClick={() => setEdivAvance(!editAvance)}><SquarePen /> Modifier</Button>
+                            {/*Save and cancel buttons */}
+                            {
+                              editAvance ?
+                                <div className="flex flex-row gap-x-2">
+                                  <Input className="w-full" type="text" value={dataavance?.montant_total} onChange={(e) => setDataavance({ ...dataavance, montant_total: e.target.value })} />
+                                  <Button variant="outline" className="cursor-pointer" onClick={() => setEdivAvance(!editAvance)}><X /></Button>
+                                  <Button variant="default" className="cursor-pointer" onClick={() => setEdivAvance(!editAvance)}><Check /></Button>
+                                </div>
+                                : null
+                            }
+                          </div>
+
+
+                        </div>
+
+                      </div>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+
+            </div>
           </div>
         </CardHeader>
       </Card>
@@ -332,6 +411,7 @@ function StatsCard({ cult_id }) {
           )}
         </CardHeader>
       </Card>
+
     </div>
   );
 }
