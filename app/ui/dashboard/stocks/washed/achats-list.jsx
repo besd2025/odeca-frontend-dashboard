@@ -39,7 +39,7 @@ const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import AddHangar from "./add-hangar";
-
+import { fetchData } from "@/app/_utils/api";
 // MockData pour les achats de café Washed
 // TODO API: Remplacer MOCK_ACHATS_WASHED par un appel à fetchData("get", "cafe/achat_washed/")
 const MOCK_ACHATS_WASHED = [
@@ -83,62 +83,40 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
     const [activeDownloadBtn, setActiveDownloadBtn] = useState(false);
     const [exportBlob, setExportBlob] = useState(null);
 
-    useEffect(() => {
-        const getAchatsWashed = async () => {
+    React.useEffect(() => {
+        const getAchats = async () => {
             setLoading(true);
             try {
-                let filtered = [...MOCK_ACHATS_WASHED];
-
-                if (search) {
-                    const q = search.toLowerCase();
-                    filtered = filtered.filter(
-                        (item) =>
-                            item.societe.toLowerCase().includes(q) ||
-                            item.qualite.toLowerCase().includes(q) ||
-                            item.date.includes(q) ||
-                            item.id.toLowerCase().includes(q)
-                    );
-                }
-
-                if (filterData.societe) {
-                    filtered = filtered.filter((item) =>
-                        item.societe.toLowerCase().includes(filterData.societe.toLowerCase())
-                    );
-                }
-
-                if (filterData.qualite) {
-                    filtered = filtered.filter((item) =>
-                        item.qualite.toLowerCase().includes(filterData.qualite.toLowerCase())
-                    );
-                }
-
-                if (filterData.qte_min) {
-                    filtered = filtered.filter((item) => item.quantite_washed >= filterData.qte_min);
-                }
-
-                if (filterData.qte_max) {
-                    filtered = filtered.filter((item) => item.quantite_washed <= filterData.qte_max);
-                }
-
-                if (filterData.date_from) {
-                    filtered = filtered.filter((item) => item.date >= filterData.date_from);
-                }
-
-                if (filterData.date_to) {
-                    filtered = filtered.filter((item) => item.date <= filterData.date_to);
-                }
-
-                setTotalCount(filtered.length);
-                const paginated = filtered.slice(pointer, pointer + limit);
-                setData(paginated);
+                const response = await fetchData("get", "cafe/achat_cafe_parche/", {
+                    params: {
+                        limit: limit,
+                        offset: pointer,
+                        search: search,
+                        ...filterData,
+                    },
+                    additionalHeaders: {}
+                });
+                console.log("achats: ", response?.results);
+                const newData = response?.results?.map((item) => {
+                    return {
+                        id: item?.id,
+                        societe: item?.responsable?.sdl_ct?.sdl?.societe?.nom_societe,
+                        hangar: item?.responsable?.sdl_ct?.sdl?.sdl_nom,
+                        quantite_washed: item?.quantite,
+                        qualite: item?.qualite,
+                        date: item?.date_achat
+                    };
+                });
+                setData(newData || []);
+                setTotalCount(response?.count || 0);
             } catch (error) {
-                console.error("Error fetching washed purchases:", error);
+                console.error("Error fetching individual achats:", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        getAchatsWashed();
+        getAchats();
     }, [limit, pointer, filterData, search]);
 
     const handleSaveEdit = (updatedItem) => {

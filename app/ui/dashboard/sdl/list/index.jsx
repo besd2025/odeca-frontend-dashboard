@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { fetchData } from "@/app/_utils/api";
 import { TableSkeleton, TableRowsSkeleton } from "@/components/ui/skeletons";
+import { Eye } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -230,6 +231,107 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
     setActivedownloadBtn(false);
     setExportBlob(null);
   };
+
+  const [sdlValidationReportId, setSdlValidationReportId] = useState("");
+  const [LoadingSdlValidationBtn, setLoadingSdlValidationBtn] = useState(false);
+  const [ActiveSdlValidationBtn, setActiveSdlValidationBtn] = useState(false);
+  const exportSdlValidationToExcel = async () => {
+    setLoadingSdlValidationBtn(true);
+    try {
+      // Étape 1 : Récupérer le nombre total d'enregistrements
+      const initial_export = await fetchData(
+        "get",
+        "cafe/cafe_payments/start_payment_validation_export/",
+        {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        },
+      );
+      console.log("initial_export", initial_export);
+      if (initial_export?.message == "Export lancé") {
+        const task_id = initial_export?.task_id;
+        let isDone = false;
+        while (!isDone) {
+          const export_excel = await fetchData(
+            "get",
+            "cafe/cafe_payments/check_payment_validation_export/",
+            {
+              params: { task_id: task_id },
+            },
+          );
+          if (export_excel?.export_status === "SUCCESS") {
+            console.log("export_excel", export_excel);
+            setActiveSdlValidationBtn(true);
+            setSdlValidationReportId(task_id);
+            isDone = true;
+          } else {
+            // Attendre 2 secondes avant la prochaine vérification
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Erreur exportation Excel :", error);
+    } finally {
+      setLoadingSdlValidationBtn(false);
+    }
+  };
+  const DownloadSdlValidationToExcel = async () => {
+    try {
+      const response = await fetchData("get", "cafe/cafe_payments/download_payment_validation_export/", {
+        params: { task_id: sdlValidationReportId },
+        isBlob: true,
+      });
+
+      // Créer le blob avec le bon type MIME
+      const blob = new Blob([response.data], {
+        type:
+          response.headers["content-type"] ||
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+
+      const timestamp = `${day}_${month}_${year}_${hours}_${minutes}_${seconds}`;
+      // Nom du fichier par défaut
+      let filename = `taux_validation_paiement_${timestamp}.xlsx`;
+
+      const contentDisposition = response.headers["content-disposition"];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match && match[1]) filename = match[1];
+      }
+
+      // Création du <a> temporaire
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+
+      // Nettoyage
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      setActivedownloadBtn(false);
+    } catch (error) {
+      console.error("Erreur lors de l'exportation Excel :", error);
+    } finally {
+      setLoadingEportBtn(false);
+    }
+  };
+
+
+
+
   const columns = [
     {
       id: "actions",
@@ -424,6 +526,64 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                 onClickDownloadButton={DownloadSDLsToExcel}
               />
             </div>
+            {user?.session?.category === ROLES.ADMIN || user?.session?.category === ROLES.SUPERVISEUR && !ActiveSdlValidationBtn ? (
+              <Button
+                variant="ghost"
+                className="text-primary hover:text-primary"
+                onClick={exportSdlValidationToExcel}
+                disabled={LoadingSdlValidationBtn}
+              >
+                {LoadingSdlValidationBtn ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 mr-2"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      />
+                    </svg>
+                    Préparation...
+                  </>
+                ) : (
+                  "Taux de validation"
+                )}
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                className="text-green-600 hover:text-green-700"
+                onClick={DownloadSdlValidationToExcel}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
+                  />
+                </svg>
+                Télécharger
+              </Button>
+            )}
           </div>
         </div>
         <div className="grid w-full [&>div]:border [&>div]:rounded-md">
