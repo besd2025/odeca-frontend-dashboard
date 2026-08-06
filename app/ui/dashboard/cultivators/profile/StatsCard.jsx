@@ -381,12 +381,13 @@ function StatsCard({ cult_id }) {
                     {data?.cultivator_account_owner}
                   </div>
                 </div>
+
               </div>
             </>
           ) : (
             <>
               <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-                {data?.cultivator_bank_name}
+                {data?.cultivator_bank_name}  {data?.cultivator_bank_opened}
                 {/* {data?.cultivator_bank_opened} */}
               </CardTitle>
               <div className="flex flex-col gap-y-2">

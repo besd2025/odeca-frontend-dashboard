@@ -623,7 +623,7 @@ export default function IndividualAchatsTable({
             {row.getValue("date_creation")}
           </div>
         ),
-      },
+      }
     ],
     [isCultivatorsPage],
   );
