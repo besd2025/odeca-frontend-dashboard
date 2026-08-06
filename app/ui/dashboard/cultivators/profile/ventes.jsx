@@ -93,6 +93,7 @@ export default function Ventes({ cult_id }) {
           num_page: item?.numero_page,
           fiche_photo: item?.photo_fiche,
           montant: item?.montant_total,
+          payment_status: item?.in_payment,
           cultivator: {
             cultivator_id: item?.cafeiculteur?.id,
             cultivator_code: item?.cafeiculteur?.cultivator_code,
@@ -175,6 +176,7 @@ export default function Ventes({ cult_id }) {
               <TableHead>CB</TableHead>
               <TableHead>Fiche</TableHead>
               <TableHead>Montant</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -241,11 +243,17 @@ export default function Ventes({ cult_id }) {
                       profile={false}
                     />
                   </TableCell>
+
                   <TableCell>
                     {(product.ca * 2800 + product.cb * 1400 ?? 0)
                       .toString()
                       .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
                     Fbu
+                  </TableCell>
+                  <TableCell>
+                    <div className={` font-semibold ${product.payment_status === true ? "text-green-600" : "text-red-600"}`}>
+                      {product.payment_status ? "Paye" : "Non Paye"}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

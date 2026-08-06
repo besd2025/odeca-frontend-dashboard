@@ -33,18 +33,18 @@ function ProfilePage() {
     <div className=" space-y-6">
 
       <div className="flex justify-end gap-2">
-        {data?.in_payment ? (
+        {/* {data?.in_payment ? (
           <></>
         ) : (
-          <>
-            {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+          <> */}
+        {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
 
-              <Edit cultivator={id} />
-            ) : (
-              <></>
-            )}
-          </>
+          <Edit cultivator={id} />
+        ) : (
+          <></>
         )}
+        {/* </>
+        )} */}
 
         {user?.session?.category === "Admin" || user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
           <>

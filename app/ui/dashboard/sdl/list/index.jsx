@@ -526,7 +526,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                 onClickDownloadButton={DownloadSDLsToExcel}
               />
             </div>
-            {user?.session?.category === ROLES.ADMIN || user?.session?.category === ROLES.SUPERVISEUR && !ActiveSdlValidationBtn ? (
+            {(user?.session?.category === ROLES.ADMIN || user?.session?.category === ROLES.SUPERVISEUR) && !ActiveSdlValidationBtn ? (
               <Button
                 variant="ghost"
                 className="text-primary hover:text-primary"
@@ -561,7 +561,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                   "Taux de validation"
                 )}
               </Button>
-            ) : (
+            ) : ActiveSdlValidationBtn ? (
               <Button
                 variant="ghost"
                 className="text-green-600 hover:text-green-700"
@@ -583,7 +583,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                 </svg>
                 Télécharger
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
         <div className="grid w-full [&>div]:border [&>div]:rounded-md">
