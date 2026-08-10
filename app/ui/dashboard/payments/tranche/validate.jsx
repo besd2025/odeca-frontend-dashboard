@@ -35,7 +35,10 @@ import ViewImageDialog from "@/components/ui/view-image-dialog";
 import Link from "next/link";
 import PaginationControls from "@/components/ui/pagination-controls";
 import { fetchData } from "@/app/_utils/api";
+import { UserContext } from "@/app/ui/context/User_Context";
+import { toast } from "sonner";
 export default function Validate() {
+  const user = React.useContext(UserContext);
   const [data, setData] = React.useState([]);
   const [totalCount, setTotalCount] = React.useState(0);
   const [searchValue, setSearchValue] = React.useState("");
@@ -49,7 +52,6 @@ export default function Validate() {
     pageSize: 10,
   });
   const [filterData, setFilterData] = React.useState({});
-
   // Debounce search value
   React.useEffect(() => {
     const handler = setTimeout(() => {
@@ -110,6 +112,41 @@ export default function Validate() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
+  const HandleRejette = async (id, cultivator_code) => {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+
+        const response = await fetchData("patch", `/cafe/cafe_payments/${id}/`, {
+          body: { validation_state: "REJECTED" },
+        });
+
+        if (response.status === 200 || response.status === 201) {
+          resolve({ id });
+        } else {
+          reject(new Error("Erreur"));
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "REJET...",
+      success: (datass) => {
+        return `${cultivator_code} a été rejeté avec succès `;
+      },
+      error: "Donnée non rejetée",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      //setLoading(false);
+    }
+  }
+
   React.useEffect(() => {
     fetchDatas();
   }, [fetchDatas]);
@@ -147,6 +184,13 @@ export default function Validate() {
               <Link href="/odeca-dashboard/cultivators/profile">
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
+                <DropdownMenuItem>
+                  <Button onClick={() => HandleRejette(cultivator?.id, cultivator.cultivator.cultivator_code)} variant="secondary" className="w-full  hover:text-secondary">
+                    Rejeter
+                  </Button>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );
