@@ -79,6 +79,8 @@ export default function Validate() {
         const isPersonne = culti?.cultivator_entity_type === "personne";
         return {
           id: item.id,
+          responsable_code: item?.responsable?.unique_code,
+          payment_id: item?.payment_period_detail?.id,
           cultivator: {
             cultivator_code: culti?.cultivator_code,
             first_name: isPersonne
@@ -112,12 +114,12 @@ export default function Validate() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
-  const HandleRejette = async (id, cultivator_code) => {
+  const HandleRejette = async (id, cultivator_code, responsable_code, payment_id) => {
     const promise = new Promise(async (resolve, reject) => {
       try {
 
         const response = await fetchData("patch", `/cafe/cafe_payments/${id}/`, {
-          body: { validation_state: "REJECTED" },
+          body: { validation_state: "REJECTED", responsable_code: responsable_code, payment_period_id: payment_id },
         });
 
         if (response.status === 200 || response.status === 201) {
@@ -186,7 +188,7 @@ export default function Validate() {
               </Link>
               {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
                 <DropdownMenuItem>
-                  <Button onClick={() => HandleRejette(cultivator?.id, cultivator.cultivator.cultivator_code)} variant="secondary" className="w-full  hover:text-secondary">
+                  <Button onClick={() => HandleRejette(cultivator?.id, cultivator.cultivator.cultivator_code, cultivator?.responsable_code, cultivator?.payment_id)} variant="secondary" className="w-full  hover:text-secondary">
                     Rejeter
                   </Button>
                 </DropdownMenuItem>
