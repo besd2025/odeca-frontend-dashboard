@@ -33,12 +33,12 @@ export default function UsinesEchantillonnageTable() {
     const fetch = async () => {
       const response = await fetchData('get', 'cafe/stock_cafe/stock-detail/')
       console.log("stock detail :", response)
-      const newData = response?.data?.map((item) => {
+      const newData = response?.results?.map((item) => {
         return {
           id: item?.id,
           usine: item?.usine,
           localite: item?.localite,
-          nb_echantillons: item?.nb_echantillons,
+          nb_echantillons: item?.total_sacs,
           quantite_kg: item?.quantite_kg
         }
       })

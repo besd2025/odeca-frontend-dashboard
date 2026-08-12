@@ -4,10 +4,11 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+import { Pencil, RotateCcw } from "lucide-react";
 import { fetchData } from '@/app/_utils/api';
 import PaginationControls from "@/components/ui/pagination-controls";
-
+import { UserContext } from "@/app/ui/context/User_Context";
+import StockInitialEdit from "./stockInitialEdit";
 export default function StockInitialList({ onStartStocking }) {
     const [lots, setLots] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
@@ -15,7 +16,20 @@ export default function StockInitialList({ onStartStocking }) {
     const [limit, setLimit] = useState(10);
     const [pointer, setPointer] = useState(0);
     const [search, setSearch] = useState("");
+    const [editOpen, setEditOpen] = useState(false);
+    const [selectedStock, setSelectedStock] = useState(null);
+    const [refreshKey, setRefreshKey] = useState(0);
+    const user = React.useContext(UserContext);
 
+    const handleEditClick = (lot) => {
+        setSelectedStock(lot);
+        setEditOpen(true);
+    };
+
+    const handleEditSuccess = () => {
+        // Rafraîchir la liste après une modification réussie
+        setRefreshKey((prev) => prev + 1);
+    };
     const onPageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
         setPointer((pageNumber - 1) * limit);
@@ -33,7 +47,7 @@ export default function StockInitialList({ onStartStocking }) {
                 const lotsData = await fetchData("get", `cafe/prestockage_apres_usinage/get_list_quantite_initial/`, {
                     params: { limit, offset: pointer }
                 });
-
+                console.log("lotsData", lotsData);
                 const formattedLots = lotsData?.results?.map(item => {
 
                     return {
@@ -44,6 +58,8 @@ export default function StockInitialList({ onStartStocking }) {
                         annee_campagne: item?.annee_campagne,
                         nombre_sacs: item?.nombre_sacs,
                         quantite: item?.quantite_cafe_vert,
+                        qualite_id: item?.stockage__qualite__id,
+                        proprietaire_id: item?.stockage__proprietaire__id,
                     };
                 });
                 setLots(formattedLots || []);
@@ -54,7 +70,7 @@ export default function StockInitialList({ onStartStocking }) {
         };
 
         fetchLots();
-    }, [limit, pointer]);
+    }, [limit, pointer, refreshKey]);
     return (
         <Card>
             <CardHeader>
@@ -74,7 +90,9 @@ export default function StockInitialList({ onStartStocking }) {
                             <TableHead className="text-center">Quantites</TableHead>
                             <TableHead className="w-[120px]">Nombre de sacs</TableHead>
                             <TableHead className="text-center">Campagne</TableHead>
-                            {/* <TableHead className="text-right">Actions</TableHead> */}
+                            {user?.session?.category === "Admin" && (
+                                <TableHead className="text-right">Actions</TableHead>
+                            )}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -93,6 +111,19 @@ export default function StockInitialList({ onStartStocking }) {
                                 <TableCell className="font-medium">{lot.quantite}</TableCell>
                                 <TableCell className="font-medium">{lot.nombre_sacs}</TableCell>
                                 <TableCell>{lot.annee_campagne}</TableCell>
+                                {user?.session?.category === "Admin" && (
+                                    <TableCell className="text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleEditClick(lot)}
+                                            className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
+                                            title="Modifier ce stock"
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
+                                )}
                             </TableRow>
                         ))}
                     </TableBody>
@@ -109,6 +140,14 @@ export default function StockInitialList({ onStartStocking }) {
                     hasPreviousPage={currentPage > 1}
                 />
             </CardContent>
+
+            {/* Dialog de modification */}
+            <StockInitialEdit
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                stockItem={selectedStock}
+                onSuccess={handleEditSuccess}
+            />
         </Card>
     )
 }

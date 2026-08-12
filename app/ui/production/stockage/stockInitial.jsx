@@ -94,57 +94,56 @@ export default function StockInitial() {
                 annee_campagne: stockInfo.annee_campagne,
                 quantite_cafe_vert: stockInfo.quantite_cafe_vert
             }
-            console.log(formData);
-            // try {
-            //     const promise = new Promise(async (resolve, reject) => {
-            //         try {
-            //             const results = await fetchData(
-            //                 "post",
-            //                 `cafe/stock_cafe/stockage_initial/`,
-            //                 {
-            //                     params: {},
-            //                     additionalHeaders: {},
-            //                     body: formData
-            //                 },
-            //             );
+            try {
+                const promise = new Promise(async (resolve, reject) => {
+                    try {
+                        const results = await fetchData(
+                            "post",
+                            `cafe/stock_cafe/stockage_initial/`,
+                            {
+                                params: {},
+                                additionalHeaders: {},
+                                body: formData
+                            },
+                        );
 
-            //             if (results.status == 200 || results.status == 201) {
+                        if (results.status == 200 || results.status == 201) {
 
-            //                 resolve({ lot: stockInfo.numero_lot });
-            //             } else {
-            //                 reject(new Error("Erreur"));
-            //             }
+                            resolve({ lot: stockInfo.numero_lot });
+                        } else {
+                            reject(new Error("Erreur"));
+                        }
 
-            //         }
-            //         catch (error) {
-            //             reject(error);
-            //         }
-            //     });
+                    }
+                    catch (error) {
+                        reject(error);
+                    }
+                });
 
-            //     toast.promise(promise, {
-            //         loading: "Modification...",
-            //         success: (data) => {
-            //             //onSave(data.lot, finalizedData);
-            //             setTimeout(() =>
+                toast.promise(promise, {
+                    loading: "Modification...",
+                    success: (data) => {
+                        //onSave(data.lot, finalizedData);
+                        setTimeout(() =>
 
-            //                 setOpen(false), 500);
-            //             return `Données Enregistrées avec succès `;
-            //         },
-            //         error: "Donnée non enregistrée!!!",
-            //     });
+                            setOpen(false), 500);
+                        return `Données Enregistrées avec succès `;
+                    },
+                    error: "Donnée non enregistrée!!!",
+                });
 
-            //     try {
-            //         promise;
-            //     } catch (error) {
-            //         console.error(error);
-            //         setError(error);
-            //     } finally {
-            //         setLoading(false);
-            //     }
-            // }
-            // catch (err) {
-            //     console.error("Error loading initial data:", err);
-            // }
+                try {
+                    promise;
+                } catch (error) {
+                    console.error(error);
+                    setError(error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+            catch (err) {
+                console.error("Error loading initial data:", err);
+            }
         }
     }
     return (

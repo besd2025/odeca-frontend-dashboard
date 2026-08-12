@@ -329,11 +329,21 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-secondary">
-                            {(data.total_quantite_washed / 1000).toFixed(2)} T
+                            {data?.total_quantite_washed >= 1000 ? (
+                                <>
+                                    {(data?.total_quantite_washed / 1000).toLocaleString("fr-FR", {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                    })}
+                                    <span className="text-sm"> T</span>
+                                </>
+                            ) : (
+                                <>
+                                    {data?.total_quantite_washed?.toLocaleString("fr-FR") || 0}
+                                    <span className="text-sm"> Kg</span>
+                                </>
+                            )}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {data.total_quantite_washed?.toLocaleString("fr-FR")} Kg au total
-                        </p>
                     </CardContent>
                 </Card>
 
@@ -345,7 +355,7 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {data.total_societe} Sociétés
+                            {data?.total_societe || 0} Sociétés
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
                             Avec collecte de café washed enregistrée
@@ -361,7 +371,7 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold ">
-                            {data.nb_achats?.toLocaleString("fr-FR")} Achats
+                            {data?.nb_achats?.toLocaleString("fr-FR") || 0} Achats
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
                             Operations cumulées d'achat
