@@ -212,7 +212,7 @@ const menuItems = {
     {
       title: "Paiement",
       url: "/odeca-dashboard/payments",
-      roles: ["Admin", "General", "Cafe_ODECA", "Cafe_Chef_societe"],
+      roles: ["Admin", "General", "Cafe_ODECA", "Cafe_Chef_societe", "Superviseur"],
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"

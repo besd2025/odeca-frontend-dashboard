@@ -56,7 +56,7 @@ export default function AddHangar() {
         })) || []);
 
         setSocieteOptions(socData?.results?.map(s => ({
-          value: s.code_societe,
+          value: s.id,
           label: s.nom_societe
         })) || []);
       } catch (err) {
@@ -130,7 +130,7 @@ export default function AddHangar() {
         params: { zone: value }
       });
       setCollineOptions(data?.map(c => ({
-        value: c.colline_code,
+        value: c.id,
         label: c.colline_name
       })) || []);
     } catch (err) {
@@ -151,8 +151,9 @@ export default function AddHangar() {
     const formData = {
       sdl_code: code,
       sdl_nom: sdlName,
-      societe_code: soc,
-      sdl_adress_code: colline,
+      societe: soc,
+      sdl_adress: colline,
+      for_washed: true
     };
     console.log("formData", formData);
     const promise = new Promise(async (resolve, reject) => {

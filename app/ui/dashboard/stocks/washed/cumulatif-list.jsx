@@ -28,7 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
-
+import { fetchData } from "@/app/_utils/api";
 // MockData pour le total cumulatif des quantités collectées par société (Café Washed)
 // TODO API: Remplacer MOCK_CUMULATIF_WASHED par un appel API à fetchData("get", "cafe/cumulatif_washed/")
 const MOCK_CUMULATIF_WASHED = [
@@ -53,7 +53,7 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
     const [columnFilters, setColumnFilters] = React.useState([]);
     const [columnVisibility, setColumnVisibility] = React.useState({});
     const [rowSelection, setRowSelection] = React.useState({});
-    const [data, setData] = React.useState([]);
+    const [data, setData] = React.useState({});
     const [loading, setLoading] = React.useState(true);
 
     const [limit, setLimit] = useState(5);
@@ -67,7 +67,40 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
     const [exportBlob, setExportBlob] = useState(null);
 
     const isActuallyLoading = externalLoading ?? loading;
+    React.useEffect(() => {
+        const getAchats = async () => {
+            setLoading(true);
+            try {
+                const QtesWashed = await fetchData("get", "cafe/achat_cafe_parche/total_quantite", {
+                    params: {},
+                    additionalHeaders: {}
+                });
+                const Nombre_Societe = await fetchData("get", "cafe/achat_cafe_parche/get_nombre_socites", {
+                    params: {},
+                    additionalHeaders: {}
+                });
+                const Nombre_Achats = await fetchData("get", "cafe/achat_cafe_parche/get_nombre_achat", {
+                    params: {},
+                    additionalHeaders: {}
+                });
+                console.log("newData: ", QtesWashed);
+                console.log("newData: ", Nombre_Achats);
+                const newData =
+                {
+                    total_societe: Nombre_Societe?.total_societe,
+                    total_quantite_washed: QtesWashed?.total_quantite,
+                    nb_achats: Nombre_Achats?.total_achat,
+                };
+                setData(newData);
+            } catch (error) {
+                console.error("Error fetching individual achats:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
+        getAchats();
+    }, []);
     useEffect(() => {
         const getCumulatifData = async () => {
             setLoading(true);
@@ -170,119 +203,119 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
         setExportBlob(null);
     };
 
-    const columns = [
-        {
-            accessorKey: "societe",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Société
-                    <ArrowUpDownIcon />
-                </Button>
-            ),
-            cell: ({ row }) => (
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="size-6 text-gray-500"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M4.125 3C3.089 3 2.25 3.84 2.25 4.875V18a3 3 0 0 0 3 3h15a3 3 0 0 1-3-3V4.875C17.25 3.839 16.41 3 15.375 3H4.125ZM12 9.75a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H12Zm-.75-2.25a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75ZM6 12.75a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5H6Zm-.75 3.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5H6a.75.75 0 0 1-.75-.75ZM6 6.75a.75.75 0 0 0-.75.75v3c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-3A.75.75 0 0 0 9 6.75H6Z"
-                                clipRule="evenodd"
-                            />
-                            <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V6.75Z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
-                            {row.getValue("societe")}
-                        </span>
-                        <span className="block text-gray-500 text-theme-xs dark:text-gray-400 mt-1">
-                            {row.original.id}
-                        </span>
-                    </div>
-                </div>
-            ),
-        },
-        {
-            accessorKey: "total_quantite_washed",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Quantité Washed Déjà Collectée
-                    <ArrowUpDownIcon />
-                </Button>
-            ),
-            cell: ({ row }) => {
-                const totalKg = Number(row.getValue("total_quantite_washed")) || 0;
-                return (
-                    <div className="font-semibold text-gray-800 dark:text-white/90">
-                        {totalKg.toLocaleString("fr-FR")} Kg
-                    </div>
-                );
-            },
-        },
-        {
-            accessorKey: "qualite",
-            header: "Qualité",
-            cell: ({ row }) => (
-                <div className="flex flex-col gap-1">
-                    {
-                        row.getValue("qualite") ? (
-                            row.getValue("qualite").map((item) => (
-                                <span className="flex items-center gap-2" key={item.label}>
-                                    <span className="rounded-full w-2 h-2 bg-primary" />
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                                        {item.label}: {item.quantite} Kg
-                                    </span>
-                                </span>
-                            ))
-                        ) : (
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
-                                Aucune qualité
-                            </span>
-                        )
-                    }
-                </div>
-            ),
-        },
-        {
-            accessorKey: "nb_achats",
-            header: "Nombre de Collectes",
-            cell: ({ row }) => (
-                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {row.getValue("nb_achats")}
-                </div>
-            ),
-        },
-    ];
+    // const columns = [
+    //     {
+    //         accessorKey: "societe",
+    //         header: ({ column }) => (
+    //             <Button
+    //                 variant="ghost"
+    //                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    //             >
+    //                 Société
+    //                 <ArrowUpDownIcon />
+    //             </Button>
+    //         ),
+    //         cell: ({ row }) => (
+    //             <div className="flex items-center gap-3">
+    //                 <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+    //                     <svg
+    //                         xmlns="http://www.w3.org/2000/svg"
+    //                         viewBox="0 0 24 24"
+    //                         fill="currentColor"
+    //                         className="size-6 text-gray-500"
+    //                     >
+    //                         <path
+    //                             fillRule="evenodd"
+    //                             d="M4.125 3C3.089 3 2.25 3.84 2.25 4.875V18a3 3 0 0 0 3 3h15a3 3 0 0 1-3-3V4.875C17.25 3.839 16.41 3 15.375 3H4.125ZM12 9.75a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H12Zm-.75-2.25a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75ZM6 12.75a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5H6Zm-.75 3.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5H6a.75.75 0 0 1-.75-.75ZM6 6.75a.75.75 0 0 0-.75.75v3c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-3A.75.75 0 0 0 9 6.75H6Z"
+    //                             clipRule="evenodd"
+    //                         />
+    //                         <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V6.75Z" />
+    //                     </svg>
+    //                 </div>
+    //                 <div>
+    //                     <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
+    //                         {row.getValue("societe")}
+    //                     </span>
+    //                     <span className="block text-gray-500 text-theme-xs dark:text-gray-400 mt-1">
+    //                         {row.original.id}
+    //                     </span>
+    //                 </div>
+    //             </div>
+    //         ),
+    //     },
+    //     {
+    //         accessorKey: "total_quantite_washed",
+    //         header: ({ column }) => (
+    //             <Button
+    //                 variant="ghost"
+    //                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    //             >
+    //                 Quantité Washed Déjà Collectée
+    //                 <ArrowUpDownIcon />
+    //             </Button>
+    //         ),
+    //         cell: ({ row }) => {
+    //             const totalKg = Number(row.getValue("total_quantite_washed")) || 0;
+    //             return (
+    //                 <div className="font-semibold text-gray-800 dark:text-white/90">
+    //                     {totalKg.toLocaleString("fr-FR")} Kg
+    //                 </div>
+    //             );
+    //         },
+    //     },
+    //     {
+    //         accessorKey: "qualite",
+    //         header: "Qualité",
+    //         cell: ({ row }) => (
+    //             <div className="flex flex-col gap-1">
+    //                 {
+    //                     row.getValue("qualite") ? (
+    //                         row.getValue("qualite").map((item) => (
+    //                             <span className="flex items-center gap-2" key={item.label}>
+    //                                 <span className="rounded-full w-2 h-2 bg-primary" />
+    //                                 <span className="text-xs text-gray-500 dark:text-gray-400">
+    //                                     {item.label}: {item.quantite} Kg
+    //                                 </span>
+    //                             </span>
+    //                         ))
+    //                     ) : (
+    //                         <span className="text-sm text-gray-500 dark:text-gray-400">
+    //                             Aucune qualité
+    //                         </span>
+    //                     )
+    //                 }
+    //             </div>
+    //         ),
+    //     },
+    //     {
+    //         accessorKey: "nb_achats",
+    //         header: "Nombre de Collectes",
+    //         cell: ({ row }) => (
+    //             <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+    //                 {row.getValue("nb_achats")}
+    //             </div>
+    //         ),
+    //     },
+    // ];
 
-    const table = useReactTable({
-        data,
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
-        },
-    });
+    // const table = useReactTable({
+    //     data,
+    //     columns,
+    //     onSortingChange: setSorting,
+    //     onColumnFiltersChange: setColumnFilters,
+    //     getCoreRowModel: getCoreRowModel(),
+    //     getPaginationRowModel: getPaginationRowModel(),
+    //     getSortedRowModel: getSortedRowModel(),
+    //     getFilteredRowModel: getFilteredRowModel(),
+    //     onColumnVisibilityChange: setColumnVisibility,
+    //     onRowSelectionChange: setRowSelection,
+    //     state: {
+    //         sorting,
+    //         columnFilters,
+    //         columnVisibility,
+    //         rowSelection,
+    //     },
+    // });
 
     return (
         <div className="space-y-4">
@@ -296,11 +329,21 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-secondary">
-                            {(grandTotalKg / 1000).toFixed(2)} T
+                            {data?.total_quantite_washed >= 1000 ? (
+                                <>
+                                    {(data?.total_quantite_washed / 1000).toLocaleString("fr-FR", {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                    })}
+                                    <span className="text-sm"> T</span>
+                                </>
+                            ) : (
+                                <>
+                                    {data?.total_quantite_washed?.toLocaleString("fr-FR") || 0}
+                                    <span className="text-sm"> Kg</span>
+                                </>
+                            )}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {grandTotalKg.toLocaleString("fr-FR")} Kg au total
-                        </p>
                     </CardContent>
                 </Card>
 
@@ -312,7 +355,7 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {MOCK_CUMULATIF_WASHED.length} Sociétés
+                            {data?.total_societe || 0} Sociétés
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
                             Avec collecte de café washed enregistrée
@@ -328,7 +371,7 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold ">
-                            55 Collectes
+                            {data?.nb_achats?.toLocaleString("fr-FR") || 0} Achats
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
                             Operations cumulées d'achat
@@ -337,7 +380,7 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
                 </Card>
             </div>
 
-            <div className="w-full bg-sidebar p-4 rounded-lg">
+            {/* <div className="w-full bg-sidebar p-4 rounded-lg">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4">
                     <div className="relative">
                         <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5" />
@@ -419,7 +462,7 @@ export default function CumulatifWashedListTable({ isLoading: externalLoading })
                         onLimitChange={datapagination.onLimitChange}
                     />
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }
