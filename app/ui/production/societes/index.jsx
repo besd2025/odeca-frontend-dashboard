@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/table";
 import React, { useState, useEffect, useCallback } from "react";
 import { fetchData } from "@/app/_utils/api";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export default function SocietesQty() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -56,7 +58,32 @@ export default function SocietesQty() {
 
     return (
         <div className="w-full bg-card p-4 rounded-lg border">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
+                <div className="relative ">
+                    <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
+                    <Input
+                        placeholder="Rechercher..."
+                        // value={searchvalue}
+                        // onChange={(e) => setSearchValue(e.target.value)}
+                        className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+                    />
+                </div>
 
+                <div className="flex flex-row justify-between gap-x-3">
+
+
+                    <div className="flex items-center gap-3 text-gray-700">
+                        {/* <ExportButton
+                            handleExportStockInitial={handleExportStockInitial}
+                            exportType="stock_initial_data"
+                            loading={loadingEportBtn}
+                            activedownloadBtn={activedownloadBtn}
+                            onClickDownloadButton={DownloadStockInitialToExcel}
+                        /> */}
+                    </div>
+
+                </div>
+            </div>
             <div className="w-full overflow-hidden rounded-md border">
                 <Table>
                     <TableHeader>
