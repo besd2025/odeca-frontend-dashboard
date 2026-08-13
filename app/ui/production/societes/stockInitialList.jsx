@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, RotateCcw, Search } from "lucide-react";
+import { MoreHorizontal, Pencil, RotateCcw, Search } from "lucide-react";
 import { fetchData } from '@/app/_utils/api';
 import PaginationControls from "@/components/ui/pagination-controls";
 import { UserContext } from "@/app/ui/context/User_Context";
@@ -14,6 +14,15 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ExportButton from '@/components/ui/export_button';
 import { Input } from '@/components/ui/input';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import StockInitialEdit from './stockInitialEdit';
 export default function StockInitialList({ onStartStocking }) {
     const [lots, setLots] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
@@ -187,6 +196,9 @@ export default function StockInitialList({ onStartStocking }) {
                 <Table>
                     <TableHeader>
                         <TableRow>
+                            {user?.session?.category === "Admin" && (
+                                <TableHead className="text-right">Actions</TableHead>
+                            )}
                             <TableHead className="w-[120px]"> #</TableHead>
                             <TableHead className="w-[120px]">Lot</TableHead>
                             <TableHead>Société</TableHead>
@@ -195,14 +207,35 @@ export default function StockInitialList({ onStartStocking }) {
                             <TableHead className="text-center">Quantites</TableHead>
                             <TableHead className="w-[120px]">Nombre de sacs</TableHead>
                             <TableHead className="text-center">Campagne</TableHead>
-                            {user?.session?.category === "Admin" && (
-                                <TableHead className="text-right">Actions</TableHead>
-                            )}
+
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {lots?.map((lot, index) => (
                             <TableRow key={lot.id}>
+                                <TableCell>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <span className="sr-only">Open menu</span>
+                                                <MoreHorizontal />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="start">
+                                            <DropdownMenuLabel className="text-muted-foreground font-normal">
+                                                Actions
+                                            </DropdownMenuLabel>
+                                            {user?.session?.category === "Admin" && (
+                                                <DropdownMenuItem onClick={() => handleEditClick(lot)} className="bg-secondary text-card flex  items-center justify-center cursor-pointer">
+
+                                                    Modifier
+                                                </DropdownMenuItem>
+                                            )}
+                                            <DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
+
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
                                 <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell className="font-medium">{lot.numero_lot}</TableCell>
                                 <TableCell>{lot.societe}</TableCell>
@@ -223,19 +256,7 @@ export default function StockInitialList({ onStartStocking }) {
                                 <TableCell className="font-medium">{lot.quantite}</TableCell>
                                 <TableCell className="font-medium">{lot.nombre_sacs}</TableCell>
                                 <TableCell>{lot.annee_campagne}</TableCell>
-                                {user?.session?.category === "Admin" && (
-                                    <TableCell className="text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleEditClick(lot)}
-                                            className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
-                                            title="Modifier ce stock"
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </Button>
-                                    </TableCell>
-                                )}
+
                             </TableRow>
                         ))}
                     </TableBody>
@@ -253,7 +274,13 @@ export default function StockInitialList({ onStartStocking }) {
                 />
             </CardContent>
 
-
+            {/* Dialog de modification */}
+            <StockInitialEdit
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                stockItem={selectedStock}
+                onSuccess={handleEditSuccess}
+            />
         </Card>
     )
 }
