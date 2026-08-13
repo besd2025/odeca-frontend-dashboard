@@ -94,7 +94,7 @@ export default function ReceptionPage() {
                     fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit } }),
                     fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit } })
                 ]);
-                console.log(pendingRes)
+                console.log("pendingRes ::::::::::::", pendingRes)
                 const pendingMapped = pendingRes?.results?.map((item) => ({
                     id: item?.id,
                     societe: item?.sdl?.societe?.nom_societe || "Inconnu",
@@ -102,6 +102,7 @@ export default function ReceptionPage() {
                     dateTransfert: item?.transfer_date || "-",
                     dateReception: "-",
                     poidsNet: item?.total_parche || 0,
+                    usine: item?.usine_deparchage?.usine_name || "-",
                     status: "en attente",
                 })) || [];
 
@@ -112,6 +113,7 @@ export default function ReceptionPage() {
                     dateTransfert: item?.transfer_date || "-",
                     dateReception: item?.date_reception ? new Date(item.date_reception).toISOString().split('T')[0] : "-",
                     poidsNet: item?.total_parche || 0,
+                    usine: item?.usine_deparchage?.usine_name || "-",
                     status: "confirmé",
                 })) || [];
 
@@ -128,6 +130,7 @@ export default function ReceptionPage() {
                     dateTransfert: item?.transfer_date || "-",
                     dateReception: "-",
                     poidsNet: item?.total_parche || 0,
+                    usine: item?.usine_deparchage?.usine_name || "-",
                     status: "en attente",
                 })) || [];
                 setReceptionsEnAttenteList(pendingMapped);
@@ -141,6 +144,7 @@ export default function ReceptionPage() {
                     dateTransfert: item?.transfer_date || "-",
                     dateReception: item?.date_reception ? new Date(item.date_reception).toISOString().split('T')[0] : "-",
                     poidsNet: item?.total_parche || 0,
+                    usine: item?.usine_deparchage?.usine_name || "-",
                     status: "confirmé",
                 })) || [];
                 setReceptionsConfirmeList(confirmedMapped);
@@ -235,6 +239,7 @@ export default function ReceptionPage() {
                             <TableRow>
                                 <TableHead className="pl-4">Actions</TableHead>
                                 <TableHead>Société</TableHead>
+                                <TableHead>Usine</TableHead>
                                 <TableHead>Date Transfert</TableHead>
                                 <TableHead>Date Réception</TableHead>
                                 <TableHead className="text-right">Poids Net (kg)</TableHead>
@@ -299,6 +304,13 @@ export default function ReceptionPage() {
 
                                             </div>
                                         </div></TableCell>
+                                        <TableCell className="font-semibold">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="font-medium text-slate-800 dark:text-slate-200">
+                                                    {lot.usine || "-"}
+                                                </span>
+                                            </div>
+                                        </TableCell>
                                         <TableCell>{lot.dateTransfert}</TableCell>
                                         <TableCell>{lot.dateReception}</TableCell>
                                         <TableCell className="text-right font-semibold">{lot.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</TableCell>

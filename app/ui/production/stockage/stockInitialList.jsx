@@ -9,6 +9,11 @@ import { fetchData } from '@/app/_utils/api';
 import PaginationControls from "@/components/ui/pagination-controls";
 import { UserContext } from "@/app/ui/context/User_Context";
 import StockInitialEdit from "./stockInitialEdit";
+import { PlusCircle } from "lucide-react";
+import { ROLES } from '@/lib/permissions';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import ExportButton from '@/components/ui/export_button';
 export default function StockInitialList({ onStartStocking }) {
     const [lots, setLots] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
@@ -20,7 +25,9 @@ export default function StockInitialList({ onStartStocking }) {
     const [selectedStock, setSelectedStock] = useState(null);
     const [refreshKey, setRefreshKey] = useState(0);
     const user = React.useContext(UserContext);
-
+    const [exportBlob, setExportBlob] = useState(null);
+    const [activedownloadBtn, setActivedownloadBtn] = useState(false);
+    const [loadingEportBtn, setLoadingEportBtn] = useState(false);
     const handleEditClick = (lot) => {
         setSelectedStock(lot);
         setEditOpen(true);
@@ -54,6 +61,7 @@ export default function StockInitialList({ onStartStocking }) {
                         id: item?.id,
                         numero_lot: item?.stockage__numero_lot,
                         societe: item?.stockage__proprietaire__nom_societe,
+                        usine: item?.stockage__usine__usine_name || "-",
                         qualite: item?.stockage__qualite__nom,
                         annee_campagne: item?.annee_campagne,
                         nombre_sacs: item?.nombre_sacs,
@@ -71,10 +79,92 @@ export default function StockInitialList({ onStartStocking }) {
 
         fetchLots();
     }, [limit, pointer, refreshKey]);
+
+    const handleExportStockInitial = async () => {
+        setLoadingEportBtn(true);
+        try {
+            const initResponse = await fetchData("get", `cafe/prestockage_apres_usinage/get_list_quantite_initial/`, {
+                params: { limit: 1 },
+            });
+            const total = initResponse?.count || 0;
+            if (total === 0) {
+                setLoadingEportBtn(false);
+                return;
+            }
+
+            const response = await fetchData("get", `cafe/prestockage_apres_usinage/get_list_quantite_initial/`, {
+                params: { limit: total },
+            });
+
+            const allData = response.results || [];
+            const formattedData = allData.map((item) => {
+                const row = {
+                    numero_lot:
+                        item.stockage__numero_lot,
+                    Usine: item.stockage__usine__usine_name || "",
+                    Proprietaire: item.stockage__proprietaire__nom_societe || "",
+                    Qualite: item.stockage__qualite__nom || "",
+                    Annee_Campagne: item?.annee_campagne || "",
+                    Nombre_sacs: item?.nombre_sacs || "",
+                    Quantite: item?.quantite_cafe_vert || "",
+                };
+                if (user?.session?.category === ROLES.ADMIN) {
+                    row.CODE_USINE = item?.stockage__usine__usine_code || "";
+                }
+                return row;
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(formattedData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "STOCK_INITIAL");
+            const excelBuffer = XLSX.write(workbook, {
+                bookType: "xlsx",
+                type: "array",
+            });
+            const blob = new Blob([excelBuffer], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+            });
+
+            setExportBlob(blob);
+            setActivedownloadBtn(true);
+        } catch (error) {
+            console.error("Erreur exportation Excel :", error);
+        } finally {
+            setLoadingEportBtn(false);
+        }
+    };
+
+    const DownloadStockInitialToExcel = () => {
+        if (!exportBlob) return;
+        const now = new Date();
+        const date = now.toISOString().split("T")[0];
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        const seconds = String(now.getSeconds()).padStart(2, "0");
+        const time = `${hours}_${minutes}_${seconds}`;
+        saveAs(
+            exportBlob,
+            `stock_initial_${date}_${time}.xlsx`,
+        );
+        setActivedownloadBtn(false);
+        setExportBlob(null);
+    };
+
+
+
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Stock Initial</CardTitle>
+                <div className="flex items-center gap-3 text-gray-700">
+                    <ExportButton
+                        handleExportStockInitial={handleExportStockInitial}
+                        exportType="stock_initial_data"
+                        loading={loadingEportBtn}
+                        activedownloadBtn={activedownloadBtn}
+                        onClickDownloadButton={DownloadStockInitialToExcel}
+                    />
+                </div>
                 <CardDescription>
                     Voici la liste de tous les lots qui sont actuellement en stock.
                 </CardDescription>
@@ -86,6 +176,7 @@ export default function StockInitialList({ onStartStocking }) {
                             <TableHead className="w-[120px]"> #</TableHead>
                             <TableHead className="w-[120px]">Lot</TableHead>
                             <TableHead>Société</TableHead>
+                            <TableHead>Usine</TableHead>
                             <TableHead className="text-center">Qualités</TableHead>
                             <TableHead className="text-center">Quantites</TableHead>
                             <TableHead className="w-[120px]">Nombre de sacs</TableHead>
@@ -101,6 +192,13 @@ export default function StockInitialList({ onStartStocking }) {
                                 <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell className="font-medium">{lot.numero_lot}</TableCell>
                                 <TableCell>{lot.societe}</TableCell>
+                                <TableCell className="font-semibold">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                                            {lot.usine || "-"}
+                                        </span>
+                                    </div>
+                                </TableCell>
                                 <TableCell className="text-center">
                                     <div className="flex flex-wrap justify-center gap-2">
                                         <Badge variant="secondary" className="px-2 py-1 text-xs">
