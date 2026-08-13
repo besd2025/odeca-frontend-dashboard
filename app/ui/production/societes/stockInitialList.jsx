@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, RotateCcw, Search } from "lucide-react";
+import { MoreHorizontal, Pencil, RotateCcw, Search } from "lucide-react";
 import { fetchData } from '@/app/_utils/api';
 import PaginationControls from "@/components/ui/pagination-controls";
 import { UserContext } from "@/app/ui/context/User_Context";
@@ -14,6 +14,15 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ExportButton from '@/components/ui/export_button';
 import { Input } from '@/components/ui/input';
+import StockInitialEdit from './stockInitialEdit';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 export default function StockInitialList({ onStartStocking }) {
     const [lots, setLots] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
@@ -203,6 +212,34 @@ export default function StockInitialList({ onStartStocking }) {
                     <TableBody>
                         {lots?.map((lot, index) => (
                             <TableRow key={lot.id}>
+                                <TableCell>
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <span className="sr-only">Open menu</span>
+                                                <MoreHorizontal />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="start">
+                                            <DropdownMenuLabel className="text-muted-foreground font-normal">
+                                                Actions
+                                            </DropdownMenuLabel>
+                                            {/* Dialog de modification */}
+                                            <StockInitialEdit
+                                                open={editOpen}
+                                                onOpenChange={setEditOpen}
+                                                stockItem={selectedStock}
+                                                onSuccess={handleEditSuccess}
+                                            />
+
+                                            <DropdownMenuSeparator />
+
+                                            <DropdownMenuItem>Supprimer</DropdownMenuItem>
+
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
                                 <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell className="font-medium">{lot.numero_lot}</TableCell>
                                 <TableCell>{lot.societe}</TableCell>
