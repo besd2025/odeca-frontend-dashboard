@@ -225,13 +225,6 @@ export default function StockInitialList({ onStartStocking }) {
                                             <DropdownMenuLabel className="text-muted-foreground font-normal">
                                                 Actions
                                             </DropdownMenuLabel>
-                                            {/* Dialog de modification */}
-                                            <StockInitialEdit
-                                                open={editOpen}
-                                                onOpenChange={setEditOpen}
-                                                stockItem={selectedStock}
-                                                onSuccess={handleEditSuccess}
-                                            />
 
                                             <DropdownMenuSeparator />
 
@@ -290,6 +283,13 @@ export default function StockInitialList({ onStartStocking }) {
                 />
             </CardContent>
 
+            {/* Dialog de modification */}
+            <StockInitialEdit
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                stockItem={selectedStock}
+                onSuccess={handleEditSuccess}
+            />
 
         </Card>
     )
