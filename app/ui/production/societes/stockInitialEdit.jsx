@@ -132,11 +132,11 @@ export default function StockInitialEdit({ open, onOpenChange, stockItem, onSucc
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="h-[90vh]">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-
-                        Modifier
+                        <Pencil className="h-5 w-5 text-primary" />
+                        Modifier le stock initial
                     </DialogTitle>
                     <DialogDescription>
                         Modifiez les informations du stock initial pour le lot{" "}
@@ -144,7 +144,8 @@ export default function StockInitialEdit({ open, onOpenChange, stockItem, onSucc
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className='flex flex-col gap-4'>
+
+                <div className='flex flex-col gap-4 overflow-auto'>
                     {/* Numéro de lot */}
                     <div className='flex flex-col gap-2'>
                         <Label htmlFor="edit-numero">Numéro de lot</Label>
