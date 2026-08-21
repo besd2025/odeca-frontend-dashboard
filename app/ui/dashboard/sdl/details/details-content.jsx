@@ -562,28 +562,29 @@ function DetailsContent({ id }) {
               <DropdownMenuContent align="start">
                 <DropdownMenuLabel>Menu</DropdownMenuLabel>
 
-                <DropdownMenuItem onClick={() => setTab("transferSdl")}>
-                  <Spline className="w-4 h-4" /> Transfer(SDL → Depulpage)
+                <DropdownMenuItem>
+                  <TabsTrigger value="transferSdl" className="shrink-0"><Spline className="w-4 h-4" /> Transfer(SDL → Depulpage)</TabsTrigger>
+
                 </DropdownMenuItem>
 
-                <DropdownMenuItem onClick={() => setTab("receptionSdl")}>
-                  <Spline className="w-4 h-4" /> Reception(CT)
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem onClick={() => setTab("rendement")}>
-                  <ChartNoAxesCombined className="w-4 h-4" /> Rendement
-                </DropdownMenuItem>
-
-                <DropdownMenuItem onClick={() => setTab("rh")}>
-                  <ScrollText className="w-4 h-4" /> RH
+                <DropdownMenuItem>
+                  <TabsTrigger value="receptionSdl" className="shrink-0"> <Spline className="w-4 h-4" /> Reception(CT)</TabsTrigger>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem onClick={() => setTab("maps")}>
-                  <MapPinHouse className="w-4 h-4" /> Map
+                <DropdownMenuItem>
+                  <TabsTrigger value="rendement" className="shrink-0"> <ChartNoAxesCombined className="w-4 h-4" /> Rendement</TabsTrigger>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem>
+                  <TabsTrigger value="rh" className="shrink-0"> <ScrollText className="w-4 h-4" /> RH</TabsTrigger>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem>
+                  <TabsTrigger value="maps" className="shrink-0"> <MapPinHouse className="w-4 h-4" /> Map</TabsTrigger>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
