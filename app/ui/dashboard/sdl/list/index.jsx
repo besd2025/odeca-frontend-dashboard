@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, MoreHorizontal, Phone, Search } from "lucide-react";
+import { ArrowUpDownIcon, ListTodo, MoreHorizontal, Phone, Search } from "lucide-react";
 import * as React from "react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,7 @@ import AddSdl from "../add-sdl";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 import { ROLES } from "@/lib/permissions";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SdlsListTable({ isLoading: externalLoading }) {
   const [sorting, setSorting] = React.useState([]);
@@ -518,7 +519,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
               <Filter handleFilter={handleFilter} />
             </div>
             <div className="flex items-center gap-3 text-gray-700">
-              {user?.session?.category === "Admin" && <AddSdl />}
+
               <ExportButton
                 handleExportSDLs={handleExportSDLs}
                 exportType="sdl_data"
@@ -527,64 +528,109 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                 onClickDownloadButton={DownloadSDLsToExcel}
               />
             </div>
-            {(user?.session?.category === ROLES.ADMIN || user?.session?.category === ROLES.SUPERVISEUR) && !ActiveSdlValidationBtn ? (
-              <Button
-                variant="ghost"
-                className="text-primary hover:text-primary"
-                onClick={exportSdlValidationToExcel}
-                disabled={LoadingSdlValidationBtn}
-              >
-                {LoadingSdlValidationBtn ? (
-                  <>
-                    <svg
-                      className="animate-spin h-4 w-4 mr-2"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v8z"
-                      />
-                    </svg>
-                    Préparation...
-                  </>
-                ) : (
-                  "Taux de validation"
-                )}
-              </Button>
-            ) : ActiveSdlValidationBtn ? (
-              <Button
-                variant="ghost"
-                className="text-green-600 hover:text-green-700"
-                onClick={DownloadSdlValidationToExcel}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
+            <div className="hidden lg:flex items-center gap-3 text-gray-700">
+              {user?.session?.category === "Admin" && <AddSdl />}
+              {(user?.session?.category === ROLES.ADMIN || user?.session?.category === ROLES.SUPERVISEUR) && !ActiveSdlValidationBtn ? (
+                <Button
+                  variant="outline"
+                  className="border-primary "
+                  onClick={exportSdlValidationToExcel}
+                  disabled={LoadingSdlValidationBtn}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
-                  />
-                </svg>
-                Télécharger
-              </Button>
-            ) : null}
+                  {LoadingSdlValidationBtn ? (
+                    <>
+                      <Spinner className="size-4" />
+                      Préparation...
+                    </>
+                  ) : (
+                    <>
+                      <ListTodo className="size-4" />
+                      Taux de validation
+                    </>
+                  )}
+                </Button>
+              ) : ActiveSdlValidationBtn ? (
+                <Button
+                  variant="ghost"
+                  className="text-green-600 hover:text-green-700"
+                  onClick={DownloadSdlValidationToExcel}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
+                    />
+                  </svg>
+                  Télécharger
+                </Button>
+              ) : null}
+            </div>
+            <div className="block lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost"><MoreHorizontal size={16} /></Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {user?.session?.category === "Admin" &&
+                    <DropdownMenuItem>
+                      <AddSdl />
+                    </DropdownMenuItem>
+                  }
+                  {(user?.session?.category === ROLES.ADMIN || user?.session?.category === ROLES.SUPERVISEUR) && !ActiveSdlValidationBtn ? (
+                    <DropdownMenuItem>
+                      <Button
+                        variant="outline"
+                        className="border-primary "
+                        onClick={exportSdlValidationToExcel}
+                        disabled={LoadingSdlValidationBtn}
+                      >
+                        {LoadingSdlValidationBtn ? (
+                          <>
+                            <Spinner className="size-4" />
+                            Préparation...
+                          </>
+                        ) : (
+                          <>
+                            <ListTodo className="size-4" />
+                            Taux de validation
+                          </>
+                        )}
+                      </Button>
+                    </DropdownMenuItem>) : ActiveSdlValidationBtn ? (
+                      <DropdownMenuItem>
+                        <Button
+                          variant="ghost"
+                          className="text-green-600 hover:text-green-700"
+                          onClick={DownloadSdlValidationToExcel}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
+                            />
+                          </svg>
+                          Télécharger
+                        </Button>
+                      </DropdownMenuItem>) : null}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
         <div className="grid w-full [&>div]:border [&>div]:rounded-md">

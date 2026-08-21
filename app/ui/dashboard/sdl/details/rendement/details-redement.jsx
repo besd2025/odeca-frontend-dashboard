@@ -6,12 +6,57 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 import { Button } from "@/components/ui/button";
-import { Grape, Layers2, MapPinHouse, ReceiptText, Spline } from "lucide-react";
+import { Grape, Layers2, MapPinHouse, MoreHorizontal, ReceiptText, Spline } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { useEffect } from "react";
+import { UserContext } from "@/app/ui/context/User_Context";
+import EditRendementParche from "./editParche";
 
 export default function DetailsRendement({ data }) {
+  const user = React.useContext(UserContext);
+
+  const [loading, setLoading] = React.useState(true);
+  useEffect(() => {
+    setLoading(true);
+    const getRapportC = async () => {
+      try {
+        const rapportC = await fetchData(
+          "get",
+          `cafe/rapport_jounalier/${data.id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          },
+        );
+        setRapportCData(rapportC);
+      } catch (error) {
+        console.error("Error fetching rapportC:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getRapportC();
+  }, [data.id]);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -19,35 +64,77 @@ export default function DetailsRendement({ data }) {
           Details
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Rendement journalier</DialogTitle>
-          <div className="mt-2 grid grid-cols-1 gap-2 ">
+          <DialogTitle>Details Rendement</DialogTitle>
+          <Card className="w-full border-none shadow-none">
+            <CardContent className="p-0">
+              <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="pl-4">Actions</TableHead>
+                      <TableHead>Grade</TableHead>
+                      <TableHead>QteParche</TableHead>
+                      {/* <TableHead>Rendement</TableHead> */}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          Chargement...
+                        </TableCell>
+                      </TableRow>
+                    ) : data.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          Aucun rendement trouvé.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      data.map((product) => (
+                        <TableRow key={product.id} className="odd:bg-muted/50">
+                          <TableCell className="pl-4">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Open menu</span>
+                                  <MoreHorizontal />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="start">
+                                <DropdownMenuLabel className="text-muted-foreground font-normal">
+                                  Actions
+                                </DropdownMenuLabel>
+                                {/* <DetailsRendement data={product} /> */}
+                                {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+                                  <EditRendementParche data={product} />
+                                )}
+                                {/* <DropdownMenuItem className="text-destructive">
+                            Supprimer
+                          </DropdownMenuItem> */}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
 
-            <div className="#CA border rounded p-2">
-              <h1 className="flex gap-x-2 bg-primary w-max items-center py-1 px-2 rounded-lg text-primary-foreground">
-                <Grape size={20} />
-                Grade: {data?.grade}
-              </h1>
-              <div className="mt-2 flex flex-col gap-y-2">
-                <div className="flex items-center gap-x-4 text-sm ">
-                  <span className="text-muted-foreground">Numero lot: {data?.lot_num} </span>
-
-                </div>
-                <div className="flex items-center gap-x-4 text-sm ">
-                  <span className="text-muted-foreground">Qte total: {data?.QteParche} kg</span>
-
-                </div>
-                <div className="flex items-center gap-x-4 text-sm ">
-                  <span className="font-medium">code rendement: {data?.rendement_code}</span>
-                </div>
-                <div className="flex items-center gap-x-4 text-sm ">
-                  <span className="text-muted-foreground">Date :{data?.date} kg</span>
-                </div>
+                          {/* <TableCell>{product.lot_num}</TableCell> */}
+                          <TableCell className="bg-secondary/20">
+                            {product.grade}
+                          </TableCell>
+                          <TableCell className="bg-accent">
+                            {product.QteParche}{" "}
+                            <span className="text-xs normal-case">Kg</span>
+                          </TableCell>
+                          {/* <TableCell>{product.rendement_code}</TableCell> */}
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
               </div>
-            </div>
-
-          </div>
+            </CardContent>
+          </Card>
         </DialogHeader>
       </DialogContent>
     </Dialog>

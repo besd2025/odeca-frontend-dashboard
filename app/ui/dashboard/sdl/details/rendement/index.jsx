@@ -9,6 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
   Table,
   TableBody,
   TableCell,
@@ -26,6 +34,7 @@ import { Input } from "@/components/ui/input";
 import { fetchData } from "@/app/_utils/api";
 import { useContext } from "react";
 import { UserContext } from "@/app/ui/context/User_Context";
+import EditRendementParche from "./editParche";
 export default function RedementC({ id }) {
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(5);
@@ -84,104 +93,188 @@ export default function RedementC({ id }) {
   }, [id, page, pageSize]);
 
   return (
-    <Card className="w-full mt-4 rounded-2xl">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl font-bold">
-          Rapport C – Rendements Cerises
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="relative">
-          <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5" />
-          <Input
-            placeholder="Rechercher..."
-            className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
-          />
-        </div>
+    <div>
+      <Card className="w-full border-none shadow-none">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-xl font-bold">
+            Rapport C – Rendements Cerises
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative">
+            <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5" />
+            <Input
+              placeholder="Rechercher..."
+              className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+            />
+          </div>
 
-        <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden mt-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="pl-4">Actions</TableHead>
-                <TableHead>Date Emmangasinage</TableHead>
-                <TableHead>No Lot</TableHead>
-                <TableHead>Grade</TableHead>
-                <TableHead>QteParche</TableHead>
-                <TableHead>Rendement</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
+          <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden mt-4">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    Chargement...
-                  </TableCell>
+                  <TableHead className="pl-4">Actions</TableHead>
+                  <TableHead>Date Emmangasinage</TableHead>
+                  <TableHead>No Lot</TableHead>
+                  <TableHead>Qte CA</TableHead>
+                  <TableHead>Qte CB</TableHead>
+                  <TableHead>QteParche</TableHead>
+                  {/* <TableHead>Rendement</TableHead> */}
                 </TableRow>
-              ) : rapportCData.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    Aucun rendement trouvé.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                rapportCData.map((product) => (
-                  <TableRow key={product.id} className="odd:bg-muted/50">
-                    <TableCell className="pl-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
-                          <DropdownMenuLabel className="text-muted-foreground font-normal">
-                            Actions
-                          </DropdownMenuLabel>
-                          <DetailsRendement data={product} />
-                          {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
-                            <EditRendement data={product} />
-                          )}
-                          {/* <DropdownMenuItem className="text-destructive">
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      Chargement...
+                    </TableCell>
+                  </TableRow>
+                ) : rapportCData.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      Aucun rendement trouvé.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  rapportCData.map((product) => (
+                    <TableRow key={product.id} className="odd:bg-muted/50">
+                      <TableCell className="pl-4">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <DropdownMenuLabel className="text-muted-foreground font-normal">
+                              Actions
+                            </DropdownMenuLabel>
+                            <DetailsRendement data={rapportCData} />
+                            {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+                              <EditRendement data={product} />
+                            )}
+                            <DropdownMenuItem className="text-destructive">
+                              Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+
+                      <TableCell className="font-medium">{product.date}</TableCell>
+                      <TableCell>{product.lot_num}</TableCell>
+                      <TableCell className="bg-accent">
+                        {product.QteParche}{" "}
+                        <span className="text-xs normal-case">Kg</span>
+                      </TableCell>
+                      <TableCell className="bg-accent">
+                        {product.QteParche}{" "}
+                        <span className="text-xs normal-case">Kg</span>
+                      </TableCell>
+                      <TableCell className="bg-accent">
+                        {product.QteParche}{" "}
+                        <span className="text-xs normal-case">Kg</span>
+                      </TableCell>
+                      {/* <TableCell>{product.rendement_code}</TableCell> */}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <PaginationControls
+            className="mt-4"
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(size) => {
+              setPage(1);
+              setPageSize(size);
+            }}
+            hasNextPage={page < totalPages}
+            hasPreviousPage={page > 1}
+          />
+        </CardContent>
+      </Card>
+      <Dialog>
+        <DialogTrigger>Open</DialogTrigger>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Details Rendement</DialogTitle>
+            <Card className="w-full border-none shadow-none">
+              <CardContent className="p-0">
+                <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="pl-4">Actions</TableHead>
+                        <TableHead>Grade</TableHead>
+                        <TableHead>QteParche</TableHead>
+                        {/* <TableHead>Rendement</TableHead> */}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {loading ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                            Chargement...
+                          </TableCell>
+                        </TableRow>
+                      ) : rapportCData.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                            Aucun rendement trouvé.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        rapportCData.map((product) => (
+                          <TableRow key={product.id} className="odd:bg-muted/50">
+                            <TableCell className="pl-4">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                  <DropdownMenuLabel className="text-muted-foreground font-normal">
+                                    Actions
+                                  </DropdownMenuLabel>
+                                  {/* <DetailsRendement data={product} /> */}
+                                  {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+                                    <EditRendementParche data={product} />
+                                  )}
+                                  {/* <DropdownMenuItem className="text-destructive">
                             Supprimer
                           </DropdownMenuItem> */}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
 
-                    <TableCell className="font-medium">{product.date}</TableCell>
-                    <TableCell>{product.lot_num}</TableCell>
-                    <TableCell className="bg-secondary/20">
-                      {product.grade}
-                    </TableCell>
-                    <TableCell className="bg-accent">
-                      {product.QteParche}{" "}
-                      <span className="text-xs normal-case">Kg</span>
-                    </TableCell>
-                    <TableCell>{product.rendement_code}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        <PaginationControls
-          className="mt-4"
-          page={page}
-          pageSize={pageSize}
-          totalItems={totalItems}
-          totalPages={totalPages}
-          onPageChange={setPage}
-          onPageSizeChange={(size) => {
-            setPage(1);
-            setPageSize(size);
-          }}
-          hasNextPage={page < totalPages}
-          hasPreviousPage={page > 1}
-        />
-      </CardContent>
-    </Card>
+                            {/* <TableCell>{product.lot_num}</TableCell> */}
+                            <TableCell className="bg-secondary/20">
+                              {product.grade}
+                            </TableCell>
+                            <TableCell className="bg-accent">
+                              {product.QteParche}{" "}
+                              <span className="text-xs normal-case">Kg</span>
+                            </TableCell>
+                            {/* <TableCell>{product.rendement_code}</TableCell> */}
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
