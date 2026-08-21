@@ -51,7 +51,12 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
             societe_code: lot?.code_societe
           }
         })
-        const data = await fetchData("get", `cafe/qualite_cafe/`);
+        const data = await fetchData("get", `cafe/qualite_cafe/`, {
+          params: {
+            limit: 50,
+            offset: 0
+          }
+        });
         const gradesData = data.results || data || [];
         setFullApiGrades(gradesData);
         setUsinageId(retoursData?.usinage_id)

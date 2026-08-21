@@ -144,6 +144,7 @@ export default function StockInitialEdit({ open, onOpenChange, stockItem, onSucc
                     </DialogDescription>
                 </DialogHeader>
 
+
                 <div className='flex flex-col gap-4 overflow-auto'>
                     {/* Numéro de lot */}
                     <div className='flex flex-col gap-2'>

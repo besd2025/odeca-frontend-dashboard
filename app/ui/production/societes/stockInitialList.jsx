@@ -197,16 +197,16 @@ export default function StockInitialList({ onStartStocking }) {
                     <TableHeader>
                         <TableRow>
                             {user?.session?.category === "Admin" && (
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="">Actions</TableHead>
                             )}
-                            <TableHead className="w-[120px]"> #</TableHead>
-                            <TableHead className="w-[120px]">Lot</TableHead>
+                            <TableHead className=""> #</TableHead>
+                            <TableHead className="">Lot</TableHead>
                             <TableHead>Société</TableHead>
                             <TableHead>Usine</TableHead>
-                            <TableHead className="text-center">Qualités</TableHead>
-                            <TableHead className="text-center">Quantites</TableHead>
-                            <TableHead className="w-[120px]">Nombre de sacs</TableHead>
-                            <TableHead className="text-center">Campagne</TableHead>
+                            <TableHead className="">Qualités</TableHead>
+                            <TableHead className="">Quantites</TableHead>
+                            <TableHead className="">Nombre de sacs</TableHead>
+                            <TableHead className="">Campagne</TableHead>
 
                         </TableRow>
                     </TableHeader>
@@ -225,6 +225,7 @@ export default function StockInitialList({ onStartStocking }) {
                                             <DropdownMenuLabel className="text-muted-foreground font-normal">
                                                 Actions
                                             </DropdownMenuLabel>
+
                                             {user?.session?.category === "Admin" && (
                                                 <DropdownMenuItem onClick={() => handleEditClick(lot)} className="bg-secondary text-card flex  items-center justify-center cursor-pointer">
 
