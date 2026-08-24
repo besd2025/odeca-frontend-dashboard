@@ -55,12 +55,19 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80"
+      className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/80 pointer-events-auto"
+      style={{ pointerEvents: "auto" }}
       onClick={handleBackdropClick}
+      onPointerDown={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
     >
       <div
-        className="relative max-h-[80vh] w-auto max-w-[90vw] p-4"
+        className="relative max-h-[80vh] w-auto max-w-[90vw] p-4 pointer-events-auto"
+        style={{ pointerEvents: "auto" }}
         onClick={stopPropagation}
+        onPointerDown={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         {(isLoading || !imageUrl) && !imageError && (
           <div className="absolute inset-0 z-20 flex items-center justify-center text-white/70">
@@ -69,10 +76,15 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
         )}
 
         {/* Zoom & rotate controls */}
-        <div className="absolute top-12 left-12 z-10 flex gap-2">
+        <div 
+          className="absolute top-6 left-6 z-50 flex gap-2 pointer-events-auto"
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           <button
             onClick={handleZoomOut}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
+            onPointerDown={(e) => e.stopPropagation()}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80 focus:outline-none cursor-pointer"
             aria-label="Zoom out"
             type="button"
           >
@@ -80,7 +92,8 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
           </button>
           <button
             onClick={handleReset}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
+            onPointerDown={(e) => e.stopPropagation()}
+            className="flex h-9 px-3 items-center justify-center rounded-full bg-black/60 text-white text-xs font-semibold backdrop-blur-sm transition-colors hover:bg-black/80 focus:outline-none cursor-pointer"
             aria-label="Reset zoom"
             type="button"
           >
@@ -88,7 +101,8 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
           </button>
           <button
             onClick={handleZoomIn}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
+            onPointerDown={(e) => e.stopPropagation()}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80 focus:outline-none cursor-pointer"
             aria-label="Zoom in"
             type="button"
           >
@@ -96,7 +110,8 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
           </button>
           <button
             onClick={handleRotation}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
+            onPointerDown={(e) => e.stopPropagation()}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80 focus:outline-none cursor-pointer"
             aria-label="Rotate"
             type="button"
           >
@@ -123,8 +138,10 @@ const FullscreenImageModal = ({ isOpen, onClose, imageUrl, alt }) => {
             onClose();
             handleReset();
           }}
-          className="absolute right-12 top-12 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 focus:outline-none"
+          onPointerDown={(e) => e.stopPropagation()}
+          className="absolute right-6 top-6 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80 focus:outline-none cursor-pointer"
           aria-label="Close"
+          type="button"
         >
           <svg
             width="24"
