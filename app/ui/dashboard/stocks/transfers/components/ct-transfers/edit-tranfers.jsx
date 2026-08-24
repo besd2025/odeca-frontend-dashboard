@@ -38,7 +38,7 @@ export default function EditTransfers({
   const [cbValue, setCbValue] = React.useState(qte_tranferer?.cb || 0);
   const [photoFicheUrl, setPhotoFicheUrl] = React.useState(photo_fiche || "");
   const [loading, setLoading] = React.useState(false);
-
+  const [transferCode, setTransferCode] = React.useState("");
   React.useEffect(() => {
 
 
@@ -59,6 +59,33 @@ export default function EditTransfers({
     photo_fiche,
   ]);
 
+  React.useEffect(() => {
+    const getSdls = async () => {
+      try {
+        const response = await fetchData("get", `cafe/transfer_ct_sdl/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+        console.log(response)
+        setFromCt(response?.ct?.ct_nom || "");
+        setToDepulpeur(response?.ct?.sdl?.sdl_nom || "");
+        setSoc(response?.ct?.sdl?.societe?.nom_societe || "");
+        setProvince(response?.ct?.ct_adress?.zone_code?.commune_code?.province_code?.province_name || "");
+        setCommune(response?.ct?.ct_adress?.zone_code?.commune_code?.commune_name || "");
+        setCaValue(response?.quantite_cerise_a || 0);
+        setCbValue(response?.quantite_cerise_b || 0);
+        setPhotoFicheUrl(response?.photo_fiche || "");
+        setTransferCode(response?.transfer_ct_sdl_code || "");
+
+      } catch (error) {
+        console.error("Error fetching station data:", error);
+      }
+    };
+
+    getSdls();
+  }, [id]);
+
   const handleSubmit = (e) => {
     setLoading(true);
 
@@ -71,6 +98,7 @@ export default function EditTransfers({
       quantite_cerise_a: caValue,
       transfer_ct_sdl_code: transfer_sdl_ct_code,
       photo_fiche: photoFicheUrl,
+      transfer_ct_sdl_code: transferCode,
     };
     const promise = new Promise(async (resolve, reject) => {
       try {

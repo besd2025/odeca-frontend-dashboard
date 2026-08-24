@@ -17,10 +17,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { fetchData } from '@/app/_utils/api';
 
 export default function EditRendement({ data }) {
+    console.log("EditRendement", data);
     const [open, setOpen] = React.useState(false);
     const [gradeOptions, setGradeOptions] = React.useState([]);
     const [idGrade, setIdGrade] = React.useState("");
     const [qteParche, setQteParche] = React.useState(data?.QteParche);
+    const [qteCa, setQteCa] = React.useState(data?.qte_ca);
+    const [qteCb, setQteCb] = React.useState(data?.qte_cb);
+    const [lot, setLot] = React.useState(data?.lot_num);
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState(null);
     const [dateSortie, setDateSortie] = React.useState(data?.date_production || new Date().toISOString().split("T")[0]);
@@ -67,11 +71,12 @@ export default function EditRendement({ data }) {
         setError(null);
 
         const dataToSend = {
-            grade_code: idGrade,
-            quantite_cafe_parche: qteParche ? Number(qteParche) : 0,
-            enregistrement_date: dateSortie,
-            rendement_cerise_detail_code: data?.rendement_detail_code,
-            rendement_code: data?.rendement_code
+            responsable_code: data?.responsable_code,
+            rendement_cerise_code: data?.rendement_cerise_code,
+            numero_lot: lot,
+            quantite_cerise_a: qteParche,
+            quantite_cerise_b: qteCb,
+            quantite_cerise_c: qteCa,
         };
         console.log("dataToSend", dataToSend)
 
@@ -81,7 +86,7 @@ export default function EditRendement({ data }) {
                     reject(new Error("ID du rendement manquant."));
                     return;
                 }
-                if (!idGrade || !qteParche || !dateSortie) {
+                if (!lot || !qteCa || !qteCb) {
                     reject(new Error("Veuillez remplir tous les champs obligatoires."));
                     return;
                 }
@@ -143,8 +148,8 @@ export default function EditRendement({ data }) {
                             <Label className="text-muted-foreground">Lot</Label>
                             <Input
                                 type="number"
-                                value={qteParche || ""}
-                                onChange={(e) => setQteParche(e.target.value)}
+                                value={lot || ""}
+                                onChange={(e) => setLot(e.target.value)}
                                 // className="w-[150px]"
                                 required
                             />
@@ -153,8 +158,8 @@ export default function EditRendement({ data }) {
                             <Label className="text-muted-foreground">Quantité CA</Label>
                             <Input
                                 type="number"
-                                value={qteParche || ""}
-                                onChange={(e) => setQteParche(e.target.value)}
+                                value={qteCa || ""}
+                                onChange={(e) => setQteCa(e.target.value)}
                                 // className="w-[150px]"
                                 required
                             />
@@ -163,8 +168,8 @@ export default function EditRendement({ data }) {
                             <Label className="text-muted-foreground">Quantité CB</Label>
                             <Input
                                 type="number"
-                                value={qteParche || ""}
-                                onChange={(e) => setQteParche(e.target.value)}
+                                value={qteCb || ""}
+                                onChange={(e) => setQteCb(e.target.value)}
                                 // className="w-[150px]"
                                 required
                             />
@@ -183,7 +188,7 @@ export default function EditRendement({ data }) {
                         <DialogClose asChild>
                             <Button type="button" variant="outline">Annuler</Button>
                         </DialogClose>
-                        <Button type="submit" variant="default" disabled={loading || !idGrade}>
+                        <Button type="submit" variant="default" disabled={loading}>
                             {loading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

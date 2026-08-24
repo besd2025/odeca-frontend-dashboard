@@ -17,14 +17,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { fetchData } from '@/app/_utils/api';
 
 export default function EditRendementParche({ data }) {
+    console.log("EditRendementParche", data);
     const [open, setOpen] = React.useState(false);
     const [gradeOptions, setGradeOptions] = React.useState([]);
     const [idGrade, setIdGrade] = React.useState("");
-    const [qteParche, setQteParche] = React.useState(data?.QteParche);
+    const [qteParche, setQteParche] = React.useState(data?.quantite_cafe_parche);
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState(null);
     const [dateSortie, setDateSortie] = React.useState(data?.date_production || new Date().toISOString().split("T")[0]);
-
     // Fetch grades options only when dialog is opened
     React.useEffect(() => {
         if (!open) return;
@@ -54,8 +54,8 @@ export default function EditRendementParche({ data }) {
     // Sync state with data prop when dialog opens
     React.useEffect(() => {
         if (open) {
-            setIdGrade(data?.grade_code);
-            setQteParche(data?.QteParche);
+            setIdGrade(data?.grade?.grade_code);
+            setQteParche(data?.quantite_cafe_parche);
             setDateSortie(data?.date_production || new Date().toISOString().split("T")[0]);
             setError(null);
         }
@@ -70,8 +70,8 @@ export default function EditRendementParche({ data }) {
             grade_code: idGrade,
             quantite_cafe_parche: qteParche ? Number(qteParche) : 0,
             enregistrement_date: dateSortie,
-            rendement_cerise_detail_code: data?.rendement_detail_code,
-            rendement_code: data?.rendement_code
+            rendement_cerise_detail_code: data?.rendement_cerise_detail_code,
+            rendement_code: data?.rendement?.rendement_cerise_code,
         };
         console.log("dataToSend", dataToSend)
 
@@ -164,7 +164,7 @@ export default function EditRendementParche({ data }) {
                         </Label>
                         <Input
                             type="number"
-                            value={data.QteParche}
+                            value={qteParche}
                             onChange={(e) => setQteParche(e.target.value)}
                             className="w-full"
                             required

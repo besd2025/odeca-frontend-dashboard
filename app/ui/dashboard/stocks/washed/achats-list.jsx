@@ -163,12 +163,28 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
     const handleExportWashed = async () => {
         setLoadingExportBtn(true);
         try {
-            const formattedData = MOCK_ACHATS_WASHED.map((item) => ({
-                ID: item.id,
-                Société: item.societe,
-                "Quantité Washed (Kg)": item.quantite_washed,
-                Qualité: item.qualite,
-                Date: item.date,
+
+
+            const initResponse = await fetchData("get", `cafe/achat_cafe_parche/`, {
+                params: { limit: 1 },
+            });
+            const total = initResponse?.count || 0;
+            if (total === 0) {
+                setLoadingExportBtn(false);
+                return;
+            }
+
+            const response = await fetchData("get", `cafe/achat_cafe_parche/`, {
+                params: { limit: total },
+            });
+
+            const formattedData = response?.results?.map((item) => ({
+                id: item?.id,
+                societe: item?.responsable?.sdl_ct?.sdl?.societe?.nom_societe,
+                hangar: item?.responsable?.sdl_ct?.sdl?.sdl_nom,
+                quantite_washed: item?.quantite,
+                qualite: item?.qualite,
+                date: item?.date_achat
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(formattedData);

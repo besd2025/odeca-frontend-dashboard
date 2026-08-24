@@ -32,23 +32,24 @@ import { UserContext } from "@/app/ui/context/User_Context";
 import EditRendementParche from "./editParche";
 
 export default function DetailsRendement({ data }) {
+  console.log("DetailsRendement", data);
   const user = React.useContext(UserContext);
-
+  const [rapportCData, setRapportCData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   useEffect(() => {
-    setLoading(true);
     const getRapportC = async () => {
       try {
         const rapportC = await fetchData(
           "get",
-          `cafe/rapport_jounalier/${data.id}/`,
+          `cafe/rendements/${data.id}/get_rendement_cerise_details_sdl/`,
           {
             params: {},
             additionalHeaders: {},
             body: {},
           },
         );
-        setRapportCData(rapportC);
+        console.log("eeeee", rapportC)
+        setRapportCData(rapportC?.results);
       } catch (error) {
         console.error("Error fetching rapportC:", error);
       } finally {
@@ -86,14 +87,14 @@ export default function DetailsRendement({ data }) {
                           Chargement...
                         </TableCell>
                       </TableRow>
-                    ) : data.length === 0 ? (
+                    ) : rapportCData?.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                           Aucun rendement trouvé.
                         </TableCell>
                       </TableRow>
                     ) : (
-                      data.map((product) => (
+                      rapportCData?.map((product) => (
                         <TableRow key={product.id} className="odd:bg-muted/50">
                           <TableCell className="pl-4">
                             <DropdownMenu>
@@ -120,10 +121,10 @@ export default function DetailsRendement({ data }) {
 
                           {/* <TableCell>{product.lot_num}</TableCell> */}
                           <TableCell className="bg-secondary/20">
-                            {product.grade}
+                            {product.grade?.grade_name ?? product.grade?.grade_code ?? "-"}
                           </TableCell>
                           <TableCell className="bg-accent">
-                            {product.QteParche}{" "}
+                            {product.quantite_cafe_parche}{" "}
                             <span className="text-xs normal-case">Kg</span>
                           </TableCell>
                           {/* <TableCell>{product.rendement_code}</TableCell> */}
