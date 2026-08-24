@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, MoreHorizontal, Phone, Search } from "lucide-react";
+import { ArrowUpDownIcon, FileChartPie, MoreHorizontal, Phone, Search } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -394,14 +394,6 @@ export default function CtsListTable({ isLoading: externalLoading }) {
         <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
           <div className="relative ">
             <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
-            {/* <input
-                placeholder="Rechercher..."
-                value={table.getColumn("ct")?.getFilterValue() ?? ""}
-                onChange={(event) =>
-                  table.getColumn("ct")?.setFilterValue(event.target.value)
-                }
-                className="pl-10 h-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
-              /> */}
             <input
               placeholder="Rechercher..."
               value={search}
@@ -415,7 +407,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
               <Filter handleFilter={handleFilter} />
             </div>
             <div className="flex items-center gap-3 text-gray-700">
-              {user?.session?.category === "Admin" && <AddCt />}
+
               <ExportButton
                 exportType="ct_data"
                 handleExportCTs={handleExportCTs}
@@ -423,6 +415,44 @@ export default function CtsListTable({ isLoading: externalLoading }) {
                 activedownloadBtn={ActivedownloadBtn}
                 onClickDownloadButton={DownloadCTsToExcel}
               />
+            </div>
+            <div className="hidden lg:flex items-center gap-3">
+              {user?.session?.category === "Admin" && <AddCt />}
+              {user?.session?.category === "Admin" &&
+                <Button
+                  className="text-sm"
+                  variant="outline"
+                >
+                  <FileChartPie className=" h-4 w-4" />
+                  Rapport CT
+                </Button>
+              }
+            </div>
+            <div className="block lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost"><MoreHorizontal size={16} /></Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {user?.session?.category === "Admin" &&
+                    <DropdownMenuItem>
+                      <AddCt />
+                    </DropdownMenuItem>
+                  }
+
+                  {user?.session?.category === "Admin" &&
+                    <DropdownMenuItem>
+                      <Button
+                        className="font-normal text-sm w-full"
+                        variant="outline"
+                      >
+                        <FileChartPie className=" h-4 w-4" />
+                        Rapport CT
+                      </Button>
+                    </DropdownMenuItem>
+                  }
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

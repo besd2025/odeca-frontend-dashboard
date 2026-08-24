@@ -136,60 +136,42 @@ export default function EditRendement({ data }) {
                     </DialogHeader>
 
                     {/* Quantité de parche */}
-                    <div className="mt-2 grid grid-cols-2 gap-2 text-left">
-                        <div className="border rounded p-2">
-                            <h1 className="flex gap-x-2 bg-primary w-max items-center py-1 px-2 rounded-lg text-primary-foreground">
-                                <Grape size={20} />
-                                {data?.grade || "Grade inconnu"}
-                            </h1>
-                            <div className="mt-2 flex flex-col gap-y-2">
-                                <div className="flex items-center gap-x-4 text-sm">
-                                    <span className="text-muted-foreground">Quantité de parche</span>
-                                    <Input
-                                        type="number"
-                                        value={qteParche || ""}
-                                        onChange={(e) => setQteParche(e.target.value)}
-                                        className="w-[150px]"
-                                        required
-                                    />
-                                </div>
-                            </div>
+
+
+                    <div className=" flex flex-col   gap-3 text-sm">
+                        <div className="flex flex-col gap-3 text-sm">
+                            <Label className="text-muted-foreground">Lot</Label>
+                            <Input
+                                type="number"
+                                value={qteParche || ""}
+                                onChange={(e) => setQteParche(e.target.value)}
+                                // className="w-[150px]"
+                                required
+                            />
                         </div>
+                        <div className="flex flex-col gap-3 text-sm">
+                            <Label className="text-muted-foreground">Quantité CA</Label>
+                            <Input
+                                type="number"
+                                value={qteParche || ""}
+                                onChange={(e) => setQteParche(e.target.value)}
+                                // className="w-[150px]"
+                                required
+                            />
+                        </div>
+                        <div className="flex flex-col gap-3 text-sm">
+                            <Label className="text-muted-foreground">Quantité CB</Label>
+                            <Input
+                                type="number"
+                                value={qteParche || ""}
+                                onChange={(e) => setQteParche(e.target.value)}
+                                // className="w-[150px]"
+                                required
+                            />
+                        </div>
+
                     </div>
 
-                    {/* Grade Select — HORS de DialogHeader pour éviter le conflit Radix portal */}
-                    <div className="space-y-2 text-left">
-                        <Label htmlFor="gradeId" className="font-semibold text-slate-700 dark:text-slate-300">
-                            Grade
-                        </Label>
-                        <Select
-                            value={idGrade}
-                            onValueChange={setIdGrade}
-                        >
-                            <SelectTrigger id="gradeId" className="w-full cursor-pointer">
-                                <SelectValue placeholder="Ajouter un grade..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {gradeOptions.map((item, index) => (
-                                    <SelectItem key={`${index + 1}`} value={item.value}>
-                                        {item.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    {/* Date */}
-                    <div className="relative text-left">
-                        <Input
-                            type="date"
-                            value={dateSortie}
-                            onChange={(e) => setDateSortie(e.target.value)}
-                            className="w-full pl-10"
-                            required
-                        />
-                        <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                    </div>
 
                     {error && (
                         <p className="text-sm text-destructive font-medium mt-2">

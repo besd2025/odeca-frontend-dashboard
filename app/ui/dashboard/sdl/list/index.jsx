@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, ListTodo, MoreHorizontal, Phone, Search } from "lucide-react";
+import { ArrowUpDownIcon, FileChartPie, FileSpreadsheet, ListTodo, MoreHorizontal, Phone, Search, Summary } from "lucide-react";
 import * as React from "react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -528,12 +528,12 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                 onClickDownloadButton={DownloadSDLsToExcel}
               />
             </div>
-            <div className="hidden lg:flex items-center gap-3 text-gray-700">
+            <div className="hidden lg:flex items-center gap-3">
               {user?.session?.category === "Admin" && <AddSdl />}
               {(user?.session?.category === ROLES.ADMIN || user?.session?.category === ROLES.SUPERVISEUR) && !ActiveSdlValidationBtn ? (
                 <Button
                   variant="outline"
-                  className="border-primary "
+                  className="border-primary"
                   onClick={exportSdlValidationToExcel}
                   disabled={LoadingSdlValidationBtn}
                 >
@@ -572,6 +572,15 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                   Télécharger
                 </Button>
               ) : null}
+              {user?.session?.category === "Admin" &&
+                <Button
+                  className="text-sm"
+                  variant="outline"
+                >
+                  <FileChartPie className=" h-4 w-4" />
+                  Rapport SDL
+                </Button>
+              }
             </div>
             <div className="block lg:hidden">
               <DropdownMenu>
@@ -628,6 +637,17 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                           Télécharger
                         </Button>
                       </DropdownMenuItem>) : null}
+                  {user?.session?.category === "Admin" &&
+                    <DropdownMenuItem>
+                      <Button
+                        className="font-normal text-sm w-full"
+                        variant="outline"
+                      >
+                        <FileChartPie className=" h-4 w-4" />
+                        Rapport SDL
+                      </Button>
+                    </DropdownMenuItem>
+                  }
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

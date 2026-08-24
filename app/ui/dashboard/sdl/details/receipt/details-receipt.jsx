@@ -14,8 +14,7 @@ export default function DetailsReceipt({ data }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="p-0">
-          <ReceiptText />
+        <Button variant="ghost" className="w-full">
           Details
         </Button>
       </DialogTrigger>

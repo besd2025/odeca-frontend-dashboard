@@ -283,7 +283,7 @@ function StatsCard({ id }) {
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card col-span-3 p-2 h-max">
+      <Card className="@container/card col-span-1 lg:col-span-3 p-2 h-max">
         <CardHeader className="p-2">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-full">
