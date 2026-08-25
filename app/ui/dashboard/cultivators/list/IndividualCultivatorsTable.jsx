@@ -313,7 +313,7 @@ export default function IndividualCultivatorsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+                {/* {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
                   result?.in_payment ? (
                     " "
                   ) : (
@@ -334,7 +334,7 @@ export default function IndividualCultivatorsTable({
                     </div>
                   )) : (
                   " "
-                )}
+                )} */}
               </DropdownMenuContent>
             </DropdownMenu>
           );

@@ -4,7 +4,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -52,10 +51,10 @@ export default function UsineListTable({ isLoading: externalLoading }) {
   const [loading, setLoading] = React.useState(true);
   const [filterData, setFilterData] = React.useState([]);
 
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const [pointer, setPointer] = React.useState(0);
+  const [limit, setLimit] = React.useState(10);
+  const [totalCount, setTotalCount] = React.useState(0);
+  const [currentPage, setCurrentPage] = React.useState(1);
   const [search, setSearch] = useState("");
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
   const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
@@ -68,12 +67,25 @@ export default function UsineListTable({ isLoading: externalLoading }) {
     setSearch(e.target.value);
   };
 
+  const totalPages = Math.ceil(totalCount / limit);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setPointer((pageNumber - 1) * limit);
+  };
+
+  const onLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
     const getUsines = async () => {
       setLoading(true);
       try {
         const response = await fetchData("get", "cafe/usine_deparchage/", {
-          params: { search: search },
+          params: { limit: limit, offset: pointer, search: search },
         });
         const results = response?.results || [];
         const sdlData = results.map((usine) => ({
@@ -97,8 +109,8 @@ export default function UsineListTable({ isLoading: externalLoading }) {
             zone: usine?.sdl_adress?.zone_code?.zone_name || "",
           },
         }));
-
         setData(sdlData);
+        setTotalCount(response?.count || 0);
       } catch (error) {
         console.error("Error fetching sdl data:", error);
       } finally {
@@ -107,7 +119,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
     };
 
     getUsines();
-  }, [search]);
+  }, [limit, pointer, search]);
 
   const handleFilter = (filteredData) => {
     setFilterData(filteredData);
@@ -326,18 +338,17 @@ export default function UsineListTable({ isLoading: externalLoading }) {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    onPaginationChange: setPagination,
+    manualPagination: true,
+    pageCount: totalPages,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination,
     },
   });
 
@@ -431,14 +442,14 @@ export default function UsineListTable({ isLoading: externalLoading }) {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
             <div className="flex-1 text-sm text-muted-foreground"></div>
             <PaginationControls
-              page={table.getState().pagination.pageIndex + 1}
-              pageSize={table.getState().pagination.pageSize}
-              totalItems={table.getFilteredRowModel().rows.length}
-              totalPages={table.getPageCount()}
-              onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
-              onPageSizeChange={(size) => table.setPageSize(size)}
-              hasNextPage={table.getCanNextPage()}
-              hasPreviousPage={table.getCanPreviousPage()}
+              page={currentPage}
+              pageSize={limit}
+              totalItems={totalCount}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+              onPageSizeChange={onLimitChange}
+              hasNextPage={currentPage < totalPages}
+              hasPreviousPage={currentPage > 1}
             />
           </div>
         </>

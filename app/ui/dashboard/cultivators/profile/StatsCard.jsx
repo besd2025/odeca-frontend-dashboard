@@ -111,7 +111,7 @@ function StatsCard({ cult_id }) {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
-                  <span className="text-base">T</span>
+
                 </>
               ) : (
                 <>

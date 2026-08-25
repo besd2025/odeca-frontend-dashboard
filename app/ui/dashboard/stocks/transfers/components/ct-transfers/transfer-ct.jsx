@@ -97,7 +97,7 @@ export default function TransferCtDep({
     toast.promise(promise, {
       loading: "Suppression...",
       success: (data) => {
-        setTimeout(() => window.location.reload(), 500);
+        // setTimeout(() => window.location.reload(), 500);
         return `Le transfert de ${data.name} a été supprimé avec succès`;
       },
       error: "Erreur lors de la suppression",
@@ -145,12 +145,12 @@ export default function TransferCtDep({
                   <EditTransfers
                     transfer_sdl_ct_code={transfer?.transfer_sdl_ct_code}
                     id={transfer?.id}
-                    from_ct={transfer.from_ct}
-                    to_depulpeur_name={transfer.to_depulpeur_name}
-                    society={transfer.society}
-                    localite={transfer.localite}
-                    qte_tranferer={transfer.qte_tranferer}
-                    photo_fiche={transfer.photo_fiche}
+                    from_ct={transfer?.from_ct}
+                    to_depulpeur_name={transfer?.to_depulpeur_name}
+                    society={transfer?.society}
+                    localite={transfer?.localite}
+                    qte_tranferer={transfer?.qte_tranferer}
+                    photo_fiche={transfer?.photo_fiche}
                   />
 
                   <DropdownMenuItem

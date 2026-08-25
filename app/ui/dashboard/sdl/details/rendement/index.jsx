@@ -35,6 +35,7 @@ import { fetchData } from "@/app/_utils/api";
 import { useContext } from "react";
 import { UserContext } from "@/app/ui/context/User_Context";
 import EditRendementParche from "./editParche";
+import { toast } from "sonner";
 export default function RedementC({ id }) {
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(5);
@@ -52,7 +53,7 @@ export default function RedementC({ id }) {
       try {
         const response = await fetchData(
           "get",
-          `cafe/stationslavage/${id}/get_rendement_cerise/`,
+          `cafe/stationslavage/${id}/get_rapport_c_par_sdl/`,
           {
             params: {
               limit: pageSize,
@@ -60,7 +61,7 @@ export default function RedementC({ id }) {
             },
           },
         );
-
+        console.log("response", response);
         // Support deux formats : { count, results } (DRF paginé) ou tableau direct
         const results = Array.isArray(response)
           ? response
@@ -73,14 +74,18 @@ export default function RedementC({ id }) {
           id: rapport?.id,
           grade_code: rapport?.grade?.grade_code,
           date: rapport?.enregistrement_date,
-          lot_num: rapport?.rendement?.numero_lot,
+          lot_num: rapport?.numero_lot,
           grade: rapport?.grade?.grade_name,
-          QteParche: rapport?.quantite_cafe_parche,
-          rendement_code: rapport?.rendement?.rendement_cerise_code,
-          rendement_detail_code: rapport?.rendement_cerise_detail_code,
+          qte_parche: rapport?.total_cafe_parche,
+          qte_cb: rapport?.quantite_cerise_b,
+          qte_ca: rapport?.quantite_cerise_a,
+          rendement_code: rapport?.rendement_cerise_code,
+          rendement_id: rapport?.rendement?.id,
+          responsable_code: rapport?.sdl?.sdl_responsable?.unique_code,
         }));
 
         setRapportCData(rapports);
+
         setTotalItems(count);
       } catch (error) {
         console.error("Error fetching rendement data:", error);
@@ -92,6 +97,48 @@ export default function RedementC({ id }) {
     getRapportC();
   }, [id, page, pageSize]);
 
+
+  //
+  const handleEdit = (product) => {
+    // Logique pour l'édition
+    console.log("Edit:", product);
+  };
+  const HandleDelete = async (id, code) => {
+    const promise = new Promise(async (resolve, reject) => {
+      console.log("code", id);
+      try {
+        await fetchData(
+          "delete",
+          `/cafe/rendements/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+
+          },
+        );
+        resolve({ code: code || 'Le rendement' });
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "SUPPRESSION...",
+      success: (data) => {
+        // setTimeout(() => window.location.reload(), 1000);
+        return `${data.code} a été supprimé avec succès `;
+      },
+      error: "Donnée non supprimée",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div>
       <Card className="w-full border-none shadow-none">
@@ -150,11 +197,11 @@ export default function RedementC({ id }) {
                             <DropdownMenuLabel className="text-muted-foreground font-normal">
                               Actions
                             </DropdownMenuLabel>
-                            <DetailsRendement data={rapportCData} />
+                            <DetailsRendement data={product} />
                             {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
                               <EditRendement data={product} />
                             )}
-                            <DropdownMenuItem className="text-destructive">
+                            <DropdownMenuItem className="text-destructive" onClick={() => HandleDelete(product.id, product.code)}>
                               Supprimer
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -164,15 +211,15 @@ export default function RedementC({ id }) {
                       <TableCell className="font-medium">{product.date}</TableCell>
                       <TableCell>{product.lot_num}</TableCell>
                       <TableCell className="bg-accent">
-                        {product.QteParche}{" "}
+                        {product.qte_ca}{" "}
                         <span className="text-xs normal-case">Kg</span>
                       </TableCell>
                       <TableCell className="bg-accent">
-                        {product.QteParche}{" "}
+                        {product.qte_cb}{" "}
                         <span className="text-xs normal-case">Kg</span>
                       </TableCell>
                       <TableCell className="bg-accent">
-                        {product.QteParche}{" "}
+                        {product.qte_parche}{" "}
                         <span className="text-xs normal-case">Kg</span>
                       </TableCell>
                       {/* <TableCell>{product.rendement_code}</TableCell> */}
