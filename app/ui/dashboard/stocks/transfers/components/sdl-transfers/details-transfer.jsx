@@ -187,8 +187,8 @@ export default function DetailsTransfer({
             </div>
 
             {/* Informations de base avec disposition en 2 colonnes */}
-            <div className="grid grid-cols-2 gap-2 pt-3 mt-3 border-t border-border/50 text-sm">
-              <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 pt-3 mt-3 border-t border-border/50 text-sm">
+              <div className="col-span-1 sm:col-span-3 flex flex-col gap-2">
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Source :</span>
                   <span className="truncate">{sdlSource}</span>
@@ -272,7 +272,7 @@ export default function DetailsTransfer({
                   <span>Liste des Lots de Café & Grades</span>
                 </div>
                 <span className="text-xs text-muted-foreground font-medium">
-                  {gradesDetails.length} lot{gradesDetails.length > 1 ? "s" : ""}
+                  {gradesDetails.length} grade{gradesDetails.length > 1 ? "s" : ""}
                 </span>
               </div>
 

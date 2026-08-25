@@ -176,7 +176,7 @@ export default function TransferSdlDep({
       accessorFn: (row) =>
         row.transfer_date || row.date_transfert || row.date || "-",
       header: ({ column }) => (
-        <div className="text-center">
+        <div className="">
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -188,59 +188,59 @@ export default function TransferSdlDep({
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center font-medium text-foreground text-sm">
+        <div className=" font-medium text-foreground text-sm">
           {row.getValue("transfer_date")}
         </div>
       ),
     },
-    {
-      id: "enregitrement_date",
-      accessorFn: (row) =>
-        row.enregitrement_date ||
-        row.date_enregistrement ||
-        row.enregistrement_date ||
-        row.created_at ||
-        "-",
-      header: ({ column }) => (
-        <div className="text-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    // {
+    //   id: "enregitrement_date",
+    //   accessorFn: (row) =>
+    //     row.enregitrement_date ||
+    //     row.date_enregistrement ||
+    //     row.enregistrement_date ||
+    //     row.created_at ||
+    //     "-",
+    //   header: ({ column }) => (
+    //     <div className="text-center">
+    //       <Button
+    //         variant="ghost"
+    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
 
-          >
-            Date d'Enregistrement
-            <ArrowUpDownIcon className="ml-1 h-3 w-3" />
-          </Button>
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className="text-center text-xs text-muted-foreground font-medium">
-          {row.getValue("enregitrement_date")}
-        </div>
-      ),
-    },
-    {
-      id: "photo_bordereau",
-      header: () => <div >Photo Bordereau</div>,
-      cell: ({ row }) => {
-        const photo =
-          row.original.photo_bordereau || row.original.photo_fiche || null;
-        return (
-          <div className="flex justify-center items-center">
-            {photo ? (
-              <ViewImageDialog
-                imageUrl={photo}
-                alt="Photo bordereau"
-                profile={false}
-                className="h-8 w-8 rounded-md border shadow-xs hover:opacity-85 transition-opacity"
-              />
-            ) : (
-              <span className="text-xs text-muted-foreground italic">-</span>
-            )}
-          </div>
-        );
-      },
-    },
+    //       >
+    //         Date d'Enregistrement
+    //         <ArrowUpDownIcon className="ml-1 h-3 w-3" />
+    //       </Button>
+    //     </div>
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-center text-xs text-muted-foreground font-medium">
+    //       {row.getValue("enregitrement_date")}
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   id: "photo_bordereau",
+    //   header: () => <div >Photo Bordereau</div>,
+    //   cell: ({ row }) => {
+    //     const photo =
+    //       row.original.photo_bordereau || row.original.photo_fiche || null;
+    //     return (
+    //       <div className="flex justify-center items-center">
+    //         {photo ? (
+    //           <ViewImageDialog
+    //             imageUrl={photo}
+    //             alt="Photo bordereau"
+    //             profile={false}
+    //             className="h-8 w-8 rounded-md border shadow-xs hover:opacity-85 transition-opacity"
+    //           />
+    //         ) : (
+    //           <span className="text-xs text-muted-foreground italic">-</span>
+    //         )}
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       id: "status",
       header: () => <div >Statut</div>,
@@ -253,7 +253,7 @@ export default function TransferSdlDep({
           row.original.comfirmation_status === "CONFIRMEE";
 
         return (
-          <div className="flex justify-center">
+          <div className="flex">
             {isConfirmed ? (
               <Badge variant="secondary" className="gap-1">
                 <CheckCircle2 className="h-3 w-3" />

@@ -1,25 +1,36 @@
-import { ChartAreaInteractive } from "@/app/ui/production/usine/dashboard/chart-area-interactive"
-import { DataTable } from "@/app/ui/production/usine/dashboard/data-table"
-import { SectionCards } from "@/app/ui/production/usine/dashboard/section-cards"
 
-import data from "./data.json"
-import QualiteProduit from "@/app/ui/production/usine/dashboard/qualite-produit";
+import UsineListTable from "@/app/ui/dashboard/usine/list";
+import CardsSectionUsines from "@/app/ui/dashboard/usine/analytics/cards-section";
+import { ROLES } from "@/lib/permissions";
+import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
+import { ChartColumn, List } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Page() {
     return (
-
-        <div className="flex flex-1 flex-col">
-            <div className="@container/main flex flex-1 flex-col gap-2">
-                <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                    <SectionCards />
-                    <div className="px-4 lg:px-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-                        {/* <ChartAreaInteractive /> */}
-                        <QualiteProduit />
-                        <DataTable data={data} />
-                    </div>
-
-                </div>
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SUPERVISEUR]}>
+            <div className="p-4">
+                <Tabs defaultValue="list" className="w-full">
+                    <TabsList className="w-full h-10 lg:w-[50%]">
+                        <TabsTrigger value="list">
+                            <List />
+                            <span>Liste</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="details">
+                            <ChartColumn />
+                            <span>Details</span>
+                        </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="list">
+                        <h1 className="text-2xl font-semibold m-2">Liste des Usines</h1>
+                        <UsineListTable />
+                    </TabsContent>
+                    <TabsContent value="details" >
+                        <CardsSectionUsines />
+                    </TabsContent>
+                </Tabs>
             </div>
-        </div>
+        </ProtectedRoute>
+
     );
 }

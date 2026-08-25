@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Card } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 
 export const schema = z.object({
   id: z.number(),
@@ -57,13 +57,27 @@ const columns = [
   },
   {
     accessorKey: "poids",
-    header: () => <div className="w-full text-right">Poids Total (Kg)</div>,
+    header: () => <div className="w-full text-right">Poids Total</div>,
     cell: ({ row }) => {
       const val = Number(row.original.poids || 0);
       return (
-        <div className="text-right font-semibold">
-          {val.toLocaleString("fr-FR")}
+        <div className="text-right font-semibold normal-case">
+          {(val.toLocaleString("fr-FR")) >= 1000 ? (
+            <>
+              {((val.toLocaleString("fr-FR")) / 1000).toLocaleString("fr-FR", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              <span className="">T</span>
+            </>
+          ) : (
+            <>
+              {(val.toLocaleString("fr-FR"))?.toLocaleString("fr-FR") || 0}{" "}
+              <span className="">Kg</span>
+            </>
+          )}
         </div>
+
       );
     },
   },
@@ -79,18 +93,7 @@ const columns = [
       );
     },
   },
-  {
-    accessorKey: "pourcentage",
-    header: () => <div className="w-full text-right">Pourcentage</div>,
-    cell: ({ row }) => {
-      const val = Number(row.original.pourcentage || 0);
-      return (
-        <div className="text-right font-bold text-primary">
-          {val}%
-        </div>
-      );
-    },
-  },
+
 ]
 
 export function DataTable({
@@ -168,6 +171,7 @@ export function DataTable({
     <div className="overflow-hidden rounded-lg">
 
       <Card className="p-4">
+        <CardTitle className="font-bold text-lg">Stock Cafe par societe</CardTitle>
         <Table>
           <TableHeader className="sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (

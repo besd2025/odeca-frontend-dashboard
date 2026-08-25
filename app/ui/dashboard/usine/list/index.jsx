@@ -215,7 +215,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <Link href={`/odeca-dashboard/usine/details/?id=${sdl?.id}`}>
-                <DropdownMenuItem>Details</DropdownMenuItem>
+                {/* <DropdownMenuItem>Details</DropdownMenuItem> */}
               </Link>
               {user?.session?.category === "Admin" ? (
                 <div>
