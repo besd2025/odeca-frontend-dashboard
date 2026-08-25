@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { fetchData } from '@/app/_utils/api';
 
 export default function EditRendement({ data }) {
-    console.log("EditRendement", data);
+    console.log("Rendement", data);
     const [open, setOpen] = React.useState(false);
     const [gradeOptions, setGradeOptions] = React.useState([]);
     const [idGrade, setIdGrade] = React.useState("");
@@ -72,7 +72,7 @@ export default function EditRendement({ data }) {
 
         const dataToSend = {
             responsable_code: data?.responsable_code,
-            rendement_cerise_code: data?.rendement_cerise_code,
+            rendement_cerise_code: data?.rendement_code,
             numero_lot: lot,
             quantite_cerise_a: qteParche,
             quantite_cerise_b: qteCb,
@@ -93,7 +93,7 @@ export default function EditRendement({ data }) {
 
                 const result = await fetchData(
                     "patch",
-                    `/cafe/detail_rendements/${data.id}/`,
+                    `/cafe/rendements/${data.id}/`,
                     { body: dataToSend }
                 );
 

@@ -114,11 +114,11 @@ const menuItems = {
     {
       title: "Production",
       items: [
-        {
-          title: "Usines list",
-          url: "/odeca-dashboard/usine/",
-          roles: ["Admin", "General", "Cafe_ODECA"],
-        },
+        // {
+        //   title: "Usines list",
+        //   url: "/odeca-dashboard/usine/",
+        //   roles: ["Admin", "General", "Cafe_ODECA"],
+        // },
         {
           title: "Usine",
           url: "/odeca-dashboard/production/usine",

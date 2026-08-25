@@ -80,7 +80,6 @@ export default function RedementC({ id }) {
           qte_cb: rapport?.quantite_cerise_b,
           qte_ca: rapport?.quantite_cerise_a,
           rendement_code: rapport?.rendement_cerise_code,
-          rendement_detail_code: rapport?.rendement_cerise_detail_code,
           rendement_id: rapport?.rendement?.id,
           responsable_code: rapport?.sdl?.sdl_responsable?.unique_code,
         }));
