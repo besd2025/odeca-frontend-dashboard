@@ -17,6 +17,7 @@ import {
   Clock,
   Building2,
   Factory,
+  Import,
 } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
@@ -44,7 +45,8 @@ import PaginationContent from "@/components/ui/pagination-content";
 import DetailsTransfer from "./details-transfer";
 import { UserContext } from "@/app/ui/context/User_Context";
 import { toast } from "sonner";
-
+import { TrashIcon } from "lucide-react";
+import EditTransfers from "./edit-tranfers";
 export default function TransferSdlDep({
   data = [],
   datapagination,
@@ -92,6 +94,43 @@ export default function TransferSdlDep({
     }
   };
 
+  const HandleDelete = async (id, hangar) => {
+    const promise = new Promise(async (resolve, reject) => {
+      console.log("code", id);
+      try {
+        await fetchData(
+          "delete",
+          `/cafe/achat_cafe_parche/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+
+          },
+        );
+        resolve({ hangar: hangar || 'L\'achat' });
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "SUPPRESSION...",
+      success: (data) => {
+        // setTimeout(() => window.location.reload(), 1000);
+        return `L'achat de ${data.hangar} a été supprimé avec succès `;
+      },
+      error: "Donnée non supprimée",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const paginatedData = data;
 
   const columns = [
@@ -122,7 +161,24 @@ export default function TransferSdlDep({
               >
                 <span>Détails</span>
               </DropdownMenuItem>
-              {/* Add more actions if needed */}
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
+                <>
+                  <div>
+                    <EditTransfers id={transfer.id} item={transfer} />
+
+                  </div>
+                  <div className="m-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => HandleDelete(transfer.id, transfer.transfer_sdl_ct_code)}
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                      Supprimer
+                    </Button>
+                  </div>
+                </>
+              ) : (null)}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -194,13 +250,9 @@ export default function TransferSdlDep({
       ),
     },
     {
-      id: "enregitrement_date",
+      id: "date_enregistrement",
       accessorFn: (row) =>
-        row.enregitrement_date ||
-        row.date_enregistrement ||
-        row.enregistrement_date ||
-        row.created_at ||
-        "-",
+        row.date_enregistrement ? new Date(row.date_enregistrement).toLocaleDateString("fr-FR") : "-",
       header: ({ column }) => (
         <div className="text-center">
           <Button
@@ -215,7 +267,7 @@ export default function TransferSdlDep({
       ),
       cell: ({ row }) => (
         <div className="text-center text-xs text-muted-foreground font-medium">
-          {row.getValue("enregitrement_date")}
+          {row.getValue("date_enregistrement")}
         </div>
       ),
     },

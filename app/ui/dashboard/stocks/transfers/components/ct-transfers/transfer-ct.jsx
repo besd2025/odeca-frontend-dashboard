@@ -140,7 +140,7 @@ export default function TransferCtDep({
               <div>
                 <DetailsTransfer />
               </div>
-              {user?.session?.category === "Admin" ? (
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
                 <div>
                   <EditTransfers
                     transfer_sdl_ct_code={transfer?.transfer_sdl_ct_code}

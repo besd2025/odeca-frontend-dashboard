@@ -238,37 +238,39 @@ function DetailsContent({ id }) {
     try {
       const response = await fetchData(
         "get",
-        `cafe/stationslavage/${id}/get_transferts/`,
+        `cafe/stationslavage/${id}/get_transfert_to_usine/`,
         {
           params: {},
         },
       );
       const results = response?.results
-      console.log("results", results);
+      console.log("response", results);
       const transferData = results?.map((transfer) => ({
         id: transfer?.id,
-        code: transfer?.transfer?.sdl?.sdl_code,
-        date_transfert: transfer?.transfer?.transfer_date,
-        from_sdl: transfer?.transfer?.sdl?.sdl_nom,
-        society: transfer?.transfer?.sdl?.societe?.nom_societe,
-        qte_total_tranferer: transfer?.quantite,
+        code: transfer?.transfer_code,
+        date_transfert: transfer?.transfer_date,
+        date_enregistrement: transfer?.enregitrement_date,
+        from_sdl: transfer?.sdl?.sdl_nom,
+        society: transfer?.sdl?.societe?.nom_societe,
+        qte_total_tranferer: transfer?.qte_total_tranferer,
         qte_tranferer: {
-          ca: transfer?.quantite,
+          ca: transfer?.quantite_cerise_a,
           cb: transfer?.quantite_cerise_b,
         },
         photo_fiche: transfer?.transfer?.photo_bordereau,
         localite: {
           province:
-            transfer?.transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
+            transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
               ?.province_name,
           commune:
-            transfer?.transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
+            transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
         },
         usine: {
-          name: transfer?.transfer?.usine_deparchage?.usine_name,
+          name: transfer?.usine_deparchage?.usine_name,
         },
       }));
       setTransferData(transferData);
+      console.log("transferData", transferData);
     } catch (error) {
       console.error("Error fetching transfers data:", error);
     }
