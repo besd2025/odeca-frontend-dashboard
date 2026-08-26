@@ -74,9 +74,8 @@ export default function EditRendement({ data }) {
             responsable_code: data?.responsable_code,
             rendement_cerise_code: data?.rendement_code,
             numero_lot: lot,
-            quantite_cerise_a: qteParche,
+            quantite_cerise_a: qteCa,
             quantite_cerise_b: qteCb,
-            quantite_cerise_c: qteCa,
         };
         console.log("dataToSend", dataToSend)
 
