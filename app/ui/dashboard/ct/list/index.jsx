@@ -506,7 +506,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
             </div>
             <div className="hidden lg:flex items-center gap-3">
               {user?.session?.category === "Admin" && <AddCt />}
-              {user?.session?.category === "Admin" &&
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
                 (!ActiveSdlRendementBtn ? (
                   <Button
                     className="text-sm"
@@ -549,7 +549,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
                     Télécharger
                   </Button>
                 ))
-              }
+              ) : (null)}
             </div>
             <div className="block lg:hidden">
               <DropdownMenu>
