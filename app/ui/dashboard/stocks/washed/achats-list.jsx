@@ -269,17 +269,17 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
                                         <Edit id={item.id} item={item} onSave={handleSaveEdit} />
 
                                     </div>
-                                    <div className="m-2">
-                                        <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={() => HandleDelete(item.id, item.hangar)}
-                                        >
-                                            <TrashIcon className="h-4 w-4" />
-                                            Supprimer
-                                        </Button>
-                                    </div>
+
                                 </>
+                            ) : (null)}
+                            {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
+                                <DropdownMenuItem
+                                    onClick={() => HandleDelete(item.id, item.hangar)}
+                                    className="cursor-pointer gap-2 font-medium text-destructive"
+                                >
+                                    <TrashIcon className="h-4 w-4" />
+                                    <span>Supprimer</span>
+                                </DropdownMenuItem>
                             ) : (null)}
 
                         </DropdownMenuContent>
