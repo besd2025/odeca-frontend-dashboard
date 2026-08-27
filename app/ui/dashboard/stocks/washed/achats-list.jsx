@@ -13,6 +13,7 @@ import * as React from "react";
 import { useState, useEffect, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { TableRowsSkeleton } from "@/components/ui/skeletons";
+import { TrashIcon } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -42,24 +43,6 @@ import AddHangar from "./add-hangar";
 import { fetchData } from "@/app/_utils/api";
 // MockData pour les achats de café Washed
 // TODO API: Remplacer MOCK_ACHATS_WASHED par un appel à fetchData("get", "cafe/achat_washed/")
-const MOCK_ACHATS_WASHED = [
-    {
-        id: "WASH-2026-001",
-        societe: "SODEICO SARL",
-        hangar: "Hangar A",
-        quantite_washed: 3500,
-        qualite: "Qualité A",
-        date: "2026-07-28",
-    },
-    {
-        id: "WASH-2026-002",
-        societe: "COPROTRAC",
-        hangar: "Hangar B",
-        quantite_washed: 2800,
-        qualite: "Fully Washed",
-        date: "2026-07-27",
-    },
-];
 
 export default function AchatsWashedListTable({ isLoading: externalLoading }) {
     const [sorting, setSorting] = React.useState([]);
@@ -68,8 +51,6 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
     const [rowSelection, setRowSelection] = React.useState({});
     const [data, setData] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
-
-    const user = useContext(UserContext);
     const [filterData, setFilterData] = React.useState({});
     const isActuallyLoading = externalLoading ?? loading;
 
@@ -82,7 +63,7 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
     const [loadingExportBtn, setLoadingExportBtn] = useState(false);
     const [activeDownloadBtn, setActiveDownloadBtn] = useState(false);
     const [exportBlob, setExportBlob] = useState(null);
-
+    const user = useContext(UserContext)
     React.useEffect(() => {
         const getAchats = async () => {
             setLoading(true);
@@ -96,7 +77,6 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
                     },
                     additionalHeaders: {}
                 });
-                console.log("achats: ", response?.results);
                 const newData = response?.results?.map((item) => {
                     return {
                         id: item?.id,
@@ -217,6 +197,43 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
         setExportBlob(null);
     };
 
+    const HandleDelete = async (id, hangar) => {
+        const promise = new Promise(async (resolve, reject) => {
+            console.log("code", id);
+            try {
+                await fetchData(
+                    "delete",
+                    `/cafe/achat_cafe_parche/${id}/`,
+                    {
+                        params: {},
+                        additionalHeaders: {},
+
+                    },
+                );
+                resolve({ hangar: hangar || 'L\'achat' });
+            } catch (error) {
+                reject(error);
+            }
+        });
+
+        toast.promise(promise, {
+            loading: "SUPPRESSION...",
+            success: (data) => {
+                // setTimeout(() => window.location.reload(), 1000);
+                return `L'achat de ${data.hangar} a été supprimé avec succès `;
+            },
+            error: "Donnée non supprimée",
+        });
+
+        try {
+            await promise;
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const columns = [
         {
             id: "actions",
@@ -244,10 +261,27 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
                             >
                                 Copier ID
                             </DropdownMenuItem>
+
                             <DropdownMenuSeparator />
-                            <div>
-                                <Edit id={item.id} item={item} onSave={handleSaveEdit} />
-                            </div>
+                            {user?.session.category == "Admin" || user?.session.category == "Superviseur" ? (
+                                <>
+                                    <div>
+                                        <Edit id={item.id} item={item} onSave={handleSaveEdit} />
+
+                                    </div>
+                                    <div className="m-2">
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => HandleDelete(item.id, item.hangar)}
+                                        >
+                                            <TrashIcon className="h-4 w-4" />
+                                            Supprimer
+                                        </Button>
+                                    </div>
+                                </>
+                            ) : (null)}
+
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );

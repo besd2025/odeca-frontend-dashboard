@@ -17,6 +17,7 @@ import {
   Clock,
   Building2,
   Factory,
+  Import,
 } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
@@ -44,7 +45,8 @@ import PaginationContent from "@/components/ui/pagination-content";
 import DetailsTransfer from "./details-transfer";
 import { UserContext } from "@/app/ui/context/User_Context";
 import { toast } from "sonner";
-
+import { TrashIcon } from "lucide-react";
+import EditTransfers from "./edit-tranfers";
 export default function TransferSdlDep({
   data = [],
   datapagination,
@@ -92,6 +94,43 @@ export default function TransferSdlDep({
     }
   };
 
+  const HandleDelete = async (id, hangar) => {
+    const promise = new Promise(async (resolve, reject) => {
+      console.log("code", id);
+      try {
+        await fetchData(
+          "delete",
+          `/cafe/achat_cafe_parche/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+
+          },
+        );
+        resolve({ hangar: hangar || 'L\'achat' });
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "SUPPRESSION...",
+      success: (data) => {
+        // setTimeout(() => window.location.reload(), 1000);
+        return `L'achat de ${data.hangar} a été supprimé avec succès `;
+      },
+      error: "Donnée non supprimée",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const paginatedData = data;
 
   const columns = [
@@ -122,7 +161,23 @@ export default function TransferSdlDep({
               >
                 <span>Détails</span>
               </DropdownMenuItem>
-              {/* Add more actions if needed */}
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
+                <>
+                  <div>
+                    <EditTransfers id={transfer.id} item={transfer} />
+
+                  </div>
+                </>
+              ) : (null)}
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
+                <DropdownMenuItem
+                  onClick={() => HandleDelete(transfer.id, transfer.transfer_sdl_ct_code)}
+                  className="cursor-pointer gap-2 font-medium text-destructive"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                  <span>Supprimer</span>
+                </DropdownMenuItem>
+              ) : (null)}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -193,54 +248,51 @@ export default function TransferSdlDep({
         </div>
       ),
     },
-    // {
-    //   id: "enregitrement_date",
-    //   accessorFn: (row) =>
-    //     row.enregitrement_date ||
-    //     row.date_enregistrement ||
-    //     row.enregistrement_date ||
-    //     row.created_at ||
-    //     "-",
-    //   header: ({ column }) => (
-    //     <div className="text-center">
-    //       <Button
-    //         variant="ghost"
-    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
 
-    //       >
-    //         Date d'Enregistrement
-    //         <ArrowUpDownIcon className="ml-1 h-3 w-3" />
-    //       </Button>
-    //     </div>
-    //   ),
-    //   cell: ({ row }) => (
-    //     <div className="text-center text-xs text-muted-foreground font-medium">
-    //       {row.getValue("enregitrement_date")}
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   id: "photo_bordereau",
-    //   header: () => <div >Photo Bordereau</div>,
-    //   cell: ({ row }) => {
-    //     const photo =
-    //       row.original.photo_bordereau || row.original.photo_fiche || null;
-    //     return (
-    //       <div className="flex justify-center items-center">
-    //         {photo ? (
-    //           <ViewImageDialog
-    //             imageUrl={photo}
-    //             alt="Photo bordereau"
-    //             profile={false}
-    //             className="h-8 w-8 rounded-md border shadow-xs hover:opacity-85 transition-opacity"
-    //           />
-    //         ) : (
-    //           <span className="text-xs text-muted-foreground italic">-</span>
-    //         )}
-    //       </div>
-    //     );
-    //   },
-    // },
+    {
+      id: "date_enregistrement",
+      accessorFn: (row) =>
+        row.date_enregistrement ? new Date(row.date_enregistrement).toLocaleDateString("fr-FR") : "-",
+      header: ({ column }) => (
+        <div className="text-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+
+          >
+            Date d'Enregistrement
+            <ArrowUpDownIcon className="ml-1 h-3 w-3" />
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="text-center text-xs text-muted-foreground font-medium">
+          {row.getValue("date_enregistrement")}
+        </div>
+      ),
+    },
+    {
+      id: "photo_bordereau",
+      header: () => <div >Photo Bordereau</div>,
+      cell: ({ row }) => {
+        const photo =
+          row.original.photo_bordereau || row.original.photo_fiche || null;
+        return (
+          <div className="flex justify-center items-center">
+            {photo ? (
+              <ViewImageDialog
+                imageUrl={photo}
+                alt="Photo bordereau"
+                profile={false}
+                className="h-8 w-8 rounded-md border shadow-xs hover:opacity-85 transition-opacity"
+              />
+            ) : (
+              <span className="text-xs text-muted-foreground italic">-</span>
+            )}
+          </div>
+        );
+      },
+    },
     {
       id: "status",
       header: () => <div >Statut</div>,
