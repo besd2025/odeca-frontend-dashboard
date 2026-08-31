@@ -47,6 +47,7 @@ import { UserContext } from "@/app/ui/context/User_Context";
 import { toast } from "sonner";
 import { TrashIcon } from "lucide-react";
 import EditTransfers from "./edit-tranfers";
+import { fetchData } from "@/app/_utils/api";
 export default function TransferSdlDep({
   data = [],
   datapagination,
@@ -62,6 +63,7 @@ export default function TransferSdlDep({
   // Details Modal state
   const [selectedTransfer, setSelectedTransfer] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   // Local pagination fallback
   const [currentPage, setCurrentPage] = useState(1);
@@ -96,18 +98,17 @@ export default function TransferSdlDep({
 
   const HandleDelete = async (id, hangar) => {
     const promise = new Promise(async (resolve, reject) => {
-      console.log("code", id);
       try {
         await fetchData(
           "delete",
-          `/cafe/achat_cafe_parche/${id}/`,
+          `cafe/transfert_sdl_usine/${id}/`,
           {
             params: {},
             additionalHeaders: {},
 
           },
         );
-        resolve({ hangar: hangar || 'L\'achat' });
+        resolve({ hangar: hangar || 'Le transfert' });
       } catch (error) {
         reject(error);
       }

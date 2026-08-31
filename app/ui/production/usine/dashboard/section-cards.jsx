@@ -102,7 +102,7 @@ export function SectionCards() {
           <CardDescription className="text-muted-foreground text-sm">Café Parche Usiné</CardDescription>
           <CardAction>
             <Badge variant="outline" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-200">
-              {data.total_cafe_usine / data.total_receptionne * 100} % du total
+              {(data.total_cafe_usine / data.total_receptionne * 100).toFixed(6)} % du total
             </Badge>
           </CardAction>
         </CardHeader>
@@ -149,7 +149,7 @@ export function SectionCards() {
           <CardDescription className="text-muted-foreground text-sm">Café Trié</CardDescription>
           <CardAction>
             <Badge variant="outline" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-200">
-              Rendement: {data.total_cafe_trie / data.total_receptionne * 100} %
+              Rendement: {(data.total_cafe_trie / data.total_receptionne * 100).toFixed(6)} %
             </Badge>
           </CardAction>
         </CardHeader>
@@ -227,7 +227,7 @@ export function SectionCards() {
       <Card className="@container/card">
         <CardHeader>
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
-            45,000 Kg
+            000 Kg
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm">Café Pret a Exporter</CardDescription>
           <CardAction>
