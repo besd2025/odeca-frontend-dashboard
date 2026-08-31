@@ -186,89 +186,93 @@ export default function DetailsTransfer({
               <div>{renderStatusBadge(isConfirmed ? "CONFIRMEE" : "EN_ATTENTE")}</div>
             </div>
 
-            {/* Informations de transfert */}
-            <div className="grid grid-cols-1 gap-2 pt-3 mt-3 border-t border-border/50 text-sm">
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Source :</span>
-                <span className="truncate">{sdlSource}</span>
+            {/* Informations de base avec disposition en 2 colonnes */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 pt-3 mt-3 border-t border-border/50 text-sm">
+              <div className="col-span-1 sm:col-span-3 flex flex-col gap-2">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Source :</span>
+                  <span className="truncate">{sdlSource}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Destination :</span>
+                  <span className="truncate">{usineDestination}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Date :</span>
+                  <span>{transferDate}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Chauffeur :</span>
+                  <span>{chauffeurNom} {chauffeurPrenom !== "-" ? chauffeurPrenom : ""}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Téléphone chauffeur :</span>
+                  <span>{chauffeurTelephone}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Accompagnateur :</span>
+                  <span>{nomAccompagnateur} {prenomAccompagnateur !== "-" ? prenomAccompagnateur : ""}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Téléphone accompagnateur :</span>
+                  <span>{phoneAccompagnateur}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Véhicule :</span>
+                  <span className="font-semibold font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">
+                    {plaqueCamion}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Total parche :</span>
+                  <span className="font-bold text-primary text-sm">
+                    {typeof totalParche === "number"
+                      ? totalParche.toLocaleString("fr-FR", { minimumFractionDigits: 2 })
+                      : totalParche}{" "}
+                    kg
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="font-medium text-foreground">Date de réception :</span>
+                  <span className="font-semibold font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">
+                    {dateReception}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Destination :</span>
-                <span className="truncate">{usineDestination}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Date :</span>
-                <span>{transferDate}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Chauffeur :</span>
-                <span>{chauffeurNom} {chauffeurPrenom !== "-" ? chauffeurPrenom : ""}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Téléphone chauffeur :</span>
-                <span>{chauffeurTelephone}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Accompagnateur :</span>
-                <span>{nomAccompagnateur} {prenomAccompagnateur !== "-" ? prenomAccompagnateur : ""}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Téléphone accompagnateur :</span>
-                <span>{phoneAccompagnateur}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Véhicule :</span>
-                <span className="font-semibold font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">
-                  {plaqueCamion}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Total parche :</span>
-                <span className="font-bold text-primary text-sm">
-                  {typeof totalParche === "number"
-                    ? totalParche.toLocaleString("fr-FR", { minimumFractionDigits: 2 })
-                    : totalParche}{" "}
-                  kg
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="font-medium text-foreground">Date de réception :</span>
-                <span className="font-semibold font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">
-                  {dateReception}
-                </span>
+
+              {/* Photo bordereau */}
+              <div>
+                {photoBordereau && photoBordereau !== "null" && (
+                  <div className="p-3 flex items-center justify-between">
+                    <div className="flex flex-col items-center gap-4">
+                      <div>
+                        <div className="text-xs font-semibold text-foreground">Bordereau de Transfert</div>
+                        <div className="text-[11px] text-muted-foreground">Cliquez sur l'image pour l'agrandir</div>
+                      </div>
+                      <ViewImageDialog
+                        imageUrl={photoBordereau}
+                        alt="Bordereau de transfert"
+                        profile={false}
+                        className="h-24 w-24 rounded-md border"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </DialogHeader>
 
           {/* Corps de la boîte de dialogue */}
-          <div className="custom-scrollbar p-5 space-y-5 flex-1">
-            {/* Photo bordereau si disponible */}
-            {photoBordereau && (
-              <div className="p-3 rounded-lg border bg-card/40 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <ViewImageDialog
-                    imageUrl={photoBordereau}
-                    alt="Bordereau de transfert"
-                    profile={false}
-                    className="h-11 w-11 rounded-md border"
-                  />
-                  <div>
-                    <div className="text-xs font-semibold text-foreground">Bordereau de Transfert</div>
-                    <div className="text-[11px] text-muted-foreground">Cliquez sur l'image pour l'agrandir</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
+          <div className="custom-scrollbar flex-1">
             {/* Section: Tableau liste des grades */}
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 p-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-semibold text-sm text-foreground">
                   <Layers className="h-4 w-4 text-primary" />
                   <span>Liste des Lots de Café & Grades</span>
                 </div>
                 <span className="text-xs text-muted-foreground font-medium">
-                  {gradesDetails.length} lot{gradesDetails.length > 1 ? "s" : ""}
+                  {gradesDetails.length} grade{gradesDetails.length > 1 ? "s" : ""}
                 </span>
               </div>
 
@@ -395,8 +399,6 @@ export default function DetailsTransfer({
                   }
                 />
               </div>
-
-
 
               <DialogFooter className="pt-3 gap-2">
                 <Button

@@ -43,6 +43,8 @@ export default function ReceiptSdlCt({ data }) {
     pageIndex: 0,
     pageSize: 10,
   });
+  console.log(data);
+
   const columns = [
     {
       id: "actions",

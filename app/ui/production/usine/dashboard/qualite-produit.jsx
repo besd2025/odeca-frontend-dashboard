@@ -13,29 +13,7 @@ import {
 import { fetchData } from "@/app/_utils/api";
 import React from "react";
 export default function QualiteProduit() {
-    const qualite = [
-        {
-            id: 1,
-            qualite: "15+",
-            poids: "100kg",
-            nombre_sacs: "1000",
-            pourcentage: "100%"
-        },
-        {
-            id: 2,
-            qualite: "FW",
-            poids: "200kg",
-            nombre_sacs: "2000",
-            pourcentage: "200%"
-        },
-        {
-            id: 3,
-            qualite: "TT",
-            poids: "300kg",
-            nombre_sacs: "3000",
-            pourcentage: "300%"
-        },
-    ]
+
     const [data, setData] = React.useState([{
         id: 0,
         qualite: "",
@@ -68,7 +46,6 @@ export default function QualiteProduit() {
     return (
         <Card className="p-4">
             <CardTitle className="font-bold text-lg">Qualite Produit</CardTitle>
-            <CardDescription className="text-muted-foreground text-sm">Poids de café par qualité</CardDescription>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -83,9 +60,26 @@ export default function QualiteProduit() {
                         <TableRow key={item.id}>
                             <TableCell className="font-medium">
                                 <Badge variant="outline">{item.qualite}</Badge></TableCell>
-                            <TableCell>{item.poids}</TableCell>
-                            <TableCell>{item.nombre_sacs}</TableCell>
-                            <TableCell>{item.pourcentage}%</TableCell>
+                            <TableCell className="normal-case">
+
+                                {(item.poids) >= 1000 ? (
+                                    <>
+                                        {((item.poids) / 1000).toLocaleString("fr-FR", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        })}{" "}
+                                        <span className="">T</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        {(item.poids)?.toLocaleString("fr-FR") || 0}{" "}
+                                        <span className="">Kg</span>
+                                    </>
+                                )}
+
+                            </TableCell>
+                            <TableCell className="normal-case">{item.nombre_sacs} sacs</TableCell>
+                            <TableCell className="normal-case">{item.pourcentage}%</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

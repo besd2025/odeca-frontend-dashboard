@@ -167,17 +167,16 @@ export default function TransferSdlDep({
                     <EditTransfers id={transfer.id} item={transfer} />
 
                   </div>
-                  <div className="m-2">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => HandleDelete(transfer.id, transfer.transfer_sdl_ct_code)}
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                      Supprimer
-                    </Button>
-                  </div>
                 </>
+              ) : (null)}
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
+                <DropdownMenuItem
+                  onClick={() => HandleDelete(transfer.id, transfer.transfer_sdl_ct_code)}
+                  className="cursor-pointer gap-2 font-medium text-destructive"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                  <span>Supprimer</span>
+                </DropdownMenuItem>
               ) : (null)}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -232,7 +231,7 @@ export default function TransferSdlDep({
       accessorFn: (row) =>
         row.transfer_date || row.date_transfert || row.date || "-",
       header: ({ column }) => (
-        <div className="text-center">
+        <div className="">
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -244,11 +243,12 @@ export default function TransferSdlDep({
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center font-medium text-foreground text-sm">
+        <div className=" font-medium text-foreground text-sm">
           {row.getValue("transfer_date")}
         </div>
       ),
     },
+
     {
       id: "date_enregistrement",
       accessorFn: (row) =>
@@ -305,7 +305,7 @@ export default function TransferSdlDep({
           row.original.comfirmation_status === "CONFIRMEE";
 
         return (
-          <div className="flex justify-center">
+          <div className="flex">
             {isConfirmed ? (
               <Badge variant="secondary" className="gap-1">
                 <CheckCircle2 className="h-3 w-3" />

@@ -668,7 +668,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                   Télécharger
                 </Button>
               ) : null}
-              {(user?.session?.category === "Admin" || user?.session?.category === ROLES.SUPERVISEUR) &&
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
                 (!ActiveSdlRendementBtn ? (
                   <Button
                     className="text-sm"
@@ -711,7 +711,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
                     Télécharger
                   </Button>
                 ))
-              }
+              ) : (null)}
             </div>
             <div className="block lg:hidden">
               <DropdownMenu>

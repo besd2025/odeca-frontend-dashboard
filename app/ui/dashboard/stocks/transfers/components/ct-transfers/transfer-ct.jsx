@@ -138,7 +138,7 @@ export default function TransferCtDep({
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <div>
-                <DetailsTransfer />
+                <DetailsTransfer data={transfer} />
               </div>
               {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
                 <div>

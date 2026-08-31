@@ -286,10 +286,12 @@ function DetailsContent({ id }) {
       );
       const results = response?.results;
       const transferData = results?.map((transfer) => ({
+        ...transfer,
         id: transfer?.id,
-        code: transfer?.ct?.ct_code,
+        code: transfer?.ct?.ct_code || transfer?.transfer_ct_sdl_code,
+        transfer_ct_sdl_code: transfer?.transfer_ct_sdl_code,
         from_sdl: transfer?.ct?.ct_nom,
-        society: transfer?.ct?.sdl?.societe?.nom_societe,
+        society: transfer?.ct?.sdl?.societe?.nom_societe || transfer?.sdl?.societe?.nom_societe,
         date_transfert: transfer?.enregitrement_date,
         qte_total_tranferer: transfer?.qte_total_tranferer,
         qte_tranferer: {
