@@ -244,7 +244,6 @@ function DetailsContent({ id }) {
         },
       );
       const results = response?.results
-      console.log("response", results);
       const transferData = results?.map((transfer) => ({
         id: transfer?.id,
         code: transfer?.transfer_code,
@@ -257,7 +256,7 @@ function DetailsContent({ id }) {
           ca: transfer?.quantite_cerise_a,
           cb: transfer?.quantite_cerise_b,
         },
-        photo_fiche: transfer?.transfer?.photo_bordereau,
+        photo_fiche: transfer?.photo_bordereau,
         localite: {
           province:
             transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
