@@ -282,49 +282,6 @@ function StatsCard({ id }) {
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card col-span-3 p-2 h-max overflow-hidden">
-        <CardHeader className="p-2">
-          <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-secondary p-2 rounded-full">
-              <Users className="text-white" />
-            </div>
-            <CardTitle className="font-normal flex flex-col   ">
-              <span className="text-muted-foreground text-sm">
-                Cafeiculteurs
-              </span>
-              <span className="text-lg font-semibold tracking-tight ">
-                {(data?.nombre_cultivateurs?.hommes ?? 0) +
-                  (data?.nombre_cultivateurs?.femmes ?? 0)}
-              </span>
-            </CardTitle>
-          </div>
-          <div className="flex flex-col gap-y-2 mt-4">
-            <div className="flex flex-row ">
-              <div className="text-muted-foreground flex gap-x-0.5">
-                <span className="bg-backgrou/nd rounded">
-                  <Mars />
-                </span>
-                Homme :
-              </div>
-              <div className="font-medium  ml-2">
-                {data?.nombre_cultivateurs?.hommes}
-              </div>
-            </div>
-            <div className="flex flex-row ">
-              <div className="text-muted-foreground flex gap-x-0.5 ">
-                <span className="">
-                  <Venus />
-                </span>
-                Femme :
-              </div>
-              <div className="font-medium  ml-2">
-                {data?.nombre_cultivateurs?.femmes || 0}
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
       <Card className="@container/card col-span-1 lg:col-span-4 ">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">

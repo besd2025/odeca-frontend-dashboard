@@ -36,11 +36,13 @@ import Edit from "./edit";
 import { Badge } from "@/components/ui/badge";
 import PaginationContent from "@/components/ui/pagination-content";
 import { UserContext } from "@/app/ui/context/User_Context";
+
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import AddHangar from "./add-hangar";
 import { fetchData } from "@/app/_utils/api";
+import Link from "next/link";
 // MockData pour les achats de café Washed
 // TODO API: Remplacer MOCK_ACHATS_WASHED par un appel à fetchData("get", "cafe/achat_washed/")
 
@@ -87,6 +89,8 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
                         date: item?.date_achat
                     };
                 });
+                console.log(response);
+
                 setData(newData || []);
                 setTotalCount(response?.count || 0);
             } catch (error) {
@@ -263,6 +267,9 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
                             </DropdownMenuItem>
 
                             <DropdownMenuSeparator />
+                            <Link href={`/odeca-dashboard/stocks/washed/hangar/details/?id=${item.id}`}>
+                                <DropdownMenuItem>Details</DropdownMenuItem>
+                            </Link>
                             {user?.session.category == "Admin" || user?.session.category == "Superviseur" ? (
                                 <>
                                     <div>
@@ -431,7 +438,7 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
                         <Filter handleFilter={handleFilter} />
                     </div>
                     <div className="flex items-center gap-3 text-gray-700">
-                        {user?.session?.category === "Admin" && <AddHangar />}
+
                         <ExportButton
                             handleExportSDLs={handleExportWashed}
                             exportType="sdl_data"
@@ -439,6 +446,24 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
                             activedownloadBtn={activeDownloadBtn}
                             onClickDownloadButton={downloadExcel}
                         />
+                        <div className="lg:block hidden">
+                            {user?.session?.category === "Admin" && <AddHangar />}
+                        </div>
+
+                    </div>
+                    <div className="block lg:hidden">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost"><MoreHorizontal size={16} /></Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                {user?.session?.category === "Admin" &&
+                                    <DropdownMenuItem>
+                                        <AddHangar />
+                                    </DropdownMenuItem>
+                                }
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             </div>

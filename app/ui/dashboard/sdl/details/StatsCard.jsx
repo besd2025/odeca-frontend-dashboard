@@ -14,6 +14,7 @@ import {
   Grape,
   Landmark,
   Mars,
+  PackageCheck,
   TruckElectric,
   Users,
   Venus,
@@ -79,8 +80,8 @@ function StatsCard({ id }) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-1">
-      <Card className="@container/card col-span-1 lg:col-span-6 relative">
+    <div className="grid grid-cols-1 lg:grid-cols-13 gap-2">
+      <Card className="@container/card col-span-1 lg:col-span-7 relative">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-primary p-2 rounded-md">
@@ -325,7 +326,439 @@ function StatsCard({ id }) {
           </div>
         </CardHeader>
       </Card>
-      <Card className="@container/card col-span-1 lg:col-span-4 hidden">
+      <Card className="@container/card col-span-1 lg:col-span-5 ">
+        <CardHeader className="flex flex-row justify-between">
+          <div className="flex flex-col">
+            <div className="flex flex-row gap-x-2 items-center">
+              <div className="bg-secondary p-2 rounded-md">
+                <TruckElectric className="text-white size-4" />
+              </div>
+              <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
+                {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                  <>
+                    {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    <span className="text-base">T</span>
+                  </>
+                ) : (
+                  <>
+                    {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
+              </CardTitle>
+              {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+                </span>
+              ) : (
+                <></>
+              )}
+            </div>
+            <CardTitle className="text-sm font-normal tabular-nums text-muted-foreground my-2">
+              Qtes Transférées (CT)
+            </CardTitle>
+            <div className="flex flex-col h-full justify-between text-xs font-medium">
+              <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg w-max">
+                <span className="text-primary flex items-center gap-1">●</span>
+                <div className="flex flex-row gap-x-1 items-center">
+                  <Grape className="text-primary size-4" />
+                  <CardTitle className="text-md font-semibold text-primary">
+                    CA :
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-semibold text-accent-foreground text-lg">
+                  {data?.qte_achete?.cerise_a >= 1000 ? (
+                    <>
+                      {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
+                        "fr-FR",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        },
+                      )}{" "}
+                      <span className="text-sm">T</span>
+                    </>
+                  ) : (
+                    <>
+                      {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
+                    </>
+                  )}
+
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    ""
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  )}
+
+                </CardDescription>
+              </div>
+              <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg">
+                <span className="text-secondary flex items-center gap-1">
+                  ●
+                </span>
+                <div className="flex flex-row gap-x-1 items-center">
+                  <Grape className="text-secondary size-4" />
+                  <CardTitle className="text-md font-semibold text-secondary">
+                    CB :
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-semibold text-accent-foreground text-lg">
+                  {data?.qte_achete?.cerise_b >= 1000 ? (
+                    <>
+                      {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
+                        "fr-FR",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        },
+                      )}
+                      <span className="text-sm">T</span>
+                    </>
+                  ) : (
+                    <>
+                      {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
+                    </>
+                  )}
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    ""
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  )}
+
+                </CardDescription>
+              </div>
+            </div>
+          </div>
+          <Separator orientation="vertical" className="h-full" />
+          <div className="flex flex-col">
+            <div className="flex flex-row gap-x-2 items-center">
+              <div className="bg-secondary p-2 rounded-md">
+                <PackageCheck className="text-white size-4" />
+              </div>
+              <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
+                {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                  <>
+                    {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    <span className="text-base">T</span>
+                  </>
+                ) : (
+                  <>
+                    {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
+              </CardTitle>
+              {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+                </span>
+              ) : (
+                <></>
+              )}
+            </div>
+            <CardTitle className="text-sm font-normal tabular-nums text-muted-foreground my-2">
+              Qtes Reçues
+            </CardTitle>
+            <div className="flex flex-col h-full justify-between text-xs font-medium">
+              <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg w-max">
+                <span className="text-primary flex items-center gap-1">●</span>
+                <div className="flex flex-row gap-x-1 items-center">
+                  <Grape className="text-primary size-4" />
+                  <CardTitle className="text-md font-semibold text-primary">
+                    CA :
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-semibold text-accent-foreground text-lg">
+                  {data?.qte_achete?.cerise_a >= 1000 ? (
+                    <>
+                      {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
+                        "fr-FR",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        },
+                      )}{" "}
+                      <span className="text-sm">T</span>
+                    </>
+                  ) : (
+                    <>
+                      {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
+                    </>
+                  )}
+
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    ""
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  )}
+
+                </CardDescription>
+              </div>
+              <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg">
+                <span className="text-secondary flex items-center gap-1">
+                  ●
+                </span>
+                <div className="flex flex-row gap-x-1 items-center">
+                  <Grape className="text-secondary size-4" />
+                  <CardTitle className="text-md font-semibold text-secondary">
+                    CB :
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-semibold text-accent-foreground text-lg">
+                  {data?.qte_achete?.cerise_b >= 1000 ? (
+                    <>
+                      {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
+                        "fr-FR",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        },
+                      )}
+                      <span className="text-sm">T</span>
+                    </>
+                  ) : (
+                    <>
+                      {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
+                    </>
+                  )}
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    ""
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  )}
+
+                </CardDescription>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardDescription>
+          <div className="p-4">
+            <Separator />
+            <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground my-2">
+              CT source:
+            </CardTitle>
+            <div className="text-sm font-normal flex flex-wrap gap-2 ">
+              <span className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">CT Gatwe</span>
+              <span className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">CT Gatwe</span>
+              <span className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">CT Gatwe</span>
+              <span className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">CT Gatwe</span>
+            </div>
+          </div>
+        </CardDescription>
+
+      </Card>
+      <Card className="@container/card col-span-1 lg:col-span-4 ">
+        <CardHeader className="flex flex-col">
+          <div className="flex flex-row gap-x-2 items-center">
+            <div className="bg-secondary p-2 rounded-md">
+              <ChartColumn className="text-white" />
+            </div>
+            <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+              {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                <>
+                  {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  <span className="text-base">T</span>
+                </>
+              ) : (
+                <>
+                  {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                  <span className="text-sm">Kg</span>
+                </>
+              )}
+            </CardTitle>
+            {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+              </span>
+            ) : (
+              <></>
+            )}
+          </div>
+          <CardTitle className="text-sm font-semibold text-muted-foreground ">
+            Rapport C
+          </CardTitle>
+          <Separator />
+          <div className="grid grid-cols-1 gap-2 text-xs w-full">
+            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
+              <div className="flex flex-row gap-x-1 items-center">
+                <span className="text-primary flex items-center gap-1">●</span>
+                <CardTitle className="text-base text-primary">
+                  Fully Washed
+                </CardTitle>
+              </div>
+              <CardDescription className="font-medium text-accent-foreground text-lg">
+                <div className="text-xs grid grid-cols-2 gap-0.5">
+                  <span className="flex items-center gap-2">
+                    <span>A1:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span>A2:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span>A3:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span>A4:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                </div>
+
+              </CardDescription>
+            </div>
+            <div className="flex flex-col gap-1 py-1 px-4 border-b-2 border-b-primary/50">
+              <div className="flex flex-row gap-x-1 items-center">
+                <span className="text-primary flex items-center gap-1">●</span>
+                <CardTitle className="text-base text-primary">
+                  Naturel
+                </CardTitle>
+              </div>
+              <CardDescription className="font-medium text-accent-foreground text-lg">
+                <div className="text-xs grid grid-cols-2">
+                  <span className="flex items-center gap-2">
+                    <span>Coque:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                </div>
+
+              </CardDescription>
+            </div>
+            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
+              <div className="flex flex-row gap-x-1 items-center">
+                <span className="text-primary flex items-center gap-1">●</span>
+                <CardTitle className="text-base text-primary">
+                  Miel
+                </CardTitle>
+              </div>
+              <CardDescription className="font-medium text-accent-foreground text-lg">
+                <div className="text-xs grid grid-cols-2">
+                  <span className="flex items-center gap-2">
+                    <span>A1:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                </div>
+
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+
+      </Card>
+      <Card className="@container/card col-span-1 lg:col-span-4 ">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-md">
@@ -356,101 +789,314 @@ function StatsCard({ id }) {
             )}
           </div>
           <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground ">
-            Qte Reçue (CT)
+            Qte Transférée (UDP)
           </CardTitle>
           <Separator />
-          <div className="flex flex-col h-full gap-y-1 justify-between text-xs font-medium">
-            <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg w-max">
-              <span className="text-primary flex items-center gap-1">●</span>
+          <div className="grid grid-cols-1 gap-2 text-xs w-full">
+            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
               <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-primary size-5" />
-                <CardTitle className="text-md font-semibold text-primary">
-                  CA :
+                <span className="text-primary flex items-center gap-1">●</span>
+                <CardTitle className="text-base text-primary">
+                  Fully Washed
                 </CardTitle>
               </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.cerise_a >= 1000 ? (
-                  <>
-                    {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
-                      "fr-FR",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      },
-                    )}{" "}
-                    <span className="text-sm">T</span>
-                  </>
-                ) : (
-                  <>
-                    {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
-                    <span className="text-sm">Kg</span>
-                  </>
-                )}
-
-                {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
-                  ""
-                ) : (
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
+              <CardDescription className="font-medium text-accent-foreground text-lg">
+                <div className="text-xs grid grid-cols-2 gap-0.5">
+                  <span className="flex items-center gap-2">
+                    <span>A1:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
                   </span>
-                )}
+                  <span className="flex items-center gap-2">
+                    <span>A2:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span>A3:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span>A4:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                </div>
 
               </CardDescription>
             </div>
-            <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg">
-              <span className="text-secondary flex items-center gap-1">
-                ●
-              </span>
+            <div className="flex flex-col gap-1 py-1 px-4 border-b-2 border-b-primary/50">
               <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-secondary size-5" />
-                <CardTitle className="text-md font-semibold text-secondary">
-                  CB :
+                <span className="text-primary flex items-center gap-1">●</span>
+                <CardTitle className="text-base text-primary">
+                  Naturel
                 </CardTitle>
               </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.cerise_b >= 1000 ? (
-                  <>
-                    {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
-                      "fr-FR",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      },
-                    )}
-                    <span className="text-sm">T</span>
-                  </>
-                ) : (
-                  <>
-                    {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
-                    <span className="text-sm">Kg</span>
-                  </>
-                )}
-                {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
-                  ""
-                ) : (
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
+              <CardDescription className="font-medium text-accent-foreground text-lg">
+                <div className="text-xs grid grid-cols-2">
+                  <span className="flex items-center gap-2">
+                    <span>Coque:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
                   </span>
-                )}
+                </div>
 
               </CardDescription>
             </div>
-          </div>
-          <div>
-            <Separator />
-            <CardTitle className="text-xs font-semibold tabular-nums text-muted-foreground my-2">
-              CT source:
-            </CardTitle>
-            <div className="text-sm font-normal flex flex-col"><span>CT Gatwe</span><span>CT Gatwe</span></div>
+            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
+              <div className="flex flex-row gap-x-1 items-center">
+                <span className="text-primary flex items-center gap-1">●</span>
+                <CardTitle className="text-base text-primary">
+                  Miel
+                </CardTitle>
+              </div>
+              <CardDescription className="font-medium text-accent-foreground text-lg">
+                <div className="text-xs grid grid-cols-2">
+                  <span className="flex items-center gap-2">
+                    <span>A1:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                </div>
+
+              </CardDescription>
+            </div>
           </div>
         </CardHeader>
 
       </Card>
-      <Card className="@container/card col-span-1 lg:col-span-4 hidden">
+      <Card className="@container/card col-span-1 lg:col-span-13 relative flex flex-col gap-y-5">
         <CardHeader className="flex flex-col">
+          <CardTitle className="text-lg font-medium tabular-nums  ">
+            Qtes globales (SDL+CT)
+          </CardTitle>
+          <div className="flex flex-row gap-x-2 items-center">
+            <div className="bg-primary p-2 rounded-md">
+              <Archive className="text-white size-5" />
+            </div>
+            <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
+              {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                <>
+                  {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  <span className="text-base">T</span>
+                </>
+              ) : (
+                <>
+                  {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                  <span className="text-sm">Kg</span>
+                </>
+              )}
+            </CardTitle>
+            {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+              </span>
+            ) : (
+              <></>
+            )}
+          </div>
+
+
+          <div className="mt-2 space-y-3 w-full">
+            <div className="flex justify-between items-end">
+              <span className="text-xs text-muted-foreground ">
+                Rapport Cerise A / B
+              </span>
+              {/* <span className="text-[10px] font-mono text-muted-foreground">
+                      Ratio: 65%
+                    </span> */}
+            </div>
+            {/* Barre de progression professionnelle */}
+            <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="bg-primary/90"
+                style={{ width: `${percentageA}%` }}
+              />
+              <div
+                className="bg-secondary/90"
+                style={{ width: `${percentageB}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-y-2 justify-between text-xs font-medium">
+              <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
+                <span className="text-primary flex items-center gap-1">●</span>
+                <div className="flex flex-row gap-x-1 items-center">
+                  <Grape className="text-primary size-5" />
+                  <CardTitle className="text-md font-semibold text-primary">
+                    CA :
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-semibold text-accent-foreground text-lg">
+                  {data?.qte_achete?.cerise_a >= 1000 ? (
+                    <>
+                      {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
+                        "fr-FR",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        },
+                      )}{" "}
+                      <span className="text-sm">T</span>
+                    </>
+                  ) : (
+                    <>
+                      {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
+                    </>
+                  )}
+
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({percentageA.toFixed(1)}%)
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  )}
+
+                </CardDescription>
+              </div>
+              <span className="w-0.5 h-8 bg-black/20 hidden lg:block"></span>
+              <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
+                <span className="text-secondary flex items-center gap-1">
+                  ●
+                </span>
+                <div className="flex flex-row gap-x-1 items-center">
+                  <Grape className="text-secondary size-5" />
+                  <CardTitle className="text-md font-semibold text-secondary">
+                    CB :
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-semibold text-accent-foreground text-lg">
+                  {data?.qte_achete?.cerise_b >= 1000 ? (
+                    <>
+                      {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
+                        "fr-FR",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        },
+                      )}
+                      <span className="text-sm">T</span>
+                    </>
+                  ) : (
+                    <>
+                      {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                      <span className="text-sm">Kg</span>
+                    </>
+                  )}
+                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({percentageB.toFixed(1)}%)
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
+                    </span>
+                  )}
+
+                </CardDescription>
+              </div>
+            </div>
+          </div>
+
+        </CardHeader>
+        <CardHeader className="flex flex-col">
+          <CardTitle className="text-lg font-medium tabular-nums  ">
+            Parche disponible
+          </CardTitle>
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-md">
-              <ChartColumn className="text-white" />
+              <Grape className="text-white size-4" />
             </div>
             <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
               {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
@@ -476,56 +1122,163 @@ function StatsCard({ id }) {
               <></>
             )}
           </div>
-          <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground ">
-            Rapport C
-          </CardTitle>
+
           <Separator />
-          <div className="grid grid-cols-2 gap-2 text-xs font-medium w-full">
-            <div className="flex flex-col gap-2 items-center py-1 px-4 rounded-lg border">
+          <div className="grid grid-cols-1 gap-2 text-xs w-full">
+            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
               <div className="flex flex-row gap-x-1 items-center">
-                <CardTitle className="text-base font-semibold text-primary">
-                  FW
+                <span className="text-primary flex items-center gap-1">●</span>
+                <CardTitle className="text-base text-primary">
+                  Fully Washed
                 </CardTitle>
               </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                <div className="text-xs flex flex-col">
-                  <span>A1: 123</span>
-                  <span>B2: 123</span>
+              <CardDescription className="font-medium text-accent-foreground text-lg">
+                <div className="text-xs grid grid-cols-2 gap-0.5">
+                  <span className="flex items-center gap-2">
+                    <span>A1:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span>A2:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span>A3:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span>A4:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
                 </div>
 
               </CardDescription>
             </div>
-            <div className="flex flex-col gap-2 items-center py-1 px-4 rounded-lg border">
+            <div className="flex flex-col gap-1 py-1 px-4 border-b-2 border-b-primary/50">
               <div className="flex flex-row gap-x-1 items-center">
-                <CardTitle className="text-base font-semibold text-primary">
-                  NATUREL
+                <span className="text-primary flex items-center gap-1">●</span>
+                <CardTitle className="text-base text-primary">
+                  Naturel
                 </CardTitle>
               </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                <div className="text-xs flex flex-col">
-                  <span>A1: 123</span>
-                  <span>B2: 123</span>
+              <CardDescription className="font-medium text-accent-foreground text-lg">
+                <div className="text-xs grid grid-cols-2">
+                  <span className="flex items-center gap-2">
+                    <span>Coque:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
                 </div>
 
               </CardDescription>
             </div>
-            <div className="flex flex-col gap-2 items-center py-1 px-4 rounded-lg border">
+            <div className="flex flex-col gap-1 py-1 px-4">
               <div className="flex flex-row gap-x-1 items-center">
-                <CardTitle className="text-base font-semibold text-primary">
-                  MIEL
+                <span className="text-primary flex items-center gap-1">●</span>
+                <CardTitle className="text-base text-primary">
+                  Miel
                 </CardTitle>
               </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                <div className="text-xs flex flex-col">
-                  <span>A1: 123</span>
-                  <span>B2: 123</span>
+              <CardDescription className="font-medium text-accent-foreground text-lg">
+                <div className="text-xs grid grid-cols-2">
+                  <span className="flex items-center gap-2">
+                    <span>A1:</span>
+                    <span>
+                      {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+                        <>
+                          {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span>T</span>
+                        </>
+                      ) : (
+                        <>
+                          {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                          <span>Kg</span>
+                        </>
+                      )}
+                    </span>
+                  </span>
                 </div>
-
               </CardDescription>
             </div>
           </div>
         </CardHeader>
-
       </Card>
     </div>
   );

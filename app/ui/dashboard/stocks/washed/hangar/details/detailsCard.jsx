@@ -1,0 +1,231 @@
+"use client";
+import React, { useEffect, useContext } from "react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { fetchData } from "@/app/_utils/api";
+import { Skeleton } from "@/components/ui/skeleton";
+import { UserContext } from "@/app/ui/context/User_Context";
+import {
+  Grape,
+  MapPinHouse,
+  Phone,
+  QrCode,
+  ShieldUser,
+  User,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { AddPrevision } from "./add-prevision-ct";
+
+function DetailsCard({ id }) {
+  const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [isExpanded, setIsExpanded] = React.useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (window.innerWidth >= 1024) {
+        setIsExpanded(false);
+      }
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
+  const user = useContext(UserContext)
+  const toggleSidebar = () => setIsExpanded(!isExpanded);
+  React.useEffect(() => {
+    const getSdls = async () => {
+      setLoading(true);
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/centres_transite/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          },
+        );
+        setData(response);
+      } catch (error) {
+        console.error("Error fetching cultivators data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getSdls();
+  }, [id]);
+
+  return (
+    <Card
+      className={cn(
+        "relative lg:sticky lg:top-5 transition-all duration-300 ease-in-out border-r shadow-sm bg-card rounded-xl h-max",
+        isExpanded
+          ? "w-full lg:w-[300px] p-6 space-y-4"
+          : "w-[80px] p-4 flex flex-col items-center",
+      )}
+    >
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden lg:flex absolute -right-3 top-6 h-9 w-9 rounded-full border bg-secondary shadow-sm hover:bg-primary dark:hover:bg-primary z-10 text-white hover:text-white cursor-pointer "
+            onClick={toggleSidebar}
+          >
+            {isExpanded ? (
+              <ChevronLeft className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Voir details</p>
+        </TooltipContent>
+      </Tooltip>
+
+      {!isExpanded ? (
+        <div className="flex flex-col items-center gap-4 mt-2">
+          <div className="w-16 h-16 mx-auto border-2 p-2 border-secondary/50 rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="size-full text-accent-foreground/80"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          <div className="text-xs font-semibold text-center truncate w-full">
+            CT{" "}
+            {data?.ct_nom
+              ? data.ct_nom.slice(0, 2).toUpperCase() + "..."
+              : "--"}
+          </div>
+          <Separator className="my-2" />
+          <MapPinHouse size={20} />
+          <Separator className="my-2" />
+          <ShieldUser size={20} />
+          <Separator className="my-2" />
+          <Phone size={20} />
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-col items-center space-y-3 text-center animate-in fade-in duration-300">
+            <div className="w-32 h-32 mx-auto">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="size-full text-accent-foreground/80"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15A.75.75 0 0 0 15 9h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="space-y-1">
+              {loading ? (
+                <Skeleton className="h-7 w-48 mx-auto" />
+              ) : (
+                <p className="text-xl font-semibold">CT {data?.ct_nom}</p>
+              )}
+              <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
+                {""}
+              </p>
+            </div>
+            <Badge
+              className="px-3 py-1 text-lg text-secondary rounded "
+              variant="outline"
+            >
+              <QrCode size={30} />
+              <span className="">
+                {loading ? <Skeleton className="h-6 w-24" /> : data?.ct_code}
+              </span>
+            </Badge>
+          </div>
+
+          {/* <Button className="w-full bg-black text-white hover:bg-black/90">
+        Message
+      </Button> */}
+
+          <div className="space-y-3">
+            <div>
+              <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                <span className="text-muted-foreground flex gap-x-1">
+                  <MapPinHouse size={20} />
+                  Localité
+                </span>
+                <span className="font-medium text-right">
+                  {loading ? (
+                    <Skeleton className="h-5 w-32 ml-auto" />
+                  ) : (
+                    <>
+                      {
+                        data?.ct_adress?.zone_code?.commune_code?.province_code
+                          ?.province_name
+                      }
+                      / {data?.ct_adress?.zone_code?.commune_code?.commune_name}
+                    </>
+                  )}
+                </span>
+              </div>
+              <Separator className="my-2" />
+            </div>
+            <div>
+              <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                <span className="text-secondary flex gap-x-1">
+                  <ShieldUser size={20} />
+                  Responsable
+                </span>
+                <span className="font-medium text-right">
+                  {loading ? (
+                    <Skeleton className="h-5 w-32 ml-auto" />
+                  ) : (
+                    <>
+                      {data?.ct_responsable?.user?.first_name}{" "}
+                      {data?.ct_responsable?.user?.last_name}
+                    </>
+                  )}
+                </span>
+              </div>
+              <Separator className="my-2" />
+            </div>
+            <div>
+              <div className="flex items-center justify-between text-sm ">
+                <span className="text-muted-foreground flex gap-x-1">
+                  <Phone size={20} />
+                  Téléphone
+                </span>
+                <span className="font-medium">
+                  {loading ? (
+                    <Skeleton className="h-5 w-24" />
+                  ) : (
+                    data?.ct_responsable?.user?.phone
+                  )}
+                </span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </Card>
+  );
+}
+
+export default DetailsCard;

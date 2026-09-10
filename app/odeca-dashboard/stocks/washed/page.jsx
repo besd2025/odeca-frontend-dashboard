@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartColumn, List } from 'lucide-react';
 import AchatsWashedListTable from '@/app/ui/dashboard/stocks/washed/achats-list';
 import CumulatifWashedListTable from '@/app/ui/dashboard/stocks/washed/cumulatif-list';
+import HangarListTable from '@/app/ui/dashboard/stocks/washed/hangar';
 
 export default function Page() {
     const user = React.useContext(UserContext);
@@ -16,6 +17,10 @@ export default function Page() {
                 <Tabs defaultValue="list" className="w-full">
                     <TabsList className="w-full h-10 lg:w-[50%]">
                         <TabsTrigger value="list">
+                            <List className="w-4 h-4 mr-2" />
+                            <span>Liste</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="achats">
                             <List className="w-4 h-4 mr-2" />
                             <span>Achats</span>
                         </TabsTrigger>
@@ -27,6 +32,12 @@ export default function Page() {
                         )}
                     </TabsList>
                     <TabsContent value="list">
+                        <h1 className="text-2xl font-semibold m-2">
+                            Liste des hangars
+                        </h1>
+                        <HangarListTable />
+                    </TabsContent>
+                    <TabsContent value="achats">
                         <h1 className="text-2xl font-semibold m-2">
                             Achats du café washed
                         </h1>
