@@ -77,6 +77,7 @@ export default function DetailsRendement({ data }) {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="pl-4">Actions</TableHead>
+                      <TableHead>Type</TableHead>
                       <TableHead>Grade</TableHead>
                       <TableHead>QteParche</TableHead>
                       {/* <TableHead>Rendement</TableHead> */}
@@ -122,6 +123,9 @@ export default function DetailsRendement({ data }) {
                           </TableCell>
 
                           {/* <TableCell>{product.lot_num}</TableCell> */}
+                          <TableCell className="">
+                            {product.cafe_parche_type}
+                          </TableCell>
                           <TableCell className="bg-secondary/20">
                             {product.grade?.grade_name ?? product.grade?.grade_code ?? "-"}
                           </TableCell>

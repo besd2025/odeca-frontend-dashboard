@@ -616,8 +616,8 @@ function StatsCard({ id }) {
               CT source:
             </CardTitle>
             <div className="text-sm font-normal flex flex-wrap gap-2 ">
-              {data?.transfert_get_ct?.map((item) => (
-                <span key={item.id} className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">
+              {data?.transfert_get_ct?.map((item, index) => (
+                <span key={index} className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">
                   {item.ct__ct_nom}
                 </span>
               ))}

@@ -29,8 +29,10 @@ import SharedGeoLocalisation from "@/components/ui/geo-localisation";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
+import Transfers from "./transfers";
+import AchatsWashedListTable from "./achats/achats-list";
 function DetailsContent({ id }) {
-  const [tab, setTab] = useState("cultivators");
+  const [tab, setTab] = useState("achats");
   const [data, setData] = React.useState([]);
   const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
   const [associationAchatsData, setAssociationAchatsData] = React.useState([]);
@@ -699,9 +701,7 @@ function DetailsContent({ id }) {
         onValueChange={(value) => handleTabChange(value)}
       >
         <TabsList className="overflow-x-auto w-full ">
-          <TabsTrigger value="cultivators" className="shrink-0">
-            <Users /> Cafeiculteurs
-          </TabsTrigger>
+
           <TabsTrigger value="achats" className="shrink-0">
             <ShoppingCart /> Achats effectues
           </TabsTrigger>
@@ -711,50 +711,16 @@ function DetailsContent({ id }) {
           <TabsTrigger value="maps" className="hidden lg:flex shrink-0">
             <MapPinHouse /> Map
           </TabsTrigger>
-          {/* <TabsTrigger value="edits">
-            <History /> Historique des modifications
-          </TabsTrigger> */}
 
-          {/* MOBILE DROPDOWN */}
-          <div className="block lg:hidden">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <MoreHorizontal />
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="start">
-                <DropdownMenuLabel>Menu</DropdownMenuLabel>
-
-                <DropdownMenuItem onClick={() => setTab("transferCt")}>
-                  <Spline className="w-4 h-4" /> Transfer(CT vers SDL)
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem onClick={() => setTab("maps")}>
-                  <MapPinHouse className="w-4 h-4" /> Map
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
         </TabsList>
         <TabsContent value="achats">
           <h1 className="text-xl font-semibold m-2">Achats effectues</h1>
-          <AchatsListTable
-            individualData={individualAchatsData}
-            associationData={associationAchatsData}
-            isCultivatorsPage={false}
-            fetchCultivatorsByType={fetchAchatCultivatorsByType}
-            datapagination={dataAchatpagination}
-            limit={limitAchat}
-            totalCount={totalCountAchat}
-            handleFilter={handleAchatFilter}
-            onExportIndividualToExcel={exportIndividualAchatsToExcel}
-            onExportAssociationToExcel={exportAssociationAchatsToExcel}
-          />
+          <AchatsWashedListTable />
         </TabsContent>
-
+        <TabsContent value="transferCt">
+          <h1 className="text-xl font-semibold m-2">Transfers effectues</h1>
+          <Transfers />
+        </TabsContent>
         <TabsContent value="maps">
           <div className="w-full h-full relative overflow-hidden">
             <SharedGeoLocalisation
@@ -833,14 +799,7 @@ function DetailsContent({ id }) {
             <ComingSoonOverlay transparent={true} />
           </div>
         </TabsContent>
-        <TabsContent value="transferCt">
-          <h1 className="text-xl font-semibold m-2">Transfers effectues</h1>
-          <TransferCtDep
-            data={dataTransfert}
-            fethTransfertbtnLoading={fethTransfertbtnLoading}
-            datapagination={dataTransferPagination}
-          />
-        </TabsContent>
+
       </Tabs>
     </Card>
   );

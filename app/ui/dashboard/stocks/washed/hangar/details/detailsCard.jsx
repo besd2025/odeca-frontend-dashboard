@@ -110,7 +110,7 @@ function DetailsCard({ id }) {
             </svg>
           </div>
           <div className="text-xs font-semibold text-center truncate w-full">
-            CT{" "}
+            HAN{" "}
             {data?.ct_nom
               ? data.ct_nom.slice(0, 2).toUpperCase() + "..."
               : "--"}
@@ -143,7 +143,7 @@ function DetailsCard({ id }) {
               {loading ? (
                 <Skeleton className="h-7 w-48 mx-auto" />
               ) : (
-                <p className="text-xl font-semibold">CT {data?.ct_nom}</p>
+                <p className="text-xl font-semibold">HANGAR {data?.ct_nom}</p>
               )}
               <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
                 {""}
