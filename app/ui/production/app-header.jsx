@@ -69,7 +69,6 @@ const deconnecter = () => {
 
 export function AppHeader() {
   const user = React.useContext(UserContext);
-  console.log(user);
   const initials = `${user?.session?.first_name?.[0] || ""}${user?.session?.last_name?.[0] || ""
     }`.toUpperCase();
 

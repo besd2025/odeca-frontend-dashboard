@@ -19,6 +19,8 @@ import { fetchData } from '@/app/_utils/api';
 export default function EditRendementParche({ data }) {
     console.log("EditRendementParche", data);
     const [open, setOpen] = React.useState(false);
+    const [typeOptions, setTypeOptions] = React.useState([]);
+    const [idType, setIdType] = React.useState("");
     const [gradeOptions, setGradeOptions] = React.useState([]);
     const [idGrade, setIdGrade] = React.useState("");
     const [qteParche, setQteParche] = React.useState(data?.quantite_cafe_parche);
@@ -135,7 +137,26 @@ export default function EditRendementParche({ data }) {
                         <DialogTitle>Modifier</DialogTitle>
                     </DialogHeader>
 
-
+                    <div className="space-y-2 text-left">
+                        <Label htmlFor="typeId" className="font-semibold text-slate-700 dark:text-slate-300">
+                            Type
+                        </Label>
+                        <Select
+                            value={idType}
+                            onValueChange={setIdType}
+                        >
+                            <SelectTrigger id="typeId" className="w-full cursor-pointer">
+                                <SelectValue placeholder={data?.cafe_parche_type} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {typeOptions.map((item, index) => (
+                                    <SelectItem key={`${index + 1}`} value={item.value}>
+                                        {item.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
                     {/* Grade Select — HORS de DialogHeader pour éviter le conflit Radix portal */}
                     <div className="space-y-2 text-left">
@@ -147,7 +168,7 @@ export default function EditRendementParche({ data }) {
                             onValueChange={setIdGrade}
                         >
                             <SelectTrigger id="gradeId" className="w-full cursor-pointer">
-                                <SelectValue placeholder="Ajouter un grade..." />
+                                <SelectValue placeholder={data?.grade?.grade_name} />
                             </SelectTrigger>
                             <SelectContent>
                                 {gradeOptions.map((item, index) => (

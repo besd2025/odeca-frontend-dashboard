@@ -334,7 +334,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
                                 Copier code
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <Link href={`/odeca-dashboard/ct/details/?id=${ct.id}`}>
+                            <Link href={`/odeca-dashboard/stocks/washed/hangar/details/?id=${ct.id}`}>
                                 <DropdownMenuItem>Details</DropdownMenuItem>
                             </Link>
                             {user?.session?.category === "Admin" ? (
@@ -519,7 +519,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
                                         ) : (
                                             <>
                                                 <FileChartPie className=" h-4 w-4" />
-                                                Rapport CT
+                                                Rapport Hangar
                                             </>
                                         )}
                                     </Button>
@@ -577,7 +577,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
                                                     ) : (
                                                         <>
                                                             <FileChartPie className=" h-4 w-4" />
-                                                            Rapport CT
+                                                            Rapport Hangar
                                                         </>
                                                     )}
                                                 </Button>
