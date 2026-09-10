@@ -46,7 +46,16 @@ function StatsCard({ id }) {
             body: {},
           },
         );
-        const response = { qte_achete, nombre_cultivateurs };
+        const qte_transfert = await fetchData(
+          "get",
+          `cafe/centres_transite/${id}/get_total_transfert_par_ct/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          },
+        );
+        const response = { qte_achete, nombre_cultivateurs, qte_transfert };
         setData(response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -332,9 +341,9 @@ function StatsCard({ id }) {
               <TruckElectric className="text-white" />
             </div>
             <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-              {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+              {(data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b) >= 1000 ? (
                 <>
-                  {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                  {((data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b) / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
@@ -342,14 +351,14 @@ function StatsCard({ id }) {
                 </>
               ) : (
                 <>
-                  {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                  {(data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
                   <span className="text-sm">Kg</span>
                 </>
               )}
             </CardTitle>
             {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
               <span className="text-sm font-normal text-muted-foreground ml-2">
-                ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+                ({(data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b)?.toLocaleString("fr-FR")} kg)
               </span>
             ) : (
               <></>
@@ -369,9 +378,9 @@ function StatsCard({ id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.cerise_a >= 1000 ? (
+                {data?.qte_transfert?.cerise_a >= 1000 ? (
                   <>
-                    {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
+                    {(data?.qte_transfert?.cerise_a / 1000).toLocaleString(
                       "fr-FR",
                       {
                         minimumFractionDigits: 2,
@@ -382,7 +391,7 @@ function StatsCard({ id }) {
                   </>
                 ) : (
                   <>
-                    {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                    {data?.qte_transfert?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -391,7 +400,7 @@ function StatsCard({ id }) {
                   ""
                 ) : (
                   <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
+                    ({data?.qte_transfert?.cerise_a?.toLocaleString("fr-FR")} kg)
                   </span>
                 )}
 
@@ -408,9 +417,9 @@ function StatsCard({ id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.cerise_b >= 1000 ? (
+                {data?.qte_transfert?.cerise_b >= 1000 ? (
                   <>
-                    {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
+                    {(data?.qte_transfert?.cerise_b / 1000).toLocaleString(
                       "fr-FR",
                       {
                         minimumFractionDigits: 2,
@@ -421,7 +430,7 @@ function StatsCard({ id }) {
                   </>
                 ) : (
                   <>
-                    {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                    {data?.qte_transfert?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -429,14 +438,14 @@ function StatsCard({ id }) {
                   ""
                 ) : (
                   <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
+                    ({data?.qte_transfert?.cerise_b?.toLocaleString("fr-FR")} kg)
                   </span>
                 )}
 
               </CardDescription>
             </div>
           </div>
-          <div>
+          {/* <div>
             <Separator />
             <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground my-2">
               SDL destination:
@@ -444,7 +453,7 @@ function StatsCard({ id }) {
             <div className="text-sm font-normal flex flex-wrap gap-2">
               <span className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">SDL Gatwe</span>
             </div>
-          </div>
+          </div> */}
         </CardHeader>
 
       </Card>

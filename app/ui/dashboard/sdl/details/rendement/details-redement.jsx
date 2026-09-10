@@ -51,7 +51,6 @@ export default function DetailsRendement({ data }) {
             body: {},
           },
         );
-        console.log("eeeee", rapportC)
         setRapportCData(rapportC?.results);
       } catch (error) {
         console.error("Error fetching rapportC:", error);
