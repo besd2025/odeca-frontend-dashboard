@@ -244,7 +244,6 @@ function DetailsContent({ id }) {
         },
       );
       const results = response?.results
-      console.log("response", results);
       const transferData = results?.map((transfer) => ({
         id: transfer?.id,
         code: transfer?.transfer_code,

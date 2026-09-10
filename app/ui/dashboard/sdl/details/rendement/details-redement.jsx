@@ -43,7 +43,10 @@ export default function DetailsRendement({ data }) {
           "get",
           `cafe/rendements/${data.id}/get_rendement_cerise_details_sdl/`,
           {
-            params: {},
+            params: {
+              limit: 30,
+              offset: 0
+            },
             additionalHeaders: {},
             body: {},
           },

@@ -166,24 +166,24 @@ export function LoginForm({ className, ...props }) {
                 />
               </Field>
               <Field>
+                <div className="flex items-center">
+                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <a
+                    href="#"
+                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                  >
+                    Mot de passe oublié ?
+                  </a>
+                </div>
                 <div className="relative">
-                  <div className="flex items-center">
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <a
-                      href="#"
-                      className="ml-auto text-sm underline-offset-2 hover:underline"
-                    >
-                      Mot de passe oublié ?
-                    </a>
-                  </div>
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <span
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-1/2 h-8 w-8 cursor-pointer"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />

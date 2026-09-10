@@ -61,7 +61,6 @@ export default function RedementC({ id }) {
             },
           },
         );
-        console.log("response", response);
         // Support deux formats : { count, results } (DRF paginé) ou tableau direct
         const results = Array.isArray(response)
           ? response
