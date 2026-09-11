@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDownIcon, MoreHorizontal, Search } from "lucide-react";
 import * as React from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,20 +31,50 @@ import {
 } from "@/components/ui/table";
 import ExportButton from "@/components/ui/export_button";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
-import PaginationControls from "@/components/ui/pagination-controls";
+import PaginationContent from "@/components/ui/pagination-content";
 import EditReceipts from "./edit-receipt";
 import DetailsReceipt from "./details-receipt";
 
-export default function ReceiptSdlCt({ data }) {
+export default function ReceiptSdlCt({
+  data = [],
+  datapagination,
+}) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  console.log(data);
+  const [searchValue, setSearchValue] = useState("");
+
+  // Local pagination fallback
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+
+  const totalCount = datapagination?.totalCount ?? data.length;
+  const resolvedTotalPages =
+    datapagination?.totalPages ?? Math.ceil(totalCount / limit);
+  const resolvedCurrentPage = datapagination?.currentPage ?? currentPage;
+  const resolvedPointer = datapagination?.pointer ?? pointer;
+  const resolvedLimit = datapagination?.limit ?? limit;
+
+  const onPageChange = (page) => {
+    if (datapagination?.onPageChange) {
+      datapagination.onPageChange(page);
+    } else {
+      setCurrentPage(page);
+      setPointer((page - 1) * limit);
+    }
+  };
+
+  const onLimitChange = (newLimit) => {
+    if (datapagination?.onLimitChange) {
+      datapagination.onLimitChange(newLimit);
+    } else {
+      setLimit(newLimit);
+      setPointer(0);
+      setCurrentPage(1);
+    }
+  };
 
   const columns = [
     {
@@ -56,13 +87,13 @@ export default function ReceiptSdlCt({ data }) {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
                 <span className="sr-only">Open menu</span>
-                <MoreHorizontal />
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuLabel className="text-muted-foreground font-normal">
+            <DropdownMenuContent align="start" className="min-w-[160px]">
+              <DropdownMenuLabel className="text-muted-foreground font-normal text-xs">
                 Actions
               </DropdownMenuLabel>
 
@@ -95,7 +126,7 @@ export default function ReceiptSdlCt({ data }) {
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           CT Source
-          <ArrowUpDownIcon />
+          <ArrowUpDownIcon className="ml-1 h-3 w-3" />
         </Button>
       ),
       filterFn: (row, columnId, filterValue) => {
@@ -109,7 +140,7 @@ export default function ReceiptSdlCt({ data }) {
         );
       },
       cell: ({ row }) => (
-        <div className="font-medium">{row.getValue("from_sdl")}</div>
+        <div className="font-semibold text-foreground">{row.getValue("from_sdl")}</div>
       ),
     },
 
@@ -121,10 +152,10 @@ export default function ReceiptSdlCt({ data }) {
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Société
-          <ArrowUpDownIcon />
+          <ArrowUpDownIcon className="ml-1 h-3 w-3" />
         </Button>
       ),
-      cell: ({ row }) => <div>{row.getValue("society")}</div>,
+      cell: ({ row }) => <div className="font-medium text-foreground">{row.getValue("society")}</div>,
     },
     {
       id: "localite",
@@ -132,7 +163,7 @@ export default function ReceiptSdlCt({ data }) {
       cell: ({ row }) => {
         const localite = row.original.localite;
         return (
-          <div className="text-sm">
+          <div className="text-sm text-muted-foreground">
             {localite?.commune}, {localite?.province}
           </div>
         );
@@ -160,15 +191,16 @@ export default function ReceiptSdlCt({ data }) {
       id: "photo_fiche",
       header: "Fiche",
       cell: ({ row }) => (
-        <div className="text-center font-semibold">
+        <div className="flex justify-center items-center">
           {row.original.photo_fiche ? (
             <ViewImageDialog
               imageUrl={row.original.photo_fiche}
               alt="Photo fiche"
               profile={false}
+              className="h-8 w-8 rounded-md border shadow-xs hover:opacity-85 transition-opacity"
             />
           ) : (
-            "-"
+            <span className="text-xs text-muted-foreground italic">-</span>
           )}
         </div>
       ),
@@ -186,62 +218,62 @@ export default function ReceiptSdlCt({ data }) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination,
     },
+    manualPagination: true,
   });
 
   return (
-    <div className="w-full bg-sidebar rounded-lg">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
-        <div className="relative ">
-          <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
+    <div className="w-full bg-sidebar rounded-lg space-y-4">
+      {/* Search Header */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-2">
+        <div className="relative w-full md:w-auto">
+          <Search className="h-4 w-4 absolute inset-y-0 my-auto left-3 text-muted-foreground" />
           <Input
             placeholder="Rechercher..."
-            value={table.getColumn("from_sdl")?.getFilterValue() ?? ""}
-            onChange={(event) =>
-              table.getColumn("from_sdl")?.setFilterValue(event.target.value)
-            }
-            className="pl-10 flex-1  shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+            value={searchValue}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSearchValue(val);
+              table.getColumn("from_sdl")?.setFilterValue(val);
+            }}
+            className="pl-9 w-full md:w-[300px] lg:w-[380px] bg-background shadow-xs rounded-lg border-border"
           />
         </div>
 
-        <div className="flex flex-row justify-between gap-x-3">
-          <div className="flex items-center gap-3 text-gray-700">
-            <ExportButton
-            //   onClickExportButton={exportCultivatorsToExcel}
-            //   onClickDownloadButton={DownloadCultivatorsToExcel}
-            //   loading={loadingEportBtn}
-            //   activedownloadBtn={activedownloadBtn}
-            />
-          </div>
+        <div className="flex items-center gap-3">
+          <ExportButton
+          //   onClickExportButton={exportCultivatorsToExcel}
+          //   onClickDownloadButton={DownloadCultivatorsToExcel}
+          //   loading={loadingEportBtn}
+          //   activedownloadBtn={activedownloadBtn}
+          />
         </div>
       </div>
-      <div className="grid w-full [&>div]:border [&>div]:rounded-md">
+
+      {/* Table */}
+      <div className="grid w-full [&>div]:border [&>div]:rounded-lg [&>div]:overflow-hidden bg-card">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/40">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
-                className=" sticky top-0 bg-background z-10 hover:bg-background"
+                className="sticky top-0 bg-background z-10 hover:bg-background/80"
               >
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="py-3">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -251,9 +283,10 @@ export default function ReceiptSdlCt({ data }) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-muted/30 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="py-3">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -266,29 +299,27 @@ export default function ReceiptSdlCt({ data }) {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-28 text-center text-muted-foreground text-sm font-medium"
                 >
-                  Pas de donneés
+                  Aucune réception trouvée.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected. */}
-        </div>
-        <PaginationControls
-          page={table.getState().pagination.pageIndex + 1}
-          pageSize={table.getState().pagination.pageSize}
-          totalItems={table.getFilteredRowModel().rows.length}
-          totalPages={table.getPageCount()}
-          onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
-          onPageSizeChange={(size) => table.setPageSize(size)}
-          hasNextPage={table.getCanNextPage()}
-          hasPreviousPage={table.getCanPreviousPage()}
+
+      {/* Pagination Controls */}
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-3 pt-2">
+        <PaginationContent
+          datapaginationlimit={onLimitChange}
+          currentPage={resolvedCurrentPage}
+          totalPages={resolvedTotalPages}
+          onPageChange={onPageChange}
+          pointer={resolvedPointer}
+          totalCount={totalCount}
+          onLimitChange={onLimitChange}
+          limit={resolvedLimit}
         />
       </div>
     </div>

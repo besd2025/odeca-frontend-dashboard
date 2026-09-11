@@ -43,7 +43,6 @@ export default function RedementC({ id }) {
   const [totalItems, setTotalItems] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
   const user = React.useContext(UserContext);
-  console.log(user.session.category)
   const totalPages = Math.max(Math.ceil(totalItems / pageSize), 1);
   const offset = (page - 1) * pageSize;
 

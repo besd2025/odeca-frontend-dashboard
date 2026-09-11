@@ -51,7 +51,6 @@ import { fetchData } from "@/app/_utils/api";
 export default function TransferSdlDep({
   data = [],
   datapagination,
-  search: externalSearchHandler,
 }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
