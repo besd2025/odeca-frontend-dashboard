@@ -17,9 +17,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { fetchData } from '@/app/_utils/api';
 
 export default function EditRendementParche({ data }) {
-    console.log("EditRendementParche", data);
     const [open, setOpen] = React.useState(false);
-    const [typeOptions, setTypeOptions] = React.useState([]);
+    const typeOptions = [
+        { value: "FULL_WASHED", label: "FULL_WASHED" },
+        { value: "MIEL", label: "MIEL" },
+        { value: "NATUREL", label: "NATUREL" },
+    ];
+    console.log(data);
+
     const [idType, setIdType] = React.useState("");
     const [gradeOptions, setGradeOptions] = React.useState([]);
     const [idGrade, setIdGrade] = React.useState("");
@@ -74,8 +79,8 @@ export default function EditRendementParche({ data }) {
             enregistrement_date: dateSortie,
             rendement_cerise_detail_code: data?.rendement_cerise_detail_code,
             rendement_code: data?.rendement?.rendement_cerise_code,
+            cafe_parche_type: idType,
         };
-        console.log("dataToSend", dataToSend)
 
         const promise = new Promise(async (resolve, reject) => {
             try {
@@ -141,21 +146,31 @@ export default function EditRendementParche({ data }) {
                         <Label htmlFor="typeId" className="font-semibold text-slate-700 dark:text-slate-300">
                             Type
                         </Label>
-                        <Select
-                            value={idType}
-                            onValueChange={setIdType}
-                        >
-                            <SelectTrigger id="typeId" className="w-full cursor-pointer">
-                                <SelectValue placeholder={data?.cafe_parche_type} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {typeOptions.map((item, index) => (
-                                    <SelectItem key={`${index + 1}`} value={item.value}>
-                                        {item.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        {data?.cafe_parche_type != null ? (
+                            <Select
+                                value={""}
+                            >
+                                <SelectTrigger id="typeId" className="w-full cursor-pointer">
+                                    <SelectValue placeholder={data?.cafe_parche_type} />
+                                </SelectTrigger>
+                            </Select>
+                        ) : (
+                            <Select
+                                value={idType}
+                                onValueChange={setIdType}
+                            >
+                                <SelectTrigger id="typeId" className="w-full cursor-pointer">
+                                    <SelectValue placeholder="Choisir un type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {typeOptions.map((item, index) => (
+                                        <SelectItem key={`${index + 1}`} value={item.value}>
+                                            {item.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        )}
                     </div>
 
                     {/* Grade Select — HORS de DialogHeader pour éviter le conflit Radix portal */}

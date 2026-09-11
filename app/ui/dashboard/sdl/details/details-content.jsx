@@ -81,6 +81,19 @@ function DetailsContent({ id }) {
   const [limitAchat, setLimitAchat] = useState(5);
   const [totalCountAchat, setTotalCountAchat] = useState(0);
   const [currentPageAchat, setCurrentPageAchat] = useState(1);
+
+  // Transfert Pagination
+  const [pointerTransfert, setPointerTransfert] = useState(0);
+  const [limitTransfert, setLimitTransfert] = useState(5);
+  const [totalCountTransfert, setTotalCountTransfert] = useState(0);
+  const [currentPageTransfert, setCurrentPageTransfert] = useState(1);
+
+  // Reception SDL Pagination
+  const [pointerReception, setPointerReception] = useState(0);
+  const [limitReception, setLimitReception] = useState(5);
+  const [totalCountReception, setTotalCountReception] = useState(0);
+  const [currentPageReception, setCurrentPageReception] = useState(1);
+
   const [achatCultivateur_type, setAchatCultivateur_type] = useState(
     "achat_cultivator_individual",
   );
@@ -182,7 +195,6 @@ function DetailsContent({ id }) {
         champs: cultivator?.nombre_champs,
       }));
       setIndividualCultivatorsData(cultivatorsData);
-      console.log("individualCultivatorsData", cultivatorsData);
       setTotalCount(response?.count);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
@@ -240,7 +252,7 @@ function DetailsContent({ id }) {
         "get",
         `cafe/stationslavage/${id}/get_transfert_to_usine/`,
         {
-          params: {},
+          params: { limit: limitTransfert, offset: pointerTransfert },
         },
       );
       const results = response?.results
@@ -269,7 +281,7 @@ function DetailsContent({ id }) {
         },
       }));
       setTransferData(transferData);
-      console.log("transferData", transferData);
+      setTotalCountTransfert(response?.count ?? 0);
     } catch (error) {
       console.error("Error fetching transfers data:", error);
     }
@@ -280,7 +292,7 @@ function DetailsContent({ id }) {
         "get",
         `cafe/stationslavage/${id}/get_transferts_recus/`,
         {
-          params: {},
+          params: { limit: limitReception, offset: pointerReception },
         },
       );
       const results = response?.results;
@@ -307,6 +319,7 @@ function DetailsContent({ id }) {
         },
       }));
       setReceptionSdl(transferData);
+      setTotalCountReception(response?.count ?? 0);
     } catch (error) {
       console.error("Error fetching transfers data:", error);
     }
@@ -422,14 +435,19 @@ function DetailsContent({ id }) {
     } else if (cultivateur_type === "cultivator_association") {
       getCultivatorsAssociation();
     }
+  }, [cultivateur_type, limit, pointer, tab]);
+
+  useEffect(() => {
     if (tab === "transferSdl") {
       getTransfers();
     }
+  }, [tab, limitTransfert, pointerTransfert]);
+
+  useEffect(() => {
     if (tab === "receptionSdl") {
       getReceptionSdl();
     }
-
-  }, [cultivateur_type, limit, pointer, tab]);
+  }, [tab, limitReception, pointerReception]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -470,6 +488,46 @@ function DetailsContent({ id }) {
     pointer: pointerAchat,
     onLimitChange: onLimitChangeAchat,
     limit: limitAchat,
+  };
+
+  const totalPagesTransfert = Math.ceil(totalCountTransfert / limitTransfert);
+  const onPageChangeTransfert = (pageNumber) => {
+    setCurrentPageTransfert(pageNumber);
+    setPointerTransfert((pageNumber - 1) * limitTransfert);
+  };
+  const onLimitChangeTransfert = (newLimit) => {
+    setLimitTransfert(newLimit);
+    setPointerTransfert(0);
+    setCurrentPageTransfert(1);
+  };
+  const dataTransfertpagination = {
+    totalCount: totalCountTransfert,
+    currentPage: currentPageTransfert,
+    onPageChange: onPageChangeTransfert,
+    totalPages: totalPagesTransfert,
+    pointer: pointerTransfert,
+    onLimitChange: onLimitChangeTransfert,
+    limit: limitTransfert,
+  };
+
+  const totalPagesReception = Math.ceil(totalCountReception / limitReception);
+  const onPageChangeReception = (pageNumber) => {
+    setCurrentPageReception(pageNumber);
+    setPointerReception((pageNumber - 1) * limitReception);
+  };
+  const onLimitChangeReception = (newLimit) => {
+    setLimitReception(newLimit);
+    setPointerReception(0);
+    setCurrentPageReception(1);
+  };
+  const dataReceptionpagination = {
+    totalCount: totalCountReception,
+    currentPage: currentPageReception,
+    onPageChange: onPageChangeReception,
+    totalPages: totalPagesReception,
+    pointer: pointerReception,
+    onLimitChange: onLimitChangeReception,
+    limit: limitReception,
   };
 
   const fetchCultivatorsByType = (type) => {
@@ -705,13 +763,19 @@ function DetailsContent({ id }) {
         </TabsContent>
         <TabsContent value="transferSdl">
           <div className="relative w-full h-full overflow-hidden">
-            <TransferSdlDep data={transferData} />
+            <TransferSdlDep
+              data={transferData}
+              datapagination={dataTransfertpagination}
+            />
             {/* <ComingSoonOverlay transparent={true} /> */}
           </div>
         </TabsContent>
         <TabsContent value="receptionSdl">
           <div className="relative w-full h-full overflow-hidden">
-            <ReceiptSdlCt data={receptionSdl} />
+            <ReceiptSdlCt
+              data={receptionSdl}
+              datapagination={dataReceptionpagination}
+            />
             {/* <ComingSoonOverlay transparent={true} /> */}
           </div>
         </TabsContent>
