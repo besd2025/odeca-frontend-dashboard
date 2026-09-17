@@ -21,6 +21,7 @@ import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
 import { UserContext } from "@/app/ui/context/User_Context";
+import { Badge } from "@/components/ui/badge";
 function StatsCard({ id }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
@@ -73,6 +74,16 @@ function StatsCard({ id }) {
     total > 0 ? ((data?.qte_achete?.cerise_a || 0) / total) * 100 : 0;
   const percentageB =
     total > 0 ? ((data?.qte_achete?.cerise_b || 0) / total) * 100 : 0;
+
+  const qteRestanteCeriseA =
+    (data?.qte_achete?.cerise_a || 0) -
+    (data?.qte_transfert?.cerise_a || 0);
+  const qteRestanteCeriseB =
+    (data?.qte_achete?.cerise_b || 0) -
+    (data?.qte_transfert?.cerise_b || 0);
+  const qteRestanteTotal =
+    (data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b || 0) -
+    (data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b || 0);
 
   const [avance, setAvance] = React.useState(false);
 
@@ -334,7 +345,7 @@ function StatsCard({ id }) {
         </CardHeader>
       </Card>
 
-      <Card className="@container/card col-span-1 lg:col-span-4 ">
+      <Card className="@container/card col-span-1 lg:col-span-4 relative">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-secondary p-2 rounded-md">
@@ -362,6 +373,29 @@ function StatsCard({ id }) {
               </span>
             ) : (
               <></>
+            )}
+            {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+              <>
+                {qteRestanteTotal !== 0 && (
+                  <Badge variant="outline" className="text-destructive ml-4 rounded text-xs absolute right-5">
+                    {qteRestanteTotal >= 1000 ? (
+                      <>
+                        {(qteRestanteTotal / 1000).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{" "}
+                        <span className="text-sm">T</span>
+                      </>
+                    ) : (
+                      <>
+                        {qteRestanteTotal.toLocaleString("fr-FR")}{" "}
+                        <span className="text-sm">Kg</span>
+                      </>
+                    )}
+                    restant
+                  </Badge>
+                )}
+              </>
             )}
           </div>
           <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground ">
@@ -405,6 +439,29 @@ function StatsCard({ id }) {
                 )}
 
               </CardDescription>
+              {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+                <>
+                  {qteRestanteCeriseA !== 0 && (
+                    <Badge variant="outline" className="text-destructive ml-4 rounded absolute right-5">
+                      {qteRestanteCeriseA >= 1000 ? (
+                        <>
+                          {(qteRestanteCeriseA / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span className="text-sm">T</span>
+                        </>
+                      ) : (
+                        <>
+                          {qteRestanteCeriseA.toLocaleString("fr-FR")}{" "}
+                          <span className="text-sm">Kg</span>
+                        </>
+                      )}
+                      restant
+                    </Badge>
+                  )}
+                </>
+              )}
             </div>
             <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg">
               <span className="text-secondary flex items-center gap-1">
@@ -441,7 +498,32 @@ function StatsCard({ id }) {
                     ({data?.qte_transfert?.cerise_b?.toLocaleString("fr-FR")} kg)
                   </span>
                 )}
+                {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+                  <>
+                    {qteRestanteCeriseB !== 0 && (
+                      <Badge variant="outline" className="text-destructive ml-4 rounded absolute right-5">
 
+                        {qteRestanteCeriseB >= 1000 ? (
+                          <>
+                            {(qteRestanteCeriseB / 1000).toLocaleString("fr-FR", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}{" "}
+                            <span className="text-sm">T</span>
+                          </>
+                        ) : (
+                          <>
+                            {qteRestanteCeriseB.toLocaleString("fr-FR")}{" "}
+                            <span className="text-sm">Kg</span>
+                          </>
+                        )}
+                        restant
+                      </Badge>
+                    )}
+
+                  </>
+
+                )}
               </CardDescription>
             </div>
           </div>
