@@ -118,7 +118,6 @@ function DetailsContent({ id, slug }) {
           body: {},
         },
       );
-      console.log("response transferts", response);
       setTotalCountTransfer(response?.count || 0);
       const results = response?.results;
       const transfersData = results?.map((transfer) => ({
