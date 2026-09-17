@@ -31,7 +31,7 @@ import { saveAs } from "file-saver";
 import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
 import Transfers from "./transfers";
 import AchatsWashedListTable from "./achats/achats-list";
-function DetailsContent({ id }) {
+function DetailsContent({ id, slug }) {
   const [tab, setTab] = useState("achats");
   const [data, setData] = React.useState([]);
   const [individualAchatsData, setIndividualAchatsData] = React.useState([]);
@@ -66,71 +66,36 @@ function DetailsContent({ id }) {
   const [limitAchat, setLimitAchat] = useState(5);
   const [currentPageAchat, setCurrentPageAchat] = useState(1);
   const [filterAchatData, setFilterAchatData] = useState({});
-  const [isCultivatorsLoading, setIsCultivatorsLoading] = useState(false);
-  const [isAchatsLoading, setIsAchatsLoading] = useState(false);
+
 
   const getAchatsHangars = async () => {
 
     try {
-      const type =
-        achatCultivateur_type === "achat_cultivator_individual"
-          ? "personne"
-          : "association";
-
       const response = await fetchData(
         "get",
-        `cafe/centres_transite/${id}/get_achats/`,
+        `cafe/stationslavage/get_hangar_list_achat_for_washed/`,
         {
           params: {
             ...filterAchatData,
-            cafeiculteur_type: type,
             limit: limitAchat,
             offset: pointerAchat,
+            hangar_code: slug,
           },
         },
       );
       const mappedData =
         response?.results?.map((achats) => ({
           id: achats?.id,
-          cultivator: {
-            cultivator_id: achats?.cafeiculteur?.id,
-            cultivator_code: achats?.cafeiculteur?.cultivator_code,
-            first_name: achats?.cafeiculteur?.cultivator_first_name,
-            last_name: achats?.cafeiculteur?.cultivator_last_name,
-            image_url: achats?.cafeiculteur?.cultivator_photo,
-            cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
-            cultivator_assoc_rep_name:
-              achats?.cafeiculteur?.cultivator_assoc_rep_name,
-            cultivator_type:
-              type === "association" ? "association" : "individual",
-          },
-          localite: {
-            province:
-              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
-            commune:
-              achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
-          },
-          in_payment: achats?.in_payment,
-          num_fiche: achats?.cafeiculteur?.cultivator_assoc_numero_fiche || "",
-          num_recu: achats?.numero_recu,
-          photo_fiche: achats?.photo_fiche,
-          ca: achats?.quantite_cerise_a,
-          cb: achats?.quantite_cerise_b,
+          societe: achats?.responsable?.sdl_ct?.sdl?.societe?.nom_societe,
+          hangar: achats?.responsable?.sdl_ct?.sdl?.sdl_nom,
+          quantite: achats?.quantite,
+          qualite: achats?.qualite,
           date: achats?.date_achat,
-          isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
+
         })) || [];
 
       setTotalCountAchat(response?.count || 0);
-
-      if (type == "personne") {
-        setIndividualAchatsData(mappedData);
-        setAssociationAchatsData([]);
-      } else {
-        setAssociationAchatsData(mappedData);
-        setIndividualAchatsData([]);
-      }
+      setIndividualAchatsData(mappedData);
     } catch (error) {
       console.error("Error fetching achats data:", error);
     }
@@ -140,100 +105,20 @@ function DetailsContent({ id }) {
     if (tab == "achats") {
       getAchatsHangars();
     }
-  }, [achatCultivateur_type, limitAchat, pointerAchat, tab, filterAchatData]);
-  const getCultivatorsIndividual = async () => {
-    try {
-      const response = await fetchData(
-        "get",
-        `cafe/centres_transite/${id}/get_cultivators/`,
-        {
-          params: { limit: limit, offset: pointer },
-          additionalHeaders: {},
-          body: {},
-        },
-      );
-      const results = response?.results;
-      const cultivatorsData = results?.map((cultivator) => ({
-        id: cultivator?.id,
-        cultivator: {
-          cultivator_code: cultivator?.cultivator_code,
-          first_name: cultivator?.cultivator_first_name,
-          last_name: cultivator?.cultivator_last_name,
-          image_url: cultivator?.cultivator_photo,
-          telephone: cultivator?.cultivator_telephone,
-        },
-        in_payment: cultivator?.in_payment,
-        cni: cultivator?.cultivator_cni,
-        cni_image_url: cultivator?.cultivator_cni_photo,
-        localite: {
-          province:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.province_code?.province_name,
-          commune:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.commune_name,
-        },
-        champs: cultivator?.nombre_champs,
-      }));
-      setIndividualCultivatorsData(cultivatorsData);
-      setTotalCount(response?.count);
-    } catch (error) {
-      console.error("Error fetching cultivators data:", error);
-    }
-  };
-  const getCultivatorsAssociation = async () => {
-    try {
-      const response = await fetchData(
-        "get",
-        `cafe/centres_transite/${id}/get_cultivators_association/`,
-        {
-          params: { limit: limit, offset: pointer },
-          additionalHeaders: {},
-          body: {},
-        },
-      );
-      const results = response?.results;
-      const cultivatorsData = results?.map((cultivator) => ({
-        id: cultivator?.id,
-        in_payment: cultivator?.in_payment,
-        cultivator: {
-          cultivator_code: cultivator?.cultivator_code,
-          first_name: cultivator?.cultivator_first_name,
-          last_name: cultivator?.cultivator_last_name,
-          image_url: cultivator?.cultivator_photo,
-          telephone: cultivator?.cultivator_telephone,
-          cultivator_assoc_name: cultivator?.cultivator_assoc_name,
-          cultivator_assoc_rep_name: cultivator?.cultivator_assoc_rep_name,
-        },
-        sdl_ct: "NGome",
-        society: "ODECA",
-        localite: {
-          province:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.province_code?.province_name,
-          commune:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.commune_name,
-        },
-        champs: cultivator?.nombre_champs,
-      }));
-      setAssociationCultivatorsData(cultivatorsData);
-      setTotalCount(response?.count);
-    } catch (error) {
-      console.error("Error fetching cultivators data:", error);
-    }
-  };
+  }, [limitAchat, pointerAchat, tab, filterAchatData]);
+
   const getTransfers = async () => {
     try {
       const response = await fetchData(
         "get",
-        `cafe/centres_transite/${id}/get_transferts/`,
+        `cafe/stationslavage/get_hangar_list_transfert_for_washed/`,
         {
-          params: { limit: limitTransfer, offset: pointerTransfer },
+          params: { hangar_code: slug, limit: limitTransfer, offset: pointerTransfer },
           additionalHeaders: {},
           body: {},
         },
       );
+      console.log("response transferts", response);
       setTotalCountTransfer(response?.count || 0);
       const results = response?.results;
       const transfersData = results?.map((transfer) => ({
@@ -241,10 +126,8 @@ function DetailsContent({ id }) {
         from_ct: transfer?.ct?.ct_nom,
         to_depulpeur_name: transfer?.sdl?.sdl_nom,
         society: transfer?.sdl?.societe?.nom_societe,
-        qte_tranferer: {
-          ca: transfer?.quantite_cerise_a,
-          cb: transfer?.quantite_cerise_b,
-        },
+        date_transfert: transfer?.transfer_date,
+        usine: transfer?.usine_deparchage?.usine_name,
         photo_fiche: transfer?.photo_bordereau || null,
         localite: {
           province:
@@ -267,21 +150,10 @@ function DetailsContent({ id }) {
     setSelectedPlace(place);
     setSelectedPosition(place?.coordinates);
   };
-  const [typeExport, setTypeExport] = useState("individual");
+
   useEffect(() => {
-    // if (achatCultivateur_type === "achat_cultivator_individual") {
-    // getAchatsHangars();
-    // } else if (achatCultivateur_type === "achat_cultivator_association") {
-
-    //}
-
     try {
-      if (cultivateur_type == "cultivator_individual") {
-        setTypeExport("individuel");
-        getCultivatorsIndividual();
-      } else if (cultivateur_type == "cultivator_association") {
-        getCultivatorsAssociation();
-      }
+
       if (transfertbtnLoading) {
         getTransfers();
       }
@@ -289,7 +161,7 @@ function DetailsContent({ id }) {
       console.error("Error fetching cultivators data:", error);
     }
   }, [
-    cultivateur_type,
+
     limit,
     pointer,
     limitTransfer,
@@ -361,211 +233,6 @@ function DetailsContent({ id }) {
     limit: limitAchat,
   };
 
-  const exportCultivatorsToExcel = async () => {
-    try {
-      const initResponse = await fetchData(
-        "get",
-        `cafe/centres_transite/${id}/get_cultivators/`,
-        { params: { limit: 1 } },
-      );
-
-      const totalCount = initResponse?.count || 0;
-      if (totalCount === 0) return;
-
-      const response = await fetchData(
-        "get",
-        `cafe/centres_transite/${id}/get_cultivators/`,
-        { params: { limit: totalCount, offset: 0 } },
-      );
-
-      const allData = response.results || [];
-      const uniqueData = Array.from(
-        new Map(allData.map((item) => [item.id, item])).values(),
-      );
-
-      const formattedData = uniqueData.map((item) => {
-        const formattedItem = {
-          code_cultivateur: item.cultivator_code || "",
-          Type: item.cultivator_entity_type || "",
-          Nom: item.cultivator_first_name || "",
-          Prénom: item.cultivator_last_name || "",
-          Genre: item.cultivator_gender || "",
-          CNI: item.cultivator_cni || "",
-          in_payment: cultivator?.in_payment,
-          // association: item.cultivator_assoc_name || "",
-          // Représentant_de_lassociation: item.cultivator_assoc_rep_name || "",
-          // numero_fiche: item.cultivator_assoc_numero_fiche || "",
-          // NIF_de_lassociation: item.cultivator_assoc_nif || "",
-          Province:
-            item.cultivator_adress?.zone_code?.commune_code?.province_code
-              ?.province_name || "",
-          Commune:
-            item.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
-          Zone: item.cultivator_adress?.zone_code?.zone_name || "",
-          Colline: item.cultivator_adress?.colline_name || "",
-          Societte: item?.collector?.hangar?.hangar_name || "",
-          Nombre_de_champs: item.nombre_champs || 0,
-          Superficie_totale_des_champs: item.superficie_totale_champs || 0,
-          Telephone: item.cultivator_telephone || "",
-        };
-
-        // Mode de paiement
-        if (
-          item?.cultivator_bank_name == "banque" ||
-          item?.cultivator_bank_name == "microfinance"
-        ) {
-          formattedItem.mode_payement =
-            item?.cultivator_bank_name.toUpperCase();
-          formattedItem.Banque_ou_microfinance = item?.cultivator_bank_name;
-          formattedItem.Numero_compte = item?.cultivator_bank_account || "";
-        } else if (item?.cultivator_payment_type == "mobile_money") {
-          formattedItem.mode_payement = item?.cultivator_payment_type
-            .replaceAll("_", " ")
-            .toUpperCase();
-          // const phone = item.cultivator_mobile_payment.toString();
-          // if (phone.startsWith("6") || phone.startsWith("3")) {
-          //   formattedItem.nom_service =
-          //     item.cultivator_mobile_payment_service || "L";
-          // } else if (phone.startsWith("7")) {
-          //   formattedItem.nom_service = "ECOCASH";
-          // }
-          formattedItem.nom_service = item.cultivator_mobile_payment_name || "";
-          formattedItem.Numero_de_telephone_de_payement =
-            item.cultivator_mobile_payment_account || "";
-          formattedItem.proprietaire = item.cultivator_account_owner || "";
-          formattedItem.date_enregistrement = item.created_at || "";
-        } else {
-          formattedItem.mode_payement = "";
-        }
-
-        return formattedItem;
-      });
-
-      // Génération du fichier Excel
-      const worksheet = XLSX.utils.json_to_sheet(formattedData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Cultivateurs");
-
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      const blob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
-      });
-
-      saveAs(
-        blob,
-        `cultivateurs_${new Date().toISOString().split("T")[0]}.xlsx`,
-      );
-    } catch (error) {
-      console.error("Erreur exportation Excel :", error);
-    }
-  };
-  const exportAssociationToExcel = async () => {
-    try {
-      const initResponse = await fetchData(
-        "get",
-        `cafe/centres_transite/${id}/get_cultivators_association/`,
-        { params: { limit: 1 } },
-      );
-
-      const totalCount = initResponse?.count || 0;
-      if (totalCount === 0) return;
-
-      const response = await fetchData(
-        "get",
-        `cafe/centres_transite/${id}/get_cultivators_association/`,
-        {
-          params: {
-            limit: totalCount,
-          },
-        },
-      );
-
-      const allData = response.results || [];
-      const uniqueData = Array.from(
-        new Map(allData.map((item) => [item.id, item])).values(),
-      );
-
-      const formattedData = uniqueData.map((item) => {
-        const formattedItem = {
-          code_cultivateur: item.cultivator_code || "",
-          Type: item.cultivator_entity_type || "",
-          association: item.cultivator_assoc_name || "",
-          Représentant_de_lassociation: item.cultivator_assoc_rep_name || "",
-          telephone_du_représentant: item.cultivator_assoc_rep_phone || "",
-          numero_fiche: item.cultivator_assoc_numero_fiche || "",
-          NIF_de_lassociation: item.cultivator_assoc_nif || "",
-
-          Province:
-            item.cultivator_adress?.zone_code?.commune_code?.province_code
-              ?.province_name || "",
-          Commune:
-            item.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
-          Zone: item.cultivator_adress?.zone_code?.zone_name || "",
-          Colline: item.cultivator_adress?.colline_name || "",
-          Societte: item?.collector?.hangar?.hangar_name || "",
-          Nombre_de_champs: item.nombre_champs || 0,
-          Superficie_totale_des_champs: item.superficie_totale_champs || 0,
-          // Telephone: item.cultivator_telephone || "",
-        };
-
-        // Mode de paiement
-        if (
-          item?.cultivator_bank_name == "banque" ||
-          item?.cultivator_bank_name == "microfinance"
-        ) {
-          formattedItem.mode_payement =
-            item?.cultivator_bank_name.toUpperCase();
-          formattedItem.Banque_ou_microfinance = item?.cultivator_bank_name;
-          formattedItem.Numero_compte = item?.cultivator_bank_account || "";
-        } else if (item?.cultivator_payment_type == "mobile_money") {
-          formattedItem.mode_payement = item?.cultivator_payment_type
-            .replaceAll("_", " ")
-            .toUpperCase();
-          // const phone = item.cultivator_mobile_payment.toString();
-          // if (phone.startsWith("6") || phone.startsWith("3")) {
-          //   formattedItem.nom_service =
-          //     item.cultivator_mobile_payment_service || "L";
-          // } else if (phone.startsWith("7")) {
-          //   formattedItem.nom_service = "ECOCASH";
-          // }
-          formattedItem.nom_service = item.cultivator_mobile_payment_name || "";
-          formattedItem.Numero_de_telephone_de_payement =
-            item.cultivator_mobile_payment_account || "";
-          formattedItem.proprietaire = item.cultivator_account_owner || "";
-          formattedItem.date_enregistrement = item.created_at || "";
-        } else {
-          formattedItem.mode_payement = "";
-        }
-
-        return formattedItem;
-      });
-
-      // Génération du fichier Excel
-      const worksheet = XLSX.utils.json_to_sheet(formattedData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "associations");
-
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      const blob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
-      });
-
-      saveAs(
-        blob,
-        `associations_${new Date().toISOString().split("T")[0]}.xlsx`,
-      );
-    } catch (error) {
-      console.error("Erreur exportation Excel :", error);
-    }
-  };
 
   const onClickTyepeExport = (type) => {
     setCultivateur_type(type);
@@ -715,11 +382,11 @@ function DetailsContent({ id }) {
         </TabsList>
         <TabsContent value="achats">
           <h1 className="text-xl font-semibold m-2">Achats effectues</h1>
-          <AchatsWashedListTable />
+          <AchatsWashedListTable data={individualAchatsData} />
         </TabsContent>
         <TabsContent value="transferCt">
           <h1 className="text-xl font-semibold m-2">Transfers effectues</h1>
-          <Transfers />
+          <Transfers data={dataTransfert} />
         </TabsContent>
         <TabsContent value="maps">
           <div className="w-full h-full relative overflow-hidden">

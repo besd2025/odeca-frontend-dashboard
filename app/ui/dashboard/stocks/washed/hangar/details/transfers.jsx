@@ -37,11 +37,11 @@ const products = [
     },
 ];
 
-export default function Transfers() {
+export default function Transfers({ data }) {
     const [page, setPage] = React.useState(1);
     const [pageSize, setPageSize] = React.useState(10);
-
-    const totalItems = products.length;
+    console.log(data)
+    const totalItems = data?.length;
     const totalPages = Math.max(Math.ceil(totalItems / pageSize), 1);
 
     React.useEffect(() => {
@@ -52,7 +52,7 @@ export default function Transfers() {
 
     const paginatedProducts = React.useMemo(() => {
         const start = (page - 1) * pageSize;
-        return products.slice(start, start + pageSize);
+        return data.slice(start, start + pageSize);
     }, [page, pageSize]);
 
     return (
@@ -61,34 +61,30 @@ export default function Transfers() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="pl-4">ID</TableHead>
-                            <TableHead>Date d'achat</TableHead>
-                            <TableHead>SDL/CT</TableHead>
-                            <TableHead>No Fiche</TableHead>
-                            <TableHead>No Recus</TableHead>
-                            <TableHead>CA</TableHead>
-                            <TableHead>CB</TableHead>
+                            <TableHead className="pl-4">#</TableHead>
+                            <TableHead>Societe</TableHead>
+                            <TableHead>From SDL</TableHead>
+                            <TableHead>Usine</TableHead>
                             <TableHead>Fiche</TableHead>
+                            <TableHead>Date</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {paginatedProducts.map((product) => (
+                        {data.map((product, index) => (
                             <TableRow key={product.id} className="odd:bg-muted/50">
-                                <TableCell className="pl-4">{product.id}</TableCell>
-                                <TableCell className="font-medium">{product.date}</TableCell>
+                                <TableCell className="pl-4">{index + 1}</TableCell>
+                                <TableCell>{product.society}</TableCell>
                                 <TableCell>
-                                    {product.sdl_ct_type} {product.sdl_ct_name}
+                                    {product.to_depulpeur_name}
                                 </TableCell>
-                                <TableCell>{product.No_fiche}</TableCell>
-                                <TableCell>{product.No_recus}</TableCell>
-                                <TableCell>{product.ca}</TableCell>
-                                <TableCell>{product.cb}</TableCell>
+                                <TableCell>{product.usine}</TableCell>
                                 <TableCell>
                                     <ViewImageDialog
                                         imageUrl={product.fiche_photo}
                                         profile={false}
                                     />
                                 </TableCell>
+                                <TableCell>{product.date_transfert}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

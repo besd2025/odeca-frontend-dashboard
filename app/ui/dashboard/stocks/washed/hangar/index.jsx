@@ -74,7 +74,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
         const getSdls = async () => {
             setLoading(true);
             try {
-                const response = await fetchData("get", "cafe/centres_transite/", {
+                const response = await fetchData("get", "cafe/stationslavage/get_hangar_for_washed/", {
                     params: {
                         limit: limit,
                         offset: pointer,
@@ -84,25 +84,26 @@ export default function HangarListTable({ isLoading: externalLoading }) {
                     additionalHeaders: {},
                     body: {},
                 });
+                console.log("hangar data", response);
                 const results = response?.results;
-                const ctData = results.map((ct) => ({
-                    id: ct?.id,
+                const ctData = results.map((hangar) => ({
+                    id: hangar?.id,
                     ct: {
-                        ct_code: ct?.ct_code,
-                        ct_name: ct?.ct_nom,
+                        ct_code: hangar?.sdl_code,
+                        ct_name: hangar?.sdl_nom,
                         type: "",
                     },
-                    society: ct?.sdl?.societe?.nom_societe,
+                    society: hangar?.societe?.nom_societe,
                     responsable: {
-                        first_name: ct?.ct_responsable?.user?.first_name || "",
-                        last_name: ct?.ct_responsable?.user?.last_name || "",
-                        telephone: ct?.ct_responsable?.user?.phone || "",
+                        first_name: hangar?.sdl_responsable?.user?.first_name || "",
+                        last_name: hangar?.sdl_responsable?.user?.last_name || "",
+                        telephone: hangar?.sdl_responsable?.user?.phone || "",
                     },
                     localite: {
                         province:
-                            ct?.ct_adress?.zone_code?.commune_code?.province_code
+                            hangar?.sdl_adress?.zone_code?.commune_code?.province_code
                                 ?.province_name || "",
-                        commune: ct?.ct_adress?.zone_code?.commune_code?.commune_name,
+                        commune: hangar?.sdl_adress?.zone_code?.commune_code?.commune_name,
                     },
                 }));
 
@@ -145,7 +146,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
     const handleExportCTs = async () => {
         setLoadingEportBtn(true);
         try {
-            const initResponse = await fetchData("get", `cafe/centres_transite/`, {
+            const initResponse = await fetchData("get", `cafe/stationslavage/get_hangar_for_washed/`, {
                 params: { limit: 1 },
             });
             const total = initResponse?.count || 0;
@@ -154,7 +155,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
                 return;
             }
 
-            const response = await fetchData("get", `cafe/centres_transite/`, {
+            const response = await fetchData("get", `cafe/stationslavage/get_hangar_for_washed/`, {
                 params: { limit: total },
             });
 
@@ -162,19 +163,18 @@ export default function HangarListTable({ isLoading: externalLoading }) {
             const formattedData = allData.map((item) => {
                 const row = {
                     Province:
-                        item.ct_adress?.zone_code?.commune_code?.province_code
+                        item.sdl_adress?.zone_code?.commune_code?.province_code
                             ?.province_name || "",
-                    Commune: item.ct_adress?.zone_code?.commune_code?.commune_name || "",
-                    Zone: item.ct_adress?.zone_code?.zone_name || "",
-                    Colline: item.ct_adress?.colline_name || "",
-                    NON_CT: item.ct_nom || "",
-                    SDL_DESTINATION: item?.sdl?.sdl_nom,
-                    SOCIETE: item?.sdl?.societe?.nom_societe || "",
-                    NOM_RESPONSABLE: item?.ct_responsable?.user?.last_name || "",
-                    PRENOM_RESPONSABLE: item?.ct_responsable?.user?.first_name || "",
-                    TELEPHONE_RESPONSABLE: item?.ct_responsable?.user?.phone || "",
-                    DATE_CREATION: item?.ct_responsable?.created_at
-                        ? new Date(item?.ct_responsable?.created_at).toLocaleString('fr-FR', {
+                    Commune: item.sdl_adress?.zone_code?.commune_code?.commune_name || "",
+                    Zone: item.sdl_adress?.zone_code?.zone_name || "",
+                    Colline: item.sdl_adress?.colline_name || "",
+                    NON_CT: item.sdl_nom || "",
+                    SOCIETE: item?.societe?.nom_societe || "",
+                    NOM_RESPONSABLE: item?.sdl_responsable?.user?.last_name || "",
+                    PRENOM_RESPONSABLE: item?.sdl_responsable?.user?.first_name || "",
+                    TELEPHONE_RESPONSABLE: item?.sdl_responsable?.user?.phone || "",
+                    DATE_CREATION: item?.sdl_responsable?.created_at
+                        ? new Date(item?.sdl_responsable?.created_at).toLocaleString('fr-FR', {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
@@ -185,7 +185,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
                         : null
                 }
                 if (user?.session?.category === ROLES.ADMIN) {
-                    row.CODE_CT = item?.ct_code || "";
+                    row.CODE_HANGAR = item?.sdl_code || "";
                 }
 
                 return row;
@@ -193,7 +193,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
 
             const worksheet = XLSX.utils.json_to_sheet(formattedData);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "CT");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "HANGARS");
             const excelBuffer = XLSX.write(workbook, {
                 bookType: "xlsx",
                 type: "array",
@@ -219,7 +219,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
         const minutes = String(now.getMinutes()).padStart(2, "0");
         const seconds = String(now.getSeconds()).padStart(2, "0");
         const time = `${hours}_${minutes}_${seconds}`;
-        saveAs(exportBlob, `liste_CTs_et_les_responsables_${date}_${time}.xlsx`);
+        saveAs(exportBlob, `liste_stocks_cafe_washed_et_les_responsables_${date}_${time}.xlsx`);
         setActivedownloadBtn(false);
         setExportBlob(null);
     };
@@ -334,7 +334,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
                                 Copier code
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <Link href={`/odeca-dashboard/stocks/washed/hangar/details/?id=${ct.id}`}>
+                            <Link href={`/odeca-dashboard/stocks/washed/hangar/details/?id=${ct.id}&slug=${ct.ct.ct_code}`}>
                                 <DropdownMenuItem>Details</DropdownMenuItem>
                             </Link>
                             {user?.session?.category === "Admin" ? (
@@ -394,7 +394,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
                                     {cts.ct_code}
                                 </span>
                             </div>
-                            <Badge className="size-max ml-2 text-xs">CT</Badge>
+                            <Badge className="size-max ml-2 text-xs">HANGAR</Badge>
                         </div>
                     </div>
                 );

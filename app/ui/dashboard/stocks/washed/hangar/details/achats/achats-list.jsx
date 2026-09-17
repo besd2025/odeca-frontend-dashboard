@@ -50,7 +50,7 @@ const products = [
     },
 ];
 
-export default function AchatsWashed() {
+export default function AchatsWashed({ data }) {
     const [page, setPage] = React.useState(1);
     const [pageSize, setPageSize] = React.useState(10);
 
@@ -80,14 +80,15 @@ export default function AchatsWashed() {
                         <TableRow>
                             <TableHead className="pl-4">Action</TableHead>
                             <TableHead>Societe</TableHead>
+                            <TableHead>Hangar</TableHead>
                             <TableHead>Quantite</TableHead>
                             <TableHead>Qualite</TableHead>
                             <TableHead>Date</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {paginatedProducts.map((product) => (
-                            <TableRow key={product.id} className="odd:bg-muted/50">
+                        {data.map((achat) => (
+                            <TableRow key={achat.id} className="odd:bg-muted/50">
                                 <TableCell className="pl-4">  <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -102,7 +103,7 @@ export default function AchatsWashed() {
 
 
                                         <div>
-                                            <Edit id={product.id} item={product} onSave={handleSaveEdit} />
+                                            <Edit id={achat.id} item={achat} onSave={handleSaveEdit} />
 
                                         </div>
 
@@ -115,13 +116,14 @@ export default function AchatsWashed() {
 
                                     </DropdownMenuContent>
                                 </DropdownMenu></TableCell>
-                                <TableCell className="font-medium">{product.date}</TableCell>
-                                <TableCell>
-                                    {product.sdl_ct_type} {product.sdl_ct_name}
-                                </TableCell>
-                                <TableCell>{product.No_fiche}</TableCell>
-                                <TableCell>{product.No_recus}</TableCell>
 
+                                <TableCell>
+                                    {achat.societe}
+                                </TableCell>
+                                <TableCell>{achat.hangar}</TableCell>
+                                <TableCell>{achat.quantite}</TableCell>
+                                <TableCell>{achat.qualite}</TableCell>
+                                <TableCell className="font-medium">{achat.date}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

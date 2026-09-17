@@ -21,32 +21,40 @@ import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
 import { UserContext } from "@/app/ui/context/User_Context";
-function StatsCard({ id }) {
+function StatsCard({ id, slug }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const user = React.useContext(UserContext)
+  console.log("user : ", user);
+  console.log("id : ", id);
+  console.log("slug : ", slug);
+
   React.useEffect(() => {
     const getSdls = async () => {
       try {
         const qte_achete = await fetchData(
           "get",
-          `cafe/centres_transite/${id}/get_total_achat_par_ct/`,
+          `cafe/stationslavage/get_hangar_quantite_for_washed`,
           {
-            params: {},
+            params: { hangar_code: slug },
             additionalHeaders: {},
             body: {},
           },
         );
-        const nombre_cultivateurs = await fetchData(
+        console.log("qte_achete", qte_achete);
+        const qte_tranferer = await fetchData(
           "get",
-          `cafe/centres_transite/${id}/get_total_cultivators_ct/`,
+          `cafe/stationslavage/get_hangar_quantite_transfert_for_washed/`,
           {
-            params: {},
+            params: { hangar_code: slug },
             additionalHeaders: {},
             body: {},
           },
         );
-        const response = { qte_achete, nombre_cultivateurs };
+        console.log("qte_achete : ", qte_achete);
+        console.log("qte_tranferer : ", qte_tranferer);
+
+        const response = { qte_achete, qte_tranferer };
         setData(response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -56,14 +64,14 @@ function StatsCard({ id }) {
     };
 
     getSdls();
-  }, [id]);
+  }, [id, slug]);
 
 
-  const total = data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b || 0;
+  const total = data?.qte_achete?.[0]?.quantite + data?.qte_achete?.[1]?.quantite || 0;
   const percentageA =
-    total > 0 ? ((data?.qte_achete?.cerise_a || 0) / total) * 100 : 0;
+    total > 0 ? ((data?.qte_achete?.[0]?.quantite || 0) / total) * 100 : 0;
   const percentageB =
-    total > 0 ? ((data?.qte_achete?.cerise_b || 0) / total) * 100 : 0;
+    total > 0 ? ((data?.qte_achete?.[1]?.quantite || 0) / total) * 100 : 0;
 
   const [avance, setAvance] = React.useState(false);
 
@@ -86,9 +94,9 @@ function StatsCard({ id }) {
               <Archive className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+              {(data?.qte_achete?.[0]?.quantite + data?.qte_achete?.[1]?.quantite) >= 1000 ? (
                 <>
-                  {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                  {((data?.qte_achete?.[0]?.quantite + data?.qte_achete?.[1]?.quantite) / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
@@ -96,14 +104,14 @@ function StatsCard({ id }) {
                 </>
               ) : (
                 <>
-                  {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                  {(data?.qte_achete?.[0]?.quantite + data?.qte_achete?.[1]?.quantite)?.toLocaleString("fr-FR") || 0}{" "}
                   <span className="text-sm">Kg</span>
                 </>
               )}
             </CardTitle>
             {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
               <span className="text-sm font-normal text-muted-foreground ml-2">
-                ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+                ({(data?.qte_achete?.[0]?.quantite + data?.qte_achete?.[1]?.quantite)?.toLocaleString("fr-FR")} kg)
               </span>
             ) : (
               <></>
@@ -116,11 +124,9 @@ function StatsCard({ id }) {
           <div className="mt-2 space-y-3 w-full">
             <div className="flex justify-between items-end">
               <span className="text-xs text-muted-foreground ">
-                Rapport Cerise A / B
+                Rapport Qualite
               </span>
-              {/* <span className="text-[10px] font-mono text-muted-foreground">
-                      Ratio: 65%
-                    </span> */}
+
             </div>
             {/* Barre de progression professionnelle */}
             <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -143,9 +149,9 @@ function StatsCard({ id }) {
                   </CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">
-                  {data?.qte_achete?.cerise_a >= 1000 ? (
+                  {data?.qte_achete?.[0]?.quantite >= 1000 ? (
                     <>
-                      {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
+                      {(data?.qte_achete?.[0]?.quantite / 1000).toLocaleString(
                         "fr-FR",
                         {
                           minimumFractionDigits: 2,
@@ -156,7 +162,7 @@ function StatsCard({ id }) {
                     </>
                   ) : (
                     <>
-                      {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                      {data?.qte_achete?.[0]?.quantite?.toLocaleString("fr-FR") || 0}{" "}
                       <span className="text-sm">Kg</span>
                     </>
                   )}
@@ -165,7 +171,7 @@ function StatsCard({ id }) {
                     ""
                   ) : (
                     <span className="text-xs font-normal text-muted-foreground ml-2">
-                      ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
+                      ({data?.qte_achete?.[0]?.quantite?.toLocaleString("fr-FR")} kg)
                     </span>
                   )}
 
@@ -182,9 +188,9 @@ function StatsCard({ id }) {
                   </CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">
-                  {data?.qte_achete?.cerise_b >= 1000 ? (
+                  {data?.qte_achete?.[1]?.quantite >= 1000 ? (
                     <>
-                      {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
+                      {(data?.qte_achete?.[1]?.quantite / 1000).toLocaleString(
                         "fr-FR",
                         {
                           minimumFractionDigits: 2,
@@ -195,7 +201,7 @@ function StatsCard({ id }) {
                     </>
                   ) : (
                     <>
-                      {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                      {data?.qte_achete?.[1]?.quantite?.toLocaleString("fr-FR") || 0}{" "}
                       <span className="text-sm">Kg</span>
                     </>
                   )}
@@ -203,7 +209,7 @@ function StatsCard({ id }) {
                     ""
                   ) : (
                     <span className="text-xs font-normal text-muted-foreground ml-2">
-                      ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
+                      ({data?.qte_achete?.[1]?.quantite?.toLocaleString("fr-FR")} kg)
                     </span>
                   )}
 
@@ -221,9 +227,9 @@ function StatsCard({ id }) {
               <TruckElectric className="text-white" />
             </div>
             <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-              {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+              {(data?.qte_tranferer?.imbunya + data?.qte_tranferer?.parche_washed) >= 1000 ? (
                 <>
-                  {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                  {((data?.qte_tranferer?.imbunya + data?.qte_tranferer?.parche_washed) / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
@@ -231,14 +237,14 @@ function StatsCard({ id }) {
                 </>
               ) : (
                 <>
-                  {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                  {(data?.qte_tranferer?.imbunya + data?.qte_tranferer?.parche_washed)?.toLocaleString("fr-FR") || 0}{" "}
                   <span className="text-sm">Kg</span>
                 </>
               )}
             </CardTitle>
             {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
               <span className="text-sm font-normal text-muted-foreground ml-2">
-                ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
+                ({(data?.qte_tranferer?.imbunya + data?.qte_tranferer?.parche_washed)?.toLocaleString("fr-FR")} kg)
               </span>
             ) : (
               <></>
@@ -258,9 +264,9 @@ function StatsCard({ id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.cerise_a >= 1000 ? (
+                {data?.qte_tranferer?.imbunya >= 1000 ? (
                   <>
-                    {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
+                    {(data?.qte_tranferer?.imbunya / 1000).toLocaleString(
                       "fr-FR",
                       {
                         minimumFractionDigits: 2,
@@ -271,7 +277,7 @@ function StatsCard({ id }) {
                   </>
                 ) : (
                   <>
-                    {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                    {data?.qte_tranferer?.imbunya?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -280,7 +286,7 @@ function StatsCard({ id }) {
                   ""
                 ) : (
                   <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
+                    ({data?.qte_tranferer?.imbunya?.toLocaleString("fr-FR")} kg)
                   </span>
                 )}
 
@@ -297,9 +303,9 @@ function StatsCard({ id }) {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.cerise_b >= 1000 ? (
+                {data?.qte_tranferer?.parche_washed >= 1000 ? (
                   <>
-                    {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
+                    {(data?.qte_tranferer?.parche_washed / 1000).toLocaleString(
                       "fr-FR",
                       {
                         minimumFractionDigits: 2,
@@ -310,7 +316,7 @@ function StatsCard({ id }) {
                   </>
                 ) : (
                   <>
-                    {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                    {data?.qte_tranferer?.parche_washed?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -318,7 +324,7 @@ function StatsCard({ id }) {
                   ""
                 ) : (
                   <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
+                    ({data?.qte_tranferer?.parche_washed?.toLocaleString("fr-FR")} kg)
                   </span>
                 )}
 
@@ -327,37 +333,17 @@ function StatsCard({ id }) {
           </div>
           <div>
             <Separator />
-            <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground my-2">
+            {/* <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground my-2">
               SDL destination:
             </CardTitle>
             <div className="text-sm font-normal flex flex-wrap gap-2">
               <span className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">SDL Gatwe</span>
-            </div>
+            </div> */}
           </div>
         </CardHeader>
 
       </Card>
-      <Card className="@container/card lg:col-span-3 overflow-hidden">
-        <CardHeader>
-          <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-yellow-500 p-2 rounded-md">
-              <CircleDollarSign className="text-white" />
-            </div>
-            <CardTitle className="text-md text-muted-foreground font-medium tabular-nums  ">
-              Montant
-            </CardTitle>
-          </div>
-          <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
-            {(
-              data?.qte_achete?.montant_cerise_a +
-              data?.qte_achete?.montant_cerise_b ?? 0
-            )
-              .toString()
-              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-            <span className="text-base">FBU</span>
-          </CardTitle>
-        </CardHeader>
-      </Card>
+
 
 
     </div>

@@ -12,6 +12,7 @@ import Edit from "../../edit";
 function DetailsPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const slug = searchParams.get("slug");
   const user = useContext(UserContext)
   return (
     <div className=" space-y-6">
@@ -20,7 +21,7 @@ function DetailsPage() {
           <Edit id={id} />
         </div>) : ""}
       <div className="flex flex-col lg:flex-row gap-4">
-        <DetailsCard id={id} />
+        <DetailsCard id={id} slug={slug} />
 
         <div className="flex-1 space-y-6">
           <Tabs className="w-full" defaultValue="general">
@@ -30,10 +31,10 @@ function DetailsPage() {
             </TabsList>
             <TabsContent value="general">
               <section className="space-y-4">
-                <StatsCard id={id} />
+                <StatsCard id={id} slug={slug} />
               </section>
             </TabsContent>
-            <TabsContent value="operations"><DetailsContent id={id} /></TabsContent>
+            <TabsContent value="operations"><DetailsContent id={id} slug={slug} /></TabsContent>
           </Tabs>
 
 

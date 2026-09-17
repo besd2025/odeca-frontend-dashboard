@@ -50,21 +50,21 @@ export default function Edit({ id, item, onSave }) {
 
     const updatedData = {
       id: id || item?.id,
-      societe,
+      hangar: hangar,
+      date_achat: date,
+      qualite: qualite,
       quantite_washed: Number(quantiteWashed),
-      qualite,
-      date,
     };
 
-    // Simulation de l'appel API pour l'intégration future par l'utilisateur
-    // TODO API: Interroger le backend e.g. await fetchData("patch", `cafe/achat_washed/${id}/`, { body: updatedData })
+    const response = await fetchData("patch", `cafe/achat_washed/${id}/`, { body: updatedData })
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success(`L'achat #${id || updatedData.id} a été modifié avec succès`);
-      if (onSave) {
+      if (response.ok) {
+        toast.success(`L'achat #${id || updatedData.id} a été modifié avec succès`);
+        setOpen(false);
         onSave(updatedData);
+      } else {
+        toast.error("Erreur lors de la modification");
       }
-      setOpen(false);
     } catch (err) {
       console.error(err);
       toast.error("Erreur lors de la modification");
