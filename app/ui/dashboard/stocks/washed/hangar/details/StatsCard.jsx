@@ -94,9 +94,9 @@ function StatsCard({ id, slug }) {
               <Archive className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {(data?.qte_achete?.[0]?.quantite + data?.qte_achete?.[1]?.quantite) >= 1000 ? (
+              {(data?.qte_achete?.[0]?.quantite || 0 + data?.qte_achete?.[1]?.quantite || 0) >= 1000 ? (
                 <>
-                  {((data?.qte_achete?.[0]?.quantite + data?.qte_achete?.[1]?.quantite) / 1000).toLocaleString("fr-FR", {
+                  {((data?.qte_achete?.[0]?.quantite || 0 + data?.qte_achete?.[1]?.quantite || 0) / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
@@ -104,14 +104,14 @@ function StatsCard({ id, slug }) {
                 </>
               ) : (
                 <>
-                  {(data?.qte_achete?.[0]?.quantite + data?.qte_achete?.[1]?.quantite)?.toLocaleString("fr-FR") || 0}{" "}
+                  {(data?.qte_achete?.[0]?.quantite || 0 + data?.qte_achete?.[1]?.quantite || 0)?.toLocaleString("fr-FR") || 0}{" "}
                   <span className="text-sm">Kg</span>
                 </>
               )}
             </CardTitle>
             {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
               <span className="text-sm font-normal text-muted-foreground ml-2">
-                ({(data?.qte_achete?.[0]?.quantite + data?.qte_achete?.[1]?.quantite)?.toLocaleString("fr-FR")} kg)
+                ({(data?.qte_achete?.[0]?.quantite || 0 + data?.qte_achete?.[1]?.quantite || 0)?.toLocaleString("fr-FR")} kg)
               </span>
             ) : (
               <></>

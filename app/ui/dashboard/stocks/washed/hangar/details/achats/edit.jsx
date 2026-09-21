@@ -56,8 +56,7 @@ export default function Edit({ id, item, onSave }) {
       date,
     };
 
-    // Simulation de l'appel API pour l'intégration future par l'utilisateur
-    // TODO API: Interroger le backend e.g. await fetchData("patch", `cafe/achat_washed/${id}/`, { body: updatedData })
+
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
       toast.success(`L'achat #${id || updatedData.id} a été modifié avec succès`);

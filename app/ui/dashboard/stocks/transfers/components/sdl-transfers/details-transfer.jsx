@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import { toast } from "sonner";
-
+import { fetchData } from "@/app/_utils/api";
 // Données fictives (Mock Data) pour la liste des grades
 const MOCK_GRADES = [
   {
@@ -70,7 +70,7 @@ export default function DetailsTransfer({
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
   const setOpen = isControlled ? setControlledOpen : setInternalOpen;
-
+  const [transferData, setTransferData] = useState([]);
   // Liste des grades avec données mockées
   const [gradesDetails, setGradesDetails] = useState(MOCK_GRADES);
 
@@ -78,42 +78,51 @@ export default function DetailsTransfer({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState(null);
 
+
+  React.useEffect(() => {
+    const fetchSdlTransfersDetails = async () => {
+      console.log('transfer id', transfer.id);
+      try {
+        const response = await fetchData("get", `cafe/transfert_sdl_usine/${transfer.id}/get_transfert_details_sdl_to_usine_deparchage/`);
+        console.log("data", response);
+        const result = response?.results[0];
+        console.log("result", result);
+        const data = {
+          chauffeurNom: result?.transfer?.chauffeur_nom || "-",
+          chauffeurPrenom: result?.transfer?.chauffeur_prenom || "-",
+          chauffeurTelephone: result?.transfer?.chauffeur_telephone || "-",
+
+          nomAccompagnateur: result?.transfer?.nom_accompagnateur || "-",
+          prenomAccompagnateur: result?.transfer?.prenom_accompagnateur || "-",
+          phoneAccompagnateur: result?.transfer?.phone_accompagnteur || result?.transfer?.phone_accompagnateur || "-",
+
+          plaqueCamion: result?.transfer?.plaque_camion || "-",
+          totalParche: result?.quantite || 0,
+          dateReception: result?.transfer?.date_reception || "-",
+
+          sdlSource: result?.transfer?.sdl?.sdl_nom || "-",
+          usineDestination: result?.transfer?.usine_deparchage?.usine_name || "-",
+          transferDate: result?.transfer?.transfer_date || "-",
+          photoBordereau: result?.transfer?.photo_bordereau || null,
+          grades: result?.grade,
+          isConfirmed: {
+            est_confirme: result?.est_confirme || "-",
+            status: result?.status || "-",
+            comfirmation_status: result?.comfirmation_status || "-"
+          }
+
+        }
+
+        console.log('transfer data', data)
+        setTransferData(data)
+      } catch (error) {
+        console.error("Error fetching SDL transfers details:", error);
+      }
+    };
+    fetchSdlTransfersDetails();
+  }, [transfer]);
   // Champs du transfert
-  const chauffeurNom = transfer?.chauffeur_nom || "-";
-  const chauffeurPrenom = transfer?.chauffeur_prenom || "-";
-  const chauffeurTelephone = transfer?.chauffeur_telephone || "-";
 
-  const nomAccompagnateur = transfer?.nom_accompagnateur || "-";
-  const prenomAccompagnateur = transfer?.prenom_accompagnateur || "-";
-  const phoneAccompagnateur =
-    transfer?.phone_accompagnteur || transfer?.phone_accompagnateur || "-";
-
-  const plaqueCamion = transfer?.plaque_camion || "-";
-  const totalParche =
-    transfer?.total_parche ??
-    transfer?.qte_tranferer?.ca ??
-    transfer?.quantite_totale ??
-    0;
-  const dateReception = transfer?.date_reception || "-";
-
-  const sdlSource = transfer?.from_sdl || transfer?.sdl?.sdl_nom || "-";
-  const usineDestination =
-    transfer?.usine_deparchage?.usine_name ||
-    transfer?.usine_deparchage ||
-    transfer?.usine?.name ||
-    transfer?.usine ||
-    "-";
-  const transferDate =
-    transfer?.transfer_date || transfer?.date_transfert || transfer?.date || "-";
-  const photoBordereau =
-    transfer?.photo_bordereau || transfer?.photo_fiche || null;
-
-  const isConfirmed =
-    transfer?.est_confirme === true ||
-    transfer?.status === true ||
-    transfer?.status === "CONFIRME" ||
-    transfer?.status === "CONFIRMEE" ||
-    transfer?.comfirmation_status === "CONFIRMEE";
 
   const renderStatusBadge = (status) => {
     const s = String(status || "").toUpperCase();
@@ -183,7 +192,7 @@ export default function DetailsTransfer({
                   Informations sur le transport, chauffeur, accompagnateur et liste des grades
                 </DialogDescription>
               </div>
-              <div>{renderStatusBadge(isConfirmed ? "CONFIRMEE" : "EN_ATTENTE")}</div>
+              <div>{renderStatusBadge(transferData?.isConfirmed?.est_confirme ? "CONFIRMEE" : "EN_ATTENTE")}</div>
             </div>
 
             {/* Informations de base avec disposition en 2 colonnes */}
@@ -191,58 +200,58 @@ export default function DetailsTransfer({
               <div className="col-span-1 sm:col-span-3 flex flex-col gap-2">
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Source :</span>
-                  <span className="truncate">{sdlSource}</span>
+                  <span className="truncate">{transferData?.sdlSource}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Destination :</span>
-                  <span className="truncate">{usineDestination}</span>
+                  <span className="truncate">{transferData?.usineDestination}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Date :</span>
-                  <span>{transferDate}</span>
+                  <span>{transferData?.transferDate}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Chauffeur :</span>
-                  <span>{chauffeurNom} {chauffeurPrenom !== "-" ? chauffeurPrenom : ""}</span>
+                  <span>{transferData?.chauffeurNom} {transferData?.chauffeurPrenom !== "-" ? transferData?.chauffeurPrenom : ""}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Téléphone chauffeur :</span>
-                  <span>{chauffeurTelephone}</span>
+                  <span>{transferData?.chauffeurTelephone}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Accompagnateur :</span>
-                  <span>{nomAccompagnateur} {prenomAccompagnateur !== "-" ? prenomAccompagnateur : ""}</span>
+                  <span>{transferData?.nomAccompagnateur} {transferData?.prenomAccompagnateur !== "-" ? transferData?.prenomAccompagnateur : ""}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Téléphone accompagnateur :</span>
-                  <span>{phoneAccompagnateur}</span>
+                  <span>{transferData?.phoneAccompagnateur}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Véhicule :</span>
                   <span className="font-semibold font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">
-                    {plaqueCamion}
+                    {transferData?.plaqueCamion}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Total parche :</span>
                   <span className="font-bold text-primary text-sm">
-                    {typeof totalParche === "number"
-                      ? totalParche.toLocaleString("fr-FR", { minimumFractionDigits: 2 })
-                      : totalParche}{" "}
+                    {typeof transferData?.totalParche === "number"
+                      ? transferData?.totalParche.toLocaleString("fr-FR", { minimumFractionDigits: 2 })
+                      : transferData?.totalParche}{" "}
                     kg
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Date de réception :</span>
                   <span className="font-semibold font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">
-                    {dateReception}
+                    {transferData?.dateReception}
                   </span>
                 </div>
               </div>
 
               {/* Photo bordereau */}
               <div>
-                {photoBordereau && photoBordereau !== "null" && (
+                {transferData?.photoBordereau && transferData?.photoBordereau !== "null" && (
                   <div className="p-3 flex items-center justify-between">
                     <div className="flex flex-col items-center gap-4">
                       <div>
@@ -250,7 +259,7 @@ export default function DetailsTransfer({
                         <div className="text-[11px] text-muted-foreground">Cliquez sur l'image pour l'agrandir</div>
                       </div>
                       <ViewImageDialog
-                        imageUrl={photoBordereau}
+                        imageUrl={transferData?.photoBordereau}
                         alt="Bordereau de transfert"
                         profile={false}
                         className="h-24 w-24 rounded-md border"
@@ -289,40 +298,41 @@ export default function DetailsTransfer({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {gradesDetails.map((item) => (
-                      <TableRow key={item.id} className="hover:bg-muted/30">
-                        <TableCell className="w-16">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 cursor-pointer"
-                            onClick={() => handleOpenEdit(item)}
-                            title="Modifier ce lot"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                        </TableCell>
-                        <TableCell className="font-semibold text-foreground text-sm">
-                          <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-bold text-xs">
-                            {item.grade}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right font-bold text-foreground text-sm">
-                          {typeof item.quantite === "number"
-                            ? item.quantite.toLocaleString("fr-FR", { minimumFractionDigits: 2 })
-                            : item.quantite}
-                        </TableCell>
-                        <TableCell className="text-sm text-foreground">
-                          <span className="font-medium">{item.cafe_parche_type}</span>
-                        </TableCell>
-                        <TableCell className="text-center text-xs text-muted-foreground">
-                          {item.enregitrement_date}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {renderStatusBadge(item.comfirmation_status)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {/* {transferData?.grades?.map((item) => ( */}
+
+                    <TableRow key={transferData?.grades?.id} className="hover:bg-muted/30">
+                      <TableCell className="w-16">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 cursor-pointer"
+                          // onClick={() => handleOpenEdit(item)}
+                          title="Modifier ce lot"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                      </TableCell>
+                      <TableCell className="font-semibold text-foreground text-sm">
+                        <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-bold text-xs">
+                          {transferData?.grades?.grade_name}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-foreground text-sm">
+                        {typeof transferData?.grades?.quantite === "number"
+                          ? transferData?.grades?.quantite.toLocaleString("fr-FR", { minimumFractionDigits: 2 })
+                          : transferData?.grades?.quantite}
+                      </TableCell>
+                      <TableCell className="text-sm text-foreground">
+                        <span className="font-medium">{transferData?.cafe_parche_type}</span>
+                      </TableCell>
+                      <TableCell className="text-center text-xs text-muted-foreground">
+                        {transferData?.enregitrement_date}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {renderStatusBadge(transferData?.comfirmation_status)}
+                      </TableCell>
+                    </TableRow>
+                    {/* ))} */}
                   </TableBody>
                 </Table>
               </div>
