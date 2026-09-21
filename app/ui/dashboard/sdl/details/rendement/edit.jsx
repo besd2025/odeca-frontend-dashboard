@@ -17,7 +17,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { fetchData } from '@/app/_utils/api';
 
 export default function EditRendement({ data }) {
-    console.log("Rendement", data);
     const [open, setOpen] = React.useState(false);
     const [gradeOptions, setGradeOptions] = React.useState([]);
     const [idGrade, setIdGrade] = React.useState("");

@@ -32,7 +32,6 @@ import { UserContext } from "@/app/ui/context/User_Context";
 import EditRendementParche from "./editParche";
 
 export default function DetailsRendement({ data }) {
-  console.log("DetailsRendement", data);
   const user = React.useContext(UserContext);
   const [rapportCData, setRapportCData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);

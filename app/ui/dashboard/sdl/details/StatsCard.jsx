@@ -672,8 +672,8 @@ function StatsCard({ id }) {
               </div>
               <CardDescription className="font-medium text-accent-foreground text-lg">
                 <div className="text-xs grid grid-cols-2 gap-0.5">
-                  {data?.rapportC?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.map((item) => (
-                    <span key={item.id} className="flex items-center gap-2">
+                  {data?.rapportC?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.map((item, index) => (
+                    <span key={index} className="flex items-center gap-2">
                       <span>{item?.grade__grade_code}:</span>
                       <span>
                         {(item?.quantite_total) >= 1000 ? (

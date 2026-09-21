@@ -23,7 +23,6 @@ export default function EditRendementParche({ data }) {
         { value: "MIEL", label: "MIEL" },
         { value: "NATUREL", label: "NATUREL" },
     ];
-    console.log(data);
 
     const [idType, setIdType] = React.useState("");
     const [gradeOptions, setGradeOptions] = React.useState([]);

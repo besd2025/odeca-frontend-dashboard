@@ -32,6 +32,7 @@ import {
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import { toast } from "sonner";
 import { fetchData } from "@/app/_utils/api";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 // Données fictives (Mock Data) pour la liste des grades
 const MOCK_GRADES = [
   {
@@ -59,6 +60,11 @@ const MOCK_GRADES = [
     comfirmation_status: "EN_ATTENTE",
   },
 ];
+const typeOptions = [
+  { value: "FULL_WASHED", label: "FULL_WASHED" },
+  { value: "MIEL", label: "MIEL" },
+  { value: "NATUREL", label: "NATUREL" },
+];
 
 export default function DetailsTransfer({
   transfer = {},
@@ -73,50 +79,71 @@ export default function DetailsTransfer({
   const [transferData, setTransferData] = useState([]);
   // Liste des grades avec données mockées
   const [gradesDetails, setGradesDetails] = useState(MOCK_GRADES);
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   // État pour le sous-dialogue de modification
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState(null);
-
-
+  const [gradeOptions, setGradeOptions] = React.useState([]);
+  const [qteParche, setQteParche] = React.useState(0);
+  const [idGrade, setIdGrade] = React.useState("");
+  const [idType, setIdType] = React.useState("");
   React.useEffect(() => {
     const fetchSdlTransfersDetails = async () => {
-      console.log('transfer id', transfer.id);
-      try {
-        const response = await fetchData("get", `cafe/transfert_sdl_usine/${transfer.id}/get_transfert_details_sdl_to_usine_deparchage/`);
-        console.log("data", response);
-        const result = response?.results[0];
-        console.log("result", result);
-        const data = {
-          chauffeurNom: result?.transfer?.chauffeur_nom || "-",
-          chauffeurPrenom: result?.transfer?.chauffeur_prenom || "-",
-          chauffeurTelephone: result?.transfer?.chauffeur_telephone || "-",
+      if (transfer?.id) {
+        try {
+          const response = await fetchData("get", `cafe/transfert_sdl_usine/${transfer?.id}/get_transfert_details_sdl_to_usine_deparchage/`);
+          const fetchedGrades = await fetchData("get", `cafe/grades/get_all_grades/`);
+          const seen = new Set();
+          const options = fetchedGrades
+            ?.map((item) => ({
+              value: item.grade_code,
+              label: item.grade_name,
+            }))
 
-          nomAccompagnateur: result?.transfer?.nom_accompagnateur || "-",
-          prenomAccompagnateur: result?.transfer?.prenom_accompagnateur || "-",
-          phoneAccompagnateur: result?.transfer?.phone_accompagnteur || result?.transfer?.phone_accompagnateur || "-",
+            .filter((item) => {
+              if (!item.value) return false;
+              if (seen.has(item.value)) return false;
+              seen.add(item.value);
+              return true;
+            }) || [];
+          console.log("options", options);
+          setGradeOptions(options);
+          const result = response?.results[0];
+          const data = {
+            chauffeurNom: result?.transfer?.chauffeur_nom || "-",
+            chauffeurPrenom: result?.transfer?.chauffeur_prenom || "-",
+            chauffeurTelephone: result?.transfer?.chauffeur_telephone || "-",
 
-          plaqueCamion: result?.transfer?.plaque_camion || "-",
-          totalParche: result?.quantite || 0,
-          dateReception: result?.transfer?.date_reception || "-",
+            nomAccompagnateur: result?.transfer?.nom_accompagnateur || "-",
+            prenomAccompagnateur: result?.transfer?.prenom_accompagnateur || "-",
+            phoneAccompagnateur: result?.transfer?.phone_accompagnteur || result?.transfer?.phone_accompagnateur || "-",
 
-          sdlSource: result?.transfer?.sdl?.sdl_nom || "-",
-          usineDestination: result?.transfer?.usine_deparchage?.usine_name || "-",
-          transferDate: result?.transfer?.transfer_date || "-",
-          photoBordereau: result?.transfer?.photo_bordereau || null,
-          grades: result?.grade,
-          isConfirmed: {
-            est_confirme: result?.est_confirme || "-",
-            status: result?.status || "-",
-            comfirmation_status: result?.comfirmation_status || "-"
+            plaqueCamion: result?.transfer?.plaque_camion || "-",
+            totalParche: result?.quantite || 0,
+            dateReception: result?.transfer?.date_reception || "-",
+
+            sdlSource: result?.transfer?.sdl?.sdl_nom || "-",
+            usineDestination: result?.transfer?.usine_deparchage?.usine_name || "-",
+            transferDate: result?.transfer?.transfer_date || "-",
+            photoBordereau: result?.transfer?.photo_bordereau || null,
+            consignataire: result?.transfer?.consignataire || "-",
+
+            grades: response?.results,
+            isConfirmed: {
+              est_confirme: result?.est_confirme || "-",
+              status: result?.status || "-",
+              comfirmation_status: result?.comfirmation_status || "-"
+            }
+
           }
-
+          setTransferData(data)
+          if (Array.isArray(response?.results)) {
+            setGradesDetails(response.results);
+          }
+        } catch (error) {
+          console.error("Error fetching SDL transfers details:", error);
         }
-
-        console.log('transfer data', data)
-        setTransferData(data)
-      } catch (error) {
-        console.error("Error fetching SDL transfers details:", error);
       }
     };
     fetchSdlTransfersDetails();
@@ -152,20 +179,69 @@ export default function DetailsTransfer({
 
   // Ouvrir le sous-dialogue pour modifier
   const handleOpenEdit = (gradeItem) => {
-    setSelectedGrade({ ...gradeItem });
+    setSelectedGrade(gradeItem);
+    setIdGrade(gradeItem?.grade?.grade_code);
+    setQteParche(gradeItem?.quantite);
+    setIdType(gradeItem?.cafe_parche_type);
     setEditModalOpen(true);
   };
 
   // Enregistrer les modifications localement
-  const handleSaveEdit = (e) => {
+  const handleSaveEdit = async (e) => {
     e.preventDefault();
-    if (!selectedGrade) return;
 
-    setGradesDetails((prev) =>
-      prev.map((g) => (g.id === selectedGrade.id ? selectedGrade : g))
-    );
-    setEditModalOpen(false);
-    toast.success(`Grade ${selectedGrade.grade} modifié avec succès`);
+    const dataToSend = {
+      transfer_detail_code: selectedGrade?.transfer_detail_code || "",
+      grade_code: idGrade || "",
+      quantite: qteParche || 0,
+      cafe_parche_type: idType || "",
+    };
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        if (!selectedGrade?.id) {
+          reject(new Error("ID du Grade manquant."));
+          return;
+        }
+        if (!idGrade || !qteParche || !idType) {
+          reject(new Error("Veuillez remplir tous les champs obligatoires."));
+          return;
+        }
+
+        const result = await fetchData(
+          "patch",
+          `/cafe/transfert_sdl_usine_detail/${selectedGrade.id}/`,
+          { body: dataToSend }
+        );
+
+        if (result.status === 200 || result.status === 201) {
+          resolve(result.data);
+        } else {
+          reject(new Error("Erreur lors de la modification."));
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "Modification en cours...",
+      success: () => {
+        setTimeout(() => setOpen(false), 1000);
+        return "Le rendement a été modifié avec succès !";
+      },
+      error: (err) => err?.message || "Erreur lors de la modification !",
+    });
+
+    try {
+      await promise;
+    } catch (err) {
+      console.error(err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+
+
   };
 
   return (
@@ -232,7 +308,7 @@ export default function DetailsTransfer({
                     {transferData?.plaqueCamion}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-muted-foreground">
+                {/* <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Total parche :</span>
                   <span className="font-bold text-primary text-sm">
                     {typeof transferData?.totalParche === "number"
@@ -240,7 +316,7 @@ export default function DetailsTransfer({
                       : transferData?.totalParche}{" "}
                     kg
                   </span>
-                </div>
+                </div> */}
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <span className="font-medium text-foreground">Date de réception :</span>
                   <span className="font-semibold font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">
@@ -281,7 +357,7 @@ export default function DetailsTransfer({
                   <span>Liste des Lots de Café & Grades</span>
                 </div>
                 <span className="text-xs text-muted-foreground font-medium">
-                  {gradesDetails.length} grade{gradesDetails.length > 1 ? "s" : ""}
+                  {(transferData?.grades || gradesDetails)?.length || 0} grade{((transferData?.grades || gradesDetails)?.length || 0) > 1 ? "s" : ""}
                 </span>
               </div>
 
@@ -298,41 +374,42 @@ export default function DetailsTransfer({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {/* {transferData?.grades?.map((item) => ( */}
-
-                    <TableRow key={transferData?.grades?.id} className="hover:bg-muted/30">
-                      <TableCell className="w-16">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 w-7 p-0 cursor-pointer"
-                          // onClick={() => handleOpenEdit(item)}
-                          title="Modifier ce lot"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                      </TableCell>
-                      <TableCell className="font-semibold text-foreground text-sm">
-                        <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-bold text-xs">
-                          {transferData?.grades?.grade_name}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right font-bold text-foreground text-sm">
-                        {typeof transferData?.grades?.quantite === "number"
-                          ? transferData?.grades?.quantite.toLocaleString("fr-FR", { minimumFractionDigits: 2 })
-                          : transferData?.grades?.quantite}
-                      </TableCell>
-                      <TableCell className="text-sm text-foreground">
-                        <span className="font-medium">{transferData?.cafe_parche_type}</span>
-                      </TableCell>
-                      <TableCell className="text-center text-xs text-muted-foreground">
-                        {transferData?.enregitrement_date}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {renderStatusBadge(transferData?.comfirmation_status)}
-                      </TableCell>
-                    </TableRow>
-                    {/* ))} */}
+                    {transferData?.grades?.map((item) => (
+                      <TableRow key={item.id} className="hover:bg-muted/30">
+                        <TableCell className="w-16">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 cursor-pointer"
+                            onClick={() => handleOpenEdit(item)}
+                            title="Modifier ce lot"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                        </TableCell>
+                        <TableCell className="font-semibold text-foreground text-sm">
+                          <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-bold text-xs">
+                            {item?.grade?.grade_name}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right font-bold text-foreground text-sm">
+                          {typeof item?.quantite === "number"
+                            ? item?.quantite.toLocaleString("fr-FR", { minimumFractionDigits: 0 })
+                            : item?.quantite}
+                        </TableCell>
+                        <TableCell className="text-sm text-foreground">
+                          <span className="font-medium">{item?.cafe_parche_type}</span>
+                        </TableCell>
+                        <TableCell className="text-center text-xs text-muted-foreground">
+                          {item?.enregitrement_date
+                            ? new Date(item.enregitrement_date).toLocaleDateString("fr-FR")
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {renderStatusBadge(item.comfirmation_status)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </div>
@@ -346,7 +423,7 @@ export default function DetailsTransfer({
         <DialogContent className="sm:max-w-[420px] bg-card">
           <DialogHeader>
             <DialogTitle className="text-base font-bold">
-              Modifier le Lot ({selectedGrade?.grade})
+              Modifier le Lot ({selectedGrade?.grade?.grade_name || selectedGrade?.grade || ""})
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
               Modifier les informations de ce lot de café
@@ -355,15 +432,28 @@ export default function DetailsTransfer({
 
           {selectedGrade && (
             <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Grade</Label>
-                <Input
-                  value={selectedGrade.grade}
-                  onChange={(e) =>
-                    setSelectedGrade((prev) => ({ ...prev, grade: e.target.value }))
-                  }
-                  required
-                />
+
+
+              {/* Grade Select — HORS de DialogHeader pour éviter le conflit Radix portal */}
+              <div className="space-y-2 text-left">
+                <Label htmlFor="gradeId" className="font-semibold text-slate-700 dark:text-slate-300">
+                  Grade
+                </Label>
+                <Select
+                  value={idGrade}
+                  onValueChange={setIdGrade}
+                >
+                  <SelectTrigger id="gradeId" className="w-full cursor-pointer">
+                    <SelectValue placeholder={selectedGrade?.grade?.grade_name} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gradeOptions.map((item, index) => (
+                      <SelectItem key={`${index + 1}`} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-1.5">
@@ -371,42 +461,60 @@ export default function DetailsTransfer({
                 <Input
                   type="number"
                   step="any"
-                  value={selectedGrade.quantite}
+                  value={qteParche}
                   onChange={(e) =>
-                    setSelectedGrade((prev) => ({
-                      ...prev,
-                      quantite: parseFloat(e.target.value) || 0,
-                    }))
+                    setQteParche(parseFloat(e.target.value) || 0)
                   }
-                  required
+
                 />
               </div>
-
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">Type de Café Parche</Label>
-                <Input
-                  value={selectedGrade.cafe_parche_type}
-                  onChange={(e) =>
-                    setSelectedGrade((prev) => ({
-                      ...prev,
-                      cafe_parche_type: e.target.value,
-                    }))
-                  }
-                  required
-                />
+                {selectedGrade?.cafe_parche_type != null ? (
+                  <Select
+                    value={""}
+                  >
+                    <SelectTrigger id="typeId" className="w-full cursor-pointer">
+                      <SelectValue placeholder={selectedGrade?.cafe_parche_type} />
+                    </SelectTrigger>
+                  </Select>
+                ) : (
+                  <Select
+                    value={idType}
+                    onValueChange={setIdType}
+                  >
+                    <SelectTrigger id="typeId" className="w-full cursor-pointer">
+                      <SelectValue placeholder="Choisir un type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {typeOptions.map((item, index) => (
+                        <SelectItem key={`${index + 1}`} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
+
 
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">Date d'enregistrement</Label>
                 <Input
+                  disabled
                   type="date"
-                  value={selectedGrade.enregitrement_date}
+                  value={
+                    selectedGrade?.enregitrement_date
+                      ? selectedGrade.enregitrement_date.split("T")[0]
+                      : ""
+                  }
                   onChange={(e) =>
                     setSelectedGrade((prev) => ({
                       ...prev,
                       enregitrement_date: e.target.value,
                     }))
                   }
+
                 />
               </div>
 
