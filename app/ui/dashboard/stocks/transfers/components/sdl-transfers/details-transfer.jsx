@@ -88,6 +88,7 @@ export default function DetailsTransfer({
   const [qteParche, setQteParche] = React.useState(0);
   const [idGrade, setIdGrade] = React.useState("");
   const [idType, setIdType] = React.useState("");
+  console.log(transfer);
   React.useEffect(() => {
     const fetchSdlTransfersDetails = async () => {
       if (transfer?.id) {
@@ -107,7 +108,6 @@ export default function DetailsTransfer({
               seen.add(item.value);
               return true;
             }) || [];
-          console.log("options", options);
           setGradeOptions(options);
           const result = response?.results[0];
           const data = {
@@ -268,7 +268,7 @@ export default function DetailsTransfer({
                   Informations sur le transport, chauffeur, accompagnateur et liste des grades
                 </DialogDescription>
               </div>
-              <div>{renderStatusBadge(transferData?.isConfirmed?.est_confirme ? "CONFIRMEE" : "EN_ATTENTE")}</div>
+              {/* <div>{renderStatusBadge(transferData?.isConfirmed?.est_confirme ? "CONFIRMEE" : "EN_ATTENTE")}</div> */}
             </div>
 
             {/* Informations de base avec disposition en 2 colonnes */}
@@ -376,17 +376,23 @@ export default function DetailsTransfer({
                   <TableBody>
                     {transferData?.grades?.map((item) => (
                       <TableRow key={item.id} className="hover:bg-muted/30">
-                        <TableCell className="w-16">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 cursor-pointer"
-                            onClick={() => handleOpenEdit(item)}
-                            title="Modifier ce lot"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                        </TableCell>
+                        {item.comfirmation_status === "PENDING" ? (
+                          <TableCell className="w-16">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 w-7 p-0 cursor-pointer"
+                              onClick={() => handleOpenEdit(item)}
+                              title="Modifier ce lot"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                          </TableCell>
+                        ) : (
+                          <TableCell className="w-16">
+                            -
+                          </TableCell>
+                        )}
                         <TableCell className="font-semibold text-foreground text-sm">
                           <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-bold text-xs">
                             {item?.grade?.grade_name}
@@ -406,7 +412,7 @@ export default function DetailsTransfer({
                             : "-"}
                         </TableCell>
                         <TableCell className="text-center">
-                          {renderStatusBadge(item.comfirmation_status)}
+                          {renderStatusBadge(item?.comfirmation_status)}
                         </TableCell>
                       </TableRow>
                     ))}

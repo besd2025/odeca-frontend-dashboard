@@ -161,14 +161,14 @@ export default function TransferSdlDep({
               >
                 <span>Détails</span>
               </DropdownMenuItem>
-              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
+              {/* {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
                 <>
                   <div>
                     <EditTransfers id={transfer.id} item={transfer} />
 
                   </div>
                 </>
-              ) : (null)}
+              ) : (null)} */}
               {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
                 <DropdownMenuItem
                   onClick={() => HandleDelete(transfer.id, transfer.transfer_sdl_ct_code)}
