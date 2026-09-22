@@ -293,7 +293,7 @@ export default function Grades() {
                                     </TableCell>
                                     <TableCell className="pl-4 font-medium">
                                         <div className="flex items-center gap-2">
-                                            {grade.status === "EN_ATTENTE" && (
+                                            {grade.status === "PENDING" && (
 
                                                 <Button variant={"secondary"} className="cursor-pointer" onClick={() => activegradedetails(grade.id, grade.grade)}><Check size={24} /> Confirmer</Button>
 

@@ -119,7 +119,6 @@ export default function ReceptionPage() {
 
                 setReceptionsEnAttenteList(pendingMapped);
                 setReceptionsConfirmeList(confirmedMapped);
-                console.log(confirmedRes)
                 setTotalCount((pendingRes?.count || 0) + (confirmedRes?.count || 0));
             } else if (tab === "en attente") {
                 const pendingRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit } });
@@ -133,6 +132,7 @@ export default function ReceptionPage() {
                     usine: item?.usine_deparchage?.usine_name || "-",
                     status: "en attente",
                 })) || [];
+                console.log("pendingMapped :", pendingMapped)
                 setReceptionsEnAttenteList(pendingMapped);
                 setTotalCount(pendingRes?.count || 0);
             } else if (tab === "confirmé") {

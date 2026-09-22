@@ -58,12 +58,11 @@ export default function TransferSdlDep({
   const [rowSelection, setRowSelection] = React.useState({});
   const [searchValue, setSearchValue] = useState("");
   const user = React.useContext(UserContext);
-
   // Details Modal state
   const [selectedTransfer, setSelectedTransfer] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [loading, setLoading] = React.useState(true);
-
+  console.log("data", data);
   // Local pagination fallback
   const [currentPage, setCurrentPage] = useState(1);
   const [pointer, setPointer] = useState(0);
@@ -172,6 +171,7 @@ export default function TransferSdlDep({
               {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
                 <DropdownMenuItem
                   onClick={() => HandleDelete(transfer.id, transfer.transfer_sdl_ct_code)}
+                  //disabled={transfer.comfirmation_status === "CONFIRMED"}
                   className="cursor-pointer gap-2 font-medium text-destructive"
                 >
                   <TrashIcon className="h-4 w-4" />
@@ -306,7 +306,7 @@ export default function TransferSdlDep({
 
         return (
           <div className="flex">
-            {isConfirmed ? (
+            {row.original.comfirmation_status === "CONFIRMEE" ? (
               <Badge variant="secondary" className="gap-1">
                 <CheckCircle2 className="h-3 w-3" />
                 Confirmé

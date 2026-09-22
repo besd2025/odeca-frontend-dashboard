@@ -257,6 +257,7 @@ function DetailsContent({ id }) {
       );
       const results = response?.results
       const transferData = results?.map((transfer) => ({
+        ...transfer,
         id: transfer?.id,
         code: transfer?.transfer_code,
         date_transfert: transfer?.transfer_date,
@@ -264,6 +265,9 @@ function DetailsContent({ id }) {
         from_sdl: transfer?.sdl?.sdl_nom,
         society: transfer?.sdl?.societe?.nom_societe,
         qte_total_tranferer: transfer?.qte_total_tranferer,
+        confirmation_status: transfer?.comfirmation_status,
+        est_confirme: transfer?.est_confirme,
+        status: transfer?.status ?? transfer?.est_confirme ?? transfer?.comfirmation_status,
         qte_tranferer: {
           ca: transfer?.quantite_cerise_a,
           cb: transfer?.quantite_cerise_b,
