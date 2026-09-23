@@ -38,6 +38,7 @@ export function Edit({ collector, children }) {
         identifiant: collector.identifiant || "",
         password: "",
       });
+
     }
   }, [open, collector]);
 
@@ -50,11 +51,22 @@ export function Edit({ collector, children }) {
     e.preventDefault();
     setLoading(true);
 
-    const payload = { ...formData };
-    // Ne pas envoyer de mot de passe vide si l'utilisateur ne l'a pas modifié
-    if (!payload.password) {
-      delete payload.password;
+    const payload = {
+      last_name: formData.last_name,
+      first_name: formData.first_name,
+      phone: formData.phone,
+      cni: formData.cni,
+      identifiant: formData.identifiant,
+
+    };
+    const dataPassWord = {
+      identifiant: formData.identifiant,
+      password: formData.password,
     }
+    // Ne pas envoyer de mot de passe vide si l'utilisateur ne l'a pas modifié
+    // if (!payload.password) {
+    //   delete payload.password;
+    // }
 
     try {
       const response = await fetchData(
@@ -66,6 +78,24 @@ export function Edit({ collector, children }) {
           body: payload,
         }
       );
+
+      if (formData.password) {
+        const response2 = await fetchData(
+          "patch",
+          `/cafe/responsable_registration/change_mot_de_passe/${collector?.id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: dataPassWord,
+          }
+        );
+        if (response2.status === 200 || response2.status === 201) {
+          toast.success(`Le mot de passe a été modifié avec succès`);
+        } else {
+          toast.error("Erreur lors de la modification du mot de passe");
+        }
+
+      }
 
       if (response.status === 200 || response.status === 201) {
         toast.success(`${formData.identifiant} a été modifié avec succès`);

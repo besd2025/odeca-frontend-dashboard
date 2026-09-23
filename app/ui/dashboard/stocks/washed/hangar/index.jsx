@@ -4,7 +4,6 @@ import {
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
-    getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
@@ -51,10 +50,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
     const [data, setData] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [filterData, setFilterData] = React.useState([]);
-    const [pagination, setPagination] = React.useState({
-        pageIndex: 0,
-        pageSize: 10,
-    });
+
 
     const isActuallyLoading = externalLoading ?? loading;
     const user = useContext(UserContext)
@@ -147,7 +143,9 @@ export default function HangarListTable({ isLoading: externalLoading }) {
         setLoadingEportBtn(true);
         try {
             const initResponse = await fetchData("get", `cafe/stationslavage/get_hangar_for_washed/`, {
-                params: { limit: 1 },
+                params: {
+                    limit: 1,
+                },
             });
             const total = initResponse?.count || 0;
             if (total === 0) {
@@ -448,27 +446,21 @@ export default function HangarListTable({ isLoading: externalLoading }) {
             },
         },
     ];
-    const datapaginationlimit = (limitdata) => {
-        setLimit(limitdata);
-    };
     const table = useReactTable({
         data,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
-        onPaginationChange: setPagination,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
             rowSelection,
-            pagination,
         },
     });
 
@@ -670,7 +662,7 @@ export default function HangarListTable({ isLoading: externalLoading }) {
 
 
                     <PaginationContent
-                        datapaginationlimit={datapaginationlimit}
+                        datapaginationlimit={datapagination.onLimitChange}
                         currentPage={datapagination.currentPage}
                         totalPages={datapagination.totalPages}
                         onPageChange={datapagination.onPageChange}
