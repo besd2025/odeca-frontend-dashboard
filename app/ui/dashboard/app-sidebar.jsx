@@ -158,7 +158,7 @@ const menuItems = {
           <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V6.75Z" />
         </svg>
       ),
-      keyword: "societies",
+      keyword: "/odeca-dashboard/societies",
       roles: ["Admin", "General", "Cafe_ODECA"],
     },
     {
@@ -212,7 +212,7 @@ const menuItems = {
           <path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03ZM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 0 0 .372-.648V7.93ZM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 0 0 .372.648l8.628 5.033Z" />
         </svg>
       ),
-      keyword: "stocks",
+      keyword: "/odeca-dashboard/stocks",
     },
     {
       title: "Paiement",

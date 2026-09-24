@@ -215,7 +215,7 @@ export function DataTable({
         <Button
           variant="default"
           size="sm"
-          onClick={() => router.push("/odeca-production/usine/societies")}
+          onClick={() => router.push("/odeca-dashboard/production/usine/societies/stocks")}
           className="flex items-center gap-2 text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           <Building2 className="h-4 w-4" />
