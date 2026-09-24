@@ -146,7 +146,7 @@ export default function EditRendementParche({ data }) {
                         <Label htmlFor="typeId" className="font-semibold text-slate-700 dark:text-slate-300">
                             Type
                         </Label>
-                        {data?.cafe_parche_type != "" ? (
+                        {data?.cafe_parche_type !== "" && data?.cafe_parche_type !== null ? (
                             <Select
                                 value={""}
                             >

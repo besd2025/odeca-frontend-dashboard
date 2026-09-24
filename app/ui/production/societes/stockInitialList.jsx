@@ -68,6 +68,7 @@ export default function StockInitialList({ onStartStocking }) {
 
                     return {
                         id: item?.id,
+                        stockage_id: item?.stockage__id,
                         numero_lot: item?.stockage__numero_lot,
                         societe: item?.stockage__proprietaire__nom_societe,
                         usine: item?.stockage__usine__usine_name || "-",

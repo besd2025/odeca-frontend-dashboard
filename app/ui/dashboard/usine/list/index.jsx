@@ -87,6 +87,7 @@ export default function UsineListTable({ isLoading: externalLoading }) {
         const response = await fetchData("get", "cafe/usine_deparchage/", {
           params: { limit: limit, offset: pointer, search: search },
         });
+        console.log("les usines data :", response)
         const results = response?.results || [];
         const sdlData = results.map((usine) => ({
           id: usine?.id,

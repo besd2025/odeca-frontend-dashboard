@@ -36,7 +36,6 @@ const MOCK_LOTS = [
   { id: "LOT-004", name: "LOT-004", },
 ]
 export default function StockedList({ lots: initialLots = [], onViewDetails, onStockGrade }) {
-  console.log("initialLots", initialLots)
   const [lots, setLots] = React.useState(initialLots);
   const [activeTab, setActiveTab] = React.useState("account");
   const [lotsExistants, setLotsExistants] = React.useState("");

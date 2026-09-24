@@ -72,8 +72,10 @@ export default function StockInitialEdit({ open, onOpenChange, stockItem, onSucc
             setQualite(stockItem.qualite_id ? String(stockItem.qualite_id) : "");
         }
     }, [stockItem, open]);
-
+    console.log("   ffffffff", stockInfo);
     const HandleSubmit = async () => {
+
+
         if (
             stockInfo.numero_lot === "" ||
             stockInfo.nombre_sacs === "" ||
@@ -82,6 +84,7 @@ export default function StockInitialEdit({ open, onOpenChange, stockItem, onSucc
             stockInfo.annee_campagne === "" ||
             stockInfo.quantite_cafe_vert === ""
         ) {
+            console.log("formData", stockInfo);
             toast.error("Veuillez remplir tous les champs");
             return;
         }
@@ -95,12 +98,13 @@ export default function StockInitialEdit({ open, onOpenChange, stockItem, onSucc
             quantite_cafe_vert: stockInfo.quantite_cafe_vert,
         };
 
+
         setLoading(true);
         const promise = new Promise(async (resolve, reject) => {
             try {
                 const results = await fetchData(
                     "patch",
-                    `cafe/stock_cafe/stockage_initial/${stockItem.id}/`,
+                    `cafe/stock_cafe/${stockItem.id}/update_stockage_initial/`,
                     {
                         params: {},
                         additionalHeaders: {},
