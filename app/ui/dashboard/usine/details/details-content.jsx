@@ -41,7 +41,7 @@ import Usinage from "./usinage";
 import Production from "./production";
 import Sorties from "./sorties";
 import Stocks from "./stocks";
-import StatsCard from "./StatsCard";
+
 
 function DetailsContent({ id }) {
   // Existing data mocks (kept for now if needed for legacy tabs, or removed if unused)
@@ -69,7 +69,7 @@ function DetailsContent({ id }) {
   const transferData = [];
   const RHData = [];
 
-  const [tab, setTab] = useState("details");
+  const [tab, setTab] = useState("receptions");
 
   const [data, setData] = React.useState([]);
   const [dataAchat, setAchatDate] = React.useState([]);
@@ -93,9 +93,6 @@ function DetailsContent({ id }) {
       <Tabs value={tab} className="space-y-6 w-full" onValueChange={setTab}>
         {/* TABS LIST */}
         <TabsList className="overflow-x-auto flex-nowrap gap-2 w-full justify-start">
-          <TabsTrigger value="details" className="shrink-0">
-            <ArrowDownToLine className="w-4 h-4 mr-2" /> Details
-          </TabsTrigger>
           <TabsTrigger value="receptions" className="shrink-0">
             <ArrowDownToLine className="w-4 h-4 mr-2" /> Réceptions
           </TabsTrigger>
@@ -145,27 +142,24 @@ function DetailsContent({ id }) {
           </div>
         </TabsList>
 
-        <TabsContent value="details">
-          <StatsCard id={id} />
-        </TabsContent>
         <TabsContent value="receptions">
-          <Receptions />
+          <Receptions id={id} />
         </TabsContent>
 
         <TabsContent value="usinage">
-          <Usinage />
+          <Usinage id={id} />
         </TabsContent>
 
         <TabsContent value="production">
-          <Production />
+          <Production id={id} />
         </TabsContent>
 
         <TabsContent value="sorties">
-          <Sorties />
+          <Sorties id={id} />
         </TabsContent>
 
         <TabsContent value="stocks">
-          <Stocks />
+          <Stocks id={id} />
         </TabsContent>
 
         <TabsContent value="maps">

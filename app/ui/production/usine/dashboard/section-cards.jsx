@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator";
 import { fetchData } from "@/app/_utils/api";
-export function SectionCards() {
+export function SectionCards({ usineId } = {}) {
   const [data, setData] = React.useState([
     {
       total_receptionne: 0,
@@ -26,19 +26,20 @@ export function SectionCards() {
   ])
   React.useEffect(() => {
     const fetch = async () => {
-      const response = await fetchData('get', 'cafe/transfert_sdl_usine_detail_comfimation/get_total_receptionne/')
-      const usinees = await fetchData('get', 'cafe/usinages/get_total_quantite_usine_et_encours_usinage/')
-      const tries = await fetchData('get', 'cafe/triage/get_total_quantite_usine_et_encours_triage/')
-      const taxe = await fetchData('get', 'cafe/stock_cafe/cafe-taxation-stats-detail/')
-      const pretExport = await fetchData('get', 'cafe/stock_cafe/societe-stock-stats-detail/')
-      const StockInitial = await fetchData('get', 'cafe/prestockage_apres_usinage/get_total_quantite_and_sacs_initial/')
+      const usineParam = usineId ? { usine_deparchage: usineId } : {};
+      const response = await fetchData('get', 'cafe/transfert_sdl_usine_detail_comfimation/get_total_receptionne/', { params: { ...usineParam } })
+      const usinees = await fetchData('get', 'cafe/usinages/get_total_quantite_usine_et_encours_usinage/', { params: { ...usineParam } })
+      const tries = await fetchData('get', 'cafe/triage/get_total_quantite_usine_et_encours_triage/', { params: { ...usineParam } })
+      const taxe = await fetchData('get', 'cafe/stock_cafe/cafe-taxation-stats-detail/', { params: { ...usineParam } })
+      const pretExport = await fetchData('get', 'cafe/stock_cafe/societe-stock-stats-detail/', { params: { ...usineParam } })
+      const StockInitial = await fetchData('get', 'cafe/prestockage_apres_usinage/get_total_quantite_and_sacs_initial/', { params: { ...usineParam } })
       console.log("StockInitial : ", StockInitial)
       const newData = {
         total_receptionne: response?.total_net,
         total_cafe_usine: usinees?.total_quantite_termine,
         total_encours_usinage: usinees?.total_encours,
         total_en_attente_usinage: usinees?.total - usinees?.total_quantite_termine - usinees?.total_encours,
-        total_cafe_trie: tries?.total_quantite_termine,
+        total_cafe_trie: tries?.total_quantite_terme,
         total_encours_trie: tries?.total_encours,
         total_en_attente_trie: tries?.total - tries?.total_quantite_termine - tries?.total_encours,
         total_cafe_taxe: usinees?.total_cafe_taxe,
@@ -48,15 +49,11 @@ export function SectionCards() {
         total_cafe_non_taxe: taxe?.cafe_non_taxe,
         nombre_sac_initial: StockInitial?.total_sacs,
         quantite_initial: StockInitial?.total_poids,
-        // total_cafe_exporte: pretExport?.total_exportable,
-        // total_cafe_en_stock: pretExport?.total
-
       }
       setData(newData)
-
     }
     fetch()
-  }, [])
+  }, [usineId])
   return (
     <div
       className="grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-3 dark:*:data-[slot=card]:bg-card">
