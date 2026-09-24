@@ -663,112 +663,119 @@ function StatsCard({ id }) {
           <Separator />
           { }
           <div className="grid grid-cols-1 gap-2 text-xs w-full">
-            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
-              <div className="flex flex-row gap-x-1 items-center">
-                <span className="text-primary flex items-center gap-1">●</span>
-                <CardTitle className="text-base text-primary">
-                  Fully Washed
-                </CardTitle>
-              </div>
-              <CardDescription className="font-medium text-accent-foreground text-lg">
-                <div className="text-xs grid grid-cols-2 gap-0.5">
-                  {data?.rapportC?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.map((item, index) => (
-                    <span key={index} className="flex items-center gap-2">
-                      <span>{item?.grade__grade_code}:</span>
-                      <span>
-                        {(item?.quantite_total) >= 1000 ? (
-                          <>
-                            {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}{" "}
-                            <span>T</span>
-                          </>
-                        ) : (
-                          <>
-                            {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
-                            <span>Kg</span>
-                          </>
-                        )}
-                      </span>
-                    </span>
-                  ))}
-
+            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.length > 0 && (
+              <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
+                <div className="flex flex-row gap-x-1 items-center">
+                  <span className="text-primary flex items-center gap-1">●</span>
+                  <CardTitle className="text-base text-primary">
+                    Fully Washed
+                  </CardTitle>
                 </div>
-
-              </CardDescription>
-            </div>
-            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
-              <div className="flex flex-row gap-x-1 items-center">
-                <span className="text-primary flex items-center gap-1">●</span>
-                <CardTitle className="text-base text-primary">
-                  Miel
-                </CardTitle>
-              </div>
-              <CardDescription className="font-medium text-accent-foreground text-lg">
-                <div className="text-xs grid grid-cols-2 gap-0.5">
-                  {data?.rapportC?.filter((item) => item?.cafe_parche_type === "MIEL")?.map((item) => (
-                    <span key={item.id} className="flex items-center gap-2">
-                      <span>{item?.grade__grade_code}:</span>
-                      <span>
-                        {(item?.quantite_total) >= 1000 ? (
-                          <>
-                            {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}{" "}
-                            <span>T</span>
-                          </>
-                        ) : (
-                          <>
-                            {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
-                            <span>Kg</span>
-                          </>
-                        )}
+                <CardDescription className="font-medium text-accent-foreground text-lg">
+                  <div className="text-xs grid grid-cols-2 gap-0.5">
+                    {data?.rapportC?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.map((item, index) => (
+                      <span key={index} className="flex items-center gap-2">
+                        <span>{item?.grade__grade_code}:</span>
+                        <span>
+                          {(item?.quantite_total) >= 1000 ? (
+                            <>
+                              {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              <span>T</span>
+                            </>
+                          ) : (
+                            <>
+                              {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
+                              <span>Kg</span>
+                            </>
+                          )}
+                        </span>
                       </span>
-                    </span>
-                  ))}
+                    ))}
 
-                </div>
+                  </div>
 
-              </CardDescription>
-            </div>
-            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
-              <div className="flex flex-row gap-x-1 items-center">
-                <span className="text-primary flex items-center gap-1">●</span>
-                <CardTitle className="text-base text-primary">
-                  Naturel
-                </CardTitle>
+                </CardDescription>
               </div>
-              <CardDescription className="font-medium text-accent-foreground text-lg">
-                <div className="text-xs grid grid-cols-2 gap-0.5">
-                  {data?.rapportC?.filter((item) => item?.cafe_parche_type === "NATUREL")?.map((item) => (
-                    <span key={item.id} className="flex items-center gap-2">
-                      <span>{item?.grade__grade_code}:</span>
-                      <span>
-                        {(item?.quantite_total) >= 1000 ? (
-                          <>
-                            {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}{" "}
-                            <span>T</span>
-                          </>
-                        ) : (
-                          <>
-                            {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
-                            <span>Kg</span>
-                          </>
-                        )}
-                      </span>
-                    </span>
-                  ))}
+            )}
 
+            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "MIEL")?.length > 0 && (
+              <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
+                <div className="flex flex-row gap-x-1 items-center">
+                  <span className="text-primary flex items-center gap-1">●</span>
+                  <CardTitle className="text-base text-primary">
+                    Miel
+                  </CardTitle>
                 </div>
+                <CardDescription className="font-medium text-accent-foreground text-lg">
+                  <div className="text-xs grid grid-cols-2 gap-0.5">
+                    {data?.rapportC?.filter((item) => item?.cafe_parche_type === "MIEL")?.map((item) => (
+                      <span key={item.id} className="flex items-center gap-2">
+                        <span>{item?.grade__grade_code}:</span>
+                        <span>
+                          {(item?.quantite_total) >= 1000 ? (
+                            <>
+                              {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              <span>T</span>
+                            </>
+                          ) : (
+                            <>
+                              {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
+                              <span>Kg</span>
+                            </>
+                          )}
+                        </span>
+                      </span>
+                    ))}
 
-              </CardDescription>
-            </div>
-            {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+                  </div>
+
+                </CardDescription>
+              </div>
+            )}
+            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "NATUREL")?.length > 0 && (
+              <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
+                <div className="flex flex-row gap-x-1 items-center">
+                  <span className="text-primary flex items-center gap-1">●</span>
+                  <CardTitle className="text-base text-primary">
+                    Naturel
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-medium text-accent-foreground text-lg">
+                  <div className="text-xs grid grid-cols-2 gap-0.5">
+                    {data?.rapportC?.filter((item) => item?.cafe_parche_type === "NATUREL")?.map((item) => (
+                      <span key={item.id} className="flex items-center gap-2">
+                        <span>{item?.grade__grade_code}:</span>
+                        <span>
+                          {(item?.quantite_total) >= 1000 ? (
+                            <>
+                              {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              <span>T</span>
+                            </>
+                          ) : (
+                            <>
+                              {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
+                              <span>Kg</span>
+                            </>
+                          )}
+                        </span>
+                      </span>
+                    ))}
+
+                  </div>
+
+                </CardDescription>
+              </div>
+            )}
+            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "NON_CLASSE")?.length > 0 && (user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
               <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
                 <div className="flex flex-row gap-x-1 items-center">
                   <span className="text-primary flex items-center gap-1">●</span>
@@ -804,12 +811,13 @@ function StatsCard({ id }) {
 
                 </CardDescription>
               </div>
-            ) : ""}
+            )}
 
           </div>
         </CardHeader>
 
       </Card>
+
       <Card className="@container/card col-span-1 lg:col-span-4 ">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
@@ -844,110 +852,120 @@ function StatsCard({ id }) {
             Qte Transférée (UDP)
           </CardTitle>
           <Separator />
+
           <div className="grid grid-cols-1 gap-2 text-xs w-full">
-            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
-              <div className="flex flex-row gap-x-1 items-center">
-                <span className="text-primary flex items-center gap-1">●</span>
-                <CardTitle className="text-base text-primary">
-                  Fully Washed
-                </CardTitle>
-              </div>
-              <CardDescription className="font-medium text-accent-foreground text-lg">
-                <div className="text-xs grid grid-cols-2 gap-0.5">
-                  {data?.transfertUDPDetails?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.map((item) => (
-                    <span className="flex items-center gap-2">
-                      <span>{item?.grade__grade_code}:</span>
-                      <span>
-                        {(item?.quantite_total) >= 1000 ? (
-                          <>
-                            {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}{" "}
-                            <span>T</span>
-                          </>
-                        ) : (
-                          <>
-                            {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
-                            <span>Kg</span>
-                          </>
-                        )}
-                      </span>
-                    </span>
-                  ))}
+            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.length > 0 && (
+              <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
+                <div className="flex flex-row gap-x-1 items-center">
+                  <span className="text-primary flex items-center gap-1">●</span>
+                  <CardTitle className="text-base text-primary">
+                    Fully Washed
+                  </CardTitle>
                 </div>
-
-              </CardDescription>
-            </div>
-            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
-              <div className="flex flex-row gap-x-1 items-center">
-                <span className="text-primary flex items-center gap-1">●</span>
-                <CardTitle className="text-base text-primary">
-                  Miel
-                </CardTitle>
-              </div>
-              <CardDescription className="font-medium text-accent-foreground text-lg">
-                <div className="text-xs grid grid-cols-2 gap-0.5">
-                  {data?.transfertUDPDetails?.filter((item) => item?.cafe_parche_type === "MIEL")?.map((item) => (
-                    <span className="flex items-center gap-2">
-                      <span>{item?.grade__grade_code}:</span>
-                      <span>
-                        {(item?.quantite_total) >= 1000 ? (
-                          <>
-                            {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}{" "}
-                            <span>T</span>
-                          </>
-                        ) : (
-                          <>
-                            {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
-                            <span>Kg</span>
-                          </>
-                        )}
+                <CardDescription className="font-medium text-accent-foreground text-lg">
+                  <div className="text-xs grid grid-cols-2 gap-0.5">
+                    {data?.transfertUDPDetails?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.map((item) => (
+                      <span className="flex items-center gap-2">
+                        <span>{item?.grade__grade_code}:</span>
+                        <span>
+                          {(item?.quantite_total) >= 1000 ? (
+                            <>
+                              {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              <span>T</span>
+                            </>
+                          ) : (
+                            <>
+                              {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
+                              <span>Kg</span>
+                            </>
+                          )}
+                        </span>
                       </span>
-                    </span>
-                  ))}
-                </div>
+                    ))}
+                  </div>
 
-              </CardDescription>
-            </div>
-            <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
-              <div className="flex flex-row gap-x-1 items-center">
-                <span className="text-primary flex items-center gap-1">●</span>
-                <CardTitle className="text-base text-primary">
-                  Naturel
-                </CardTitle>
+                </CardDescription>
               </div>
-              <CardDescription className="font-medium text-accent-foreground text-lg">
-                <div className="text-xs grid grid-cols-2 gap-0.5">
-                  {data?.transfertUDPDetails?.filter((item) => item?.cafe_parche_type === "NATUREL")?.map((item) => (
-                    <span className="flex items-center gap-2">
-                      <span>{item?.grade__grade_code}:</span>
-                      <span>
-                        {(item?.quantite_total) >= 1000 ? (
-                          <>
-                            {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}{" "}
-                            <span>T</span>
-                          </>
-                        ) : (
-                          <>
-                            {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
-                            <span>Kg</span>
-                          </>
-                        )}
-                      </span>
-                    </span>
-                  ))}
-                </div>
+            )}
+            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "MIEL")?.length > 0 && (
 
-              </CardDescription>
-            </div>
-            {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+              <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
+                <div className="flex flex-row gap-x-1 items-center">
+                  <span className="text-primary flex items-center gap-1">●</span>
+                  <CardTitle className="text-base text-primary">
+                    Miel
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-medium text-accent-foreground text-lg">
+                  <div className="text-xs grid grid-cols-2 gap-0.5">
+                    {data?.transfertUDPDetails?.filter((item) => item?.cafe_parche_type === "MIEL")?.map((item) => (
+                      <span className="flex items-center gap-2">
+                        <span>{item?.grade__grade_code}:</span>
+                        <span>
+                          {(item?.quantite_total) >= 1000 ? (
+                            <>
+                              {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              <span>T</span>
+                            </>
+                          ) : (
+                            <>
+                              {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
+                              <span>Kg</span>
+                            </>
+                          )}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+
+                </CardDescription>
+              </div>
+            )}
+            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "NATUREL")?.length > 0 && (
+
+              <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
+                <div className="flex flex-row gap-x-1 items-center">
+                  <span className="text-primary flex items-center gap-1">●</span>
+                  <CardTitle className="text-base text-primary">
+                    Naturel
+                  </CardTitle>
+                </div>
+                <CardDescription className="font-medium text-accent-foreground text-lg">
+                  <div className="text-xs grid grid-cols-2 gap-0.5">
+                    {data?.transfertUDPDetails?.filter((item) => item?.cafe_parche_type === "NATUREL")?.map((item) => (
+                      <span className="flex items-center gap-2">
+                        <span>{item?.grade__grade_code}:</span>
+                        <span>
+                          {(item?.quantite_total) >= 1000 ? (
+                            <>
+                              {((item?.quantite_total) / 1000).toLocaleString("fr-FR", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              <span>T</span>
+                            </>
+                          ) : (
+                            <>
+                              {(item?.quantite_total)?.toLocaleString("fr-FR") || 0}{" "}
+                              <span>Kg</span>
+                            </>
+                          )}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+
+                </CardDescription>
+              </div>
+            )}
+            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "NON_CLASSE")?.length > 0 && (user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
+
               <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
                 <div className="flex flex-row gap-x-1 items-center">
                   <span className="text-primary flex items-center gap-1">●</span>
@@ -982,8 +1000,8 @@ function StatsCard({ id }) {
 
                 </CardDescription>
               </div>
+            )}
 
-            ) : ""}
           </div>
         </CardHeader>
 

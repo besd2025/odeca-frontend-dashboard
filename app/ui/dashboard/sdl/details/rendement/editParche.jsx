@@ -33,6 +33,7 @@ export default function EditRendementParche({ data }) {
     const [dateSortie, setDateSortie] = React.useState(data?.date_production || new Date().toISOString().split("T")[0]);
     // Fetch grades options only when dialog is opened
     React.useEffect(() => {
+        console.log("data", data);
         if (!open) return;
         const fetchGrades = async () => {
             try {
@@ -145,7 +146,7 @@ export default function EditRendementParche({ data }) {
                         <Label htmlFor="typeId" className="font-semibold text-slate-700 dark:text-slate-300">
                             Type
                         </Label>
-                        {data?.cafe_parche_type != null ? (
+                        {data?.cafe_parche_type != "" ? (
                             <Select
                                 value={""}
                             >
