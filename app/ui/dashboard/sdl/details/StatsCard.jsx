@@ -609,23 +609,26 @@ function StatsCard({ id }) {
             </div>
           </div>
         </CardHeader>
-        <CardDescription>
-          <div className="p-4">
-            <Separator />
-            <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground my-2">
-              CT source:
-            </CardTitle>
-            <div className="text-sm font-normal flex flex-wrap gap-2 ">
-              {data?.transfert_get_ct?.map((item, index) => (
-                <span key={index} className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">
-                  {item.ct__ct_nom}
-                </span>
-              ))}
+        {data?.transfert_get_ct?.length !== 0 ? (
+          <CardDescription>
 
+            <div className="p-4">
+              <Separator />
+
+              <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground my-2">
+                CT source:
+              </CardTitle>
+              <div className="text-sm font-normal flex flex-wrap gap-2 ">
+                {data?.transfert_get_ct?.map((item, index) => (
+                  <span key={index} className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">
+                    {item.ct__ct_nom}
+                  </span>
+                ))}
+
+              </div>
             </div>
-          </div>
-        </CardDescription>
-
+          </CardDescription>
+        ) : ("")}
       </Card>
       <Card className="@container/card col-span-1 lg:col-span-4 ">
         <CardHeader className="flex flex-col">
@@ -775,7 +778,7 @@ function StatsCard({ id }) {
                 </CardDescription>
               </div>
             )}
-            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "NON_CLASSE")?.length > 0 && (user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
+            {data?.rapportC?.filter((item) => item?.cafe_parche_type === null)?.length > 0 && data?.rapportC?.filter((item) => item?.cafe_parche_type === "")?.length === 0 && (user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
               <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
                 <div className="flex flex-row gap-x-1 items-center">
                   <span className="text-primary flex items-center gap-1">●</span>
@@ -854,7 +857,7 @@ function StatsCard({ id }) {
           <Separator />
 
           <div className="grid grid-cols-1 gap-2 text-xs w-full">
-            {data?.rapportC?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.length > 0 && (
+            {data?.transfertUDPDetails?.filter((item) => item?.cafe_parche_type === "FULL_WASHED")?.length > 0 && (
               <div className="flex flex-col gap-1 py-1 px-4  border-b-2 border-b-primary/50">
                 <div className="flex flex-row gap-x-1 items-center">
                   <span className="text-primary flex items-center gap-1">●</span>

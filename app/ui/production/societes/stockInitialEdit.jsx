@@ -100,7 +100,7 @@ export default function StockInitialEdit({ open, onOpenChange, stockItem, onSucc
             try {
                 const results = await fetchData(
                     "patch",
-                    `cafe/stock_cafe/stockage_initial/${stockItem.id}/`,
+                    `cafe/stock_cafe/${stockItem.stockage_id}/update_stockage_initial/`,
                     {
                         params: {},
                         additionalHeaders: {},

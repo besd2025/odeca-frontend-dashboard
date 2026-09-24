@@ -80,7 +80,9 @@ export default function StockInitial() {
 
 
     const HandleSubmit = () => {
+
         if (stockInfo.numero_lot === "" || stockInfo.nombre_sacs === "" || Society === "" || qualite === "" || stockInfo.annee_campagne === "" || stockInfo.quantite_cafe_vert === "") {
+            console.log("stockInfo", stockInfo);
             toast.error("Veuillez remplir tous les champs")
         }
 
