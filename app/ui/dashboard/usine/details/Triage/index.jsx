@@ -2,14 +2,14 @@
 
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { CheckCircle2, Search, Layers, Settings } from "lucide-react";
+import { CheckCircle2, Search, ClipboardList, Play } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PretesUsinage from "./pretes-usinage";
-import EnCoursUsinage from "./en-cours";
-import FinaliseUsinage from "./finalise";
+import PretATrier from "./pret-a-trier";
+import EnCoursTriage from "./en-cours";
+import TrieStocke from "./trie-stocke";
 
-export default function Usinage({ id, data = [] }) {
-  const [activeTab, setActiveTab] = useState("pretes");
+export default function Triage({ id, data = [] }) {
+  const [activeTab, setActiveTab] = useState("pret");
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleTabChange = (val) => {
@@ -35,43 +35,40 @@ export default function Usinage({ id, data = [] }) {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="flex w-full md:w-max overflow-x-auto justify-start h-10 p-1 bg-slate-100 dark:bg-slate-900 select-none mb-4 gap-1">
             <TabsTrigger
-              value="pretes"
+              value="pret"
               className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer"
             >
-              <Layers className="h-3.5 w-3.5 text-slate-500" />
-              <span>Pretes à l'usinage (2)</span>
+              <ClipboardList className="h-3.5 w-3.5 text-blue-500" />
+              <span>Prêt à trier (2)</span>
             </TabsTrigger>
 
             <TabsTrigger
               value="encours"
               className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer"
             >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-              </span>
-              <span>En cours (1)</span>
+              <Play className="h-3.5 w-3.5 text-amber-500" />
+              <span>En cours de triage (1)</span>
             </TabsTrigger>
 
             <TabsTrigger
-              value="finalise"
+              value="trie"
               className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer"
             >
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-              <span>Finalisé (2)</span>
+              <CheckCircle2 className="h-3.5 w-3.5 text-indigo-500" />
+              <span>Trié (2)</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="pretes">
-            <PretesUsinage searchQuery={searchQuery} />
+          <TabsContent value="pret">
+            <PretATrier searchQuery={searchQuery} />
           </TabsContent>
 
           <TabsContent value="encours">
-            <EnCoursUsinage searchQuery={searchQuery} />
+            <EnCoursTriage searchQuery={searchQuery} />
           </TabsContent>
 
-          <TabsContent value="finalise">
-            <FinaliseUsinage searchQuery={searchQuery} />
+          <TabsContent value="trie">
+            <TrieStocke searchQuery={searchQuery} />
           </TabsContent>
         </Tabs>
       </div>

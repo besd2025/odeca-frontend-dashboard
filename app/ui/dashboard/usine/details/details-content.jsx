@@ -3,8 +3,6 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchData } from "@/app/_utils/api";
-import EditHistory from "./edit-history";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,30 +12,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  ChartNoAxesCombined,
-  History,
   MapPinHouse,
   MoreHorizontal,
   ScrollText,
-  ShoppingCart,
-  Spline,
-  Users,
   ArrowDownToLine,
   Factory,
   Leaf,
   Truck,
   Package,
+  Search,
 } from "lucide-react";
-import CultivatorsListTable from "../../cultivators/list";
-import Achats from "./achats/achats";
-import RedementC from "./rendement";
-import RHlist from "./RH";
 import { Button } from "@/components/ui/button";
 import SharedGeoLocalisation from "@/components/ui/geo-localisation";
 
 // New Components
 import Receptions from "./receptions";
 import Usinage from "./usinage";
+import Triage from "./Triage";
 import Production from "./production";
 import Sorties from "./sorties";
 import Stocks from "./stocks";
@@ -100,7 +91,9 @@ function DetailsContent({ id }) {
           <TabsTrigger value="usinage" className="shrink-0">
             <Factory className="w-4 h-4 mr-2" /> Usinage
           </TabsTrigger>
-
+          <TabsTrigger value="triage" className="shrink-0">
+            <Search className="w-4 h-4 mr-2" /> Triage
+          </TabsTrigger>
           <TabsTrigger value="production" className="shrink-0">
             <Leaf className="w-4 h-4 mr-2" /> Production
           </TabsTrigger>
@@ -148,6 +141,10 @@ function DetailsContent({ id }) {
 
         <TabsContent value="usinage">
           <Usinage id={id} />
+        </TabsContent>
+
+        <TabsContent value="triage">
+          <Triage id={id} />
         </TabsContent>
 
         <TabsContent value="production">
