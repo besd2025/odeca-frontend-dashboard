@@ -3,8 +3,6 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchData } from "@/app/_utils/api";
-import EditHistory from "./edit-history";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,34 +12,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  ChartNoAxesCombined,
-  History,
   MapPinHouse,
   MoreHorizontal,
   ScrollText,
-  ShoppingCart,
-  Spline,
-  Users,
   ArrowDownToLine,
   Factory,
   Leaf,
   Truck,
   Package,
+  Search,
 } from "lucide-react";
-import CultivatorsListTable from "../../cultivators/list";
-import Achats from "./achats/achats";
-import RedementC from "./rendement";
-import RHlist from "./RH";
 import { Button } from "@/components/ui/button";
 import SharedGeoLocalisation from "@/components/ui/geo-localisation";
 
 // New Components
 import Receptions from "./receptions";
 import Usinage from "./usinage";
+import Triage from "./Triage";
 import Production from "./production";
 import Sorties from "./sorties";
 import Stocks from "./stocks";
-import StatsCard from "./StatsCard";
+
 
 function DetailsContent({ id }) {
   // Existing data mocks (kept for now if needed for legacy tabs, or removed if unused)
@@ -69,7 +60,7 @@ function DetailsContent({ id }) {
   const transferData = [];
   const RHData = [];
 
-  const [tab, setTab] = useState("details");
+  const [tab, setTab] = useState("receptions");
 
   const [data, setData] = React.useState([]);
   const [dataAchat, setAchatDate] = React.useState([]);
@@ -93,9 +84,6 @@ function DetailsContent({ id }) {
       <Tabs value={tab} className="space-y-6 w-full" onValueChange={setTab}>
         {/* TABS LIST */}
         <TabsList className="overflow-x-auto flex-nowrap gap-2 w-full justify-start">
-          <TabsTrigger value="details" className="shrink-0">
-            <ArrowDownToLine className="w-4 h-4 mr-2" /> Details
-          </TabsTrigger>
           <TabsTrigger value="receptions" className="shrink-0">
             <ArrowDownToLine className="w-4 h-4 mr-2" /> Réceptions
           </TabsTrigger>
@@ -103,14 +91,16 @@ function DetailsContent({ id }) {
           <TabsTrigger value="usinage" className="shrink-0">
             <Factory className="w-4 h-4 mr-2" /> Usinage
           </TabsTrigger>
-
+          <TabsTrigger value="triage" className="shrink-0">
+            <Search className="w-4 h-4 mr-2" /> Triage
+          </TabsTrigger>
           <TabsTrigger value="production" className="shrink-0">
             <Leaf className="w-4 h-4 mr-2" /> Production
           </TabsTrigger>
 
-          <TabsTrigger value="sorties" className="shrink-0">
+          {/* <TabsTrigger value="sorties" className="shrink-0">
             <Truck className="w-4 h-4 mr-2" /> Sorties
-          </TabsTrigger>
+          </TabsTrigger> */}
 
           <TabsTrigger value="stocks" className="shrink-0">
             <Package className="w-4 h-4 mr-2" /> Stocks
@@ -145,27 +135,28 @@ function DetailsContent({ id }) {
           </div>
         </TabsList>
 
-        <TabsContent value="details">
-          <StatsCard id={id} />
-        </TabsContent>
         <TabsContent value="receptions">
-          <Receptions />
+          <Receptions id={id} />
         </TabsContent>
 
         <TabsContent value="usinage">
-          <Usinage />
+          <Usinage id={id} />
+        </TabsContent>
+
+        <TabsContent value="triage">
+          <Triage id={id} />
         </TabsContent>
 
         <TabsContent value="production">
-          <Production />
+          <Production id={id} />
         </TabsContent>
 
-        <TabsContent value="sorties">
-          <Sorties />
-        </TabsContent>
+        {/* <TabsContent value="sorties">
+          <Sorties id={id} />
+        </TabsContent> */}
 
         <TabsContent value="stocks">
-          <Stocks />
+          <Stocks id={id} />
         </TabsContent>
 
         <TabsContent value="maps">

@@ -1,9 +1,9 @@
-import { ChartAreaInteractive } from "@/app/ui/production/usine/dashboard/chart-area-interactive"
-import { DataTable } from "@/app/ui/production/usine/dashboard/data-table"
-import { SectionCards } from "@/app/ui/production/usine/dashboard/section-cards"
+import { ChartAreaInteractive } from "@/app/ui/dashboard/usine/dashboard/chart-area-interactive"
+import { DataTable } from "@/app/ui/dashboard/usine/dashboard/data-table"
+import { SectionCards } from "@/app/ui/dashboard/usine/dashboard/section-cards"
 
 import data from "./data.json"
-import QualiteProduit from "@/app/ui/production/usine/dashboard/qualite-produit";
+import QualiteProduit from "@/app/ui/dashboard/usine/dashboard/qualite-produit";
 
 export default function Page() {
   return (
