@@ -98,9 +98,9 @@ function DetailsContent({ id }) {
             <Leaf className="w-4 h-4 mr-2" /> Production
           </TabsTrigger>
 
-          <TabsTrigger value="sorties" className="shrink-0">
+          {/* <TabsTrigger value="sorties" className="shrink-0">
             <Truck className="w-4 h-4 mr-2" /> Sorties
-          </TabsTrigger>
+          </TabsTrigger> */}
 
           <TabsTrigger value="stocks" className="shrink-0">
             <Package className="w-4 h-4 mr-2" /> Stocks
@@ -151,9 +151,9 @@ function DetailsContent({ id }) {
           <Production id={id} />
         </TabsContent>
 
-        <TabsContent value="sorties">
+        {/* <TabsContent value="sorties">
           <Sorties id={id} />
-        </TabsContent>
+        </TabsContent> */}
 
         <TabsContent value="stocks">
           <Stocks id={id} />
