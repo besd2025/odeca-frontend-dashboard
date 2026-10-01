@@ -122,12 +122,12 @@ const menuItems = {
         {
           title: "Usine",
           url: "/odeca-dashboard/production/usine",
-          roles: ["Admin", "General", "Cafe_ODECA"],
+          roles: ["Admin", "General", "Cafe_ODECA", "Superviseur"],
         },
         {
           title: "Laboratoire",
           url: "/odeca-dashboard/production/laboratoire",
-          roles: ["Admin", "General", "Cafe_ODECA"],
+          roles: ["Admin", "General", "Cafe_ODECA", "Superviseur"],
         },
         {
           title: "Enregistrements",

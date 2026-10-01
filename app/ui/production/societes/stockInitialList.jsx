@@ -61,9 +61,8 @@ export default function StockInitialList({ onStartStocking }) {
         const fetchLots = async () => {
             try {
                 const lotsData = await fetchData("get", `cafe/prestockage_apres_usinage/get_list_quantite_initial/`, {
-                    params: { limit, offset: pointer }
+                    params: { limit, offset: pointer, search: search }
                 });
-                console.log("lotsData", lotsData);
                 const formattedLots = lotsData?.results?.map(item => {
 
                     return {
@@ -88,7 +87,7 @@ export default function StockInitialList({ onStartStocking }) {
         };
 
         fetchLots();
-    }, [limit, pointer, refreshKey]);
+    }, [limit, pointer, refreshKey, search]);
 
     const handleExportStockInitial = async () => {
         setLoadingEportBtn(true);
@@ -171,8 +170,8 @@ export default function StockInitialList({ onStartStocking }) {
                         <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
                         <Input
                             placeholder="Rechercher..."
-                            // value={searchvalue}
-                            // onChange={(e) => setSearchValue(e.target.value)}
+                            value={search ?? ""}
+                            onChange={(e) => setSearch(e.target.value)}
                             className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
                         />
                     </div>
