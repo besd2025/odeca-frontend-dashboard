@@ -43,13 +43,10 @@ export default function EditUsine({ id }) {
             body: {},
           },
         );
-        console.log("response", response);
 
         setCode(response?.code_usine || "");
         setUsineName(response?.usine_name || "");
-        // Keeping Societe if applicable, though typically for filtering/grouping
         setSoc(response?.societe?.nom_societe || "");
-
         setFirstName(response?.usine_responsable?.user?.first_name || "");
         setLastName(response?.usine_responsable?.user?.last_name || "");
         setTelephone(response?.usine_responsable?.user?.phone || "");

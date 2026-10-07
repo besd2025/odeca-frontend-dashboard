@@ -2,6 +2,7 @@
 import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
 import React from "react";
 import { Badge } from "@/components/ui/badge"
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardAction,
@@ -14,6 +15,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { fetchData } from "@/app/_utils/api";
 export function SectionCards({ usineId } = {}) {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const [data, setData] = React.useState([
     {
       total_receptionne: 0,
@@ -26,17 +29,18 @@ export function SectionCards({ usineId } = {}) {
   ])
   React.useEffect(() => {
     const fetch = async () => {
-      const response = await fetchData('get', 'cafe/transfert_sdl_usine_detail_comfimation/get_total_receptionne/', { params: {} })
-      const usinees = await fetchData('get', 'cafe/usinages/get_total_quantite_usine_et_encours_usinage/', { params: {} })
-      const tries = await fetchData('get', 'cafe/triage/get_total_quantite_usine_et_encours_triage/', { params: {} })
-      const taxe = await fetchData('get', 'cafe/stock_cafe/cafe-taxation-stats-detail/', { params: {} })
-      const StockInitial = await fetchData('get', 'cafe/prestockage_apres_usinage/get_total_quantite_and_sacs_initial/', { params: {} })
+      const response = await fetchData('get', 'cafe/transfert_sdl_usine_detail_comfimation/get_total_receptionne/', { params: { usine_deparchage_id: id } })
+      const usinees = await fetchData('get', 'cafe/usinages/get_total_quantite_usine_et_encours_usinage/', { params: { usine_deparchage_id: id } })
+      const tries = await fetchData('get', 'cafe/triage/get_total_quantite_usine_et_encours_triage/', { params: { usine_deparchage_id: id } })
+      const taxe = await fetchData('get', 'cafe/stock_cafe/cafe-taxation-stats-detail/', { params: { usine_deparchage_id: id } })
+      const StockInitial = await fetchData('get', 'cafe/prestockage_apres_usinage/get_total_quantite_and_sacs_initial/', { params: { usine_deparchage_id: id } })
       const newData = {
         total_receptionne: response?.total_net,
         total_cafe_usine: usinees?.total_quantite_termine,
         total_encours_usinage: usinees?.total_encours,
         total_en_attente_usinage: usinees?.total - usinees?.total_quantite_termine - usinees?.total_encours,
-        total_cafe_trie: tries?.total_quantite_terme,
+        qte_cafe_usinage_total: usinees?.total,
+        total_cafe_trie: tries,
         total_encours_trie: tries?.total_encours,
         total_en_attente_trie: tries?.total - tries?.total_quantite_termine - tries?.total_encours,
         total_cafe_taxe: usinees?.total_cafe_taxe,
@@ -85,7 +89,7 @@ export function SectionCards({ usineId } = {}) {
 
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
             {(() => {
-              const kg = Number(data.total_cafe_usine || 0);
+              const kg = Number(data?.qte_cafe_usinage_total || 0);
               const isTonne = kg >= 1000;
               const value = isTonne ? kg / 1000 : kg;
               const unit = isTonne ? "T" : "Kg";
@@ -96,7 +100,7 @@ export function SectionCards({ usineId } = {}) {
           <CardDescription className="text-muted-foreground text-sm">Café Parche Usiné</CardDescription>
           <CardAction>
             <Badge variant="outline" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-200">
-              {(data.total_cafe_usine / data.total_receptionne * 100).toFixed(6)} % du total
+              {(data.total_cafe_usine / data.qte_cafe_usinage_total * 100).toFixed(2)} % du total
             </Badge>
           </CardAction>
         </CardHeader>
@@ -132,7 +136,7 @@ export function SectionCards({ usineId } = {}) {
         <CardHeader>
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
             {(() => {
-              const kg = Number(data.total_cafe_trie || 0);
+              const kg = Number(data?.total_cafe_trie?.total_quantite_termine + data?.total_cafe_trie?.total_encours || 0);
               const isTonne = kg >= 1000;
               const value = isTonne ? kg / 1000 : kg;
               const unit = isTonne ? "T" : "Kg";
@@ -143,7 +147,7 @@ export function SectionCards({ usineId } = {}) {
           <CardDescription className="text-muted-foreground text-sm">Café Trié</CardDescription>
           <CardAction>
             <Badge variant="outline" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-200">
-              Rendement: {(data.total_cafe_trie / data.total_receptionne * 100).toFixed(6)} %
+              Rendement: {(data.total_cafe_trie?.total_quantite_termine / data.total_cafe_trie?.total * 100).toFixed(1) || 0} %
             </Badge>
           </CardAction>
         </CardHeader>
@@ -152,7 +156,7 @@ export function SectionCards({ usineId } = {}) {
           <CardDescription className="text-muted-foreground text-xs">En cours de tri</CardDescription>
           <CardTitle className="font-bold tabular-nums text-foreground">
             {(() => {
-              const kg = Number(data.total_encours_trie || 0);
+              const kg = Number(data.total_cafe_trie?.total_encours || 0);
               const isTonne = kg >= 1000;
               const value = isTonne ? kg / 1000 : kg;
               const unit = isTonne ? "T" : "Kg";
@@ -163,7 +167,7 @@ export function SectionCards({ usineId } = {}) {
           <CardDescription className="text-muted-foreground text-xs">En attente de tri</CardDescription>
           <CardTitle className="font-bold tabular-nums text-foreground">
             {(() => {
-              const kg = Number(data.total_en_attente_trie || 0);
+              const kg = Number(data.total_cafe_trie?.total_quantite_termine || 0);
               const isTonne = kg >= 1000;
               const value = isTonne ? kg / 1000 : kg;
               const unit = isTonne ? "T" : "Kg";
@@ -247,7 +251,7 @@ export function SectionCards({ usineId } = {}) {
         <CardHeader>
           <CardTitle className="text-xl font-bold tabular-nums text-foreground">
             {(() => {
-              const kg = Number(data.quantite_initial || 0);
+              const kg = Number(data?.quantite_initial || 0);
               const isTonne = kg >= 1000;
               const value = isTonne ? kg / 1000 : kg;
               const unit = isTonne ? "T" : "Kg";

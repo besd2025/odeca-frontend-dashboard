@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Package, AlertCircle } from "lucide-react";
 import PaginationContent from "@/components/ui/pagination-content";
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -24,48 +26,58 @@ export default function TabStocksInitiaux({ searchQuery = "", onViewDetails }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [stocksInitiauxList, setStocksInitiauxList] = useState([]);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [stockinitialList, setStockinitialList] = useState([]);
+  const totalPages = Math.ceil(totalCount / limit) || 1;
 
-  const STOCKS_INITIAUX = [
-    {
-      id: "INIT-001",
-      societe: "SOGESTAL Ngozi",
-      qualite: "FW AA",
-      nombre_sacs: 150,
-      poids_net: 9000,
-      date_enregistrement: "2026-05-01",
-      observation: "Stock initial d'ouverture de campagne.",
-      grades: {
-        "FW AA": 150,
-      },
-    },
-    {
-      id: "INIT-002",
-      societe: "COCOCA",
-      qualite: "ROBUSTA NATURAL",
-      nombre_sacs: 80,
-      poids_net: 4800,
-      date_enregistrement: "2026-05-02",
-      observation: "Report de stock usine saison précédente.",
-      grades: {
-        "ROBUSTA NATURAL": 80,
-      },
-    },
-  ];
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setPointer((page - 1) * limit);
+  };
 
-  const filtered = STOCKS_INITIAUX.filter((item) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      item.societe.toLowerCase().includes(q) ||
-      item.qualite.toLowerCase().includes(q) ||
-      item.id.toLowerCase().includes(q)
-    );
-  });
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
   const handleOpen = (item) => {
     setSelectedItem(item);
     setOpen(true);
   };
+
+  React.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/prestockage_apres_usinage/get_list_quantite_initial/`, { params: { usine_deparchage_id: id, offset: pointer, limit: limit } });
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id_initial,
+          societe: item?.stockage__usine__usine_name,
+          qualite: item?.stockage__qualite__nom,
+          nombre_sacs: item?.nombre_sacs,
+          poids_net: item?.quantite_cafe_vert,
+          date_enregistrement: item?.created_at,
+          observation: item?.observation,
+          grades: item?.grades
+        })) || [];
+        setStockinitialList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
 
   return (
     <div className="space-y-4">
@@ -91,7 +103,7 @@ export default function TabStocksInitiaux({ searchQuery = "", onViewDetails }) {
                   Chargement...
                 </TableCell>
               </TableRow>
-            ) : filtered.length === 0 ? (
+            ) : stockinitialList?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8 text-slate-500 font-medium">
                   <div className="flex flex-col items-center gap-1.5">
@@ -101,10 +113,10 @@ export default function TabStocksInitiaux({ searchQuery = "", onViewDetails }) {
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((item, idx) => (
+              stockinitialList?.map((item, idx) => (
                 <TableRow key={item.id} className="odd:bg-muted/50">
                   <TableCell className="font-bold text-slate-900 dark:text-white">
-                    {idx + 1}
+                    {pointer + idx + 1}
                   </TableCell>
                   <TableCell className="font-medium text-slate-800 dark:text-slate-200">
                     {item.societe}
@@ -121,7 +133,14 @@ export default function TabStocksInitiaux({ searchQuery = "", onViewDetails }) {
                     {item.poids_net?.toLocaleString("fr-FR")} kg
                   </TableCell>
                   <TableCell className="text-slate-600 dark:text-slate-400">
-                    {item.date_enregistrement}
+                    {new Date(item.date_enregistrement).toLocaleDateString('fr-FR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false
+                    })}
                   </TableCell>
                   <TableCell className="text-right sticky right-0 bg-background shadow-2xl border-l border-slate-200 dark:border-slate-800">
                     <Button
@@ -140,7 +159,15 @@ export default function TabStocksInitiaux({ searchQuery = "", onViewDetails }) {
         </Table>
       </div>
 
-      <PaginationContent />
+      <PaginationContent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        pointer={pointer}
+        totalCount={totalCount}
+        limit={limit}
+        onLimitChange={handleLimitChange}
+      />
 
       {/* Details Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>

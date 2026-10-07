@@ -22,62 +22,68 @@ import {
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
+import { TableRowsSkeleton } from '@/components/ui/skeletons';
 
 export default function FinaliseUsinage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const [usinageFinaliseList, setUsinageFinaliseList] = useState([]);
+  const totalPages = Math.ceil(totalCount / limit) || 1;
 
-  const LOTS_FINALISES = [
-    {
-      id: "USIN-2026-001",
-      code_societe: "SOC-NGO",
-      societe: "SOGESTAL Ngozi",
-      sdls: ["SDL Ngozi", "SDL Gitega"],
-      dateUsinage: "2026-05-15",
-      dateSortie: "2026-05-18",
-      usinageQuantitiesTotal: 15000,
-      poidsNetSortie: 13200,
-      status: "TERMINE",
-      observation: "Usinage excellent, bon rendement global. Conversion du café déparché A1/A2 en café vert (FW/W).",
-      productions: [
-        { nom_qualite: "FW NGOMA MILD-SDL", quantite_sortie: 7200, nombre_sacs: 120 },
-        { nom_qualite: "FW AA", quantite_sortie: 4800, nombre_sacs: 80 },
-        { nom_qualite: "W ABC", quantite_sortie: 1200, nombre_sacs: 20 },
-      ],
-    },
-    {
-      id: "USIN-2026-005",
-      code_societe: "SOC-COC",
-      societe: "COCOCA",
-      sdls: ["SDL Ngozi"],
-      dateUsinage: "2026-05-11",
-      dateSortie: "2026-05-13",
-      usinageQuantitiesTotal: 10000,
-      poidsNetSortie: 8600,
-      status: "TERMINE",
-      observation: "Usinage finalisé avec validation du contrôle qualité laboratoire.",
-      productions: [
-        { nom_qualite: "FW AA", quantite_sortie: 5200, nombre_sacs: 87 },
-        { nom_qualite: "FW TT", quantite_sortie: 3400, nombre_sacs: 56 },
-      ],
-    },
-  ];
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setPointer((page - 1) * limit);
+  };
 
-  const filteredLots = LOTS_FINALISES.filter((lot) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      lot.societe.toLowerCase().includes(q) ||
-      lot.id.toLowerCase().includes(q) ||
-      lot.sdls.some((s) => s.toLowerCase().includes(q))
-    );
-  });
-
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
   const handleOpenDetails = (lot) => {
     setSelectedLot(lot);
     setOpen(true);
   };
+
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/usinages/`, { params: { responsable_responsable_usineusine_id: id, processing_status: "TERMINE", offset: pointer, limit: limit } });
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe,
+          societe: item?.nom_societe,
+          sdls: item?.sdls,
+          nombre_sacs: item?.nombre_sacs_total,
+          usinageQuantitiesTotal: item?.quantite_total,
+          status: item?.processing_status,
+          dateUsinage: item?.date_debut,
+          dateSortie: item?.date_fin,
+          observation: item?.observation,
+          productions: item?.productions
+        })) || [];
+
+        setUsinageFinaliseList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
 
   return (
     <div className="space-y-4">
@@ -103,7 +109,7 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
                   Chargement...
                 </TableCell>
               </TableRow>
-            ) : filteredLots.length === 0 ? (
+            ) : usinageFinaliseList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8 text-slate-500 font-medium">
                   <div className="flex flex-col items-center gap-1.5">
@@ -113,10 +119,10 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredLots.map((lot, index) => (
+              usinageFinaliseList.map((lot, index) => (
                 <TableRow key={lot.id} className="odd:bg-muted/50">
                   <TableCell className="font-bold text-slate-900 dark:text-white">
-                    {index + 1}
+                    {pointer + index + 1}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
@@ -136,7 +142,7 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
                     </div>
                   </TableCell>
                   <TableCell className="text-slate-600 dark:text-slate-400">
-                    {lot.dateUsinage}
+                    {new Date(lot.dateUsinage).toLocaleDateString("fr-FR")}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
@@ -155,7 +161,7 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-slate-600 dark:text-slate-400">
-                    {lot.dateSortie}
+                    {new Date(lot.dateSortie).toLocaleDateString("fr-FR")}
                   </TableCell>
                   <TableCell className="text-right sticky right-0 bg-background shadow-2xl border-l border-slate-200 dark:border-slate-800">
                     <Button
@@ -174,7 +180,15 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
         </Table>
       </div>
 
-      <PaginationContent />
+      <PaginationContent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        pointer={pointer}
+        totalCount={totalCount}
+        limit={limit}
+        onLimitChange={handleLimitChange}
+      />
 
       {/* Fiche Récapitulative Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
@@ -198,7 +212,7 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
                   <span className="text-xs bg-primary/10 px-2.5 py-0.5 rounded-full font-semibold">{selectedLot.societe}</span>
                 </div>
                 <div className="text-xs text-slate-500">
-                  SDLs : {selectedLot.sdls?.join(", ")} • Période : du {selectedLot.dateUsinage} au {selectedLot.dateSortie}
+                  • Période : du {new Date(selectedLot.dateUsinage).toLocaleDateString("fr-FR")} au {new Date(selectedLot.dateSortie).toLocaleDateString("fr-FR")}
                 </div>
               </div>
 
@@ -217,7 +231,7 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
                           Date de Sortie d'Usinage
                         </Label>
                         <div className="p-2 border rounded-md bg-slate-50 dark:bg-slate-900/50 text-sm text-slate-800 dark:text-slate-200">
-                          {selectedLot.dateSortie}
+                          {new Date(selectedLot.dateSortie).toLocaleDateString("fr-FR")}
                         </div>
                       </div>
 

@@ -7,14 +7,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PretesUsinage from "./pretes-usinage";
 import EnCoursUsinage from "./en-cours";
 import FinaliseUsinage from "./finalise";
+import { fetchData } from "@/app/_utils/api";
 
 export default function Usinage({ id, data = [] }) {
   const [activeTab, setActiveTab] = useState("pretes");
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [usinagePretList, setUsinagePretList] = useState(0);
+  const [usinageEnCoursList, setUsinageEnCoursList] = useState(0);
+  const [usinageFinaliseList, setUsinageFinaliseList] = useState(0);
   const handleTabChange = (val) => {
     setActiveTab(val);
   };
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/`, { params: { usine_deparchage_id: id, etat_selection: "PRET_USINE", limit: 1 } });
+        const response2 = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/`, { params: { usine_deparchage_id: id, etat_selection: "EN_COURS", limit: 1 } });
+        const response3 = await fetchData("get", `cafe/usinages/`, {
+          params: {
+            responsable_responsable_usineusine_id: id, processing_status: "TERMINE",
+            limit: 1
+          }
+        });
+        console.log("response3", response3);
+        setUsinagePretList(response?.count);
+        setUsinageEnCoursList(response2?.count);
+        setUsinageFinaliseList(response3?.count);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      }
+    };
+    handleFetchData();
+
+  }, [id]);
 
   return (
     <div className="">
@@ -39,7 +65,7 @@ export default function Usinage({ id, data = [] }) {
               className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer"
             >
               <Layers className="h-3.5 w-3.5 text-slate-500" />
-              <span>Pretes à l'usinage (2)</span>
+              <span>Pretes à l'usinage ({usinagePretList || 0})</span>
             </TabsTrigger>
 
             <TabsTrigger
@@ -50,7 +76,7 @@ export default function Usinage({ id, data = [] }) {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
-              <span>En cours (1)</span>
+              <span>En cours ({usinageEnCoursList || 0})</span>
             </TabsTrigger>
 
             <TabsTrigger
@@ -58,7 +84,7 @@ export default function Usinage({ id, data = [] }) {
               className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer"
             >
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-              <span>Finalisé (2)</span>
+              <span>Finalisé ({usinageFinaliseList || 0})</span>
             </TabsTrigger>
           </TabsList>
 

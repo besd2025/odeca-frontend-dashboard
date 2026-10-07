@@ -19,12 +19,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
 
 export default function TabNouveauLot({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
+  const [stockNouveauLotList, setStockNouveauLotList] = useState([]);
+  const id = useSearchParams().get("id");
+  const [limit, setLimit] = useState(5);
+  const [pointer, setPointer] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(totalCount / limit) || 1;
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setPointer((page - 1) * limit);
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
   const NOUVEAUX_LOTS = [
     {
       id: "NVL-001",
@@ -68,6 +87,32 @@ export default function TabNouveauLot({ searchQuery = "" }) {
     setSelectedLot(lot);
     setOpen(true);
   };
+  React.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/stock_cafe/get_qualites_pretes_stockage/`, { params: { usine_deparchage_id: id, offset: pointer, limit: limit } });
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id_initial,
+          societe: item?.nom_societe,
+          grades: item?.qualites,
+          totalSacs: item?.qualites?.reduce((acc, grade) => acc + grade?.nombre_sacs_restant, 0),
+          poids_net: item?.quantite_cafe_vert,
+          date_enregistrement: item?.created_at,
+          observation: item?.observation,
+
+        })) || [];
+        setStockNouveauLotList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
 
   return (
     <div className="space-y-4">
@@ -91,7 +136,7 @@ export default function TabNouveauLot({ searchQuery = "" }) {
                   Chargement...
                 </TableCell>
               </TableRow>
-            ) : filtered.length === 0 ? (
+            ) : stockNouveauLotList?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8 text-slate-500 font-medium">
                   <div className="flex flex-col items-center gap-1.5">
@@ -101,40 +146,29 @@ export default function TabNouveauLot({ searchQuery = "" }) {
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((lot, index) => (
+              stockNouveauLotList?.map((lot, index) => (
                 <TableRow key={lot.id} className="odd:bg-muted/50">
                   <TableCell className="font-bold text-slate-900 dark:text-white">
-                    {index + 1}
+                    {pointer + index + 1}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-0.5">
                       <span className="font-medium text-slate-800 dark:text-slate-200">
                         {lot.societe}
                       </span>
-                      <div className="flex flex-wrap gap-1">
-                        {lot.sdls?.map((sdl, i) => (
-                          <span
-                            key={i}
-                            className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
-                          >
-                            {sdl}
-                          </span>
-                        ))}
-                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1.5">
-                      {lot.grades &&
-                        Object.keys(lot.grades).map((grade) => (
-                          <Badge
-                            key={grade}
-                            variant="secondary"
-                            className="text-xs bg-secondary/10 text-secondary dark:bg-secondary/30 dark:text-secondary dark:border-secondary/30"
-                          >
-                            {grade} ({lot.grades[grade]} sacs)
-                          </Badge>
-                        ))}
+                      {lot.grades && lot.grades.map((grade, i) => (
+                        <Badge
+                          key={i}
+                          variant="secondary"
+                          className="text-xs bg-secondary/10 text-secondary dark:bg-secondary/30 dark:text-secondary dark:border-secondary/30"
+                        >
+                          {grade?.qualite} ({grade?.nombre_sacs_restant} sacs)
+                        </Badge>
+                      ))}
                     </div>
                   </TableCell>
                   <TableCell className="text-right font-semibold text-slate-900 dark:text-white">
@@ -157,7 +191,15 @@ export default function TabNouveauLot({ searchQuery = "" }) {
         </Table>
       </div>
 
-      <PaginationContent />
+      <PaginationContent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        pointer={pointer}
+        totalCount={totalCount}
+        limit={limit}
+        onLimitChange={handleLimitChange}
+      />
 
       {/* Details Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
@@ -176,7 +218,7 @@ export default function TabNouveauLot({ searchQuery = "" }) {
                   <Badge variant="outline">{selectedLot.status}</Badge>
                 </div>
                 <div className="text-xs text-slate-500">
-                  SDLs : {selectedLot.sdls?.join(", ")} • Total : {selectedLot.totalSacs} sacs
+                  Total : {selectedLot.totalSacs} sacs
                 </div>
               </div>
 
@@ -185,13 +227,12 @@ export default function TabNouveauLot({ searchQuery = "" }) {
                   Grades et Nombres de Sacs Prêts
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
-                  {selectedLot.grades &&
-                    Object.entries(selectedLot.grades).map(([g, q]) => (
-                      <div key={g} className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-md border text-xs flex justify-between items-center">
-                        <span className="font-semibold">{g}</span>
-                        <span className="font-bold text-slate-900 dark:text-white">{q} sacs</span>
-                      </div>
-                    ))}
+                  {selectedLot.grades && selectedLot.grades.map((grade, i) => (
+                    <div key={i} className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-md border text-xs flex justify-between items-center">
+                      <span className="font-semibold">{grade?.qualite}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{grade?.nombre_sacs_restant} sacs</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

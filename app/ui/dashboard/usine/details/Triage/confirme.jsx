@@ -26,61 +26,54 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
-
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
 export default function ConfirmedTriage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
-
-  const CONFIRMED_TRIAGES = [
-    {
-      id: "TRI-2026-001",
-      societe: "SOGESTAL Ngozi",
-      sdls: ["SDL Ngozi", "SDL Gitega"],
-      usine: "Usine Ngozi",
-      dateEntree: "2026-05-18",
-      dateSortie: "2026-05-20",
-      totalSacs: 216,
-      poidsNet: 12960.0,
-      status: "confirmé",
-      observation: "Triage conforme aux standards café vert ODECA. Échantillon envoyé au laboratoire pour cupping test.",
-      grades: [
-        { qualite: "FW NGOMA MILD-SDL", nombre_sacs: 118, quantite_kg: 7080, type: "Trié & Taxé", status: "Confirmé" },
-        { qualite: "FW AA", nombre_sacs: 78, quantite_kg: 4680, type: "Trié & Taxé", status: "Confirmé" },
-        { qualite: "W ABC", nombre_sacs: 20, quantite_kg: 1200, type: "Stock Direct", status: "Confirmé" },
-      ],
-    },
-    {
-      id: "TRI-2026-005",
-      societe: "SOGESTAL Ngozi",
-      sdls: ["SDL Gitega"],
-      usine: "Usine Ngozi",
-      dateEntree: "2026-05-28",
-      dateSortie: "2026-05-28",
-      totalSacs: 3,
-      poidsNet: 180.0,
-      status: "confirmé",
-      observation: "Lot étiqueté directement sans tri supplémentaire requis. Prêt pour stockage.",
-      grades: [
-        { qualite: "W ABC", nombre_sacs: 3, quantite_kg: 180, type: "Tri non requis", status: "Confirmé" },
-      ],
-    },
-  ];
-
-  const filteredLots = CONFIRMED_TRIAGES.filter((lot) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      lot.societe.toLowerCase().includes(query) ||
-      lot.id.toLowerCase().includes(query) ||
-      lot.usine.toLowerCase().includes(query)
-    );
-  });
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [confirmeTriageList, setConfirmeTriageList] = React?.useState([]);
 
   const handleOpenDetails = (lot) => {
     setSelectedLot(lot);
     setOpen(true);
   };
+
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/triage/get_termine_triage/`, { params: { usine_deparchage_id: id, offset: pointer, limit: limit } });
+
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe,
+          societe: item?.nom_societe,
+          sdls: item?.sdls,
+          nombre_sacs: item?.nombre_sacs_total,
+          usinageQuantitiesTotal: item?.quantite_total,
+          status: item?.processing_status,
+          dateUsinage: item?.date_debut,
+          dateSortie: item?.date_fin,
+          observation: item?.observation,
+          productions: item?.productions
+        })) || [];
+        setConfirmeTriageList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
 
   return (
     <div className="grid w-full [&>div]:border [&>div]:rounded-md">
@@ -104,14 +97,14 @@ export default function ConfirmedTriage({ searchQuery = "" }) {
                 Chargement des données...
               </TableCell>
             </TableRow>
-          ) : filteredLots.length === 0 ? (
+          ) : confirmeTriageList?.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-8 text-slate-500 dark:text-slate-400 font-medium">
                 Aucun lot de triage confirmé trouvé.
               </TableCell>
             </TableRow>
           ) : (
-            filteredLots.map((lot, index) => (
+            confirmeTriageList?.map((lot, index) => (
               <TableRow className="odd:bg-muted/50" key={lot.id || index}>
                 <TableCell className="pl-4 font-medium">
                   <div className="flex items-center gap-2">

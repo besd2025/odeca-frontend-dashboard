@@ -20,7 +20,9 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from '@/components/ui/label';
 import PaginationContent from '@/components/ui/pagination-content';
-
+import { useSearchParams } from "next/navigation";
+import { fetchData } from "@/app/_utils/api";
+import { TableRowsSkeleton } from '@/components/ui/skeletons';
 export default function EnAttenteReception() {
     const [loading, setLoading] = React.useState(false);
     const DEFAULT_RECEPTIONS = [
@@ -34,6 +36,49 @@ export default function EnAttenteReception() {
             status: "confirmé",
         }
     ];
+    const [totalCount, setTotalCount] = useState(0);
+    const [pointer, setPointer] = useState(0);
+    const [limit, setLimit] = useState(10);
+    const currentPage = Math.floor(pointer / limit) + 1;
+    const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+    const [receptionsEnAttenteList, setReceptionsEnAttenteList] = React?.useState([])
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id");
+    React?.useEffect(() => {
+        const loadDataForTab = async () => {
+            setLoading(true);
+            try {
+
+                const confirmedRes = await fetchData("get", `cafe/transfert_sdl_usine/?usine_deparchage=${id}`, { params: { est_confirme: false, offset: pointer, limit: limit } });
+                console.log("confirmedReseeeeee", confirmedRes)
+                const confirmedMapped = confirmedRes?.results?.map((item) => ({
+                    id: item?.id,
+                    societe: item?.sdl?.societe?.nom_societe || "Inconnu",
+                    sdls: item?.sdl?.sdl_nom || [],
+                    dateTransfert: item?.transfer_date || "-",
+                    dateReception: item?.date_reception ? new Date(item.date_reception).toISOString().split('T')[0] : "-",
+                    poidsNet: item?.total_parche || 0,
+                    usine: item?.usine_deparchage?.usine_name || "-",
+                    status: "en attente",
+                })) || [];
+                setReceptionsEnAttenteList(confirmedMapped);
+                console.log("confirmedMapped", receptionsEnAttenteList)
+                setTotalCount(confirmedRes?.count || 0);
+            } catch (error) {
+                console.error(`Error fetching data for tab ${tab}:`, error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+
+        loadDataForTab();
+    }, [pointer, limit, id]);
+    const [details, setDetails] = React.useState(null);
+    const handleOpenDialog = (lot) => {
+        setDetails(lot);
+        setOpen(true);
+    };
 
     const TRIAGE_GRADES = [{ grade: "A1", poidsNet: 1000, status: "CONFIRMEE" }, { grade: "A2", poidsNet: 1000, status: "CONFIRMEE" }];
     const [gradesList, setGradesList] = React.useState(TRIAGE_GRADES);
@@ -47,7 +92,6 @@ export default function EnAttenteReception() {
                         <TableHead>Société</TableHead>
                         <TableHead>Usine</TableHead>
                         <TableHead>Date Transfert</TableHead>
-                        <TableHead>Date Réception</TableHead>
                         <TableHead className="text-right">Poids Net (kg)</TableHead>
                         <TableHead className="text-center">Statut</TableHead>
                     </TableRow>
@@ -55,14 +99,14 @@ export default function EnAttenteReception() {
                 <TableBody>
                     {loading ? (
                         <TableRowsSkeleton columns={6} rows={5} />
-                    ) : DEFAULT_RECEPTIONS.length === 0 ? (
+                    ) : receptionsEnAttenteList.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={6} className="text-center py-8 text-slate-500 dark:text-slate-400 font-medium">
                                 Aucun lot trouvé avec ce statut.
                             </TableCell>
                         </TableRow>
                     ) : (
-                        DEFAULT_RECEPTIONS.map((lot, index = 0) => (
+                        receptionsEnAttenteList.map((lot, index = 0) => (
                             <TableRow className="odd:bg-muted/50" key={index + 1}>
                                 <TableCell className="pl-4 font-medium">
                                     <div className="flex items-center gap-2">
@@ -74,7 +118,7 @@ export default function EnAttenteReception() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align='start'>
 
-                                                <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(true)} >Détails</DropdownMenuItem>
+                                                <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenDialog(lot)} >Détails</DropdownMenuItem>
                                                 <DropdownMenuItem className="cursor-pointer" >Modifier</DropdownMenuItem>
 
                                             </DropdownMenuContent>
@@ -104,7 +148,7 @@ export default function EnAttenteReception() {
                                     </div>
                                 </TableCell>
                                 <TableCell>{lot.dateTransfert}</TableCell>
-                                <TableCell>{lot.dateReception}</TableCell>
+
                                 <TableCell className="text-right font-semibold">{lot.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</TableCell>
                                 <TableCell className="text-center lowercase">
                                     {lot.status === "confirmé" ? (
@@ -130,14 +174,13 @@ export default function EnAttenteReception() {
             </Table>
 
             <PaginationContent
-            // page={table.getState().pagination.pageIndex + 1}
-            // pageSize={table.getState().pagination.pageSize}
-            // totalItems={table.getFilteredRowModel().rows.length}
-            // totalPages={table.getPageCount()}
-            // onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
-            // onPageSizeChange={(size) => table.setPageSize(size)}
-            // hasNextPage={table.getCanNextPage()}
-            // hasPreviousPage={table.getCanPreviousPage()}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalCount={totalCount}
+                pointer={pointer}
+                limit={limit}
+                onPageChange={(page) => setPointer((page - 1) * limit)}
+                onLimitChange={(newLimit) => { setLimit(newLimit); setPointer(0); }}
             />
             <Dialog open={open} onOpenChange={setOpen}>
 
@@ -154,7 +197,7 @@ export default function EnAttenteReception() {
                                         Société / Propriétaire
                                     </Label>
                                     <span>
-                                        {DEFAULT_RECEPTIONS[0].societe}
+                                        {details?.societe}
                                     </span>
                                 </div>
                                 {/* SDL */}
@@ -163,7 +206,7 @@ export default function EnAttenteReception() {
                                         Station de Lavage
                                     </Label>
                                     <span>
-                                        {DEFAULT_RECEPTIONS[0].sdls}
+                                        {details?.sdls}
                                     </span>
 
                                 </div>

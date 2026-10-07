@@ -160,6 +160,7 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
             const response = await fetchData("get", `cafe/achat_cafe_parche/`, {
                 params: { limit: total },
             });
+            console.log("ffffffff:", response)
 
             const formattedData = response?.results?.map((item) => ({
                 id: item?.id,

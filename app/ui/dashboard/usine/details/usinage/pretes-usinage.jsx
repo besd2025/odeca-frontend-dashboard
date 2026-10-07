@@ -20,57 +20,69 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
-
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
+import { TableRowsSkeleton } from '@/components/ui/skeletons';
 export default function PretesUsinage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const [usinagePretList, setUsinagePretList] = useState([]);
+  const totalPages = Math.ceil(totalCount / limit) || 1;
 
-  const LOTS_PRETS = [
-    {
-      id: "USID-2026-003",
-      code_societe: "SOC-MUR",
-      societe: "SOGESTAL Muramvya",
-      sdls: ["SDL Muramvya", "SDL Bururi"],
-      usinageQuantitiesTotal: 5200,
-      status: "PRET_USINE",
-      dateTransfert: "2026-05-26",
-      observation: "Lot réceptionné en usine, déparchage prêt à être lancé.",
-      intrants: [
-        { grade: "C1", quantite: 3500, poidsNet: 3500, status: "Prêt" },
-        { grade: "C2", quantite: 1700, poidsNet: 1700, status: "Prêt" },
-      ],
-    },
-    {
-      id: "USID-2026-004",
-      code_societe: "SOC-COC",
-      societe: "COCOCA",
-      sdls: ["SDL Gitega", "SDL Karusi"],
-      usinageQuantitiesTotal: 4800,
-      status: "PRET_USINE",
-      dateTransfert: "2026-05-27",
-      observation: "Café déparché conforme, prêt pour la file d'usinage.",
-      intrants: [
-        { grade: "A1", quantite: 3000, poidsNet: 3000, status: "Prêt" },
-        { grade: "A2", quantite: 1800, poidsNet: 1800, status: "Prêt" },
-      ],
-    },
-  ];
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setPointer((page - 1) * limit);
+  };
 
-  const filteredLots = LOTS_PRETS.filter((lot) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      lot.societe.toLowerCase().includes(q) ||
-      lot.id.toLowerCase().includes(q) ||
-      lot.sdls.some((s) => s.toLowerCase().includes(q))
-    );
-  });
-
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
   const handleOpenDetails = (lot) => {
     setSelectedLot(lot);
     setOpen(true);
   };
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/?usine_deparchage_id=${id}`, { params: { etat_selection: "PRET_USINE", offset: pointer, limit: limit } });
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe,
+          societe: item?.nom_societe,
+          sdls: item?.sdls,
+          usinageQuantitiesTotal: item?.total_quantite_confirme - item?.total_quantite_confirme_tare,
+          status: item?.status,
+          dateTransfert: item?.dateTransfert,
+          observation: item?.observation,
+          intrants: item?.details?.map((detail) => ({
+            grade: detail?.grade,
+            quantite: detail?.quantite,
+            poidsNet: detail?.poids_net,
+            status: detail?.status,
+          })) || [],
+        })) || [];
+        setUsinagePretList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
+
 
   return (
     <div className="space-y-4">
@@ -94,7 +106,7 @@ export default function PretesUsinage({ searchQuery = "" }) {
                   Chargement...
                 </TableCell>
               </TableRow>
-            ) : filteredLots.length === 0 ? (
+            ) : usinagePretList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8 text-slate-500 font-medium">
                   <div className="flex flex-col items-center gap-1.5">
@@ -104,10 +116,10 @@ export default function PretesUsinage({ searchQuery = "" }) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredLots.map((lot, index) => (
+              usinagePretList.map((lot, index) => (
                 <TableRow key={lot.id} className="odd:bg-muted/50">
                   <TableCell className="font-bold text-slate-900 dark:text-white">
-                    {index + 1}
+                    {pointer + index + 1}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
@@ -159,7 +171,15 @@ export default function PretesUsinage({ searchQuery = "" }) {
         </Table>
       </div>
 
-      <PaginationContent />
+      <PaginationContent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        pointer={pointer}
+        totalCount={totalCount}
+        limit={limit}
+        onLimitChange={handleLimitChange}
+      />
 
       {/* Details Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>

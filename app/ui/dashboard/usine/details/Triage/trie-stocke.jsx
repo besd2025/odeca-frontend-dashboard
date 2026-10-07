@@ -22,12 +22,19 @@ import {
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
-
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
 export default function TrieStocke({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
-
+  const [trieStockeList, setTrieStockeList] = useState([]);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const [confirmeTriageList, setConfirmeTriageList] = useState([]);
   const LOTS_TRIES = [
     {
       id: "TRI-2026-001",
@@ -89,6 +96,35 @@ export default function TrieStocke({ searchQuery = "" }) {
     setOpen(true);
   };
 
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/triage/get_termine_triage/`, { params: { usine_deparchage_id: id, offset: pointer, limit: limit } });
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe,
+          societe: item?.nom_societe,
+          sdls: item?.sdls,
+          nombre_sacs: item?.nombre_sacs_total,
+          usinageQuantitiesTotal: item?.quantite_total,
+          status: item?.processing_status,
+          dateUsinage: item?.date_debut,
+          dateSortie: item?.date_fin,
+          observation: item?.observation,
+          productions: item?.productions
+        })) || [];
+        setConfirmeTriageList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
   return (
     <div className="space-y-4">
       <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-x-auto">
@@ -113,7 +149,7 @@ export default function TrieStocke({ searchQuery = "" }) {
                   Chargement...
                 </TableCell>
               </TableRow>
-            ) : filteredLots.length === 0 ? (
+            ) : confirmeTriageList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8 text-slate-500 font-medium">
                   <div className="flex flex-col items-center gap-1.5">
@@ -123,7 +159,7 @@ export default function TrieStocke({ searchQuery = "" }) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredLots.map((lot, index) => (
+              confirmeTriageList?.map((lot, index) => (
                 <TableRow key={lot.id} className="odd:bg-muted/50">
                   <TableCell className="font-bold text-slate-900 dark:text-white">
                     {index + 1}

@@ -1,9 +1,9 @@
 import { ChartAreaInteractive } from "@/app/ui/dashboard/usine/dashboard/chart-area-interactive"
-import { DataTable } from "@/app/ui/dashboard/usine/dashboard/data-table"
 
 import data from "@/app/ui/dashboard/usine/analytics/data.json"
-import QualiteProduit from "@/app/ui/dashboard/usine/dashboard/qualite-produit";
-import { SectionCards } from "../dashboard/section-cards";
+import { SectionCards } from "./section-cards";
+import QualiteProduit from "./qualite-produit";
+import { DataTable } from "./data-table";
 
 export default function CardsSectionUsines({ usineId } = {}) {
     return (

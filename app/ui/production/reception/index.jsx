@@ -73,7 +73,7 @@ export default function ReceptionPage() {
     const [receptionsConfirmeList, setReceptionsConfirmeList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showDateReception, setShowDateReception] = useState("");
-
+    const [search, setSearch] = useState("");
     // Pagination state
     const [totalCount, setTotalCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -91,10 +91,9 @@ export default function ReceptionPage() {
         try {
             if (tab === "all") {
                 const [pendingRes, confirmedRes] = await Promise.all([
-                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit } }),
-                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit } })
+                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit, search: search } }),
+                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit, search: search } })
                 ]);
-                console.log("pendingRes ::::::::::::", pendingRes)
                 const pendingMapped = pendingRes?.results?.map((item) => ({
                     id: item?.id,
                     societe: item?.sdl?.societe?.nom_societe || "Inconnu",
@@ -121,7 +120,7 @@ export default function ReceptionPage() {
                 setReceptionsConfirmeList(confirmedMapped);
                 setTotalCount((pendingRes?.count || 0) + (confirmedRes?.count || 0));
             } else if (tab === "en attente") {
-                const pendingRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit } });
+                const pendingRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit, search: search } });
                 const pendingMapped = pendingRes?.results?.map((item) => ({
                     id: item?.id,
                     societe: item?.sdl?.societe?.nom_societe || "Inconnu",
@@ -132,11 +131,10 @@ export default function ReceptionPage() {
                     usine: item?.usine_deparchage?.usine_name || "-",
                     status: "en attente",
                 })) || [];
-                console.log("pendingMapped :", pendingMapped)
                 setReceptionsEnAttenteList(pendingMapped);
                 setTotalCount(pendingRes?.count || 0);
             } else if (tab === "confirmé") {
-                const confirmedRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit } });
+                const confirmedRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit, search: search } });
                 const confirmedMapped = confirmedRes?.results?.map((item) => ({
                     id: item?.id,
                     societe: item?.sdl?.societe?.nom_societe || "Inconnu",
@@ -159,7 +157,7 @@ export default function ReceptionPage() {
 
     useEffect(() => {
         loadDataForTab(activeTab);
-    }, [activeTab, pointer, limit]);
+    }, [activeTab, pointer, limit, search]);
 
     const onPageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -229,8 +227,8 @@ export default function ReceptionPage() {
                         <Search className="h-4 w-4 absolute inset-y-0 my-auto left-2.5 " />
                         <input
                             placeholder="Rechercher..."
-                            // value={search}
-                            // onChange={handleSearch}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                             className="pl-9 h-9 text-sm flex-1 shadow-none w-[300px] lg:w-[350px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
                         />
                     </div>

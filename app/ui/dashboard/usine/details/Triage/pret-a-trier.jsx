@@ -21,58 +21,58 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
+import { TableRowsSkeleton } from '@/components/ui/skeletons';
 
 export default function PretATrier({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
-
-  const LOTS_PRET_TRIER = [
-    {
-      id: "TRI-2026-003",
-      societe: "COCOCA",
-      sdls: ["SDL Gitega", "SDL Karusi"],
-      usine: "Usine Gitega",
-      grades: {
-        "ROBUSTA NATURAL CLEAN SUPER": 58,
-        "FW NGOMA MILD-SDL": 420,
-        "FW AA": 78,
-        "W ABC": 20,
-      },
-      dateEntree: "2026-05-28",
-      dateSortie: "-",
-      status: "Prêt à trier",
-      observation: "Lot issu de l'usinage, disponible pour triage gravimétrique.",
-    },
-    {
-      id: "TRI-2026-004",
-      societe: "SOGESTAL Mumirwa",
-      sdls: ["SDL Muramvya"],
-      usine: "Usine Muramvya",
-      grades: {
-        "GRADE 1": 18,
-      },
-      dateEntree: "2026-05-29",
-      dateSortie: "-",
-      status: "Prêt à trier",
-      observation: "Café vert prêt pour contrôle et étiquetage.",
-    },
-  ];
-
-  const filteredLots = LOTS_PRET_TRIER.filter((lot) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      lot.societe.toLowerCase().includes(q) ||
-      lot.id.toLowerCase().includes(q) ||
-      lot.sdls.some((s) => s.toLowerCase().includes(q))
-    );
-  });
-
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const currentPage = Math.floor(pointer / limit) + 1;
+  const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+  const [enAttenteTriageList, setEnAttenteTriageList] = useState([]);
+  const [pretTrierList, setPreTrierList] = useState([]);
   const handleOpenDetails = (lot) => {
     setSelectedLot(lot);
     setOpen(true);
   };
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/usinages/get_pret_pour_triage/`, { params: { usine_deparchage_id: id, offset: pointer, limit: limit } });
+        console.log("pret a trier", response);
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe,
+          societe: item?.nom_societe,
+          grades: item?.productions,
+          nombre_sacs: item?.nombre_sacs_total,
+          usinageQuantitiesTotal: item?.quantite_total,
+          status: item?.processing_status,
+          dateEntree: item?.date_debut,
+          dateSortie: item?.date_fin,
+          observation: item?.observation,
+          productions: item?.productions
+        })) || [];
+        setPreTrierList(mappedData);
+        console.log("mappedData", mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
 
   return (
     <div className="space-y-4">
@@ -98,7 +98,7 @@ export default function PretATrier({ searchQuery = "" }) {
                   Chargement...
                 </TableCell>
               </TableRow>
-            ) : filteredLots.length === 0 ? (
+            ) : pretTrierList?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8 text-slate-500 font-medium">
                   <div className="flex flex-col items-center gap-1.5">
@@ -108,46 +108,36 @@ export default function PretATrier({ searchQuery = "" }) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredLots.map((lot, index) => (
+              pretTrierList?.map((lot, index) => (
                 <TableRow key={lot.id} className="odd:bg-muted/50">
                   <TableCell className="font-bold text-slate-900 dark:text-white">
-                    {index + 1}
+                    {pointer + index + 1}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
                       <span className="font-medium text-slate-800 dark:text-slate-200">
                         {lot.societe}
                       </span>
-                      <div className="flex flex-wrap gap-1">
-                        {lot.sdls?.map((sdl, i) => (
-                          <span
-                            key={i}
-                            className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded"
-                          >
-                            {sdl}
-                          </span>
-                        ))}
-                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
-                      {lot.grades &&
-                        Object.entries(lot.grades).map(([grade, qty]) => (
-                          <div key={grade} className="text-xs flex items-center gap-1.5">
-                            <span className="font-semibold text-slate-700 dark:text-slate-300">
-                              {grade}:
-                            </span>
-                            <span className="text-slate-600 dark:text-slate-400">{qty} sacs</span>
-                          </div>
-                        ))}
+                      {lot.grades && lot?.grades.map((grade, qty) => (
+                        <div key={grade?.id} className="text-xs flex items-center gap-1.5">
+                          <span className="font-semibold text-slate-700 dark:text-slate-300">
+                            {grade?.nom_qualite}:
+                          </span>
+                          <span className="text-slate-600 dark:text-slate-400">{grade?.nombre_sacs} sacs: </span>
+                          <span className="text-slate-600 dark:text-slate-400">{grade?.quantite_sortie} kg</span>
+                        </div>
+                      ))}
                     </div>
                   </TableCell>
                   <TableCell className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                    {lot.dateEntree || "—"}
+                    {new Date(lot.dateEntree).toLocaleDateString("fr-FR") || "—"}
                   </TableCell>
                   <TableCell className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                    {lot.dateSortie || "—"}
+                    {new Date(lot.dateSortie).toLocaleDateString("fr-FR") || "—"}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -175,7 +165,18 @@ export default function PretATrier({ searchQuery = "" }) {
         </Table>
       </div>
 
-      <PaginationContent />
+      <PaginationContent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        pointer={pointer}
+        totalCount={totalCount}
+        limit={limit}
+        onPageChange={(page) => setPointer((page - 1) * limit)}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setPointer(0);
+        }}
+      />
 
       {/* Details Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
@@ -200,7 +201,13 @@ export default function PretATrier({ searchQuery = "" }) {
                   </span>
                 </div>
                 <div className="text-xs text-slate-500">
-                  SDLs : {selectedLot.sdls?.join(", ")} • Date d'entrée : {selectedLot.dateEntree}
+                  Date d'entrée : {new Date(selectedLot.dateEntree).toLocaleDateString(
+                    {
+                      year: "numeric",
+                      month: "short",
+                      day: "2-digit",
+                    }
+                  )}
                 </div>
               </div>
 
@@ -216,13 +223,17 @@ export default function PretATrier({ searchQuery = "" }) {
                   Grades et Sacs en Entrée
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
-                  {selectedLot.grades &&
-                    Object.entries(selectedLot.grades).map(([g, q]) => (
-                      <div key={g} className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-md border text-xs flex justify-between items-center">
-                        <span className="font-semibold">{g}</span>
-                        <span className="font-bold text-slate-900 dark:text-white">{q} sacs</span>
-                      </div>
-                    ))}
+                  {selectedLot.grades && selectedLot.grades.length > 0 ? selectedLot.grades.map((grade, index) => (
+                    <div key={index} className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-md border text-xs flex justify-between items-center">
+                      <span className="font-semibold">{grade.nom_qualite}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{grade.nombre_sacs} sacs</span>
+                    </div>
+                  )) : (
+                    <div className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-md border text-xs flex justify-between items-center">
+                      <span className="font-semibold">{selectedLot.qualite}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{selectedLot.nombre_sacs} sacs</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

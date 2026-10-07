@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { fetchData } from "@/app/_utils/api";
 
 const MOCK_SOCIETES = [
   { id: "SOC001", nom: "SODEICO SARL" },
@@ -56,7 +57,7 @@ export default function Edit({ id, item, onSave }) {
       quantite_washed: Number(quantiteWashed),
     };
 
-    const response = await fetchData("patch", `cafe/achat_washed/${id}/`, { body: updatedData })
+    const response = await fetchData("patch", `cafe/achat_cafe_parche/`, { body: updatedData })
     try {
       if (response.ok) {
         toast.success(`L'achat #${id || updatedData.id} a été modifié avec succès`);

@@ -26,12 +26,20 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
+import { TableRowsSkeleton } from '@/components/ui/skeletons';
 
 export default function EnAttenteTriage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
-
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const [enAttenteTriageList, setEnAttenteTriageList] = useState([]);
   const DEFAULT_TRIAGES = [
     {
       id: "TRI-2026-002",
@@ -98,6 +106,39 @@ export default function EnAttenteTriage({ searchQuery = "" }) {
     setSelectedLot(lot);
     setOpen(true);
   };
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      console.log("pointer===================>", pointer)
+      console.log("limit====================>", limit)
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/triage/get_pret_pour_triage/`, { params: { usine_deparchage_id: id, offset: pointer, limit: limit } });
+        console.log("response en attente triage===================>", response)
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe,
+          societe: item?.nom_societe,
+          sdls: item?.sdls,
+          nombre_sacs: item?.nombre_sacs_total,
+          usinageQuantitiesTotal: item?.quantite_total,
+          status: item?.processing_status,
+          dateUsinage: item?.date_debut,
+          dateSortie: item?.date_fin,
+          observation: item?.observation,
+          productions: item?.productions
+        })) || [];
+        setUsinageFinaliseList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
+
 
   return (
     <div className="grid w-full [&>div]:border [&>div]:rounded-md">

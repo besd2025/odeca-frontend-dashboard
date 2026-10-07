@@ -20,44 +20,56 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
-
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
+import { TableRowsSkeleton } from '@/components/ui/skeletons';
 export default function EnCoursUsinage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
-
-  const LOTS_EN_COURS = [
-    {
-      id: "USID-2026-002",
-      code_societe: "SOC-KAY",
-      societe: "SOGESTAL Kayanza",
-      sdls: ["SDL Kayanza"],
-      usinageQuantitiesTotal: 3700,
-      status: "EN_COURS",
-      dateTransfert: "2026-05-25",
-      dateDebut: "2026-05-27",
-      observation: "Usinage en cours sur les machines 1 et 2 pour déparchage B1 et B2.",
-      intrants: [
-        { grade: "B1", quantite: 2500, poidsNet: 2500, status: "En cours" },
-        { grade: "B2", quantite: 1200, poidsNet: 1200, status: "En cours" },
-      ],
-    },
-  ];
-
-  const filteredLots = LOTS_EN_COURS.filter((lot) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      lot.societe.toLowerCase().includes(q) ||
-      lot.id.toLowerCase().includes(q) ||
-      lot.sdls.some((s) => s.toLowerCase().includes(q))
-    );
-  });
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [usinageEnCoursList, setUsinageEnCoursList] = React?.useState([]);
 
   const handleOpenDetails = (lot) => {
     setSelectedLot(lot);
     setOpen(true);
   };
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/`, { params: { usine_deparchage_id: id, etat_selection: "EN_COURS", offset: pointer, limit: limit } });
+
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe,
+          societe: item?.nom_societe,
+          sdls: item?.sdls,
+          usinageQuantitiesTotal: item?.total_quantite_confirme - item?.total_quantite_confirme_tare,
+          status: item?.status,
+          dateTransfert: item?.dateTransfert,
+          dateDebut: item?.dateDebut,
+          observation: item?.observation,
+          intrants: [
+            { grade: "B1", quantite: 2500, poidsNet: 2500, status: "En cours" },
+            { grade: "B2", quantite: 1200, poidsNet: 1200, status: "En cours" },
+          ],
+        })) || [];
+        setUsinageEnCoursList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
 
   return (
     <div className="space-y-4">
@@ -81,7 +93,7 @@ export default function EnCoursUsinage({ searchQuery = "" }) {
                   Chargement...
                 </TableCell>
               </TableRow>
-            ) : filteredLots.length === 0 ? (
+            ) : usinageEnCoursList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8 text-slate-500 font-medium">
                   <div className="flex flex-col items-center gap-1.5">
@@ -91,7 +103,7 @@ export default function EnCoursUsinage({ searchQuery = "" }) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredLots.map((lot, index) => (
+              usinageEnCoursList.map((lot, index) => (
                 <TableRow key={lot.id} className="odd:bg-muted/50">
                   <TableCell className="font-bold text-slate-900 dark:text-white">
                     {index + 1}

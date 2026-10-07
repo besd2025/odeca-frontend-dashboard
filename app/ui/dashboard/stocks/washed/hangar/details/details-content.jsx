@@ -381,11 +381,11 @@ function DetailsContent({ id, slug }) {
         </TabsList>
         <TabsContent value="achats">
           <h1 className="text-xl font-semibold m-2">Achats effectues</h1>
-          <AchatsWashedListTable data={individualAchatsData} />
+          <AchatsWashedListTable data={individualAchatsData} datapagination={dataAchatpagination} />
         </TabsContent>
         <TabsContent value="transferCt">
           <h1 className="text-xl font-semibold m-2">Transfers effectues</h1>
-          <Transfers data={dataTransfert} />
+          <Transfers data={dataTransfert} datapagination={dataTransferPagination} />
         </TabsContent>
         <TabsContent value="maps">
           <div className="w-full h-full relative overflow-hidden">

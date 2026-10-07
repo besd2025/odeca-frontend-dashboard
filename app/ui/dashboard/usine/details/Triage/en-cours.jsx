@@ -21,45 +21,65 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
-
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
 export default function EnCoursTriage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [enCoursTriageList, setEnCoursTriageList] = React?.useState([]);
+  const totalPages = Math.ceil(totalCount / limit) || 1;
 
-  const LOTS_EN_COURS = [
-    {
-      id: "TRI-2026-002",
-      societe: "SOGESTAL Kayanza",
-      sdls: ["SDL Kayanza"],
-      usine: "Usine Kayanza",
-      quantite_trie: 3600,
-      nombre_sacs: 60,
-      dateEntree: "2026-05-27",
-      dateSortie: "-",
-      status: "En cours de triage",
-      observation: "Triage mécanique en cours sur tamis 15+ et FW AA.",
-      grades: [
-        { qualite: "FW AA", nombre_sacs: 40, quantite_kg: 2400, type: "Trié" },
-        { qualite: "15+", nombre_sacs: 20, quantite_kg: 1200, type: "Trié" },
-      ],
-    },
-  ];
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setPointer((page - 1) * limit);
+  };
 
-  const filteredLots = LOTS_EN_COURS.filter((lot) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      lot.societe.toLowerCase().includes(q) ||
-      lot.id.toLowerCase().includes(q) ||
-      lot.sdls.some((s) => s.toLowerCase().includes(q))
-    );
-  });
-
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
   const handleOpenDetails = (lot) => {
     setSelectedLot(lot);
     setOpen(true);
   };
+
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/triage/get_en_cours_triage/`, { params: { usine_deparchage_id: id, offset: pointer, limit: limit } });
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id,
+          code_societe: item?.code_societe,
+          societe: item?.nom_societe,
+          sdls: item?.sdls,
+          nombre_sacs: item?.nombre_sacs_total,
+          usinageQuantitiesTotal: item?.quantite_total,
+          status: item?.processing_status,
+          dateUsinage: item?.date_debut,
+          dateSortie: item?.date_fin,
+          observation: item?.observation,
+          productions: item?.productions
+        })) || [];
+        setEnCoursTriageList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
 
   return (
     <div className="space-y-4">
@@ -84,7 +104,7 @@ export default function EnCoursTriage({ searchQuery = "" }) {
                   Chargement...
                 </TableCell>
               </TableRow>
-            ) : filteredLots.length === 0 ? (
+            ) : enCoursTriageList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-slate-500 font-medium">
                   <div className="flex flex-col items-center gap-1.5">
@@ -94,10 +114,10 @@ export default function EnCoursTriage({ searchQuery = "" }) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredLots.map((lot, index) => (
+              enCoursTriageList?.map((lot, index) => (
                 <TableRow key={lot.id} className="odd:bg-muted/50">
                   <TableCell className="font-bold text-slate-900 dark:text-white">
-                    {index + 1}
+                    {pointer + index + 1}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
@@ -155,7 +175,15 @@ export default function EnCoursTriage({ searchQuery = "" }) {
         </Table>
       </div>
 
-      <PaginationContent />
+      <PaginationContent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        pointer={pointer}
+        totalCount={totalCount}
+        limit={limit}
+        onLimitChange={handleLimitChange}
+      />
 
       {/* Details Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>

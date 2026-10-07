@@ -19,58 +19,63 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
 export default function TabStockNonPreleves({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
+  const id = useSearchParams().get("id");
+  const [limit, setLimit] = useState(5);
+  const [pointer, setPointer] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(totalCount / limit) || 1;
 
-  const LOTS_NON_PRELEVES = [
-    {
-      id: "SNP-001",
-      societe: "SOGESTAL Kayanza",
-      numero_lot: "LOT-KAY-01",
-      sdls: ["SDL Kayanza"],
-      dateEntree: "2026-05-27",
-      nombreSacs: 60,
-      poidsNet: 3600,
-      grades: {
-        "FW AA": 40,
-        "15+": 20,
-      },
-      status: "Non prélevé",
-      observation: "Lot en attente d'échantillonnage laboratoire.",
-    },
-    {
-      id: "SNP-002",
-      societe: "SOGESTAL Mumirwa",
-      numero_lot: "LOT-MUM-03",
-      sdls: ["SDL Muramvya"],
-      dateEntree: "2026-05-28",
-      nombreSacs: 18,
-      poidsNet: 1080,
-      grades: {
-        "GRADE 1": 18,
-      },
-      status: "Non prélevé",
-      observation: "Micro-lot en attente de validation qualité.",
-    },
-  ];
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setPointer((page - 1) * limit);
+  };
 
-  const filtered = LOTS_NON_PRELEVES.filter((lot) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      lot.societe.toLowerCase().includes(q) ||
-      lot.id.toLowerCase().includes(q) ||
-      lot.numero_lot.toLowerCase().includes(q)
-    );
-  });
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setPointer(0);
+    setCurrentPage(1);
+  };
+  const [stockNonPrelevesList, setStockNonPrelevesList] = useState([]);
 
   const handleOpen = (lot) => {
     setSelectedLot(lot);
     setOpen(true);
   };
+
+
+  React.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/stock_cafe/get_qualites_stockees/`, { params: { usine_deparchage_id: id, offset: pointer, limit: limit } });
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id_initial,
+          societe: item?.stockage__usine__usine_name,
+          qualite: item?.stockage__qualite__nom,
+          nombre_sacs: item?.nombre_sacs,
+          poids_net: item?.quantite_cafe_vert,
+          date_enregistrement: item?.created_at,
+          observation: item?.observation,
+          grades: item?.grades
+        })) || [];
+        setStockNonPrelevesList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer, id]);
 
   return (
     <div className="space-y-4">
@@ -97,7 +102,7 @@ export default function TabStockNonPreleves({ searchQuery = "" }) {
                   Chargement...
                 </TableCell>
               </TableRow>
-            ) : filtered.length === 0 ? (
+            ) : stockNonPrelevesList?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-8 text-slate-500 font-medium">
                   <div className="flex flex-col items-center gap-1.5">
@@ -107,10 +112,10 @@ export default function TabStockNonPreleves({ searchQuery = "" }) {
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((lot, index) => (
+              stockNonPrelevesList?.map((lot, index) => (
                 <TableRow key={lot.id} className="odd:bg-muted/50">
                   <TableCell className="font-bold text-slate-900 dark:text-white">
-                    {index + 1}
+                    {pointer + index + 1}
                   </TableCell>
                   <TableCell className="font-semibold text-primary">
                     {lot.numero_lot}
@@ -156,7 +161,15 @@ export default function TabStockNonPreleves({ searchQuery = "" }) {
         </Table>
       </div>
 
-      <PaginationContent />
+      <PaginationContent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        pointer={pointer}
+        totalCount={totalCount}
+        limit={limit}
+        onLimitChange={handleLimitChange}
+      />
 
       {/* Details Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>

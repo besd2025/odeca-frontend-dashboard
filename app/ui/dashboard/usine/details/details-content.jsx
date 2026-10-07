@@ -32,9 +32,9 @@ import Triage from "./Triage";
 import Production from "./production";
 import Sorties from "./sorties";
 import Stocks from "./stocks";
-
-
-function DetailsContent({ id }) {
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
+function DetailsContent() {
   // Existing data mocks (kept for now if needed for legacy tabs, or removed if unused)
   const cultivatorsData = [
     {
@@ -55,6 +55,8 @@ function DetailsContent({ id }) {
     },
     // ... (rest of mock data can be assumed to be fetched or removed if not needed)
   ];
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
   // Minimal mock data setup for legacy components to prevent crash if tabs are clicked
   const transferData = [];
@@ -65,11 +67,7 @@ function DetailsContent({ id }) {
   const [data, setData] = React.useState([]);
   const [dataAchat, setAchatDate] = React.useState([]);
 
-  React.useEffect(() => {
-    // Existing fetch logic kept for "cultivators" and "achats" if they are still relevant
-    // ...
-    // For now, focusing on the new Usine modules
-  }, [id]);
+
 
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -78,6 +76,7 @@ function DetailsContent({ id }) {
     setSelectedPlace(place);
     setSelectedPosition(place?.coordinates);
   };
+
 
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">

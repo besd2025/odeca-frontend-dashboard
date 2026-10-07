@@ -96,6 +96,7 @@ export default function Grades() {
             const res = await fetchData("get", `cafe/transfert_sdl_usine/${lotId}/get_transfert_detail/`, {
                 params: { offset: pointer, limit },
             });
+            console.log("res: ", res)
             const mapped = res?.results?.map((item) => ({
                 id: item?.id,
                 grade: item?.grade?.grade_name,
@@ -103,6 +104,7 @@ export default function Grades() {
                 dateReception: item?.date_reception,
                 status: item?.comfirmation_status,
             })) || [];
+
 
             setGradesList(mapped);
             console.log("mapped: ", mapped)
@@ -144,9 +146,10 @@ export default function Grades() {
         setGradedetail(grade)
         setIsFinalizing(true)
         // Fetch all grades
-        const res = await fetchData("get", `cafe/transfert_sdl_usine_detail/${id_grade}/`, {
+        const res = await fetchData("get", `cafe/transfert_sdl_usine/${id_grade}/get_transfert_detail/`, {
             params: { offset: pointer, limit },
         });
+        console.log("res ::::::::::::", res)
         const fetchedGrades = await fetchData("get", `cafe/grades/get_all_grades/`);
         setFormData((prev) => ({
             ...prev,

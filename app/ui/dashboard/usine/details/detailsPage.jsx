@@ -1,6 +1,5 @@
 "use client";
 import React, { useContext } from "react";
-import CardsSectionUsines from "@/app/ui/dashboard/usine/analytics/cards-section";
 import Edit from "../edit";
 import DetailsCard from "./detailsCard";
 import DetailsContent from "./details-content";
@@ -8,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { UserContext } from "@/app/ui/context/User_Context";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LayoutGrid, Server } from "lucide-react";
+import CardsSectionUsines from "./cards-section";
 
 function DetailsPage() {
   const searchParams = useSearchParams();

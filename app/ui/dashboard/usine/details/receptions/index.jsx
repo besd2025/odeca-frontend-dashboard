@@ -17,6 +17,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, } from "@/components/
 import { Label } from "@/components/ui/label";
 import EnAttenteReception from "./en-attente";
 import ConfirmedReception from "./confirme";
+import { fetchData } from "@/app/_utils/api";
+import { useSearchParams } from "next/navigation";
 
 export default function Receptions({ data = [] }) {
 
@@ -69,16 +71,40 @@ export default function Receptions({ data = [] }) {
   const TRIAGE_GRADES = [{ grade: "A1", poidsNet: 1000, status: "CONFIRMEE" }, { grade: "A2", poidsNet: 1000, status: "CONFIRMEE" }];
   const [gradesList, setGradesList] = React.useState(TRIAGE_GRADES);
 
-
-
-
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
   const [activeTab, setActiveTab] = useState("en attente");
 
   const [open, setOpen] = useState(false)
+
+  const [loading, setLoading] = useState(false)
+
+  const [totalConfirmCount, setTotalConfirmCount] = useState(0);
+  const [totalEnAttenteCount, setTotalEnAttenteCount] = useState(0);
   const handleTabChange = (val) => {
     setActiveTab(val);
   };
+
+  React?.useEffect(() => {
+    const loadDataForTab = async () => {
+      setLoading(true);
+      try {
+
+        const confirmedRes = await fetchData("get", `cafe/transfert_sdl_usine/?usine_deparchage=${id}`, { params: { est_confirme: true, limit: 1 } });
+        setTotalConfirmCount(confirmedRes?.count || 0);
+        const enAttenteRes = await fetchData("get", `cafe/transfert_sdl_usine/?usine_deparchage=${id}`, { params: { est_confirme: false, limit: 1 } });
+        setTotalEnAttenteCount(enAttenteRes?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+    loadDataForTab();
+  }, [id]);
 
   return (
     <div className="">
@@ -104,11 +130,11 @@ export default function Receptions({ data = [] }) {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
-              <span>En attente ({data?.length})</span>
+              <span>En attente ({totalEnAttenteCount})</span>
             </TabsTrigger>
             <TabsTrigger value="confirmé" className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer">
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-              <span>Confirmé ({data?.length})</span>
+              <span>Confirmé ({totalConfirmCount})</span>
             </TabsTrigger>
           </TabsList>
           <TabsContent value="en attente" className="">

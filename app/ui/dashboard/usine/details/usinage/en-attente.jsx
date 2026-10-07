@@ -26,11 +26,20 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
-
+import { useSearchParams } from "next/navigation";
+import { fetchData } from '@/app/_utils/api';
 export default function EnAttenteUsinage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [pointer, setPointer] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const currentPage = Math.floor(pointer / limit) + 1;
+  const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+  const [receptionsEnAttenteList, setReceptionsEnAttenteList] = React?.useState([])
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
   const DEFAULT_USINAGES = [
     {
@@ -100,6 +109,36 @@ export default function EnAttenteUsinage({ searchQuery = "" }) {
     setSelectedLot(lot);
     setOpen(true);
   };
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/?usine_deparchage_id=${id}`, { params: { etat_selection: "PRET_USINE", offset: pointer, limit: limit } });
+        console.log("response:::::::::>,,,", response)
+        const mappedData = response?.results?.map((item) => ({
+          id: item?.id,
+          societe: item?.nom_societe,
+          sdls: item?.sdl_cafes?.map((sdl) => sdl?.nom_sdl),
+          usine: item?.nom_usine,
+          dateTransfert: "2026-05-27",
+          dateUsinage: "2026-05-28",
+          poidsNet: 4800.0,
+          quantiteIntrants: 4800.0,
+          status: "en attente",
+          observation: "Lot réceptionné en usine, déparchage programmé.",
+          status: "en attente",
+        })) || [];
+        setReceptionsEnAttenteList(mappedData);
+        setTotalCount(response?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab ${tab}:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleFetchData();
+
+  }, [limit, pointer]);
 
   return (
     <div className="grid w-full [&>div]:border [&>div]:rounded-md">

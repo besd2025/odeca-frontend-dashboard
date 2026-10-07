@@ -7,14 +7,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PretATrier from "./pret-a-trier";
 import EnCoursTriage from "./en-cours";
 import TrieStocke from "./trie-stocke";
+import { fetchData } from "@/app/_utils/api";
 
 export default function Triage({ id, data = [] }) {
   const [activeTab, setActiveTab] = useState("pret");
   const [searchQuery, setSearchQuery] = useState("");
+  const [pretTrierList, setPreTrierList] = useState([]);
+  const [enAttenteTriageList, setEnAttenteTriageList] = useState([]);
+  const [trieStockeList, setTrieStockeList] = useState([]);
 
   const handleTabChange = (val) => {
     setActiveTab(val);
   };
+  React?.useEffect(() => {
+    const handleFetchData = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData("get", `cafe/usinages/get_pret_pour_triage/`, { params: { usine_deparchage_id: id, limit: 1 } });
+        setPreTrierList(response?.count || 0);
+        const response2 = await fetchData("get", `cafe/triage/get_en_cours_triage/`, { params: { usine_deparchage_id: id, limit: 1 } });
+        setEnAttenteTriageList(response2?.count || 0);
+        const response3 = await fetchData("get", `cafe/triage/get_termine_triage/`, { params: { usine_deparchage_id: id, limit: 1 } });
+        setTrieStockeList(response3?.count || 0);
+      } catch (error) {
+        console.error(`Error fetching data for tab pretes usinage:`, error);
+      }
+    };
+    handleFetchData();
+
+  }, [id]);
 
   return (
     <div className="">
@@ -39,7 +60,7 @@ export default function Triage({ id, data = [] }) {
               className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer"
             >
               <ClipboardList className="h-3.5 w-3.5 text-blue-500" />
-              <span>Prêt à trier (2)</span>
+              <span>Prêt à trier ({pretTrierList})</span>
             </TabsTrigger>
 
             <TabsTrigger
@@ -47,7 +68,7 @@ export default function Triage({ id, data = [] }) {
               className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer"
             >
               <Play className="h-3.5 w-3.5 text-amber-500" />
-              <span>En cours de triage (1)</span>
+              <span>En cours de triage ({enAttenteTriageList})</span>
             </TabsTrigger>
 
             <TabsTrigger
@@ -55,7 +76,7 @@ export default function Triage({ id, data = [] }) {
               className="flex items-center gap-1.5 px-3 py-1 text-xs md:text-sm cursor-pointer"
             >
               <CheckCircle2 className="h-3.5 w-3.5 text-indigo-500" />
-              <span>Trié (2)</span>
+              <span>Trié ({trieStockeList})</span>
             </TabsTrigger>
           </TabsList>
 
