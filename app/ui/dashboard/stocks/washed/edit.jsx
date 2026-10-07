@@ -16,15 +16,6 @@ import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchData } from "@/app/_utils/api";
-
-const MOCK_SOCIETES = [
-  { id: "SOC001", nom: "SODEICO SARL" },
-  { id: "SOC002", nom: "COPROTRAC" },
-  { id: "SOC003", nom: "SUCAFINA BURUNDI" },
-  { id: "SOC004", nom: "BUCAF COFFEE" },
-  { id: "SOC005", nom: "INTERCAFE" },
-];
-
 const MOCK_QUALITES = ["Qualité A", "Qualité B", "Fully Washed", "Washed", "Grade 1", "Grade 2"];
 
 export default function Edit({ id, item, onSave }) {
