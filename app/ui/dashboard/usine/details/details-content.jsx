@@ -94,9 +94,9 @@ function DetailsContent({ id }) {
           <TabsTrigger value="triage" className="shrink-0">
             <Search className="w-4 h-4 mr-2" /> Triage
           </TabsTrigger>
-          <TabsTrigger value="production" className="shrink-0">
+          {/* <TabsTrigger value="production" className="shrink-0">
             <Leaf className="w-4 h-4 mr-2" /> Production
-          </TabsTrigger>
+          </TabsTrigger> */}
 
           {/* <TabsTrigger value="sorties" className="shrink-0">
             <Truck className="w-4 h-4 mr-2" /> Sorties
@@ -147,9 +147,9 @@ function DetailsContent({ id }) {
           <Triage id={id} />
         </TabsContent>
 
-        <TabsContent value="production">
+        {/* <TabsContent value="production">
           <Production id={id} />
-        </TabsContent>
+        </TabsContent> */}
 
         {/* <TabsContent value="sorties">
           <Sorties id={id} />

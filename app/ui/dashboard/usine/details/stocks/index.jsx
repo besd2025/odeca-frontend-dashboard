@@ -47,7 +47,7 @@ export default function Stocks({ id, data = [] }) {
             <TabsTrigger value="password" className="text-xs md:text-sm">
               Stock non prélevés
             </TabsTrigger>
-            <TabsTrigger value="Taxation" className="text-xs md:text-sm">
+            {/* <TabsTrigger value="Taxation" className="text-xs md:text-sm">
               Rapport de taxation
             </TabsTrigger>
             <TabsTrigger value="stocked" className="text-xs md:text-sm">
@@ -55,7 +55,7 @@ export default function Stocks({ id, data = [] }) {
             </TabsTrigger>
             <TabsTrigger value="retours" className="text-xs md:text-sm">
               Retours
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="initials">
