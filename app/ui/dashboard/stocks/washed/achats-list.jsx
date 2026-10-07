@@ -81,6 +81,8 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
                 const newData = response?.results?.map((item) => {
                     return {
                         id: item?.id,
+                        code_achat: item?.code_achat,
+                        responsable_code: item?.responsable?.unique_code,
                         societe: item?.responsable?.sdl_ct?.sdl?.societe?.nom_societe,
                         hangar: item?.responsable?.sdl_ct?.sdl?.sdl_nom,
                         quantite_washed: item?.quantite,
@@ -88,7 +90,6 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
                         date: item?.date_achat
                     };
                 });
-                console.log(response);
 
                 setData(newData || []);
                 setTotalCount(response?.count || 0);
@@ -160,7 +161,6 @@ export default function AchatsWashedListTable({ isLoading: externalLoading }) {
             const response = await fetchData("get", `cafe/achat_cafe_parche/`, {
                 params: { limit: total },
             });
-            console.log("ffffffff:", response)
 
             const formattedData = response?.results?.map((item) => ({
                 id: item?.id,

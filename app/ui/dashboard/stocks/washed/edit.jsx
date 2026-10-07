@@ -35,7 +35,6 @@ export default function Edit({ id, item, onSave }) {
   const [qualite, setQualite] = React.useState(item?.qualite || "Qualité A");
   const [date, setDate] = React.useState(item?.date || "2026-07-28");
   const [loading, setLoading] = React.useState(false);
-
   React.useEffect(() => {
     if (item) {
       setSociete(item.societe || "SODEICO SARL");
@@ -50,16 +49,16 @@ export default function Edit({ id, item, onSave }) {
     setLoading(true);
 
     const updatedData = {
-      id: id || item?.id,
-      hangar: hangar,
+      code_achat: item?.code_achat,
+      responsable_code: item?.responsable_code,
       date_achat: date,
       qualite: qualite,
       quantite_washed: Number(quantiteWashed),
     };
 
-    const response = await fetchData("patch", `cafe/achat_cafe_parche/`, { body: updatedData })
+    const response = await fetchData("patch", `cafe/achat_cafe_parche/${item?.id}/`, { body: updatedData })
     try {
-      if (response.ok) {
+      if (response?.status == 200 || response?.status == 201) {
         toast.success(`L'achat #${id || updatedData.id} a été modifié avec succès`);
         setOpen(false);
         onSave(updatedData);
