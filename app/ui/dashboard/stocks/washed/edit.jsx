@@ -44,7 +44,7 @@ export default function Edit({ id, item, onSave }) {
       responsable_code: item?.responsable_code,
       date_achat: date,
       qualite: qualite,
-      quantite_washed: Number(quantiteWashed),
+      quantite: Number(quantiteWashed),
     };
 
     const response = await fetchData("patch", `cafe/achat_cafe_parche/${item?.id}/`, { body: updatedData })
