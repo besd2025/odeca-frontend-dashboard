@@ -207,7 +207,6 @@ export default function StockInitialList({ onStartStocking }) {
                             <TableHead className="">Quantites</TableHead>
                             <TableHead className="">Nombre de sacs</TableHead>
                             <TableHead className="">Campagne</TableHead>
-
                         </TableRow>
                     </TableHeader>
                     <TableBody>

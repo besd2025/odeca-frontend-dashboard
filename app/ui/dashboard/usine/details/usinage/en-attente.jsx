@@ -114,7 +114,6 @@ export default function EnAttenteUsinage({ searchQuery = "" }) {
       //setLoading(true);
       try {
         const response = await fetchData("get", `cafe/transfert_sdl_usine_detail_comfimation/get_transfert_comfirmed_par_societe/?usine_deparchage_id=${id}`, { params: { etat_selection: "PRET_USINE", offset: pointer, limit: limit } });
-        console.log("response:::::::::>,,,", response)
         const mappedData = response?.results?.map((item) => ({
           id: item?.id,
           societe: item?.nom_societe,

@@ -138,7 +138,7 @@ const menuItems = {
       // url: "/odeca-production/usine/reception",
       icon: <Coffee />,
       keyword: "production",
-      roles: ["Admin", "General"],
+      roles: ["Admin", "General","Superviseur", "Cafe_ODECA"],
     },
     {
       title: "Societes",
@@ -159,7 +159,7 @@ const menuItems = {
         </svg>
       ),
       keyword: "/odeca-dashboard/societies",
-      roles: ["Admin", "General", "Cafe_ODECA"],
+      roles: ["Admin", "General", "Cafe_ODECA", "Superviseur"],
     },
     {
       title: "Collecteurs",
