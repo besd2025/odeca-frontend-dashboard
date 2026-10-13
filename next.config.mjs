@@ -1,3 +1,5 @@
+import path from 'path';
+
 /** @type {import('next').NextConfig} */
 const imageDomain = process.env.NEXT_PUBLIC_IMAGE_DOMAIN;
 const nextConfig = {
@@ -5,7 +7,9 @@ const nextConfig = {
   images: {
     domains: imageDomain ? [imageDomain] : [],
   },
-  reactCompiler: true,
+  turbopack: {
+    root: path.resolve(process.cwd()),
+  },
 };
 
 export default nextConfig;

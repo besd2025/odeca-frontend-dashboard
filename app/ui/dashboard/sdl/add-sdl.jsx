@@ -205,7 +205,7 @@ export default function AddSdl() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="font-normal text-sm">
+        <Button className="font-normal text-sm w-full sm:w-max">
           <Plus className="mr-2 h-4 w-4" />
           Ajouter SDL
         </Button>

@@ -171,7 +171,6 @@ export default function AddLaboUsersDialog() {
             if (response.status === 201 || response.status === 200) {
                 setOpen(false);
                 toast.success("Utilisateur ajouté avec succès");
-                // Reset states
                 setFormData({
                     first_name: "",
                     last_name: "",
@@ -179,7 +178,8 @@ export default function AddLaboUsersDialog() {
                     cni: "",
                     telephone: "",
                     password: "",
-                    usine_code: ""
+                    labo_code: "",
+                    addresse: ""
                 });
                 setProvince("");
                 setCommune("");
@@ -222,7 +222,7 @@ export default function AddLaboUsersDialog() {
                                 <Input
                                     id="last_name"
                                     name="last_name"
-                                    value={formData.last_name}
+                                    value={formData.last_name || ""}
                                     onChange={handleChange}
                                     placeholder="Entrer le nom"
                                     required
@@ -233,7 +233,7 @@ export default function AddLaboUsersDialog() {
                                 <Input
                                     id="first_name"
                                     name="first_name"
-                                    value={formData.first_name}
+                                    value={formData.first_name || ""}
                                     onChange={handleChange}
                                     placeholder="Entrer le prénom"
                                     required
@@ -244,7 +244,7 @@ export default function AddLaboUsersDialog() {
                                 <Input
                                     id="identifiant"
                                     name="identifiant"
-                                    value={formData.identifiant}
+                                    value={formData.identifiant || ""}
                                     onChange={handleChange}
                                     placeholder="john.doe"
                                     required
@@ -256,7 +256,7 @@ export default function AddLaboUsersDialog() {
                                     id="password"
                                     name="password"
                                     type="password"
-                                    value={formData.password}
+                                    value={formData.password || ""}
                                     onChange={handleChange}
                                     placeholder="••••••••"
                                     required
@@ -267,7 +267,7 @@ export default function AddLaboUsersDialog() {
                                 <Input
                                     id="cni"
                                     name="cni"
-                                    value={formData.cni}
+                                    value={formData.cni || ""}
                                     onChange={handleChange}
                                     placeholder="Numéro de pièce d'identité"
                                 />
@@ -277,7 +277,7 @@ export default function AddLaboUsersDialog() {
                                 <Input
                                     id="telephone"
                                     name="telephone"
-                                    value={formData.telephone}
+                                    value={formData.telephone || ""}
                                     onChange={handleChange}
                                     placeholder="+257 ..."
                                 />
@@ -354,7 +354,7 @@ export default function AddLaboUsersDialog() {
                                     <Label>Laboratoire</Label>
                                     <select
                                         name="labo_code"
-                                        value={formData.labo_code}
+                                        value={formData.labo_code || ""}
                                         onChange={handleChange}
                                         required
                                         className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"

@@ -8,9 +8,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, MoreHorizontal, Phone, Search } from "lucide-react";
+import { ArrowUpDownIcon, FileChartPie, MoreHorizontal, Phone, Search } from "lucide-react";
 import * as React from "react";
-
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -67,7 +67,9 @@ export default function CtsListTable({ isLoading: externalLoading }) {
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
   const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
   const [exportBlob, setExportBlob] = useState(null);
-
+  const [LoadingSdlRendementBtn, setLoadingSdlRendementBtn] = useState(false);
+  const [sdlRendementReportId, setSdlRendementReportId] = useState("");
+  const [ActiveSdlRendementBtn, setActiveSdlRendementBtn] = useState(false);
   React.useEffect(() => {
     const getSdls = async () => {
       setLoading(true);
@@ -221,6 +223,92 @@ export default function CtsListTable({ isLoading: externalLoading }) {
     setActivedownloadBtn(false);
     setExportBlob(null);
   };
+
+  const exportctstotaleinventory = async () => {
+    setLoadingSdlRendementBtn(true);
+    try {
+      const initial_export = await fetchData(
+        "get",
+        "cafe/centres_transite/start_ct_inventory_report",
+        {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        },
+      );
+      if (initial_export?.message == "Export lancé") {
+        const task_id = initial_export?.task_id;
+        let isDone = false;
+        while (!isDone) {
+          const export_excel = await fetchData(
+            "get",
+            "cafe/centres_transite/check_ct_inventory_report_export/",
+            { params: { task_id: task_id } },
+          );
+          if (export_excel?.export_status === "SUCCESS") {
+            setActiveSdlRendementBtn(true);
+            setSdlRendementReportId(task_id);
+            isDone = true;
+          } else {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Erreur exportation Excel :", error);
+    } finally {
+      setLoadingSdlRendementBtn(false);
+    }
+  };
+
+  const DownloadTotalctstoinventory = async () => {
+    try {
+      const response = await fetchData("get", "cafe/centres_transite/download_ct_inventory_report_export/", {
+        params: { task_id: sdlRendementReportId },
+        isBlob: true,
+      });
+
+      const blob = new Blob([response.data], {
+        type:
+          response.headers["content-type"] ||
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+      const timestamp = `${day}_${month}_${year}_${hours}_${minutes}_${seconds}`;
+      let filename = `rapport_total_ct_${timestamp}.xlsx`;
+
+      const contentDisposition = response.headers["content-disposition"];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match && match[1]) filename = match[1];
+      }
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      //setActiveSdlRendementBtn(false);
+    } catch (error) {
+      console.error("Erreur lors de l'exportation Excel :", error);
+    } finally {
+      setLoadingSdlRendementBtn(false);
+    }
+  };
+
+
+
   const columns = [
     {
       id: "actions",
@@ -394,14 +482,6 @@ export default function CtsListTable({ isLoading: externalLoading }) {
         <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
           <div className="relative ">
             <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5 " />
-            {/* <input
-                placeholder="Rechercher..."
-                value={table.getColumn("ct")?.getFilterValue() ?? ""}
-                onChange={(event) =>
-                  table.getColumn("ct")?.setFilterValue(event.target.value)
-                }
-                className="pl-10 h-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
-              /> */}
             <input
               placeholder="Rechercher..."
               value={search}
@@ -415,7 +495,7 @@ export default function CtsListTable({ isLoading: externalLoading }) {
               <Filter handleFilter={handleFilter} />
             </div>
             <div className="flex items-center gap-3 text-gray-700">
-              {user?.session?.category === "Admin" && <AddCt />}
+
               <ExportButton
                 exportType="ct_data"
                 handleExportCTs={handleExportCTs}
@@ -423,6 +503,114 @@ export default function CtsListTable({ isLoading: externalLoading }) {
                 activedownloadBtn={ActivedownloadBtn}
                 onClickDownloadButton={DownloadCTsToExcel}
               />
+            </div>
+            <div className="hidden lg:flex items-center gap-3">
+              {user?.session?.category === "Admin" && <AddCt />}
+              {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") ? (
+                (!ActiveSdlRendementBtn ? (
+                  <Button
+                    className="text-sm"
+                    variant="outline"
+                    onClick={exportctstotaleinventory}
+                    disabled={LoadingSdlRendementBtn}
+                  >
+                    {LoadingSdlRendementBtn ? (
+                      <>
+                        <Spinner className="size-4" />
+                        Préparation...
+                      </>
+                    ) : (
+                      <>
+                        <FileChartPie className=" h-4 w-4" />
+                        Rapport CT
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    className="text-green-600 hover:text-green-700"
+                    onClick={DownloadTotalctstoinventory}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
+                      />
+                    </svg>
+                    Télécharger
+                  </Button>
+                ))
+              ) : (null)}
+            </div>
+            <div className="block lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost"><MoreHorizontal size={16} /></Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {user?.session?.category === "Admin" &&
+                    <DropdownMenuItem>
+                      <AddCt />
+                    </DropdownMenuItem>
+                  }
+
+                  {user?.session?.category === "Admin" &&
+                    <DropdownMenuItem>
+                      {!ActiveSdlRendementBtn ? (
+                        <Button
+                          className="font-normal text-sm w-full"
+                          variant="outline"
+                          onClick={exportctstotaleinventory}
+                          disabled={LoadingSdlRendementBtn}
+                        >
+                          {LoadingSdlRendementBtn ? (
+                            <>
+                              <Spinner className="size-4" />
+                              Préparation...
+                            </>
+                          ) : (
+                            <>
+                              <FileChartPie className=" h-4 w-4" />
+                              Rapport CT
+                            </>
+                          )}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          className="text-green-600 hover:text-green-700 w-full"
+                          onClick={DownloadTotalctstoinventory}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
+                            />
+                          </svg>
+                          Télécharger
+                        </Button>
+                      )}
+                    </DropdownMenuItem>
+                  }
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

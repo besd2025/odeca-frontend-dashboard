@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "header": "LOT-2026-001",
+    "type": "COPROCA",
+    "status": "Finalisé",
+    "target": "25400",
+    "limit": "20574",
+    "reviewer": "SOGESTAL Ngozi"
+  },
+  {
+    "id": 2,
+    "header": "LOT-2026-002",
+    "type": "KIBIRA COFFEE",
+    "status": "Finalisé",
+    "target": "18900",
+    "limit": "15498",
+    "reviewer": "SOGESTAL Kayanza"
+  },
+  {
+    "id": 3,
+    "header": "LOT-2026-003",
+    "type": "KAWASE COFFEE",
+    "status": "Finalisé",
+    "target": "12200",
+    "limit": "9930",
+    "reviewer": "SOGESTAL Gitega"
+  },
+  {
+    "id": 6,
+    "header": "LOT-2026-006",
+    "type": "BUBANZA COFFEE",
+    "status": "Réceptionné",
+    "target": "8500",
+    "limit": "0",
+    "reviewer": "SOGESTAL Ngozi"
+  }
+]

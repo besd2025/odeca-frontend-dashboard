@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "../toggle-theme-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircleIcon, Loader2 } from "lucide-react";
+import { AlertCircleIcon, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchData } from "@/app/_utils/api";
 import { useRouter } from "next/navigation";
@@ -30,7 +30,15 @@ export function LoginForm({ className, ...props }) {
       const user = DecodeToJwt(accessToken);
       const now = new Date();
       if (now < new Date(user?.exp * 1000)) {
-        router.push("/odeca-dashboard/home");
+        if (user?.category === "Respo_usine_deparchage" || user?.category === "Superviseur_usine") {
+          router.push("odeca-production/usine/reception");
+        }
+        else if (user?.category === "Respo_labo") {
+          router.push("odeca-production/laboratoire/reception");
+        }
+        else if (user?.category === "Admin" || user?.category === "General" || user?.category === "Cafe_ODECA" || user?.category === "Cafe_Chef_societe" || user?.category === "Superviseur_Regional" || user?.category === "Superviseur") {
+          router.push("/odeca-dashboard/home");
+        }
       } else {
         localStorage.removeItem("Access_Token");
         router.push("/");
@@ -99,14 +107,16 @@ export function LoginForm({ className, ...props }) {
         router.push("/odeca-dashboard/home");
       }
       else if (
-        user?.category === "Respo_usine_deparchage"
+        user?.category === "Respo_usine_deparchage" ||
+        user?.category === "Superviseur_usine"
       ) {
         document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
         localStorage.setItem("Access_Token", data.access);
         router.push("odeca-production/usine/reception");
       }
       else if (
-        user?.category === "Respo_labo"
+        user?.category === "Respo_labo" ||
+        user?.category === "Superviseur_labo"
       ) {
         document.cookie = `Access_Token=${data.access}; path=/; max-age=3600; secure`;
         localStorage.setItem("Access_Token", data.access);
@@ -165,11 +175,24 @@ export function LoginForm({ className, ...props }) {
                     Mot de passe oublié ?
                   </a>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <span
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </span>
+                </div>
+
               </Field>
               {error && (
                 <Alert variant="destructive">

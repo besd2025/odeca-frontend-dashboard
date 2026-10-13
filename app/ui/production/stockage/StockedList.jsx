@@ -21,6 +21,7 @@ import TabLotsTaxes from "./tabs/TabLotsTaxes";
 import TabLotsNonTaxes from "./tabs/TabLotsNonTaxes";
 import TabLotsStockesTaxes from "./tabs/TabLotsStockesTaxes";
 import RetourList from "./tabs/retours";
+import StockInitialList from "./stockInitialList";
 
 // Mock data to replace the statics
 const MOCK_GRADES = [
@@ -35,7 +36,6 @@ const MOCK_LOTS = [
   { id: "LOT-004", name: "LOT-004", },
 ]
 export default function StockedList({ lots: initialLots = [], onViewDetails, onStockGrade }) {
-  console.log("initialLots", initialLots)
   const [lots, setLots] = React.useState(initialLots);
   const [activeTab, setActiveTab] = React.useState("account");
   const [lotsExistants, setLotsExistants] = React.useState("");
@@ -46,7 +46,6 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
   const [checkedNonRequis, setCheckedNonRequis] = React.useState({});
   const [isViewingDetailsStock, setIsViewingDetailsStock] = React.useState(false);
   const [formData, setFormData] = React.useState([]);
-  const [nombreSacs, setNombreSacs] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [codeSociete, setCodeSociete] = React.useState("")
   const [open, setOpen] = React.useState(false);
@@ -140,6 +139,19 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
       [productionId]: Number(value), // Convertit la saisie en nombre
     }));
   };
+
+  const totalSacsSelectionnes = React.useMemo(() => {
+    const totalTries = Object.entries(quantitiesSelected || {}).reduce((sum, [id, qty]) => {
+      return checkedTries[id] ? sum + Number(qty || 0) : sum;
+    }, 0);
+
+    const totalNonRequis = Object.entries(nonRequisQuantity || {}).reduce((sum, [id, qty]) => {
+      return checkedNonRequisTries[id] ? sum + Number(qty || 0) : sum;
+    }, 0);
+
+    return totalTries + totalNonRequis;
+  }, [quantitiesSelected, nonRequisQuantity, checkedTries, checkedNonRequisTries]);
+
   const handleConfirmStocking = async (e) => {
     e.preventDefault();
 
@@ -185,8 +197,7 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
     const totalNonRequisAvailable = Object.values(selectedNonRequisItems).reduce((sum, n) => sum + n, 0);
 
     // Total des volumes saisis par l'utilisateur
-    const totalSacsDemandes = Object.values(quantitiesSelected || {}).reduce((sum, n) => sum + Number(n), 0) +
-      Object.values(nonRequisQuantity || {}).reduce((sum, n) => sum + Number(n), 0);
+    const totalSacsDemandes = totalSacsSelectionnes;
 
     if ((totalSacsAvailable + totalNonRequisAvailable) < totalSacsDemandes) {
       toast.error("La quantité à stocker est supérieure au nombre de sacs disponibles.");
@@ -200,7 +211,7 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
     if (hasTriesChecked) {
       Object.keys(quantitiesSelected || {}).forEach((id) => {
         const nombreSacs = Number(quantitiesSelected[id]);
-        if (nombreSacs > 0) {
+        if (nombreSacs > 0 && checkedTries[id] === true) {
           apiPayloads.push({
             idProduction: Number(id),
             nombreSacs: nombreSacs,
@@ -215,7 +226,7 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
     if (hasNonRequisChecked) {
       Object.keys(nonRequisQuantity || {}).forEach((id) => {
         const nombreSacs = Number(nonRequisQuantity[id]);
-        if (nombreSacs > 0) {
+        if (nombreSacs > 0 && checkedNonRequisTries[id] === true) {
           apiPayloads.push({
             idProduction: Number(id),
             nombreSacs: nombreSacs,
@@ -330,12 +341,16 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
     <div>
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="w-full md:w-max">
+          <TabsTrigger value="initials">Stocks initiaux</TabsTrigger>
           <TabsTrigger value="account">Nouveau lot</TabsTrigger>
           <TabsTrigger value="password">Stock non prélevés</TabsTrigger>
           <TabsTrigger value="Taxation">Rapport de taxation</TabsTrigger>
           <TabsTrigger value="stocked">Lots Stockes & taxes</TabsTrigger>
           <TabsTrigger value="retours">Retours</TabsTrigger>
         </TabsList>
+        <TabsContent value="initials">
+          <StockInitialList handleViewDetailsStock={handleViewDetailsStock} />
+        </TabsContent>
         <TabsContent value="account">
           <TabNouveauLot onViewDetails={handleViewDetailsStock} handleOpenStocking={handleOpenStocking} />
         </TabsContent>
@@ -401,7 +416,7 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                     />
                   </div>
                   <div className="space-y-2 mt-2">
-                    <Label htmlFor="qualitySelect">Qualité</Label>
+                    <Label htmlFor="qualitySelect">Qualité en Kg</Label>
                     <Select
                       value={selectedQuality}
                       onValueChange={setSelectedQuality}
@@ -525,10 +540,10 @@ export default function StockedList({ lots: initialLots = [], onViewDetails, onS
                 <Label className="text-sm font-semibold">Nombre de sacs à stocker</Label>
                 <Input
                   type="number"
-                  min="1"
-                  value={nombreSacs}
-                  onChange={(e) => setNombreSacs(e.target.value)}
-                  required
+                  value={totalSacsSelectionnes}
+                  readOnly
+                  disabled
+                  className="bg-slate-100 dark:bg-slate-800 cursor-not-allowed"
                 />
               </div>
 

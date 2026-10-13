@@ -24,6 +24,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { fetchData } from "@/app/_utils/api";
+import PaginationControls from "@/components/ui/pagination-controls";
+
 export default function Grades() {
     const [isFinalizing, setIsFinalizing] = useState(false);
     const [activeTab, setActiveTab] = useState("all");
@@ -94,6 +96,7 @@ export default function Grades() {
             const res = await fetchData("get", `cafe/transfert_sdl_usine/${lotId}/get_transfert_detail/`, {
                 params: { offset: pointer, limit },
             });
+            console.log("res: ", res)
             const mapped = res?.results?.map((item) => ({
                 id: item?.id,
                 grade: item?.grade?.grade_name,
@@ -101,6 +104,7 @@ export default function Grades() {
                 dateReception: item?.date_reception,
                 status: item?.comfirmation_status,
             })) || [];
+
 
             setGradesList(mapped);
             console.log("mapped: ", mapped)
@@ -141,14 +145,13 @@ export default function Grades() {
     const activegradedetails = async (id_grade, grade) => {
         setGradedetail(grade)
         setIsFinalizing(true)
+        console.log("id_grade ::::::::::::", grade)
         // Fetch all grades
-        const res = await fetchData("get", `cafe/transfert_sdl_usine_detail/${id_grade}/`, {
-            params: { offset: pointer, limit },
-        });
+
         const fetchedGrades = await fetchData("get", `cafe/grades/get_all_grades/`);
         setFormData((prev) => ({
             ...prev,
-            societe: res.transfer?.sdl?.societe?.nom_societe,
+            societe: "",
             selectedSDLs: [],
             humidite: "",
             rendement: "",
@@ -291,7 +294,7 @@ export default function Grades() {
                                     </TableCell>
                                     <TableCell className="pl-4 font-medium">
                                         <div className="flex items-center gap-2">
-                                            {grade.status === "EN_ATTENTE" && (
+                                            {grade.status === "PENDING" && (
 
                                                 <Button variant={"secondary"} className="cursor-pointer" onClick={() => activegradedetails(grade.id, grade.grade)}><Check size={24} /> Confirmer</Button>
 
@@ -304,6 +307,17 @@ export default function Grades() {
                     </TableBody>
                 </Table>
             </div>
+            <PaginationControls
+                className="mt-4"
+                page={currentPage}
+                pageSize={limit}
+                totalItems={totalCount}
+                totalPages={Math.ceil(totalCount / limit)}
+                onPageChange={onPageChange}
+                onPageSizeChange={onLimitChange}
+                hasNextPage={currentPage < Math.ceil(totalCount / limit)}
+                hasPreviousPage={currentPage > 1}
+            />
             <Dialog open={isFinalizing} onOpenChange={setIsFinalizing}>
                 <DialogContent className="border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
                     <DialogHeader>

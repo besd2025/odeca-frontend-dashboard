@@ -26,6 +26,7 @@ function ExportButton({
   exportType,
   handleExportSocieties,
   handlerExportAchat,
+  handleExportStockInitial,
 }) {
   const value = typeExport || "individuel";
   const [exportTypeState, setExportTypeState] = React.useState("");
@@ -87,6 +88,8 @@ function ExportButton({
                   handleExportCTs();
                 } else if (exportTypeState === "society_data") {
                   handleExportSocieties();
+                } else if (exportTypeState === "stock_initial_data") {
+                  handleExportStockInitial();
                 }
               }
             }}

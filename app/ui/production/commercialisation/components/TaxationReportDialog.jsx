@@ -23,7 +23,7 @@ export default function TaxationReportDialog({
         </DialogHeader>
 
         {selectedReport && (
-          <div className="py-6 space-y-6 text-sm text-slate-800 leading-relaxed font-sans">
+          <div id="print-area" className="py-6 space-y-6 text-sm text-slate-800 leading-relaxed font-sans">
             {/* Header Title */}
             <div className="text-center border-b-2 border-slate-900 pb-4">
               <h1 className="text-2xl font-black tracking-wider uppercase text-slate-900">CERTIFICAT DE QUALITÉ ET DE TAXATION</h1>

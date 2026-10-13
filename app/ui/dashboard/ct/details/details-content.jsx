@@ -252,8 +252,10 @@ function DetailsContent({ id }) {
           commune:
             transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
         },
+        date: transfer?.transfer_date,
       }));
       setDataTransfert(transfersData);
+      //console.log("transfer data ", response);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     }

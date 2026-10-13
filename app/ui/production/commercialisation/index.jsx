@@ -156,8 +156,9 @@ const initialExports = [
     createdAt: "2026-06-05"
   }
 ];
-
+import { fetchData } from "@/app/_utils/api";
 export default function CommercialisationComponent() {
+
   // UI States Only
   const [activeMainTab, setActiveMainTab] = useState("taxation");
 
@@ -171,6 +172,15 @@ export default function CommercialisationComponent() {
   const [isSynthModalOpen, setIsSynthModalOpen] = useState(false);
   const [isContractFormOpen, setIsContractFormOpen] = useState(false);
   const [isExportFormOpen, setIsExportFormOpen] = useState(false);
+  const [data, setData] = React.useState([])
+  const [contractList, setContractList] = React.useState([])
+  const [exportList, setExportList] = React.useState([])
+  const [qteList, setQteList] = React.useState([])
+
+  // pagination state 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   // Handlers for child components
   const handleViewReportDetails = (report) => {
@@ -192,6 +202,39 @@ export default function CommercialisationComponent() {
     toast.success(`La confirmation d'exportation a été soumise avec succès (Illustration locale).`);
     setIsExportFormOpen(false);
   };
+
+  React.useEffect(() => {
+    const fetch = async () => {
+      if (activeMainTab === "taxation") {
+        try {
+          const response = await fetchData('get', 'cafe/stock_cafe/stock-detail/')
+          console.log("rapport taxation :", response)
+          const newData = response?.results?.map((item) => {
+            return {
+              id: item?.id,
+              codeEtiquette: item?.code_etiquette,
+              lotNumber: item?.numero_lot,
+              societe: item?.proprietaire,
+              deparcheur: item?.deparcheur,
+              sacsCount: item?.total_sacs,
+              qteEchantillon: item?.poids_kg,
+              qualite: item?.qualite,
+              status: item?.status,
+              dateReception: item?.date_reception,
+              noteCupping: item?.note_degustation || 0,
+              granulometrie: item?.granulometrie,
+              triage: item?.triage,
+              degustation: item?.degustation
+            }
+          })
+          setData(newData)
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    }
+    fetch()
+  }, [])
 
   return (
     <div className="space-y-6 mx-4">
@@ -225,7 +268,7 @@ export default function CommercialisationComponent() {
         {/* TAB 1: RECEPTION & TAXATION */}
         <TabsContent value="taxation" className="space-y-4 mt-4">
           <TaxationTab
-            taxationReports={initialTaxationReports}
+            taxationReports={data}
             searchTaxation={searchTaxation}
             setSearchTaxation={setSearchTaxation}
             onViewDetails={handleViewReportDetails}

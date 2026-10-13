@@ -58,7 +58,7 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails, onIdCh
           usinageQuantitiesTotal: item?.total_quantite_confirme || 0,
           status: item?.pret_usine || "",
         })) || [];
-
+        console.log(pendingRes)
 
         setReceptionsAllList(pendingMapped);
 
@@ -194,7 +194,7 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails, onIdCh
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
+                <TableHead>#</TableHead>
                 <TableHead>Société & SDLs</TableHead>
                 {activeTab === "Finalisé" && (
                   <TableHead>Date d'Usinage</TableHead>
@@ -208,14 +208,14 @@ export default function ProcessingList({ lots, onFinalize, onViewDetails, onIdCh
               </TableRow>
             </TableHeader>
             <TableBody>
-              {receptionsAllList.map((lot) => {
+              {receptionsAllList.map((lot, index) => {
                 const isFinished = lot.status === "TERMINE";
                 const isReadyForUsinage = lot.status === "PRET_USINE";
                 const isInProcess = lot.status === "EN_COURS";
                 return (
                   <TableRow key={lot.id}>
                     <TableCell className="font-bold text-slate-900 dark:text-white">
-                      {lot.code_societe}
+                      {index + 1}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">

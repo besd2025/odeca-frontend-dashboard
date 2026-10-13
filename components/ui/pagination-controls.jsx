@@ -103,10 +103,14 @@ export default function PaginationControls({
   };
   const [currentPageSize, setCurrentPageSize] = React.useState(pageSize);
   const handlePageSizeChange = (newPageSize) => {
-    PaginatedDateFunction({
-      ...PaginatedData,
-      pageSize: newPageSize,
-    });
+    if (typeof onPageSizeChange === "function") {
+      onPageSizeChange(newPageSize);
+    } else if (typeof PaginatedDateFunction === "function") {
+      PaginatedDateFunction({
+        ...PaginatedData,
+        pageSize: newPageSize,
+      });
+    }
     setCurrentPageSize(newPageSize);
   };
   // React.useEffect(() => {

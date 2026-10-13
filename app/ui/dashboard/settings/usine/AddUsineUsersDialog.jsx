@@ -222,7 +222,7 @@ export default function AddUsersUsineDialog() {
                                 <Input
                                     id="last_name"
                                     name="last_name"
-                                    value={formData.last_name}
+                                    value={formData.last_name || ""}
                                     onChange={handleChange}
                                     placeholder="Entrer le nom"
                                     required
@@ -233,7 +233,7 @@ export default function AddUsersUsineDialog() {
                                 <Input
                                     id="first_name"
                                     name="first_name"
-                                    value={formData.first_name}
+                                    value={formData.first_name || ""}
                                     onChange={handleChange}
                                     placeholder="Entrer le prénom"
                                     required
@@ -244,7 +244,7 @@ export default function AddUsersUsineDialog() {
                                 <Input
                                     id="identifiant"
                                     name="identifiant"
-                                    value={formData.identifiant}
+                                    value={formData.identifiant || ""}
                                     onChange={handleChange}
                                     placeholder="john.doe"
                                     required
@@ -256,7 +256,7 @@ export default function AddUsersUsineDialog() {
                                     id="password"
                                     name="password"
                                     type="password"
-                                    value={formData.password}
+                                    value={formData.password || ""}
                                     onChange={handleChange}
                                     placeholder="••••••••"
                                     required
@@ -267,7 +267,7 @@ export default function AddUsersUsineDialog() {
                                 <Input
                                     id="cni"
                                     name="cni"
-                                    value={formData.cni}
+                                    value={formData.cni || ""}
                                     onChange={handleChange}
                                     placeholder="Numéro de pièce d'identité"
                                 />
@@ -277,7 +277,7 @@ export default function AddUsersUsineDialog() {
                                 <Input
                                     id="telephone"
                                     name="telephone"
-                                    value={formData.telephone}
+                                    value={formData.telephone || ""}
                                     onChange={handleChange}
                                     placeholder="+257 ..."
                                 />
@@ -354,7 +354,7 @@ export default function AddUsersUsineDialog() {
                                     <Label>Usine</Label>
                                     <select
                                         name="usine_code"
-                                        value={formData.usine_code}
+                                        value={formData.usine_code || ""}
                                         onChange={handleChange}
                                         required
                                         className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"

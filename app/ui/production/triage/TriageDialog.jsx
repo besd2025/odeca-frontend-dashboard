@@ -39,7 +39,7 @@ export default function TriageDialog({ lot, onSave, onCancel, readOnly = false }
         const gradesData = data.results || data || [];
         setFullApiGrades(gradesData);
         const newGrades = Array.isArray(gradesData)
-          ? gradesData.map(item => typeof item === 'object' ? (item.nom || item.designation || item.name || item.code) : item).filter(Boolean)
+          ? [...new Set(gradesData.map(item => typeof item === 'object' ? (item.nom || item.designation || item.name || item.code) : item).filter(Boolean))]
           : [];
         if (newGrades.length > 0) {
           setApiGrades(newGrades);

@@ -85,7 +85,7 @@ export default function ConfirmationPage() {
     // Summing grade quantities
     const totalGradesQty = Object.values(formData.grades).reduce((acc, qty) => acc + (parseFloat(qty) || 0), 0);
 
-    console.log("Submit Reception Lots Data:", { ...formData, poidsNet, totalGradesQty });
+    //console.log("Submit Reception Lots Data:", { ...formData, poidsNet, totalGradesQty });
   };
 
   return (

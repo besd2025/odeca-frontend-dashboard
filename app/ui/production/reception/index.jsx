@@ -36,7 +36,7 @@ import {
 import { Button } from '@/components/ui/button';
 import PaginationContent from '@/components/ui/pagination-content';
 import Link from 'next/link';
-
+import ModificationForm from './modification_form';
 const DEFAULT_RECEPTIONS = [
     {
         id: "LOT-2026-001",
@@ -73,7 +73,7 @@ export default function ReceptionPage() {
     const [receptionsConfirmeList, setReceptionsConfirmeList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showDateReception, setShowDateReception] = useState("");
-
+    const [search, setSearch] = useState("");
     // Pagination state
     const [totalCount, setTotalCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -91,10 +91,9 @@ export default function ReceptionPage() {
         try {
             if (tab === "all") {
                 const [pendingRes, confirmedRes] = await Promise.all([
-                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit } }),
-                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit } })
+                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit, search: search } }),
+                    fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit, search: search } })
                 ]);
-                console.log(pendingRes)
                 const pendingMapped = pendingRes?.results?.map((item) => ({
                     id: item?.id,
                     societe: item?.sdl?.societe?.nom_societe || "Inconnu",
@@ -102,6 +101,7 @@ export default function ReceptionPage() {
                     dateTransfert: item?.transfer_date || "-",
                     dateReception: "-",
                     poidsNet: item?.total_parche || 0,
+                    usine: item?.usine_deparchage?.usine_name || "-",
                     status: "en attente",
                 })) || [];
 
@@ -112,15 +112,15 @@ export default function ReceptionPage() {
                     dateTransfert: item?.transfer_date || "-",
                     dateReception: item?.date_reception ? new Date(item.date_reception).toISOString().split('T')[0] : "-",
                     poidsNet: item?.total_parche || 0,
+                    usine: item?.usine_deparchage?.usine_name || "-",
                     status: "confirmé",
                 })) || [];
 
                 setReceptionsEnAttenteList(pendingMapped);
                 setReceptionsConfirmeList(confirmedMapped);
-                console.log(confirmedRes)
                 setTotalCount((pendingRes?.count || 0) + (confirmedRes?.count || 0));
             } else if (tab === "en attente") {
-                const pendingRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit } });
+                const pendingRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: false, offset: pointer, limit: limit, search: search } });
                 const pendingMapped = pendingRes?.results?.map((item) => ({
                     id: item?.id,
                     societe: item?.sdl?.societe?.nom_societe || "Inconnu",
@@ -128,12 +128,13 @@ export default function ReceptionPage() {
                     dateTransfert: item?.transfer_date || "-",
                     dateReception: "-",
                     poidsNet: item?.total_parche || 0,
+                    usine: item?.usine_deparchage?.usine_name || "-",
                     status: "en attente",
                 })) || [];
                 setReceptionsEnAttenteList(pendingMapped);
                 setTotalCount(pendingRes?.count || 0);
             } else if (tab === "confirmé") {
-                const confirmedRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit } });
+                const confirmedRes = await fetchData("get", `cafe/transfert_sdl_usine/`, { params: { est_confirme: true, offset: pointer, limit: limit, search: search } });
                 const confirmedMapped = confirmedRes?.results?.map((item) => ({
                     id: item?.id,
                     societe: item?.sdl?.societe?.nom_societe || "Inconnu",
@@ -141,6 +142,7 @@ export default function ReceptionPage() {
                     dateTransfert: item?.transfer_date || "-",
                     dateReception: item?.date_reception ? new Date(item.date_reception).toISOString().split('T')[0] : "-",
                     poidsNet: item?.total_parche || 0,
+                    usine: item?.usine_deparchage?.usine_name || "-",
                     status: "confirmé",
                 })) || [];
                 setReceptionsConfirmeList(confirmedMapped);
@@ -155,7 +157,7 @@ export default function ReceptionPage() {
 
     useEffect(() => {
         loadDataForTab(activeTab);
-    }, [activeTab, pointer, limit]);
+    }, [activeTab, pointer, limit, search]);
 
     const onPageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -166,6 +168,16 @@ export default function ReceptionPage() {
         setLimit(newLimit);
         setPointer(0);
         setCurrentPage(1);
+    };
+    const handleRejeter = (lot) => {
+        console.log(lot);
+    };
+    const [detailData, setDetailData] = useState([]);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const handleModifier = (lot) => {
+        setDetailData(lot);
+        setShowDetailModal(true);
+        console.log(lot);
     };
 
     const filteredReceptions = activeTab === "all"
@@ -215,8 +227,8 @@ export default function ReceptionPage() {
                         <Search className="h-4 w-4 absolute inset-y-0 my-auto left-2.5 " />
                         <input
                             placeholder="Rechercher..."
-                            // value={search}
-                            // onChange={handleSearch}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                             className="pl-9 h-9 text-sm flex-1 shadow-none w-[300px] lg:w-[350px] rounded-lg bg-background max-w-sm border-none focus-visible:ring-0"
                         />
                     </div>
@@ -225,6 +237,7 @@ export default function ReceptionPage() {
                             <TableRow>
                                 <TableHead className="pl-4">Actions</TableHead>
                                 <TableHead>Société</TableHead>
+                                <TableHead>Usine</TableHead>
                                 <TableHead>Date Transfert</TableHead>
                                 <TableHead>Date Réception</TableHead>
                                 <TableHead className="text-right">Poids Net (kg)</TableHead>
@@ -263,8 +276,13 @@ export default function ReceptionPage() {
                                                                     <Settings className="h-3 w-3" /> Usiner
                                                                 </Button>
                                                             </Link>
+
                                                         )}
-                                                        {/* <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">Rejeter</DropdownMenuItem> */}
+                                                        {lot.status === "en attente" ? (
+                                                            <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => handleRejeter(lot)}>Rejeter</DropdownMenuItem>
+                                                        ) : (
+                                                            <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400" onClick={() => handleModifier(lot)}>Modifier</DropdownMenuItem>
+                                                        )}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
@@ -284,6 +302,13 @@ export default function ReceptionPage() {
 
                                             </div>
                                         </div></TableCell>
+                                        <TableCell className="font-semibold">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="font-medium text-slate-800 dark:text-slate-200">
+                                                    {lot.usine || "-"}
+                                                </span>
+                                            </div>
+                                        </TableCell>
                                         <TableCell>{lot.dateTransfert}</TableCell>
                                         <TableCell>{lot.dateReception}</TableCell>
                                         <TableCell className="text-right font-semibold">{lot.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</TableCell>
@@ -347,6 +372,7 @@ export default function ReceptionPage() {
                     limit={limit}
                 />
             </div>
+            <ModificationForm show={showDetailModal} onShowChange={setShowDetailModal} detailData={detailData} />
         </div>
 
     );

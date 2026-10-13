@@ -38,17 +38,27 @@ function StatsCard({ id }) {
         // Placeholder for API calls
         const response = await fetchData(
           "get",
-          `cafe/usine_deparchage/${id}/get_quantite_receptionne_par_hangar/`,
+          `cafe/transfert_sdl_usine_detail_comfimation/get_total_receptionne/?usine_deparchage_id=${id}`,
           {}
         );
         const usinee = await fetchData(
           "get",
-          `cafe/usine_deparchage/${id}/get_quantite_usinee_par_hangar/`,
+          `cafe/usinages/get_total_quantite_usine_et_encours_usinage/?usine_deparchage_id=${id}`,
           {}
         );
-        const produit = await fetchData(
+        const qteTrie = await fetchData(
           "get",
-          `cafe/usine_deparchage/${id}/get_quanitite_vert_produit_par_usine/`,
+          `cafe/stock_cafe/cafe-taxation-stats-detail/?usine_id=${id}`,
+          {}
+        );
+        const qteTaxe = await fetchData(
+          "get",
+          `cafe/stock_cafe/cafe-taxation-stats-detail/?usine_id=${id}`,
+          {}
+        );
+        const StockInitial = await fetchData(
+          "get",
+          `cafe/prestockage_apres_usinage/get_total_quantite_and_sacs_initial/?usine_deparchage=${id}`,
           {}
         );
         const qteVendu = await fetchData(
@@ -56,13 +66,15 @@ function StatsCard({ id }) {
           `cafe/usine_deparchage/${id}/get_quanitite_vert_vendu_par_usine/`,
           {}
         );
+
         setData({
           total_recu: response?.quantite_receptionne || 0,
           total_usine: usinee?.quantite_usinee || 0,
-          total_vert_produit: produit?.quantite_vert_produit || 0,
+          total_vert_produit: qteTrie?.quantite_vert_produit || 0,
+          total_stock_initial: StockInitial?.total_poids || 0,
           total_vert_sorti: qteVendu?.quantite_vert_vendu || 0,
           stock_actuel:
-            produit?.quantite_vert_produit - qteVendu?.quantite_vert_vendu || 0,
+            StockInitial?.total_poids + qteTrie?.quantite_vert_produit - qteVendu?.quantite_vert_vendu || 0,
           rendement_moyen: 80,
           lots_actifs: 5,
         });
@@ -146,7 +158,7 @@ function StatsCard({ id }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {cards.map((card, index) => (
         <Card key={index} className="@container/card">
           <CardHeader>

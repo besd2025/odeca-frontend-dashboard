@@ -2,13 +2,6 @@
 
 import * as React from "react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Table,
   TableBody,
   TableCell,
@@ -16,24 +9,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import ViewImageDialog from "@/components/ui/view-image-dialog";
 import PaginationControls from "@/components/ui/pagination-controls";
-import DetailsReceipt from "../receipt/details-receipt";
-import { MoreHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import DetailsRendement from "./details-redement";
 
 const products = [
   {
     id: 101,
     date: "12/8/2025",
-    lot_num: 40,
+    sdl_ct_type: "SDL",
+    sdl_ct_name: "Ngome",
+    No_fiche: 59.99,
+    No_recus: 4.5,
     ca: 452,
     cb: 52,
-    qte_total: 4455.5,
+    fiche_photo: "/images/logo_1.jpg",
+    montant: 5555555,
+  },
+  {
+    id: 102,
+    date: "12/8/2025",
+    sdl_ct_type: "SDL",
+    sdl_ct_name: "Ngome",
+    No_fiche: 59.99,
+    No_recus: 4.5,
+    ca: 452,
+    cb: 52,
+    fiche_photo: "/images/logo_1.jpg",
+    montant: 5555555,
   },
 ];
 
-export default function RedementC() {
+export default function Ventes() {
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
 
@@ -52,49 +58,41 @@ export default function RedementC() {
   }, [page, pageSize]);
 
   return (
-    <div className="w-full mt-4">
+    <div className="w-full">
       <div className="w-full border rounded-md overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="pl-4">Actions</TableHead>
-              <TableHead>ID</TableHead>
+              <TableHead className="pl-4">ID</TableHead>
               <TableHead>Date d'achat</TableHead>
-              <TableHead>No Lot</TableHead>
+              <TableHead>SDL/CT</TableHead>
+              <TableHead>No Fiche</TableHead>
+              <TableHead>No Recus</TableHead>
               <TableHead>CA</TableHead>
               <TableHead>CB</TableHead>
-              <TableHead>Qte TOTAL</TableHead>
+              <TableHead>Fiche</TableHead>
+              <TableHead>Montant</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedProducts.map((product) => (
               <TableRow key={product.id} className="odd:bg-muted/50">
-                <TableCell className="pl-4" asChild>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      <DropdownMenuLabel className="text-muted-foreground font-normal">
-                        Actions
-                      </DropdownMenuLabel>
-
-                      <div>
-                        <DetailsRendement />
-                      </div>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-
                 <TableCell className="pl-4">{product.id}</TableCell>
                 <TableCell className="font-medium">{product.date}</TableCell>
-                <TableCell>{product.lot_num}</TableCell>
+                <TableCell>
+                  {product.sdl_ct_type} {product.sdl_ct_name}
+                </TableCell>
+                <TableCell>{product.No_fiche}</TableCell>
+                <TableCell>{product.No_recus}</TableCell>
                 <TableCell>{product.ca}</TableCell>
                 <TableCell>{product.cb}</TableCell>
-                <TableCell>{product.qte_total} Kg</TableCell>
+                <TableCell>
+                  <ViewImageDialog
+                    imageUrl={product.fiche_photo}
+                    profile={false}
+                  />
+                </TableCell>
+                <TableCell>{product.montant} Fbu</TableCell>
               </TableRow>
             ))}
           </TableBody>

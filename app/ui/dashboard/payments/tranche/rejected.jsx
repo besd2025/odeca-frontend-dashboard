@@ -92,14 +92,17 @@ export default function Rejected() {
           ...filterData
         }
       });
+      console.log("response :", response);
       const mappedData = response?.results?.map((item) => {
         const cafeiculteur = item?.achat?.cafeiculteur;
         const isPersonne = cafeiculteur?.cultivator_entity_type === "personne";
         return {
           id: item?.id,
+          responsable_code: item?.responsable?.unique_code,
+          payment_id: item?.payment_period_detail?.id,
           cultivator: {
             cultivator_id: cafeiculteur?.id,
-            cultivator_code: cafeiculteur?.code,
+            cultivator_code: cafeiculteur?.cultivator_code,
             first_name: isPersonne
               ? cafeiculteur?.cultivator_first_name
               : cafeiculteur?.cultivator_assoc_name,
@@ -131,12 +134,12 @@ export default function Rejected() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
-  const HandleValidate = async (id, cultivator_code) => {
+  const HandleValidate = async (id, cultivator_code, responsable_code, payment_id) => {
     const promise = new Promise(async (resolve, reject) => {
       try {
 
         const response = await fetchData("patch", `/cafe/cafe_payments/${id}/`, {
-          body: { validation_state: "VALIDATED" },
+          body: { validation_state: "VALIDATED", responsable_code: responsable_code, payment_period_id: payment_id },
         });
 
         if (response.status === 200 || response.status === 201) {
@@ -204,7 +207,7 @@ export default function Rejected() {
               </Link>
               {(user?.session?.category === "Admin" || user?.session?.category === "Superviseur") && (
                 <DropdownMenuItem>
-                  <Button onClick={() => HandleValidate(cultivator?.id, cultivator.cultivator.cultivator_code)} variant="secondary" className="w-full  hover:text-secondary">
+                  <Button onClick={() => HandleValidate(cultivator?.id, cultivator?.cultivator?.cultivator_code, cultivator?.responsable_code, cultivator?.payment_id)} variant="secondary" className="w-full  hover:text-secondary">
                     Valider
                   </Button>
                 </DropdownMenuItem>

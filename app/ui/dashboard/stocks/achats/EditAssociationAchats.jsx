@@ -27,6 +27,7 @@ export default function EditAssociationAchats({
   cb = 0,
   date = "",
   photo_fiche = "",
+  responsable_code,
 }) {
   const [open, setOpen] = React.useState(false);
   const [code, setCode] = React.useState(cultivator.cultivator_code || "");
@@ -43,9 +44,10 @@ export default function EditAssociationAchats({
   const [purchaseDate, setPurchaseDate] = React.useState(date || "");
   const [photoFicheUrl, setPhotoFicheUrl] = React.useState(photo_fiche || "");
   const [pageNumber, setPageNumber] = React.useState(num_page || "");
+  //const [responsable_code, setResponsable_code] = React.useState(responsable_code || null);
   const [loading, setLoading] = React.useState(false)
 
-
+  console.log("responsable_code Edit : ", responsable_code)
   React.useEffect(() => {
     setCode(cultivator.cultivator_code || "");
     setAssocName(cultivator.cultivator_assoc_name || "");
@@ -57,7 +59,7 @@ export default function EditAssociationAchats({
     setCbValue(cb || 0);
     setPurchaseDate(date || "");
     setPhotoFicheUrl(photo_fiche || "");
-
+    // setResponsable_code(responsable_code || null);
   }, [cultivator, num_fiche, num_recu, num_page, ca, cb, date, photo_fiche]);
 
   const handleSubmit = async (e) => {
@@ -71,6 +73,8 @@ export default function EditAssociationAchats({
     bodyToSend.append("quantite_cerise_a", caValue);
     bodyToSend.append("quantite_cerise_b", cbValue);
     bodyToSend.append("date_achat", purchaseDate);
+    bodyToSend.append("responsable_code", responsable_code);
+    bodyToSend.append("cafeiculteur_code", code);
 
     if (photoFicheUrl instanceof File) {
       bodyToSend.append("photo_fiche", photoFicheUrl);

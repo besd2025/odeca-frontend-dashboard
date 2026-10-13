@@ -260,3 +260,78 @@
     @apply font-[inherit];
   }
 }
+
+/* Print Styles */
+@media print {
+  /* Hide the rest of the application */
+  body > *:not([data-radix-portal]) {
+    display: none !important;
+  }
+
+  /* Show the radix portal containing our modal */
+  body > [data-radix-portal] {
+    display: block !important;
+    position: static !important;
+  }
+
+  /* Hide the modal backdrop */
+  [data-radix-portal] > div:not([role="dialog"]) {
+    display: none !important;
+  }
+
+  /* Remove dialog restrictions, margins, shadows and backgrounds to print full-page */
+  [role="dialog"] {
+    position: static !important;
+    transform: none !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+  }
+
+  /* Hide non-printable UI controls */
+  [role="dialog"] button,
+  [role="dialog"] [class*="DialogHeader"],
+  [role="dialog"] [class*="DialogFooter"],
+  [role="dialog"] .DialogHeader,
+  [role="dialog"] .DialogFooter,
+  button[aria-label="Close"],
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure the printed certificate fills the layout */
+  #print-area {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+  }
+
+  /* Optimize layout for print sheets */
+  @page {
+    size: auto;
+    margin: 15mm 15mm 15mm 15mm;
+  }
+
+  /* Avoid cutting tables in the middle of a row */
+  table, tr, td, th {
+    page-break-inside: avoid !important;
+  }
+
+  /* Force background colors and borders to print properly */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

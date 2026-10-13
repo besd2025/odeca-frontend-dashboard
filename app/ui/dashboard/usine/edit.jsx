@@ -34,16 +34,19 @@ export default function EditUsine({ id }) {
     const getUsine = async () => {
       try {
         // Fetching Usine data
-        const response = await fetchData("get", `cafe/usines/${id}/`, {
-          params: {},
-          additionalHeaders: {},
-          body: {},
-        });
-        setCode(response?.usine_code || "");
-        setUsineName(response?.usine_nom || "");
-        // Keeping Societe if applicable, though typically for filtering/grouping
-        setSoc(response?.societe?.nom_societe || "");
+        const response = await fetchData(
+          "get",
+          `cafe/usine_deparchage/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          },
+        );
 
+        setCode(response?.code_usine || "");
+        setUsineName(response?.usine_name || "");
+        setSoc(response?.societe?.nom_societe || "");
         setFirstName(response?.usine_responsable?.user?.first_name || "");
         setLastName(response?.usine_responsable?.user?.last_name || "");
         setTelephone(response?.usine_responsable?.user?.phone || "");
@@ -69,13 +72,13 @@ export default function EditUsine({ id }) {
     e.preventDefault();
     setLoading(true);
     const formData = {
-      usine_nom: usineName,
+      usine_name: usineName,
       // Add other fields here if the API supports patching them
     };
 
     const promise = new Promise(async (resolve, reject) => {
       try {
-        const results = await fetchData("patch", `/cafe/usines/${id}/`, {
+        const results = await fetchData("patch", `/cafe/usine_deparchage/${id}/`, {
           params: {},
           additionalHeaders: {},
           body: formData,

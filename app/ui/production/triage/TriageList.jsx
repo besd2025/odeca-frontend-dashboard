@@ -160,7 +160,6 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
         setTotalCount((pendingRes?.count || 0));
       } else if (tab === "En cours de triage") {
         const pendingRes = await fetchData("get", `cafe/triage/get_en_cours_triage/`, { params: { limit, offset: pointer } });
-        console.log("pendingRes en cours de triage", pendingRes)
         const pendingMapped = pendingRes?.results?.map((item) => {
           return {
             id: item.id,
@@ -308,7 +307,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Code Lot d'Origine</TableHead>
+                  <TableHead>#</TableHead>
                   <TableHead>Société / Propriétaire</TableHead>
                   <TableHead>Grade / Qualité</TableHead>
                   <TableHead>Type</TableHead>
@@ -322,7 +321,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                 {receptionsAllList.map((item, idx) => (
                   <TableRow key={`${item.lotId}-${item.grade}-${idx}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
                     <TableCell className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
-                      {item.lotId}
+                      {idx + 1}
                     </TableCell>
                     <TableCell className="font-medium text-slate-800 dark:text-slate-200">
                       {item.societe}
@@ -372,7 +371,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code Lot</TableHead>
+                <TableHead>#</TableHead>
                 <TableHead>Société & SDLs</TableHead>
                 {activeTab === "Prêt à trier" && <TableHead>Grade / Poids Initial</TableHead>}
                 {activeTab === "En cours de triage" || activeTab === "Trié & Stocké" && <TableHead>Quantités à trier</TableHead>}
@@ -386,11 +385,11 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
               </TableRow>
             </TableHeader>
             <TableBody>
-              {receptionsAllList.map((lot) => (
+              {receptionsAllList.map((lot, index) => (
                 <TableRow key={lot.id}>
                   {/* Code Lot */}
                   <TableCell className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
-                    {lot.id}
+                    {index + 1}
                   </TableCell>
 
                   {/* Société & SDLs */}

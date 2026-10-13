@@ -252,12 +252,12 @@ export default function TriageComponent() {
             },
             triage: {
               date: item?.date ? new Date(item.date).toLocaleDateString() : "",
-              vraisDefauts: parseFloat(item?.vrais_defauts_brisure) || 0,
+              vraisDefauts: parseFloat(item?.vrais_defauts) || 0,
               defectueux: parseFloat(item?.defectueux) || 0,
               brisure: parseFloat(item?.brisure) || 0,
               nEtRat: parseFloat(item?.n_et_rat) || 0,
               corpsEtrangers: parseFloat(item?.corps_etrangers) || 0,
-              totalDefectPct: parseFloat(item?.vrais_defauts_brisure || 0) +
+              totalDefectPct: parseFloat(item?.vrais_defauts || 0) +
                 parseFloat(item?.defectueux || 0) +
                 parseFloat(item?.brisure || 0) +
                 parseFloat(item?.n_et_rat || 0) +
@@ -592,6 +592,9 @@ export default function TriageComponent() {
                   { id: "brisure", label: "Brisure" },
                   { id: "nEtRat", label: "N et Rat" },
                   { id: "corpsEtrangers", label: "Corps étrangers" },
+                  { id: "coques", label: "Coques et parches" },
+                  { id: "blanchies", label: "Blanchies" },
+                  { id: "moisies", label: "Moisies" },
                 ].map((defect) => (
                   <div key={defect.id} className="space-y-1.5 p-3 bg-slate-50/50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-900">
                     <Label htmlFor={defect.id} className="text-xs font-bold text-slate-600 dark:text-slate-400">{defect.label}</Label>

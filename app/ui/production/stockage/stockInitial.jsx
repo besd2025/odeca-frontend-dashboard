@@ -19,18 +19,22 @@ import { fetchData } from '@/app/_utils/api';
 
 const StockInfo = {
     numero_lot: "",
-    qualite: ["FW", "15+"],
+    qualite: "",
     nombre_sacs: "",
-    proprietaire: ["SUCCAM", "ODECA"]
+    proprietaire: "",
+    annee_campagne: "",
+    quantite_cafe_vert: ""
 }
 
 export default function StockInitial() {
     const [stockInfo, setStockInfo] = React.useState(StockInfo);
-    const [Society, setSociety] = React.useState(stockInfo.proprietaire[0]);
-    const [qualite, setQualite] = React.useState(stockInfo.numero_lot[0]);
+    const [Society, setSociety] = React.useState("");
+    const [qualite, setQualite] = React.useState("");
     const [loading, setLoading] = React.useState(false)
     const [societes, setSocietes] = React.useState([]);
     const [lotsAvailable, setLotsAvailable] = React.useState([]);
+    const [annee_campagne, setAnneeCampagne] = React.useState("");
+    const [nombre_sacs, setNombreSacs] = React.useState("");
     const [open, setOpen] = React.useState(false)
     const HandleSociety = (value) => {
         setSociety(value)
@@ -38,6 +42,15 @@ export default function StockInitial() {
 
     const HandleQualite = (value) => {
         setQualite(value)
+    }
+    const HandleNumeroLot = (value) => {
+        setNumeroLot(value)
+    }
+    const HandleNombreSacs = (value) => {
+        setNombreSacs(value)
+    }
+    const HandleAnneeCampagne = (value) => {
+        setAnneeCampagne(value)
     }
     const fetchInitialData = async () => {
         try {
@@ -67,18 +80,21 @@ export default function StockInitial() {
 
 
     const HandleSubmit = () => {
-        if (stockInfo.numero_lot === "" || stockInfo.nombre_sacs === "" || stockInfo.proprietaire === "") {
+
+        if (stockInfo.numero_lot === "" || stockInfo.nombre_sacs === "" || Society === "" || qualite === "" || stockInfo.annee_campagne === "" || stockInfo.quantite_cafe_vert === "") {
             toast.error("Veuillez remplir tous les champs")
         }
+
         else {
 
             const formData = {
                 proprietaire: Society,
                 qualite: qualite,
                 nombre_sacs: stockInfo.nombre_sacs,
-                numero_lot: stockInfo.numero_lot
+                numero_lot: stockInfo.numero_lot,
+                annee_campagne: stockInfo.annee_campagne,
+                quantite_cafe_vert: stockInfo.quantite_cafe_vert
             }
-
             try {
                 const promise = new Promise(async (resolve, reject) => {
                     try {
@@ -168,8 +184,12 @@ export default function StockInitial() {
                         </Select>
                     </div>
                     <div className='flex flex-col gap-2'>
-                        <Label htmlFor="nombre_sacs">Nombre sacs</Label>
-                        <Input id="nombre_sacs" value={stockInfo.nombre_sacs} onChange={(e) => setStockInfo({ ...stockInfo, nombre_sacs: e.target.value })} />
+                        <Label htmlFor="quantite_cafe_vert">Quantité café vert (en kg)</Label>
+                        <Input type='number' id="quantite_cafe_vert" value={stockInfo?.quantite_cafe_vert} onChange={(e) => setStockInfo({ ...stockInfo, quantite_cafe_vert: e.target.value })} />
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <Label htmlFor="nombre_sacs">Nombre de sacs</Label>
+                        <Input type='number' id="nombre_sacs" value={stockInfo.nombre_sacs} onChange={(e) => setStockInfo({ ...stockInfo, nombre_sacs: e.target.value })} />
                     </div>
                     <div className='flex flex-col gap-2'>
                         <Label htmlFor="proprietaire">Proprietaire/Societe</Label>
@@ -186,6 +206,10 @@ export default function StockInitial() {
                                 ))}
                             </SelectContent>
                         </Select>
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <Label htmlFor="annee_campagne">Année du campagne</Label>
+                        <Input type='number' id="annee_campagne" value={stockInfo?.annee_campagne} onChange={(e) => setStockInfo({ ...stockInfo, annee_campagne: e.target.value })} />
                     </div>
                 </div>
                 <DialogFooter>

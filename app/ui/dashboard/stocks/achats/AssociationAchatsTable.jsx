@@ -98,6 +98,7 @@ export default function AssociationAchatsTable({
             },
           },
         );
+        console.log("Associations Achats : ", response)
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
           cultivator: {
@@ -139,12 +140,12 @@ export default function AssociationAchatsTable({
               minute: '2-digit',
               second: '2-digit',
             })
-            : null
-
-
+            : null,
+          responsable_code: achat?.responsable?.unique_code,
         }));
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
+        //console.log("formattedData : ", formattedData)
       } catch (error) {
         console.error("Error fetching association achats:", error);
       } finally {
@@ -338,6 +339,7 @@ export default function AssociationAchatsTable({
                         cb={cultivator.cb}
                         date={cultivator.date}
                         photo_fiche={cultivator.photo_fiche}
+                        responsable_code={cultivator.responsable_code}
                       />
                       <DropdownMenuItem
                         onSelect={() => HandleDelete(cultivator?.id, cultivator?.cultivator?.cultivator_code)}

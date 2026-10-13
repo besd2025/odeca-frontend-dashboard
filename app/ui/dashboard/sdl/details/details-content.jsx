@@ -81,6 +81,19 @@ function DetailsContent({ id }) {
   const [limitAchat, setLimitAchat] = useState(5);
   const [totalCountAchat, setTotalCountAchat] = useState(0);
   const [currentPageAchat, setCurrentPageAchat] = useState(1);
+
+  // Transfert Pagination
+  const [pointerTransfert, setPointerTransfert] = useState(0);
+  const [limitTransfert, setLimitTransfert] = useState(5);
+  const [totalCountTransfert, setTotalCountTransfert] = useState(0);
+  const [currentPageTransfert, setCurrentPageTransfert] = useState(1);
+
+  // Reception SDL Pagination
+  const [pointerReception, setPointerReception] = useState(0);
+  const [limitReception, setLimitReception] = useState(5);
+  const [totalCountReception, setTotalCountReception] = useState(0);
+  const [currentPageReception, setCurrentPageReception] = useState(1);
+
   const [achatCultivateur_type, setAchatCultivateur_type] = useState(
     "achat_cultivator_individual",
   );
@@ -182,7 +195,6 @@ function DetailsContent({ id }) {
         champs: cultivator?.nombre_champs,
       }));
       setIndividualCultivatorsData(cultivatorsData);
-      console.log("individualCultivatorsData", cultivatorsData);
       setTotalCount(response?.count);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
@@ -238,37 +250,42 @@ function DetailsContent({ id }) {
     try {
       const response = await fetchData(
         "get",
-        `cafe/stationslavage/${id}/get_transferts/`,
+        `cafe/stationslavage/${id}/get_transfert_to_usine/`,
         {
-          params: {},
+          params: { limit: limitTransfert, offset: pointerTransfert },
         },
       );
       const results = response?.results
-      console.log("results", results);
       const transferData = results?.map((transfer) => ({
+        ...transfer,
         id: transfer?.id,
-        code: transfer?.transfer?.sdl?.sdl_code,
-        date_transfert: transfer?.transfer?.transfer_date,
-        from_sdl: transfer?.transfer?.sdl?.sdl_nom,
-        society: transfer?.transfer?.sdl?.societe?.nom_societe,
-        qte_total_tranferer: transfer?.quantite,
+        code: transfer?.transfer_code,
+        date_transfert: transfer?.transfer_date,
+        date_enregistrement: transfer?.enregitrement_date,
+        from_sdl: transfer?.sdl?.sdl_nom,
+        society: transfer?.sdl?.societe?.nom_societe,
+        qte_total_tranferer: transfer?.qte_total_tranferer,
+        confirmation_status: transfer?.comfirmation_status,
+        est_confirme: transfer?.est_confirme,
+        status: transfer?.status ?? transfer?.est_confirme ?? transfer?.comfirmation_status,
         qte_tranferer: {
-          ca: transfer?.quantite,
+          ca: transfer?.quantite_cerise_a,
           cb: transfer?.quantite_cerise_b,
         },
-        photo_fiche: transfer?.transfer?.photo_bordereau,
+        photo_fiche: transfer?.photo_bordereau,
         localite: {
           province:
-            transfer?.transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
+            transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
               ?.province_name,
           commune:
-            transfer?.transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
+            transfer?.sdl?.sdl_adress?.zone_code?.commune_code?.commune_name,
         },
         usine: {
-          name: transfer?.transfer?.usine_deparchage?.usine_name,
+          name: transfer?.usine_deparchage?.usine_name,
         },
       }));
       setTransferData(transferData);
+      setTotalCountTransfert(response?.count ?? 0);
     } catch (error) {
       console.error("Error fetching transfers data:", error);
     }
@@ -279,15 +296,17 @@ function DetailsContent({ id }) {
         "get",
         `cafe/stationslavage/${id}/get_transferts_recus/`,
         {
-          params: {},
+          params: { limit: limitReception, offset: pointerReception },
         },
       );
       const results = response?.results;
       const transferData = results?.map((transfer) => ({
+        ...transfer,
         id: transfer?.id,
-        code: transfer?.ct?.ct_code,
+        code: transfer?.ct?.ct_code || transfer?.transfer_ct_sdl_code,
+        transfer_ct_sdl_code: transfer?.transfer_ct_sdl_code,
         from_sdl: transfer?.ct?.ct_nom,
-        society: transfer?.ct?.sdl?.societe?.nom_societe,
+        society: transfer?.ct?.sdl?.societe?.nom_societe || transfer?.sdl?.societe?.nom_societe,
         date_transfert: transfer?.enregitrement_date,
         qte_total_tranferer: transfer?.qte_total_tranferer,
         qte_tranferer: {
@@ -304,10 +323,12 @@ function DetailsContent({ id }) {
         },
       }));
       setReceptionSdl(transferData);
+      setTotalCountReception(response?.count ?? 0);
     } catch (error) {
       console.error("Error fetching transfers data:", error);
     }
   };
+
   // ── Export functions filtrées par SDL ──────────────────────────────────────
   const buildXlsx = (rows, sheetName, filename) => {
     const ws = XLSX.utils.json_to_sheet(rows);
@@ -418,13 +439,19 @@ function DetailsContent({ id }) {
     } else if (cultivateur_type === "cultivator_association") {
       getCultivatorsAssociation();
     }
+  }, [cultivateur_type, limit, pointer, tab]);
+
+  useEffect(() => {
     if (tab === "transferSdl") {
       getTransfers();
     }
+  }, [tab, limitTransfert, pointerTransfert]);
+
+  useEffect(() => {
     if (tab === "receptionSdl") {
       getReceptionSdl();
     }
-  }, [cultivateur_type, limit, pointer, tab]);
+  }, [tab, limitReception, pointerReception]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -465,6 +492,46 @@ function DetailsContent({ id }) {
     pointer: pointerAchat,
     onLimitChange: onLimitChangeAchat,
     limit: limitAchat,
+  };
+
+  const totalPagesTransfert = Math.ceil(totalCountTransfert / limitTransfert);
+  const onPageChangeTransfert = (pageNumber) => {
+    setCurrentPageTransfert(pageNumber);
+    setPointerTransfert((pageNumber - 1) * limitTransfert);
+  };
+  const onLimitChangeTransfert = (newLimit) => {
+    setLimitTransfert(newLimit);
+    setPointerTransfert(0);
+    setCurrentPageTransfert(1);
+  };
+  const dataTransfertpagination = {
+    totalCount: totalCountTransfert,
+    currentPage: currentPageTransfert,
+    onPageChange: onPageChangeTransfert,
+    totalPages: totalPagesTransfert,
+    pointer: pointerTransfert,
+    onLimitChange: onLimitChangeTransfert,
+    limit: limitTransfert,
+  };
+
+  const totalPagesReception = Math.ceil(totalCountReception / limitReception);
+  const onPageChangeReception = (pageNumber) => {
+    setCurrentPageReception(pageNumber);
+    setPointerReception((pageNumber - 1) * limitReception);
+  };
+  const onLimitChangeReception = (newLimit) => {
+    setLimitReception(newLimit);
+    setPointerReception(0);
+    setCurrentPageReception(1);
+  };
+  const dataReceptionpagination = {
+    totalCount: totalCountReception,
+    currentPage: currentPageReception,
+    onPageChange: onPageChangeReception,
+    totalPages: totalPagesReception,
+    pointer: pointerReception,
+    onLimitChange: onLimitChangeReception,
+    limit: limitReception,
   };
 
   const fetchCultivatorsByType = (type) => {
@@ -518,7 +585,7 @@ function DetailsContent({ id }) {
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
       <Tabs
         value={tab}
-        className="space-y-6 w-full"
+        className=" w-full"
         onValueChange={handleTabChange}
       >
         {/* TABS LIST */}
@@ -560,28 +627,29 @@ function DetailsContent({ id }) {
               <DropdownMenuContent align="start">
                 <DropdownMenuLabel>Menu</DropdownMenuLabel>
 
-                <DropdownMenuItem onClick={() => setTab("transferSdl")}>
-                  <Spline className="w-4 h-4" /> Transfer(SDL → Depulpage)
+                <DropdownMenuItem>
+                  <TabsTrigger value="transferSdl" className="shrink-0"><Spline className="w-4 h-4" /> Transfer(SDL → Depulpage)</TabsTrigger>
+
                 </DropdownMenuItem>
 
-                <DropdownMenuItem onClick={() => setTab("receptionSdl")}>
-                  <Spline className="w-4 h-4" /> Reception(CT)
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem onClick={() => setTab("rendement")}>
-                  <ChartNoAxesCombined className="w-4 h-4" /> Rendement
-                </DropdownMenuItem>
-
-                <DropdownMenuItem onClick={() => setTab("rh")}>
-                  <ScrollText className="w-4 h-4" /> RH
+                <DropdownMenuItem>
+                  <TabsTrigger value="receptionSdl" className="shrink-0"> <Spline className="w-4 h-4" /> Reception(CT)</TabsTrigger>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem onClick={() => setTab("maps")}>
-                  <MapPinHouse className="w-4 h-4" /> Map
+                <DropdownMenuItem>
+                  <TabsTrigger value="rendement" className="shrink-0"> <ChartNoAxesCombined className="w-4 h-4" /> Rendement</TabsTrigger>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem>
+                  <TabsTrigger value="rh" className="shrink-0"> <ScrollText className="w-4 h-4" /> RH</TabsTrigger>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem>
+                  <TabsTrigger value="maps" className="shrink-0"> <MapPinHouse className="w-4 h-4" /> Map</TabsTrigger>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -699,13 +767,19 @@ function DetailsContent({ id }) {
         </TabsContent>
         <TabsContent value="transferSdl">
           <div className="relative w-full h-full overflow-hidden">
-            <TransferSdlDep data={transferData} />
+            <TransferSdlDep
+              data={transferData}
+              datapagination={dataTransfertpagination}
+            />
             {/* <ComingSoonOverlay transparent={true} /> */}
           </div>
         </TabsContent>
         <TabsContent value="receptionSdl">
           <div className="relative w-full h-full overflow-hidden">
-            <ReceiptSdlCt data={receptionSdl} />
+            <ReceiptSdlCt
+              data={receptionSdl}
+              datapagination={dataReceptionpagination}
+            />
             {/* <ComingSoonOverlay transparent={true} /> */}
           </div>
         </TabsContent>
@@ -714,7 +788,7 @@ function DetailsContent({ id }) {
           <h1 className="text-xl font-semibold m-2">
             Selectionner les Rapports
           </h1>
-          <Rapports />
+          <Rapports id={id} />
         </TabsContent>
       </Tabs>
     </Card>

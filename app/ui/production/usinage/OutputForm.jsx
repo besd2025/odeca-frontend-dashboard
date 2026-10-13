@@ -51,12 +51,17 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
             societe_code: lot?.code_societe
           }
         })
-        const data = await fetchData("get", `cafe/qualite_cafe/`);
+        const data = await fetchData("get", `cafe/qualite_cafe/`, {
+          params: {
+            limit: 50,
+            offset: 0
+          }
+        });
         const gradesData = data.results || data || [];
         setFullApiGrades(gradesData);
         setUsinageId(retoursData?.usinage_id)
         const newGrades = Array.isArray(gradesData)
-          ? gradesData.map(item => typeof item === 'object' ? (item.nom || item.designation || item.name || item.code) : item).filter(Boolean)
+          ? [...new Set(gradesData.map(item => typeof item === 'object' ? (item.nom || item.designation || item.name || item.code) : item).filter(Boolean))]
           : [];
         if (newGrades.length > 0) {
           setApiGrades(newGrades);
@@ -166,8 +171,6 @@ export default function OutputForm({ lot, onSave, onCancel, readOnly = false }) 
             formData.append("qualite", gradeId);
             const isGradeChecked = !!checkedGrades[grade];
             formData.append("pret_pour_triage", isGradeChecked)
-
-
             const promise = new Promise(async (resolve, reject) => {
               try {
                 const results = await fetchData(

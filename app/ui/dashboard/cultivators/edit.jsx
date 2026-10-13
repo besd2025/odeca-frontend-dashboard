@@ -93,7 +93,7 @@ export default function Edit({
           body: {},
         });
         setCode(response.cultivator_code || "");
-        setFirstName(response?.cultivator_first_name || cultivator_assoc_name);
+        setFirstName(response?.cultivator_first_name || response?.cultivator_assoc_name || "");
         setLastName(response?.cultivator_last_name || "");
         setImageUrl(response?.cultivator_photo || "");
         setDateNaissance(response?.date_naissance || "");

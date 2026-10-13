@@ -4,10 +4,18 @@ import * as React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   Table,
   TableBody,
@@ -17,150 +25,225 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import PaginationControls from "@/components/ui/pagination-controls";
-import DetailsReceipt from "../receipt/details-receipt";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DetailsRendement from "./details-redement";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const products = [
-  {
-    id: 1,
-    date: "12/8/2025",
-    lot_num: 40,
-    grade_A: { A1: 10, A2: 20, A3: 30 },
-    grade_B: { B1: 10, B2: 20, B3: 30 },
-    coque: 452,
-    qte_total: 4455.5,
-    rendement: "58%",
-  },
-];
-
-export default function RedementC() {
+import EditRendement from "./edit";
+import { Input } from "@/components/ui/input";
+import { fetchData } from "@/app/_utils/api";
+import { useContext } from "react";
+import { UserContext } from "@/app/ui/context/User_Context";
+import EditRendementParche from "./editParche";
+import { toast } from "sonner";
+export default function RedementC({ id }) {
   const [page, setPage] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(10);
-
-  const totalItems = products.length;
+  const [pageSize, setPageSize] = React.useState(5);
+  const [rapportCData, setRapportCData] = React.useState([]);
+  const [totalItems, setTotalItems] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
+  const user = React.useContext(UserContext);
   const totalPages = Math.max(Math.ceil(totalItems / pageSize), 1);
+  const offset = (page - 1) * pageSize;
 
   React.useEffect(() => {
-    if (page > totalPages) {
-      setPage(totalPages);
+    const getRapportC = async () => {
+      //setLoading(true);
+      try {
+        const response = await fetchData(
+          "get",
+          `cafe/stationslavage/${id}/get_rapport_c_par_sdl/`,
+          {
+            params: {
+              limit: pageSize,
+              offset: offset,
+            },
+          },
+        );
+        // Support deux formats : { count, results } (DRF paginé) ou tableau direct
+        const results = Array.isArray(response)
+          ? response
+          : response?.results ?? [];
+        const count = Array.isArray(response)
+          ? response.length
+          : response?.count ?? results.length;
+
+        const rapports = results.map((rapport) => ({
+          id: rapport?.id,
+          grade_code: rapport?.grade?.grade_code,
+          date: rapport?.enregistrement_date,
+          lot_num: rapport?.numero_lot,
+          grade: rapport?.grade?.grade_name,
+          qte_parche: rapport?.total_cafe_parche,
+          qte_cb: rapport?.quantite_cerise_b,
+          qte_ca: rapport?.quantite_cerise_a,
+          rendement_code: rapport?.rendement_cerise_code,
+          rendement_id: rapport?.rendement?.id,
+          responsable_code: rapport?.sdl?.sdl_responsable?.unique_code,
+        }));
+
+        setRapportCData(rapports);
+
+        setTotalItems(count);
+      } catch (error) {
+        console.error("Error fetching rendement data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getRapportC();
+  }, [id, page, pageSize]);
+
+
+  //
+  const handleEdit = (product) => {
+    // Logique pour l'édition
+    console.log("Edit:", product);
+  };
+  const HandleDelete = async (id, code) => {
+    const promise = new Promise(async (resolve, reject) => {
+      console.log("code", id);
+      try {
+        await fetchData(
+          "delete",
+          `/cafe/rendements/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+
+          },
+        );
+        resolve({ code: code || 'Le rendement' });
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: "SUPPRESSION...",
+      success: (data) => {
+        // setTimeout(() => window.location.reload(), 1000);
+        return `${data.code} a été supprimé avec succès `;
+      },
+      error: "Donnée non supprimée",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-  }, [page, totalPages]);
-
-  const paginatedProducts = React.useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return products.slice(start, start + pageSize);
-  }, [page, pageSize]);
-
+  };
   return (
-    <Card className="w-full mt-4 rounded-2xl ">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl font-bold">
-          Rapport C – Rendements Cerises
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="pl-4">Actions</TableHead>
-                <TableHead>Date Emmangasinage</TableHead>
-                <TableHead>No Lot</TableHead>
-                <TableHead>Grade A</TableHead>
-                <TableHead>Grade B</TableHead>
-                <TableHead>Coque</TableHead>
-                <TableHead>Qte TOTAL</TableHead>
-                <TableHead>Rendement</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedProducts.map((product) => (
-                <TableRow key={product.id} className="odd:bg-mu/ted/50">
-                  <TableCell className="pl-4" asChild>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start">
-                        <DropdownMenuLabel className="text-muted-foreground font-normal">
-                          Actions
-                        </DropdownMenuLabel>
+    <div>
+      <Card className="w-full border-none shadow-none">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-xl font-bold">
+            Rapport C – Rendements Cerises
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative">
+            <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5" />
+            <Input
+              placeholder="Rechercher..."
+              className="pl-10 flex-1 shadow-none w-[300px] lg:w-[380px] rounded-lg bg-background max-w-sm border-none"
+            />
+          </div>
 
-                        <div>
-                          <DetailsRendement />
-                        </div>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-
-                  <TableCell className="font-medium">{product.date}</TableCell>
-                  <TableCell>{product.lot_num}</TableCell>
-                  <TableCell className="bg-primary/20">
-                    <div className="flex flex-col gap-y-2">
-                      <span>
-                        A1: {product.grade_A.A1}{" "}
-                        <span className="text-xs normal-case">Kg</span>
-                      </span>
-                      <span>
-                        A2: {product.grade_A.A2}{" "}
-                        <span className="text-xs normal-case">Kg</span>
-                      </span>
-                      <span>
-                        A3: {product.grade_A.A3}{" "}
-                        <span className="text-xs normal-case">Kg</span>
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="bg-secondary/20">
-                    {" "}
-                    <div className="flex flex-col gap-y-2">
-                      <span>
-                        B1: {product.grade_B.B1}{" "}
-                        <span className="text-xs normal-case">Kg</span>
-                      </span>
-                      <span>
-                        B2: {product.grade_B.B2}{" "}
-                        <span className="text-xs normal-case">Kg</span>
-                      </span>
-                      <span>
-                        B3: {product.grade_B.B3}{" "}
-                        <span className="text-xs normal-case">Kg</span>
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="bg-accent">
-                    {product.coque}{" "}
-                    <span className="text-xs normal-case">Kg</span>
-                  </TableCell>
-                  <TableCell>{product.qte_total} Kg</TableCell>
-                  <TableCell>{product.rendement}</TableCell>
+          <div className="grid w-full [&>div]:border [&>div]:rounded-md overflow-hidden mt-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="pl-4">Actions</TableHead>
+                  <TableHead>Date Emmangasinage</TableHead>
+                  <TableHead>No Lot</TableHead>
+                  <TableHead>Qte CA</TableHead>
+                  <TableHead>Qte CB</TableHead>
+                  <TableHead>QteParche</TableHead>
+                  {/* <TableHead>Rendement</TableHead> */}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      Chargement...
+                    </TableCell>
+                  </TableRow>
+                ) : rapportCData.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      Aucun rendement trouvé.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  rapportCData.map((product) => (
+                    <TableRow key={product.id} className="odd:bg-muted/50">
+                      <TableCell className="pl-4">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <DropdownMenuLabel className="text-muted-foreground font-normal">
+                              Actions
+                            </DropdownMenuLabel>
+                            <DetailsRendement data={product} />
+                            {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+                              <EditRendement data={product} />
+                            )}
+                            <DropdownMenuItem className="text-destructive" onClick={() => HandleDelete(product.id, product.code)}>
+                              Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
 
-        <PaginationControls
-          className="mt-4"
-          page={page}
-          pageSize={pageSize}
-          totalItems={totalItems}
-          totalPages={totalPages}
-          onPageChange={setPage}
-          onPageSizeChange={(size) => {
-            setPage(1);
-            setPageSize(size);
-          }}
-          hasNextPage={page < totalPages}
-          hasPreviousPage={page > 1}
-        />
-      </CardContent>
-    </Card>
+                      <TableCell className="font-medium">{product.date}</TableCell>
+                      <TableCell>{product.lot_num}</TableCell>
+                      <TableCell className="bg-accent">
+                        {product.qte_ca}{" "}
+                        <span className="text-xs normal-case">Kg</span>
+                      </TableCell>
+                      <TableCell className="bg-accent">
+                        {product.qte_cb}{" "}
+                        <span className="text-xs normal-case">Kg</span>
+                      </TableCell>
+                      <TableCell className="bg-accent">
+                        {product.qte_parche}{" "}
+                        <span className="text-xs normal-case">Kg</span>
+                      </TableCell>
+                      {/* <TableCell>{product.rendement_code}</TableCell> */}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <PaginationControls
+            className="mt-4"
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(size) => {
+              setPage(1);
+              setPageSize(size);
+            }}
+            hasNextPage={page < totalPages}
+            hasPreviousPage={page > 1}
+          />
+        </CardContent>
+      </Card>
+    </div>
   );
 }

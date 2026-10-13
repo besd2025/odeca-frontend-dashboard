@@ -31,10 +31,30 @@ const RETOUR_LOTS = [
 export default function RetourList({ }) {
     const [isViewingDetails, setIsViewingDetails] = useState(false);
     const [selectedLot, setSelectedLot] = useState(null);
+
+    // Pagination states
+    const [limit, setLimit] = useState(5);
+    const [pointer, setPointer] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalCount = RETOUR_LOTS.length;
+
+    const onPageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        setPointer((pageNumber - 1) * limit);
+    };
+
+    const onLimitChange = (newLimit) => {
+        setLimit(newLimit);
+        setPointer(0);
+        setCurrentPage(1);
+    };
+
     const handleViewDetails = (lot) => {
         setSelectedLot(lot);
         setIsViewingDetails(true);
     };
+
+    const paginatedLots = RETOUR_LOTS.slice(pointer, pointer + limit);
 
     return (
         <Card className="shadow-xs dark:bg-slate-950 border-slate-200 dark:border-slate-800">
@@ -58,6 +78,7 @@ export default function RetourList({ }) {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead>#</TableHead>
                                 <TableHead>Numéro de Lot</TableHead>
                                 <TableHead>Propriétaire / Société</TableHead>
                                 <TableHead>Motif de Retour</TableHead>
@@ -69,8 +90,11 @@ export default function RetourList({ }) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {RETOUR_LOTS.map((lot) => (
+                            {paginatedLots.map((lot, index) => (
                                 <TableRow key={lot.id}>
+                                    <TableCell className="font-semibold text-slate-900 dark:text-white">
+                                        {pointer + index + 1}
+                                    </TableCell>
                                     <TableCell className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
                                         {lot.id}
                                     </TableCell>
@@ -138,7 +162,15 @@ export default function RetourList({ }) {
                         </TableBody>
                     </Table>
                 )}
-                <PaginationContent />
+                <PaginationContent
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(totalCount / limit)}
+                    onPageChange={onPageChange}
+                    pointer={pointer}
+                    totalCount={totalCount}
+                    onLimitChange={onLimitChange}
+                    limit={limit}
+                />
                 <Dialog open={isViewingDetails} onOpenChange={setIsViewingDetails}>
                     <DialogContent className="sm:max-w-2xl bg-sidebar border border-slate-200 dark:border-slate-800 shadow-xl overflow-y-auto max-h-[90vh]">
                         <DialogHeader>

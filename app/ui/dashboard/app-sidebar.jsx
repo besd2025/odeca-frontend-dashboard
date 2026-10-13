@@ -113,27 +113,32 @@ const menuItems = {
 
     {
       title: "Production",
-      // items: [
-      //   {
-      //     title: "Usine",
-      //     url: "/odeca-dashboard/usine",
-      //     roles: ["Admin", "General", "Cafe_ODECA"],
-      //   },
-      //   {
-      //     title: "Traitement",
-      //     url: "/odeca-dashboard/traitement",
-      //     roles: ["Admin", "General", "Cafe_ODECA"],
-      //   },
-      //   {
-      //     title: "Laboratoire",
-      //     url: "/odeca-dashboard/laboratoire",
-      //     roles: ["Admin", "General", "Cafe_ODECA"],
-      //   },
-      // ],
-      url: "/odeca-production/usine/reception",
+      items: [
+        // {
+        //   title: "Usines list",
+        //   url: "/odeca-dashboard/usine/",
+        //   roles: ["Admin", "General", "Cafe_ODECA"],
+        // },
+        {
+          title: "Usine",
+          url: "/odeca-dashboard/production/usine",
+          roles: ["Admin", "General", "Cafe_ODECA", "Superviseur"],
+        },
+        {
+          title: "Laboratoire",
+          url: "/odeca-dashboard/production/laboratoire",
+          roles: ["Admin", "General", "Cafe_ODECA", "Superviseur"],
+        },
+        {
+          title: "Enregistrements",
+          url: "/odeca-production/usine/reception",
+          roles: ["Admin", "Respo_usine_deparchage", "Respo_labo"],
+        },
+      ],
+      // url: "/odeca-production/usine/reception",
       icon: <Coffee />,
       keyword: "production",
-      roles: ["Admin", "General"],
+      roles: ["Admin", "General","Superviseur", "Cafe_ODECA"],
     },
     {
       title: "Societes",
@@ -153,8 +158,8 @@ const menuItems = {
           <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V6.75Z" />
         </svg>
       ),
-      keyword: "societies",
-      roles: ["Admin", "General", "Cafe_ODECA"],
+      keyword: "/odeca-dashboard/societies",
+      roles: ["Admin", "General", "Cafe_ODECA", "Superviseur"],
     },
     {
       title: "Collecteurs",
@@ -192,6 +197,10 @@ const menuItems = {
           title: "Transferts",
           url: "/odeca-dashboard/stocks/transfers",
         },
+        {
+          title: "Cafe Washed",
+          url: "/odeca-dashboard/stocks/washed",
+        },
       ],
       url: "/odeca-dashboard/stocks",
       icon: (
@@ -203,12 +212,12 @@ const menuItems = {
           <path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03ZM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 0 0 .372-.648V7.93ZM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 0 0 .372.648l8.628 5.033Z" />
         </svg>
       ),
-      keyword: "stocks",
+      keyword: "/odeca-dashboard/stocks",
     },
     {
       title: "Paiement",
       url: "/odeca-dashboard/payments",
-      roles: ["Admin", "General", "Cafe_ODECA", "Cafe_Chef_societe"],
+      roles: ["Admin", "General", "Cafe_ODECA", "Cafe_Chef_societe", "Superviseur"],
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -34,15 +34,46 @@ export default function TransfersPage() {
           });
           const results = response?.results || [];
           const mappedSdlTransfers = results.map((transfer) => ({
+            ...transfer,
             id: transfer.id,
-            from_sdl: transfer.sdl?.sdl_nom || "Inconnu",
-            usine: transfer.usine_deparchage?.usine_name || "Inconnu",
-            society: transfer.sdl?.societe?.nom_societe,
-            date: transfer?.transfer_date,
+            from_sdl: transfer.sdl?.sdl_nom || transfer.from_sdl || "Inconnu",
+            usine:
+              transfer.usine_deparchage?.usine_name ||
+              transfer.usine_deparchage ||
+              transfer.usine?.name ||
+              transfer.usine ||
+              "Inconnu",
+            usine_deparchage:
+              transfer.usine_deparchage?.usine_name ||
+              transfer.usine_deparchage ||
+              transfer.usine?.name ||
+              transfer.usine ||
+              "Inconnu",
+            society: transfer.sdl?.societe?.nom_societe || transfer.society,
+            transfer_date: transfer?.transfer_date || transfer?.date_transfert || transfer?.date,
+            date: transfer?.transfer_date || transfer?.date_transfert || transfer?.date,
+            enregitrement_date:
+              transfer?.enregitrement_date ||
+              transfer?.enregistrement_date ||
+              transfer?.date_enregistrement ||
+              transfer?.created_at,
+            photo_bordereau: transfer?.photo_bordereau || transfer?.photo_fiche,
+            photo_fiche: transfer?.photo_bordereau || transfer?.photo_fiche,
+            est_confirme: transfer?.est_confirme ?? transfer?.status,
+            status: transfer?.est_confirme ?? transfer?.status,
+            chauffeur_nom: transfer?.chauffeur_nom,
+            chauffeur_prenom: transfer?.chauffeur_prenom,
+            chauffeur_telephone: transfer?.chauffeur_telephone,
+            nom_accompagnateur: transfer?.nom_accompagnateur,
+            prenom_accompagnateur: transfer?.prenom_accompagnateur,
+            phone_accompagnteur:
+              transfer?.phone_accompagnteur || transfer?.phone_accompagnateur,
+            plaque_camion: transfer?.plaque_camion,
+            total_parche: transfer?.total_parche,
+            date_reception: transfer?.date_reception,
             qte_tranferer: {
               ca: transfer?.total_parche,
             },
-            photo_fiche: transfer.photo_bordereau,
             localite: {
               province:
                 transfer.sdl?.sdl_adress?.zone_code?.commune_code?.province_code
@@ -159,7 +190,11 @@ export default function TransfersPage() {
               {loading ? (
                 <TableSkeleton rows={5} columns={5} />
               ) : (
-                <TransferSdlDep data={sdlTransfers} datapagination={datapagination} />
+                <TransferSdlDep
+                  data={sdlTransfers}
+                  datapagination={datapagination}
+                  search={handleSearch}
+                />
               )}
             </div>
             {/* <ComingSoonOverlay transparent={true} /> */}

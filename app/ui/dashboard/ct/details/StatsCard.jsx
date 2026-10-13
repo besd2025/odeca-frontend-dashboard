@@ -21,6 +21,7 @@ import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
 import { UserContext } from "@/app/ui/context/User_Context";
+import { Badge } from "@/components/ui/badge";
 function StatsCard({ id }) {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
@@ -46,7 +47,16 @@ function StatsCard({ id }) {
             body: {},
           },
         );
-        const response = { qte_achete, nombre_cultivateurs };
+        const qte_transfert = await fetchData(
+          "get",
+          `cafe/centres_transite/${id}/get_total_transfert_par_ct/`,
+          {
+            params: {},
+            additionalHeaders: {},
+            body: {},
+          },
+        );
+        const response = { qte_achete, nombre_cultivateurs, qte_transfert };
         setData(response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -65,6 +75,16 @@ function StatsCard({ id }) {
   const percentageB =
     total > 0 ? ((data?.qte_achete?.cerise_b || 0) / total) * 100 : 0;
 
+  const qteRestanteCeriseA =
+    (data?.qte_achete?.cerise_a || 0) -
+    (data?.qte_transfert?.cerise_a || 0);
+  const qteRestanteCeriseB =
+    (data?.qte_achete?.cerise_b || 0) -
+    (data?.qte_transfert?.cerise_b || 0);
+  const qteRestanteTotal =
+    (data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b || 0) -
+    (data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b || 0);
+
   const [avance, setAvance] = React.useState(false);
 
   if (loading) {
@@ -78,7 +98,7 @@ function StatsCard({ id }) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-1">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
       <Card className="@container/card col-span-1 lg:col-span-6 relative">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
@@ -219,126 +239,6 @@ function StatsCard({ id }) {
 
         </CardHeader>
       </Card>
-      <Card className="@container/card lg:col-span-3 hidden">
-        <CardHeader className="flex flex-col">
-          <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-secondary p-2 rounded-md">
-              <TruckElectric className="text-white" />
-            </div>
-            <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
-                <>
-                  {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  <span className="text-base">T</span>
-                </>
-              ) : (
-                <>
-                  {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
-                  <span className="text-sm">Kg</span>
-                </>
-              )}
-            </CardTitle>
-            {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
-              <span className="text-sm font-normal text-muted-foreground ml-2">
-                ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
-              </span>
-            ) : (
-              <></>
-            )}
-          </div>
-          <CardTitle className="text-lg font-semibold tabular-nums  ">
-            Qte transférée
-          </CardTitle>
-          <Separator />
-          <div className="flex flex-col h-full gap-y-3 justify-between text-xs font-medium">
-            <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg w-max">
-              <span className="text-primary flex items-center gap-1">●</span>
-              <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-primary size-5" />
-                <CardTitle className="text-md font-semibold text-primary">
-                  CA :
-                </CardTitle>
-              </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.cerise_a >= 1000 ? (
-                  <>
-                    {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
-                      "fr-FR",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      },
-                    )}{" "}
-                    <span className="text-sm">T</span>
-                  </>
-                ) : (
-                  <>
-                    {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
-                    <span className="text-sm">Kg</span>
-                  </>
-                )}
-
-                {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
-                  ""
-                ) : (
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
-                  </span>
-                )}
-
-              </CardDescription>
-            </div>
-            <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg">
-              <span className="text-secondary flex items-center gap-1">
-                ●
-              </span>
-              <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-secondary size-5" />
-                <CardTitle className="text-md font-semibold text-secondary">
-                  CB :
-                </CardTitle>
-              </div>
-              <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.qte_achete?.cerise_b >= 1000 ? (
-                  <>
-                    {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
-                      "fr-FR",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      },
-                    )}
-                    <span className="text-sm">T</span>
-                  </>
-                ) : (
-                  <>
-                    {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
-                    <span className="text-sm">Kg</span>
-                  </>
-                )}
-                {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
-                  ""
-                ) : (
-                  <span className="text-xs font-normal text-muted-foreground ml-2">
-                    ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
-                  </span>
-                )}
-
-              </CardDescription>
-            </div>
-          </div>
-          <div>
-            <Separator />
-            <CardTitle className="text-xs font-semibold tabular-nums text-muted-foreground my-2">
-              SDL destination:
-            </CardTitle>
-            <div className="text-sm font-normal flex flex-col"><span>SDL Nyango </span><span>SDL Nyango </span></div>
-          </div>
-        </CardHeader>
-      </Card>
       <Card className="@container/card lg:col-span-3 overflow-hidden">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
@@ -444,6 +344,202 @@ function StatsCard({ id }) {
           </div>
         </CardHeader>
       </Card>
+
+      <Card className="@container/card col-span-1 lg:col-span-4 relative">
+        <CardHeader className="flex flex-col">
+          <div className="flex flex-row gap-x-2 items-center">
+            <div className="bg-secondary p-2 rounded-md">
+              <TruckElectric className="text-white" />
+            </div>
+            <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+              {(data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b) >= 1000 ? (
+                <>
+                  {((data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  <span className="text-base">T</span>
+                </>
+              ) : (
+                <>
+                  {(data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                  <span className="text-sm">Kg</span>
+                </>
+              )}
+            </CardTitle>
+            {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                ({(data?.qte_transfert?.cerise_a + data?.qte_transfert?.cerise_b)?.toLocaleString("fr-FR")} kg)
+              </span>
+            ) : (
+              <></>
+            )}
+            {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+              <>
+                {qteRestanteTotal !== 0 && (
+                  <Badge variant="outline" className="text-destructive ml-4 rounded text-xs absolute right-5">
+                    {qteRestanteTotal >= 1000 ? (
+                      <>
+                        {(qteRestanteTotal / 1000).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{" "}
+                        <span className="text-sm">T</span>
+                      </>
+                    ) : (
+                      <>
+                        {qteRestanteTotal.toLocaleString("fr-FR")}{" "}
+                        <span className="text-sm">Kg</span>
+                      </>
+                    )}
+                    restant
+                  </Badge>
+                )}
+              </>
+            )}
+          </div>
+          <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground ">
+            Qte Transferée (CT)
+          </CardTitle>
+          <Separator />
+          <div className="flex flex-col h-full justify-between text-xs font-medium">
+            <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg w-max">
+              <span className="text-primary flex items-center gap-1">●</span>
+              <div className="flex flex-row gap-x-1 items-center">
+                <Grape className="text-primary size-5" />
+                <CardTitle className="text-md font-semibold text-primary">
+                  CA :
+                </CardTitle>
+              </div>
+              <CardDescription className="font-semibold text-accent-foreground text-lg">
+                {data?.qte_transfert?.cerise_a >= 1000 ? (
+                  <>
+                    {(data?.qte_transfert?.cerise_a / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      },
+                    )}{" "}
+                    <span className="text-sm">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.qte_transfert?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
+
+                {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                  ""
+                ) : (
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({data?.qte_transfert?.cerise_a?.toLocaleString("fr-FR")} kg)
+                  </span>
+                )}
+
+              </CardDescription>
+              {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+                <>
+                  {qteRestanteCeriseA !== 0 && (
+                    <Badge variant="outline" className="text-destructive ml-4 rounded absolute right-5">
+                      {qteRestanteCeriseA >= 1000 ? (
+                        <>
+                          {(qteRestanteCeriseA / 1000).toLocaleString("fr-FR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          <span className="text-sm">T</span>
+                        </>
+                      ) : (
+                        <>
+                          {qteRestanteCeriseA.toLocaleString("fr-FR")}{" "}
+                          <span className="text-sm">Kg</span>
+                        </>
+                      )}
+                      restant
+                    </Badge>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="flex flex-row gap-x-2 items-center py-1 px-2 rounded-lg">
+              <span className="text-secondary flex items-center gap-1">
+                ●
+              </span>
+              <div className="flex flex-row gap-x-1 items-center">
+                <Grape className="text-secondary size-5" />
+                <CardTitle className="text-md font-semibold text-secondary">
+                  CB :
+                </CardTitle>
+              </div>
+              <CardDescription className="font-semibold text-accent-foreground text-lg">
+                {data?.qte_transfert?.cerise_b >= 1000 ? (
+                  <>
+                    {(data?.qte_transfert?.cerise_b / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      },
+                    )}
+                    <span className="text-sm">T</span>
+                  </>
+                ) : (
+                  <>
+                    {data?.qte_transfert?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                    <span className="text-sm">Kg</span>
+                  </>
+                )}
+                {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
+                  ""
+                ) : (
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({data?.qte_transfert?.cerise_b?.toLocaleString("fr-FR")} kg)
+                  </span>
+                )}
+                {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+                  <>
+                    {qteRestanteCeriseB !== 0 && (
+                      <Badge variant="outline" className="text-destructive ml-4 rounded absolute right-5">
+
+                        {qteRestanteCeriseB >= 1000 ? (
+                          <>
+                            {(qteRestanteCeriseB / 1000).toLocaleString("fr-FR", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}{" "}
+                            <span className="text-sm">T</span>
+                          </>
+                        ) : (
+                          <>
+                            {qteRestanteCeriseB.toLocaleString("fr-FR")}{" "}
+                            <span className="text-sm">Kg</span>
+                          </>
+                        )}
+                        restant
+                      </Badge>
+                    )}
+
+                  </>
+
+                )}
+              </CardDescription>
+            </div>
+          </div>
+          {/* <div>
+            <Separator />
+            <CardTitle className="text-sm font-semibold tabular-nums text-muted-foreground my-2">
+              SDL destination:
+            </CardTitle>
+            <div className="text-sm font-normal flex flex-wrap gap-2">
+              <span className="text-xs bg-secondary/10 py-1 px-2 rounded-lg">SDL Gatwe</span>
+            </div>
+          </div> */}
+        </CardHeader>
+
+      </Card>
+
     </div>
   );
 }
