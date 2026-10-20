@@ -131,7 +131,6 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
     try {
       if (tab === "Prêt à trier") {
         const pendingRes = await fetchData("get", `cafe/usinages/get_pret_pour_triage/`, { params: { limit, offset: pointer } });
-        console.log("pendingRes", pendingRes)
         const pendingMapped = pendingRes?.results?.map((item) => {
           const processedGrades = Array.isArray(item?.productions)
             ? item.productions.reduce((acc, curr) => {
@@ -161,7 +160,6 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
         setTotalCount((pendingRes?.count || 0));
       } else if (tab === "En cours de triage") {
         const pendingRes = await fetchData("get", `cafe/triage/get_en_cours_triage/`, { params: { limit, offset: pointer } });
-        console.log("pendingRes", pendingRes)
         const pendingMapped = pendingRes?.results?.map((item) => {
           return {
             id: item.id,
@@ -171,7 +169,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
             //dateSortie: new Date(item?.fin_triage).toLocaleDateString() || "-",
             status: "En cours de triage",
             quantite_trie: item?.quantite_sortie,
-            nombre_sacs: item?.nombre_sacs,
+            nombre_sacs: item?.nombre_sacs_total,
           };
         }) || [];
         setReceptionsAllList(pendingMapped);
@@ -377,6 +375,7 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                 <TableHead>Société & SDLs</TableHead>
                 {activeTab === "Prêt à trier" && <TableHead>Grade / Poids Initial</TableHead>}
                 {activeTab === "En cours de triage" || activeTab === "Trié & Stocké" && <TableHead>Quantités à trier</TableHead>}
+                {activeTab === "En cours de triage" && <TableHead>  Nombre de Sacs</TableHead>}
                 {activeTab === "En cours de triage" && <TableHead>Date Entrée</TableHead>}
                 {activeTab === "Trié & Stocké" && <TableHead>Date Sortie</TableHead>}
                 <TableHead>Statut</TableHead>
@@ -442,9 +441,10 @@ export default function TriageList({ lots, onStartTriage, onLabelDirect, onFinal
                   </TableCell>
 
                   {/* Date Sortie */}
-                  <TableCell className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                  {activeTab === "Trié & Stocké" && <TableCell className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
                     {lot.dateSortie || <span className="text-slate-400">—</span>}
                   </TableCell>
+                  }
 
                   {/* Statut */}
                   <TableCell>

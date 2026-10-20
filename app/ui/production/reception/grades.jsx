@@ -145,15 +145,13 @@ export default function Grades() {
     const activegradedetails = async (id_grade, grade) => {
         setGradedetail(grade)
         setIsFinalizing(true)
+        console.log("id_grade ::::::::::::", grade)
         // Fetch all grades
-        const res = await fetchData("get", `cafe/transfert_sdl_usine/${id_grade}/get_transfert_detail/`, {
-            params: { offset: pointer, limit },
-        });
-        console.log("res ::::::::::::", res)
+
         const fetchedGrades = await fetchData("get", `cafe/grades/get_all_grades/`);
         setFormData((prev) => ({
             ...prev,
-            societe: res.transfer?.sdl?.societe?.nom_societe,
+            societe: "",
             selectedSDLs: [],
             humidite: "",
             rendement: "",

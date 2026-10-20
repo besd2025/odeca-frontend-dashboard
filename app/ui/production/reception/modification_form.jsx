@@ -75,13 +75,15 @@ export default function ModificationForm({ show, onShowChange, detailData }) {
         if (!show || !detailData?.id) return;
 
         async function load() {
+            console.log("detailData ::::::::::::", detailData)
             setFetching(true);
             try {
                 const [detail, grades] = await Promise.all([
                     fetchData("get", `cafe/transfert_sdl_usine/${detailData.id}/`),
                     fetchData("get", `cafe/grades/get_all_grades/`),
                 ]);
-
+                console.log("detail ::::::::::::", detail)
+                console.log("grades ::::::::::::", grades)
                 setFormData({
                     gradeId: detail?.grade?.id ?? "",
                     gradeName: detail?.grade?.grade_name ?? "",

@@ -30,7 +30,7 @@ export default function Edit({ id, item, onSave }) {
     if (item) {
       setSociete(item.societe || "SODEICO SARL");
       setQuantiteWashed(item.quantite_washed || 1250);
-      setQualite(item.qualite || "Qualité A");
+      setQualite(item.qualite);
       setDate(item.date || "2026-07-28");
     }
   }, [item]);
