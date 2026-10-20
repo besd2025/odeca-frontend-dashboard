@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { SquarePen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchData } from "@/app/_utils/api";
-const MOCK_QUALITES = ["Qualité A", "Qualité B", "Fully Washed", "Washed", "Grade 1", "Grade 2"];
+const MOCK_QUALITES = ["PARCHE_WASHED", "IMBUNYA"];
 
 export default function Edit({ id, item, onSave }) {
   const [open, setOpen] = React.useState(false);
