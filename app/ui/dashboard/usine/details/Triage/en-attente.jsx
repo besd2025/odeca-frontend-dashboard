@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle2, Search, MoreHorizontal, Layers } from "lucide-react";
+import { Clock, CheckCircle2, Search, MoreHorizontal, Layers, Pencil } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,9 +21,13 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
 import { fetchData } from "@/app/_utils/api";
@@ -33,6 +37,7 @@ import { TableRowsSkeleton } from '@/components/ui/skeletons';
 export default function EnAttenteTriage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -105,6 +110,10 @@ export default function EnAttenteTriage({ searchQuery = "" }) {
   const handleOpenDetails = (lot) => {
     setSelectedLot(lot);
     setOpen(true);
+  };
+  const handleEditDialog = (lot) => {
+    setSelectedLot(lot);
+    setOpenEdit(true);
   };
   React?.useEffect(() => {
     const handleFetchData = async () => {
@@ -185,7 +194,10 @@ export default function EnAttenteTriage({ searchQuery = "" }) {
                         >
                           Détails
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => handleEditDialog(lot)}
+                        >
                           Modifier
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -345,6 +357,111 @@ export default function EnAttenteTriage({ searchQuery = "" }) {
               </div>
             )}
           </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Modifier Triage en attente */}
+      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold flex items-center gap-2">
+              <Pencil className="h-4 w-4 text-primary" />
+              Modifier le lot en attente de triage
+            </DialogTitle>
+            <DialogDescription>
+              Modifiez les informations de ce lot ci-dessous.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Informations générales */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4 bg-muted/30">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Société / Propriétaire</Label>
+              <Input value={selectedLot?.societe ?? ""} readOnly />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Usine & SDLs</Label>
+              <Input value={selectedLot ? `${selectedLot.usine ?? ""} (${selectedLot.sdls?.join(", ") ?? ""})` : ""} readOnly />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Date Entrée Triage</Label>
+              <Input type="date" defaultValue={selectedLot?.dateEntree ?? ""} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Nombre de Sacs Total</Label>
+              <Input type="number" min="0" step="1" defaultValue={selectedLot?.totalSacs ?? ""} />
+            </div>
+          </div>
+
+          {/* Grades modifiables */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Grades et qualités en entrée</h3>
+              <span className="text-xs text-muted-foreground">{selectedLot?.grades?.length ?? 0} grade(s)</span>
+            </div>
+            <div className="overflow-x-auto rounded-lg border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead>Grade / Qualité</TableHead>
+                    <TableHead className="min-w-[100px] text-right">Sacs</TableHead>
+                    <TableHead className="min-w-[150px] text-right">Poids Net (kg)</TableHead>
+                    <TableHead className="min-w-[160px] text-center">Statut</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {!selectedLot?.grades || selectedLot.grades.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="py-6 text-center text-muted-foreground">
+                        Aucun grade trouvé.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    selectedLot.grades.map((item, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="font-medium">{item.grade}</TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="1"
+                            defaultValue={item.sacs}
+                            className="text-right"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            defaultValue={item.poidsNet}
+                            className="text-right"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Select defaultValue={item.status ?? "En attente"}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Statut" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="En cours de triage">En cours de triage</SelectItem>
+                              <SelectItem value="Prêt à trier">Prêt à trier</SelectItem>
+                              <SelectItem value="Stock direct">Stock direct</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setOpenEdit(false)}>Annuler</Button>
+            <Button>Enregistrer</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

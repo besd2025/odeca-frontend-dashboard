@@ -16,6 +16,8 @@ import { MoreHorizontal } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
@@ -24,6 +26,9 @@ import PaginationContent from '@/components/ui/pagination-content';
 import { fetchData } from '@/app/_utils/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TableRowsSkeleton } from '@/components/ui/skeletons';
+
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 export default function ConfirmedReception() {
     const [loading, setLoading] = React.useState(false);
     const [receptionsConfirmeList, setReceptionsConfirmeList] = useState([]);
@@ -68,6 +73,11 @@ export default function ConfirmedReception() {
         setDetails(lot);
         setOpen(true);
     };
+    const [openEdit, setOpenEdit] = React.useState(false);
+    const handleEditDialog = (lot) => {
+        setDetails(lot);
+        setOpenEdit(true);
+    };
 
 
     const TRIAGE_GRADES = [{ grade: "A1", poidsNet: 1000, status: "CONFIRMEE" }, { grade: "A2", poidsNet: 1000, status: "CONFIRMEE" }];
@@ -83,7 +93,7 @@ export default function ConfirmedReception() {
                         <TableHead>Usine</TableHead>
                         <TableHead>Date Transfert</TableHead>
                         <TableHead>Date Réception</TableHead>
-                        <TableHead className="text-right">Poids Net (kg)</TableHead>
+                        <TableHead className="text-right">Poids Net</TableHead>
                         <TableHead className="text-center">Statut</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -110,7 +120,7 @@ export default function ConfirmedReception() {
                                             <DropdownMenuContent align='start'>
 
                                                 <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenDialog(lot)} >Détails</DropdownMenuItem>
-                                                <DropdownMenuItem className="cursor-pointer" >Modifier</DropdownMenuItem>
+                                                <DropdownMenuItem className="cursor-pointer" onClick={() => handleEditDialog(lot)}>Modifier</DropdownMenuItem>
 
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -140,7 +150,10 @@ export default function ConfirmedReception() {
                                 </TableCell>
                                 <TableCell>{lot.dateTransfert}</TableCell>
                                 <TableCell>{lot.dateReception}</TableCell>
-                                <TableCell className="text-right font-semibold">{lot.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</TableCell>
+                                <TableCell className="text-right font-semibold flex flex-col">
+                                    {lot.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
+                                    <span className='font-normal italic text-xs text-slate-600 dark:text-slate-400'>{lot.poidsNet >= 1000 ? "≈ " + (lot.poidsNet / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " T" : ""}</span>
+                                </TableCell>
                                 <TableCell className="text-center lowercase">
                                     {lot.status === "confirmé" ? (
                                         <div className='gap-2 flex items-center justify-center'>
@@ -259,6 +272,119 @@ export default function ConfirmedReception() {
                             </Table>
                         </div>
                     </DialogHeader>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-semibold">
+                            Modifier les grades réceptionnés
+                        </DialogTitle>
+                        <DialogDescription>
+                            Modifiez les informations des grades ci-dessous.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {/* Informations générales */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4 bg-muted/30">
+                        <div className="space-y-1">
+                            <Label className="text-xs text-muted-foreground">
+                                Société / Propriétaire
+                            </Label>
+                            <Input value={details?.societe ?? ""} readOnly />
+                        </div>
+
+                        <div className="space-y-1">
+                            <Label className="text-xs text-muted-foreground">
+                                Station de lavage
+                            </Label>
+                            <Input value={details?.sdls ?? ""} readOnly />
+                        </div>
+                    </div>
+
+                    {/* Grades modifiables */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-semibold">Liste des grades</h3>
+                            <Badge variant="secondary">{gradesList.length} grades</Badge>
+                        </div>
+
+                        <div className="overflow-x-auto rounded-lg border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="bg-muted/50">
+                                        <TableHead>Grade</TableHead>
+                                        <TableHead className="min-w-[150px] text-right">
+                                            Poids net (kg)
+                                        </TableHead>
+                                        <TableHead className="min-w-[160px] text-center">
+                                            Statut
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+
+                                <TableBody>
+                                    {gradesList.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={3}
+                                                className="py-8 text-center text-muted-foreground"
+                                            >
+                                                Aucun grade trouvé.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        gradesList.map((grade, index) => (
+                                            <TableRow key={grade.id ?? index}>
+                                                <TableCell className="font-medium">
+                                                    {grade.grade}
+                                                </TableCell>
+
+                                                <TableCell>
+                                                    <Input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.01"
+                                                        defaultValue={grade.poidsNet}
+                                                        className="text-right"
+                                                    />
+                                                </TableCell>
+
+                                                <TableCell>
+                                                    <Select defaultValue={grade.status}>
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Choisir le statut" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="CONFIRMEE">
+                                                                Confirmé
+                                                            </SelectItem>
+                                                            <SelectItem value="EN_ATTENTE">
+                                                                En attente
+                                                            </SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </div>
+
+                    <DialogFooter className="gap-2 ">
+                        <Button
+                            variant="outline"
+                            onClick={() => setOpen(false)}
+                        >
+                            Annuler
+                        </Button>
+
+                        <Button>
+                            Enregistrer
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>

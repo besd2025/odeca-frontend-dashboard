@@ -149,7 +149,10 @@ export default function Transferts() {
                                         </span>
 
                                     </div></TableCell>
-                                    <TableCell className="text-right font-semibold">{lot.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}</TableCell>
+                                    <TableCell className="text-right font-semibold flex flex-col">
+                                        {lot.poidsNet.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
+                                        <span className='font-normal italic text-xs text-slate-600 dark:text-slate-400'>≈ {lot.poidsNet ? (lot.poidsNet / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " T" : ""}</span>
+                                    </TableCell>
                                     <TableCell className="text-center lowercase">
                                         {lot.status === "confirmé" ? (
                                             <div className='gap-2 flex items-center justify-center'>

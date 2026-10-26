@@ -10,15 +10,24 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Eye, AlertCircle, Factory, Coffee, FileText } from "lucide-react";
+import { CheckCircle2, Eye, AlertCircle, Factory, Coffee, FileText, MoreHorizontal, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
@@ -29,6 +38,7 @@ import { TableRowsSkeleton } from '@/components/ui/skeletons';
 export default function FinaliseUsinage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -52,6 +62,10 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
   const handleOpenDetails = (lot) => {
     setSelectedLot(lot);
     setOpen(true);
+  };
+  const handleEditDialog = (lot) => {
+    setSelectedLot(lot);
+    setOpenEdit(true);
   };
 
   React?.useEffect(() => {
@@ -146,8 +160,9 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
-                      <div className="text-xs flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-300">
-                        {lot.usinageQuantitiesTotal?.toLocaleString("fr-FR")} kg
+                      <div className="text-xs flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-300 flex-col">
+                        {lot.usinageQuantitiesTotal?.toLocaleString("fr-FR")}
+                        <span className='font-normal italic text-xs text-slate-600 dark:text-slate-400'>{lot.usinageQuantitiesTotal >= 1000 ? "≈ " + (lot.usinageQuantitiesTotal / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " T" : ""}</span>
                       </div>
                     </div>
                   </TableCell>
@@ -164,14 +179,21 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
                     {new Date(lot.dateSortie).toLocaleDateString("fr-FR")}
                   </TableCell>
                   <TableCell className="text-right sticky right-0 bg-background shadow-2xl border-l border-slate-200 dark:border-slate-800">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenDetails(lot)}
-                      className="h-8 text-xs flex items-center gap-1.5 ml-auto bg-sidebar"
-                    >
-                      <Eye className="h-3.5 w-3.5" /> Détails
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer ml-auto flex">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenDetails(lot)}>
+                          Détails
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => handleEditDialog(lot)}>
+                          Modifier
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -284,6 +306,100 @@ export default function FinaliseUsinage({ searchQuery = "" }) {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Modifier Usinage finalisé */}
+      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold flex items-center gap-2">
+              <Pencil className="h-4 w-4 text-primary" />
+              Modifier l'usinage finalisé
+            </DialogTitle>
+            <DialogDescription>
+              Modifiez les informations de cet usinage ci-dessous.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Informations générales */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4 bg-muted/30">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Société / Propriétaire</Label>
+              <Input value={selectedLot?.societe ?? ""} readOnly />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">SDLs d'origine</Label>
+              <Input value={selectedLot?.sdls?.join(", ") ?? ""} readOnly />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Date de Début Usinage</Label>
+              <Input type="date" defaultValue={selectedLot?.dateUsinage ?? ""} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Date de Sortie</Label>
+              <Input type="date" defaultValue={selectedLot?.dateSortie ?? ""} />
+            </div>
+            <div className="space-y-1 col-span-2">
+              <Label className="text-xs text-muted-foreground">Observations / Remarques</Label>
+              <Input defaultValue={selectedLot?.observation ?? ""} />
+            </div>
+          </div>
+
+          {/* Productions modifiables */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5">
+                <Coffee className="h-4 w-4" /> Qualités produites (café vert)
+              </h3>
+              <span className="text-xs text-muted-foreground">{selectedLot?.productions?.length ?? 0} qualité(s)</span>
+            </div>
+            <div className="overflow-x-auto rounded-lg border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead>Qualité / Grade</TableHead>
+                    <TableHead className="min-w-[120px] text-right">Nb Sacs</TableHead>
+                    <TableHead className="min-w-[150px] text-right">Quantité Sortie (kg)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {!selectedLot?.productions || selectedLot.productions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={3} className="py-6 text-center text-muted-foreground">
+                        Aucune production trouvée.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    selectedLot.productions.map((prod, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="font-medium">{prod.nom_qualite}</TableCell>
+                        <TableCell>
+                          <Input
+                            type="number" min="0" step="1"
+                            defaultValue={prod.nombre_sacs}
+                            className="text-right"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number" min="0" step="0.01"
+                            defaultValue={prod.quantite_sortie}
+                            className="text-right"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setOpenEdit(false)}>Annuler</Button>
+            <Button>Enregistrer</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

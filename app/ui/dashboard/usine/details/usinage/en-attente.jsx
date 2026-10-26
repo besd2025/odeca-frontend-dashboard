@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle2, Factory, MoreHorizontal, Settings } from "lucide-react";
+import { Clock, CheckCircle2, Factory, MoreHorizontal, Settings, Pencil } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,9 +21,13 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import PaginationContent from "@/components/ui/pagination-content";
 import { useSearchParams } from "next/navigation";
@@ -31,6 +35,7 @@ import { fetchData } from '@/app/_utils/api';
 export default function EnAttenteUsinage({ searchQuery = "" }) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const [selectedLot, setSelectedLot] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
   const [pointer, setPointer] = useState(0);
@@ -109,6 +114,10 @@ export default function EnAttenteUsinage({ searchQuery = "" }) {
     setSelectedLot(lot);
     setOpen(true);
   };
+  const handleEditDialog = (lot) => {
+    setSelectedLot(lot);
+    setOpenEdit(true);
+  };
   React?.useEffect(() => {
     const handleFetchData = async () => {
       //setLoading(true);
@@ -184,7 +193,10 @@ export default function EnAttenteUsinage({ searchQuery = "" }) {
                         >
                           Détails
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => handleEditDialog(lot)}
+                        >
                           Modifier
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -338,6 +350,101 @@ export default function EnAttenteUsinage({ searchQuery = "" }) {
               </div>
             )}
           </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Modifier Usinage en attente */}
+      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold flex items-center gap-2">
+              <Pencil className="h-4 w-4 text-primary" />
+              Modifier l'usinage en attente
+            </DialogTitle>
+            <DialogDescription>
+              Modifiez les informations de cet usinage ci-dessous.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Informations générales */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4 bg-muted/30">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Société / Propriétaire</Label>
+              <Input value={selectedLot?.societe ?? ""} readOnly />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Usine & SDLs</Label>
+              <Input value={selectedLot ? `${selectedLot.usine ?? ""} (${selectedLot.sdls?.join(", ") ?? ""})` : ""} readOnly />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Date Transfert</Label>
+              <Input type="date" defaultValue={selectedLot?.dateTransfert ?? ""} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Date Usinage prévue</Label>
+              <Input type="date" defaultValue={selectedLot?.dateUsinage ?? ""} />
+            </div>
+          </div>
+
+          {/* Intrants modifiables */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Intrants de déparchage</h3>
+              <span className="text-xs text-muted-foreground">{selectedLot?.intrants?.length ?? 0} intrant(s)</span>
+            </div>
+            <div className="overflow-x-auto rounded-lg border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead>Grade / Qualité</TableHead>
+                    <TableHead className="min-w-[150px] text-right">Poids Net (kg)</TableHead>
+                    <TableHead className="min-w-[160px] text-center">Statut</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {!selectedLot?.intrants || selectedLot.intrants.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={3} className="py-6 text-center text-muted-foreground">
+                        Aucun intrant trouvé.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    selectedLot.intrants.map((item, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="font-medium">{item.grade}</TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            defaultValue={item.poidsNet}
+                            className="text-right"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Select defaultValue={item.status}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Choisir le statut" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Traité">Traité</SelectItem>
+                              <SelectItem value="En cours">En cours</SelectItem>
+                              <SelectItem value="En attente">En attente</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setOpenEdit(false)}>Annuler</Button>
+            <Button>Enregistrer</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
