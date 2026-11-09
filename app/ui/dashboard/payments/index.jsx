@@ -28,12 +28,14 @@ import ComingSoonOverlay from "../../components/coming-soon-overlay";
 
 const recentFiles = [
   {
+    id: 1,
     name: "1ere Tranchee collecte 2026",
     date: "02/04/2026",
     intervalle: "01 Mars - 30 Avril 2026",
     icon: FileText,
   },
   {
+    id: 2,
     name: "2eme Tranche collecte 2026",
     date: "03/08/2026",
     intervalle: "01 Mai - 02 Aout 2026",
@@ -44,12 +46,14 @@ const recentFiles = [
 
 const Listes = [
   {
+    id: 1,
     name: "1ere tranche collecte 2024",
     nbre_cafeiculteurs: "7844",
     intervalle: "01 Jan - 31 Mar 2024",
     date: "Apr 14, 2024",
   },
   {
+    id: 2,
     name: "1ere tranche collecte 2024",
     nbre_cafeiculteurs: "7844",
     intervalle: "01 Jan - 31 Mar 2024",
@@ -64,8 +68,9 @@ const Listes = [
 ];
 
 export default function PaymentsPage() {
-  const [searchQuery, setSearchQuery] = useState("");
+
   const [isStoragePanelOpen, setIsStoragePanelOpen] = useState(false);
+  const [etatPayement, setEtatPayement] = useState(1);
 
   return (
     <div className="bg-sidebar flex rounded-lg relative">
@@ -141,7 +146,7 @@ export default function PaymentsPage() {
                         <div className="text-muted-foreground text-xs flex flex-row items-center justify-between">
 
                           <span className="block">Exportee le : {file.date}</span>
-                          <Link href="/odeca-dashboard/payments/tranche">
+                          <Link href={`/odeca-dashboard/payments/tranche?id=${file.id}`}>
                             <Button variant="secondary" className=" p-0 m-0 mr-1 ">
                               <Eye />
                               Consulter

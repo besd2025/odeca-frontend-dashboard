@@ -78,11 +78,12 @@ export default function Ventes({ cult_id }) {
             body: {},
           },
         );
+        console.log("data: ", valuesdata.results)
         const AchatsData = valuesdata?.results?.map((item) => ({
           id: item?.id,
           date: item?.date_achat,
           sdl_ct_type: "SDL",
-          societe: item?.responsable?.sdl_ct?.sdl?.societe?.nom_societe,
+          societe: item?.responsable?.sdl_ct?.sdl?.societe?.nom_societe || item?.responsable?.sdl_ct?.ct?.sdl?.societe?.nom_societe,
           sdl_ct: item?.responsable?.sdl_ct?.sdl?.sdl_nom
             ? "SDL " + item.responsable.sdl_ct.sdl.sdl_nom
             : "CT " + item?.responsable?.sdl_ct?.ct?.ct_nom,

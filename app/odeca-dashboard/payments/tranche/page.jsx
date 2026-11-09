@@ -1,6 +1,7 @@
 import TrancheDetails from '@/app/ui/dashboard/payments/tranche'
 import ProtectedRoute from "@/app/ui/protection/ProtectedRoute";
 import { ROLES } from "@/lib/permissions";
+export const dynamic = "force-dynamic";
 export default function TranchePage() {
     return (
         <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.GENERAL, ROLES.ODECA, ROLES.SOCIETE, ROLES.SUPERVISEUR]}>

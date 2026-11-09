@@ -54,7 +54,7 @@ const RHData = [
   },
 ];
 
-export default function Paid() {
+export default function Paid({ id }) {
   const [data, setData] = React.useState([]);
   const [totalCount, setTotalCount] = React.useState(0);
   const [searchValue, setSearchValue] = React.useState("");
@@ -63,6 +63,9 @@ export default function Paid() {
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [loadingEportBtn, setLoadingEportBtn] = React.useState(false);
+  const [exportBlob, setExportBlob] = React.useState(null);
+  const [activedownloadBtn, setActivedownloadBtn] = React.useState(false);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
@@ -77,42 +80,54 @@ export default function Paid() {
     }, 500);
     return () => clearTimeout(handler);
   }, [searchValue]);
-
   const fetchDatas = React.useCallback(async () => {
+    let response = [];
+    console.log("this is the id of the tranche", id);
     try {
-      const response = await fetchData("get", `cafe/cafe_payments`, {
-        params: {
-          is_paid: "True",
-          search: debouncedSearch,
-          limit: pagination.pageSize,
-          offset: pagination.pageIndex * pagination.pageSize,
-          ...filterData
-        }
-      });
+      if (!id) {
+        return;
+      }
+      else if (id == 1) {
+
+        response = await fetchData("get", `cafe/paids/?paiement_period=PREMIERE_PAIEMENT`, {
+          params: {
+            search: debouncedSearch,
+            limit: pagination.pageSize,
+            offset: pagination.pageIndex * pagination.pageSize,
+            ...filterData
+          }
+        });
+      }
+      else if (id == 2) {
+        response = await fetchData("get", `cafe/cafe_payments`, {
+          params: {
+            id: id,
+            is_paid: "True",
+            search: debouncedSearch,
+            limit: pagination.pageSize,
+            offset: pagination.pageIndex * pagination.pageSize,
+            ...filterData
+          }
+        });
+      }
+      console.log("this is the response", response);
       const mappedData = response?.results?.map((item) => {
-        const culti = item?.achat?.cafeiculteur;
-        const isPersonne = culti?.cultivator_entity_type === "personne";
         return {
           id: item.id,
           cultivator: {
-            cultivator_code: culti?.cultivator_code,
-            first_name: isPersonne
-              ? culti?.cultivator_first_name || culti?.first_name
-              : culti?.cultivator_assoc_name,
-            last_name: isPersonne
-              ? culti?.cultivator_last_name
-              : (culti?.cultivator_assoc_rep_name ? `(Rep: ${culti.cultivator_assoc_rep_name})` : ""),
-            image_url: culti?.cultivator_photo || "/images/logo_1.jpg",
-            nom_banque: culti?.cultivator_bank_name,
-            Numero_compte: culti?.cultivator_bank_account,
+            cultivator_code: item?.cafeiculteur_code,
+            first_name: item?.nom_cafeiculteur,
+            image_url: item?.image_url || "/images/logo_1.jpg",
+            nom_banque: item?.bank,
+            Numero_compte: item?.account_number,
           },
-          cni: isPersonne ? culti?.cultivator_cni : culti?.cultivator_assoc_nif,
+          cni: item?.cni,
           ca: item?.achat?.quantite_cerise_a,
           ca_price: (item?.achat?.quantite_cerise_a || 0) * 2800,
           cb: item?.achat?.quantite_cerise_b,
           cb_price: (item?.achat?.quantite_cerise_b || 0) * 1400,
           qte_total: (item?.achat?.quantite_cerise_a || 0) + (item?.achat?.quantite_cerise_b || 0),
-          total_price: (item?.achat?.quantite_cerise_a || 0) * 2800 + (item?.achat?.quantite_cerise_b || 0) * 1400,
+          total_price: item?.montant,
         };
       });
       setData(mappedData);
@@ -129,7 +144,80 @@ export default function Paid() {
 
   React.useEffect(() => {
     fetchDatas();
-  }, [fetchDatas]);
+  }, [fetchDatas, id]);
+
+  const handleExportSDLs = async () => {
+    setLoadingEportBtn(true);
+    try {
+      const initResponse = await fetchData("get", `cafe/paids/?paiement_period=PREMIERE_PAIEMENT`, {
+        params: { limit: 1 },
+      });
+      const total = initResponse?.count || 0;
+      if (total === 0) {
+        setLoadingEportBtn(false);
+        return;
+      }
+
+      const response = await fetchData("get", `cafe/paids/?paiement_period=PREMIERE_PAIEMENT`, {
+        params: { limit: total },
+      });
+
+      const allData = response.results || [];
+      const formattedData = allData.map((item) => {
+        const row = {
+          "Société": item?.responsable?.sdl_ct?.sdl?.societe?.nom_societe || "",
+          "Code Caféiculteur": item?.cafeiculteur_code || "",
+          "Nom du caféiculteur / Association ": item.nom_cafeiculteur || "",
+          "Nom banque": item?.bank || "",
+          "Compte Bancaire": item?.account_number || "",
+          "Ouvert A": item?.ouvert_a || "",
+          "Propriétaire Compte": item?.proprietaire || "",
+          "CNI": item?.cni || "",
+          "montant_apres_avance": item?.montant || "",
+
+        }
+        if (item?.responsable?.sdl_ct?.sdl?.sdl_nom) {
+          row.Nom_SDL_CT = item?.responsable?.sdl_ct?.sdl?.sdl_nom || "";
+        }
+        else if (item?.responsable?.sdl_ct?.ct_nom) {
+          row.Nom_SDL_CT = item?.responsable?.sdl_ct?.ct_nom || "";
+        }
+        return row;
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "SDL");
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      });
+
+      setExportBlob(blob);
+      setActivedownloadBtn(true);
+    } catch (error) {
+      console.error("Erreur exportation Excel :", error);
+    } finally {
+      setLoadingEportBtn(false);
+    }
+  };
+
+  const DownloadSDLsToExcel = () => {
+    if (!exportBlob) return;
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const time = `${hours}_${minutes}_${seconds}`;
+    saveAs(exportBlob, `liste_sdls_et_les_responsables_${date}_${time}.xlsx`);
+    setActivedownloadBtn(false);
+    setExportBlob(null);
+  };
+
   const columns = [
     {
       id: "actions",
@@ -199,10 +287,10 @@ export default function Paid() {
         const cultivators = row.original.cultivator;
         return (
           <div className="flex items-center gap-3">
-            <ViewImageDialog
+            {/* <ViewImageDialog
               imageUrl={cultivators.image_url}
               alt={`${cultivators.last_name} ${cultivators.first_name}`}
-            />
+            /> */}
             <div>
               <span className="block text-gray-800 text-theme-sm dark:text-white/90 font-bold">
                 {cultivators.last_name} {cultivators.first_name}
@@ -236,47 +324,47 @@ export default function Paid() {
         <div className="text-center font-semibold">{row.original.cultivator.Numero_compte}</div>
       ),
     },
-    {
-      accessorKey: "ca",
-      header: "CA",
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">{row.getValue("ca")} Kg</div>
-      ),
-    },
-    {
-      accessorKey: "ca_price",
-      header: "Prix CA",
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">
-          {row.getValue("ca_price")} Fbu
-        </div>
-      ),
-    },
-    {
-      accessorKey: "cb",
-      header: "CB",
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">{row.getValue("cb")} Kg</div>
-      ),
-    },
-    {
-      accessorKey: "cb_price",
-      header: "Prix CB",
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">
-          {row.getValue("cb_price")} Fbu
-        </div>
-      ),
-    },
-    {
-      accessorKey: "qte_total",
-      header: "Qte TOTAL",
-      cell: ({ row }) => (
-        <div className="text-center font-semibold">
-          {row.getValue("qte_total")} Kg
-        </div>
-      ),
-    },
+    // {
+    //   accessorKey: "ca",
+    //   header: "CA",
+    //   cell: ({ row }) => (
+    //     <div className="text-center font-semibold">{row.getValue("ca")} Kg</div>
+    //   ),
+    // },
+    // {
+    //   accessorKey: "ca_price",
+    //   header: "Prix CA",
+    //   cell: ({ row }) => (
+    //     <div className="text-center font-semibold">
+    //       {row.getValue("ca_price")} Fbu
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   accessorKey: "cb",
+    //   header: "CB",
+    //   cell: ({ row }) => (
+    //     <div className="text-center font-semibold">{row.getValue("cb")} Kg</div>
+    //   ),
+    // },
+    // {
+    //   accessorKey: "cb_price",
+    //   header: "Prix CB",
+    //   cell: ({ row }) => (
+    //     <div className="text-center font-semibold">
+    //       {row.getValue("cb_price")} Fbu
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   accessorKey: "qte_total",
+    //   header: "Qte TOTAL",
+    //   cell: ({ row }) => (
+    //     <div className="text-center font-semibold">
+    //       {row.getValue("qte_total")} Kg
+    //     </div>
+    //   ),
+    // },
     {
       accessorKey: "total_price",
       header: "Prix TOTAL",

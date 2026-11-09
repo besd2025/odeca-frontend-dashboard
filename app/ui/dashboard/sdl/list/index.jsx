@@ -156,7 +156,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
     setLoadingEportBtn(true);
     try {
       const initResponse = await fetchData("get", `cafe/stationslavage/`, {
-        params: { limit: 1, for_washed: true },
+        params: { limit: 1 },
       });
       console.log(initResponse);
       const total = initResponse?.count || 0;
@@ -166,7 +166,7 @@ export default function SdlsListTable({ isLoading: externalLoading }) {
       }
 
       const response = await fetchData("get", `cafe/stationslavage/`, {
-        params: { limit: total, for_washed: true },
+        params: { limit: total },
       });
 
       const allData = response.results || [];

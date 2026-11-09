@@ -11,8 +11,10 @@ import Validate from './validate';
 import Rejected from './rejected';
 import Paid from './paid';
 import Irregulars from './irregulars';
-
+import { useSearchParams } from 'next/navigation';
 export default function TrancheDetails() {
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
     return (
         <div className="bg-sidebar p-4 rounded-lg">
             <h1 className='text-xl font-bold text-foreground mb-4'>1ere Tranche du 01 Avr - 30 Jun 2026</h1>
@@ -56,19 +58,19 @@ export default function TrancheDetails() {
                 </div>
 
                 <TabsContent value="en_attente" className="mt-0">
-                    <EnAttente />
+                    <EnAttente id={id} />
                 </TabsContent>
                 <TabsContent value="valide" className="mt-0">
-                    <Validate />
+                    <Validate id={id} />
                 </TabsContent>
                 <TabsContent value="rejette" className="mt-0">
-                    <Rejected />
+                    <Rejected id={id} />
                 </TabsContent>
                 <TabsContent value="paye" className="mt-0">
-                    <Paid />
+                    <Paid id={id} />
                 </TabsContent>
                 <TabsContent value="irregularites" className="mt-0">
-                    <Irregulars />
+                    <Irregulars id={id} />
                 </TabsContent>
             </Tabs>
         </div>
